@@ -1069,6 +1069,16 @@
 	)
 	(wire
 		(pts
+			(xy 77.47 45.72) (xy 80.01 45.72)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1ef03985-b3e6-44f6-a598-d1aa272f3d02")
+	)
+	(wire
+		(pts
 			(xy 100.33 67.31) (xy 104.14 67.31)
 		)
 		(stroke
@@ -1146,6 +1156,16 @@
 			(type default)
 		)
 		(uuid "f268d6db-5bcc-4aae-bc96-77535fbaed01")
+	)
+	(label "3V3"
+		(at 77.47 45.72 0)
+		(effects
+			(font
+				(size 0.508 0.508)
+			)
+			(justify left bottom)
+		)
+		(uuid "3491f135-8971-4c70-b190-4f7a472f6d8f")
 	)
 	(label "3V3"
 		(at 101.6 67.31 0)
@@ -1682,7 +1702,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinSocket_1.00mm:PinSocket_1x06_P1.00mm_Vertical"
 			(at 66.04 52.07 0)
 			(effects
 				(font
