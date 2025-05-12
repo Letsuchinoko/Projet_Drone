@@ -729,7 +729,7 @@
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property "Reference" "U"
+			(property "Reference" "GPS"
 				(at 0 0 0)
 				(effects
 					(font
@@ -1109,6 +1109,16 @@
 	)
 	(wire
 		(pts
+			(xy 100.33 62.23) (xy 104.14 62.23)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "706673b4-0228-47cf-b40a-bc1b77df7f1c")
+	)
+	(wire
+		(pts
 			(xy 85.09 54.61) (xy 88.9 54.61)
 		)
 		(stroke
@@ -1136,6 +1146,16 @@
 			(type default)
 		)
 		(uuid "d822dc77-80d1-4696-b312-73c5e2370f08")
+	)
+	(wire
+		(pts
+			(xy 77.47 46.99) (xy 80.01 46.99)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e3f7c283-98ab-412c-98fa-2f5fa1c55abb")
 	)
 	(wire
 		(pts
@@ -1176,6 +1196,26 @@
 			(justify left bottom)
 		)
 		(uuid "5a165e71-8710-4247-94c4-4318b39924e8")
+	)
+	(label "Output"
+		(at 101.6 62.23 0)
+		(effects
+			(font
+				(size 0.508 0.508)
+			)
+			(justify left bottom)
+		)
+		(uuid "6183c5ce-9a19-477b-94e4-997f3b07e4f9")
+	)
+	(label "Output"
+		(at 77.47 46.99 0)
+		(effects
+			(font
+				(size 0.508 0.508)
+			)
+			(justify left bottom)
+		)
+		(uuid "6c596efa-ae64-4cc3-88c4-150fdcef819d")
 	)
 	(label "3V3"
 		(at 72.39 60.96 0)
@@ -1684,7 +1724,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "b5101f71-9498-4630-9f8f-0fe13ac1204b")
-		(property "Reference" "U2"
+		(property "Reference" "GPS1"
 			(at 55.88 57.1499 0)
 			(effects
 				(font
@@ -1750,7 +1790,7 @@
 		(instances
 			(project ""
 				(path "/8b2e4a81-52b6-4667-8a39-1aa7e9632131"
-					(reference "U2")
+					(reference "GPS1")
 					(unit 1)
 				)
 			)
