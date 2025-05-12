@@ -1396,7 +1396,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Librairie_Drone:MODULE_NUCLEO-F303K8"
 			(at 97.79 46.99 0)
 			(effects
 				(font
