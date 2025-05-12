@@ -10,7 +10,7 @@
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "U"
-				(at 0 0 0)
+				(at 0 -0.508 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -127,7 +127,7 @@
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "BLU"
-				(at 0 0 0)
+				(at 0 -0.508 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -901,7 +901,7 @@
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "GPS"
-				(at 0 0 0)
+				(at -0.254 -0.508 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -1727,10 +1727,9 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "2aed6236-adf1-4353-89ce-ce4a3a2286da")
 		(property "Reference" "U3"
-			(at 71.755 39.37 0)
+			(at 69.85 42.418 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1798,10 +1797,9 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "52c77b43-7915-4a07-8df1-a1952a104b62")
 		(property "Reference" "BLU1"
-			(at 118.11 44.4499 0)
+			(at 110.998 39.878 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1946,10 +1944,9 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "a291497b-c2e7-4bab-b8b2-f22b52b44c24")
 		(property "Reference" "U1"
-			(at 94.615 45.72 0)
+			(at 93.726 48.768 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2233,7 +2230,7 @@
 		(dnp no)
 		(uuid "b5101f71-9498-4630-9f8f-0fe13ac1204b")
 		(property "Reference" "GPS1"
-			(at 55.88 57.1499 0)
+			(at 65.024 52.578 0)
 			(effects
 				(font
 					(size 1.27 1.27)
