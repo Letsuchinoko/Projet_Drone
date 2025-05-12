@@ -1606,6 +1606,239 @@
 		(layer "Edge.Cuts")
 		(uuid "0f8f7d71-146c-49db-8b6d-b87085a4c53d")
 	)
+	(gr_text "TXG"
+		(at 203.2 63.4 0)
+		(layer "F.SilkS")
+		(uuid "03ae819b-972e-429d-a583-19c57b8c7ae0")
+		(effects
+			(font
+				(size 0.5 0.5)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "3V3"
+		(at 198.8 94 0)
+		(layer "F.SilkS")
+		(uuid "17cd9004-0005-4eff-adf8-48416201457b")
+		(effects
+			(font
+				(size 0.5 0.5)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "TXB"
+		(at 198.83 96.34 0)
+		(layer "F.SilkS")
+		(uuid "2cecf106-86a6-47d3-af2f-53bfa4b40fcf")
+		(effects
+			(font
+				(size 0.5 0.5)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "Output"
+		(at 229 83.735 0)
+		(layer "F.SilkS")
+		(uuid "2d585ce1-5d89-4441-bd83-ef84aca46e75")
+		(effects
+			(font
+				(size 0.5 0.5)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "RXG"
+		(at 203 61.6 0)
+		(layer "F.SilkS")
+		(uuid "2eb2507f-fbaf-422f-9502-206a2b8c1105")
+		(effects
+			(font
+				(size 0.5 0.5)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "GND"
+		(at 202.8 68.6 0)
+		(layer "F.SilkS")
+		(uuid "468669b9-fb93-4ec0-bbf2-25c1ed30ef63")
+		(effects
+			(font
+				(size 0.5 0.5)
+				(thickness 0.125)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "RXB"
+		(at 198.8 97.8 0)
+		(layer "F.SilkS")
+		(uuid "4a715042-d498-450c-ad80-ca3bea2ed14d")
+		(effects
+			(font
+				(size 0.5 0.5)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "GND"
+		(at 198.8 77.2 0)
+		(layer "F.SilkS")
+		(uuid "4bd3c5d9-7d15-456e-ad8b-877762b81f8e")
+		(effects
+			(font
+				(size 0.5 0.5)
+				(thickness 0.125)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "3V3"
+		(at 230.2 82 0)
+		(layer "F.SilkS")
+		(uuid "4cf52113-d965-4626-b089-c04d9654260e")
+		(effects
+			(font
+				(size 0.5 0.5)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "TXG"
+		(at 198.8 74.8 0)
+		(layer "F.SilkS")
+		(uuid "5e08c570-00d6-488d-ab1d-96648e77dcda")
+		(effects
+			(font
+				(size 0.5 0.5)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "RXG"
+		(at 198.8 73.4 0)
+		(layer "F.SilkS")
+		(uuid "64985c67-8240-4cec-b1ca-9774163829fc")
+		(effects
+			(font
+				(size 0.5 0.5)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "GND"
+		(at 198.8 95 0)
+		(layer "F.SilkS")
+		(uuid "7922ed7a-de36-4cde-b90b-338d8740be04")
+		(effects
+			(font
+				(size 0.5 0.5)
+				(thickness 0.125)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "Output"
+		(at 223.2 83.4 0)
+		(layer "F.SilkS")
+		(uuid "819dfd1a-97a8-433b-8fef-a88b6e8bc434")
+		(effects
+			(font
+				(size 0.5 0.5)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "GND"
+		(at 230 80.8 0)
+		(layer "F.SilkS")
+		(uuid "94bb62d4-97fd-4570-b716-22b3eb032197")
+		(effects
+			(font
+				(size 0.5 0.5)
+				(thickness 0.125)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "3V3"
+		(at 198.8 78.6 0)
+		(layer "F.SilkS")
+		(uuid "9b4d3fa5-c2a2-417a-b504-fd0b7eed0a16")
+		(effects
+			(font
+				(size 0.5 0.5)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "3V3"
+		(at 223.2 93.8 0)
+		(layer "F.SilkS")
+		(uuid "a25c55cf-e7c0-4955-b80a-4efd3f9f1ba5")
+		(effects
+			(font
+				(size 0.5 0.5)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "RXB"
+		(at 203 78.6 0)
+		(layer "F.SilkS")
+		(uuid "b769edb2-c29e-4d0d-a0f6-b90ceb77d77e")
+		(effects
+			(font
+				(size 0.5 0.5)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "TXB"
+		(at 203.2 76.4 0)
+		(layer "F.SilkS")
+		(uuid "e403209a-9efa-4468-8e61-739ede4a1734")
+		(effects
+			(font
+				(size 0.5 0.5)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "GND"
+		(at 223.2 63.2 0)
+		(layer "F.SilkS")
+		(uuid "ff7c49b8-aaa4-4407-a120-a048ad6f174e")
+		(effects
+			(font
+				(size 0.5 0.5)
+				(thickness 0.125)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+	)
 	(segment
 		(start 198.301 94.239)
 		(end 198.301 77.881)
