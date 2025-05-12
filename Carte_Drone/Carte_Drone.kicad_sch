@@ -122,6 +122,177 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "Librairie_Drone:HC-05"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "BLU"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "HC-05_1_1"
+				(rectangle
+					(start -1.27 -1.27)
+					(end 7.62 -10.16)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type color)
+						(color 255 255 141 1)
+					)
+				)
+				(pin input line
+					(at -3.81 -2.54 0)
+					(length 2.54)
+					(name "Key"
+						(effects
+							(font
+								(size 0.508 0.508)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 0.508 0.508)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -3.81 -3.81 0)
+					(length 2.54)
+					(name "VCC"
+						(effects
+							(font
+								(size 0.508 0.508)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 0.508 0.508)
+							)
+						)
+					)
+				)
+				(pin power_out line
+					(at -3.81 -5.08 0)
+					(length 2.54)
+					(name "GND"
+						(effects
+							(font
+								(size 0.508 0.508)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 0.508 0.508)
+							)
+						)
+					)
+				)
+				(pin output line
+					(at -3.81 -6.35 0)
+					(length 2.54)
+					(name "TXD"
+						(effects
+							(font
+								(size 0.508 0.508)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 0.508 0.508)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -3.81 -7.62 0)
+					(length 2.54)
+					(name "RXD"
+						(effects
+							(font
+								(size 0.508 0.508)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 0.508 0.508)
+							)
+						)
+					)
+				)
+				(pin output line
+					(at -3.81 -8.89 0)
+					(length 2.54)
+					(name "STATUS"
+						(effects
+							(font
+								(size 0.508 0.508)
+							)
+						)
+					)
+					(number "6"
+						(effects
+							(font
+								(size 0.508 0.508)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "Librairie_Drone:NUCLEO32-F303K8"
 			(exclude_from_sim no)
 			(in_bom yes)
@@ -1069,6 +1240,16 @@
 	)
 	(wire
 		(pts
+			(xy 102.87 45.72) (xy 102.87 44.45)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0e96c221-d2e8-4322-abc7-31d6ec45c430")
+	)
+	(wire
+		(pts
 			(xy 77.47 45.72) (xy 80.01 45.72)
 		)
 		(stroke
@@ -1096,6 +1277,16 @@
 			(type default)
 		)
 		(uuid "456d9dc8-9d1f-43ba-96eb-d49adaabd028")
+	)
+	(wire
+		(pts
+			(xy 102.87 44.45) (xy 105.41 44.45)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "45d6556a-8e9c-4c92-838c-c6d4f0f02c92")
 	)
 	(wire
 		(pts
@@ -1149,6 +1340,16 @@
 	)
 	(wire
 		(pts
+			(xy 102.87 43.18) (xy 105.41 43.18)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d8a3f055-6e45-4738-b241-67fb28431557")
+	)
+	(wire
+		(pts
 			(xy 77.47 46.99) (xy 80.01 46.99)
 		)
 		(stroke
@@ -1176,6 +1377,16 @@
 			(type default)
 		)
 		(uuid "f268d6db-5bcc-4aae-bc96-77535fbaed01")
+	)
+	(label "3V3"
+		(at 104.14 43.18 0)
+		(effects
+			(font
+				(size 0.508 0.508)
+			)
+			(justify left bottom)
+		)
+		(uuid "1a227068-e9c9-4230-a550-d7d7cfb29272")
 	)
 	(label "3V3"
 		(at 77.47 45.72 0)
@@ -1294,6 +1505,71 @@
 		)
 	)
 	(symbol
+		(lib_id "power:Earth")
+		(at 102.87 45.72 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "113d2705-eb8b-4900-b6de-a2cca62a9b4d")
+		(property "Reference" "#PWR05"
+			(at 102.87 52.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "Earth"
+			(at 102.87 49.53 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 102.87 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 102.87 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"Earth\""
+			(at 102.87 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "d0fe2785-0c22-46cf-a976-5a16732b2738")
+		)
+		(instances
+			(project "Carte_Drone"
+				(path "/8b2e4a81-52b6-4667-8a39-1aa7e9632131"
+					(reference "#PWR05")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Librairie_Drone:Analog_Sound_Sensor")
 		(at 69.85 41.91 0)
 		(unit 1)
@@ -1359,6 +1635,88 @@
 			(project ""
 				(path "/8b2e4a81-52b6-4667-8a39-1aa7e9632131"
 					(reference "U3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Librairie_Drone:HC-05")
+		(at 109.22 39.37 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "52c77b43-7915-4a07-8df1-a1952a104b62")
+		(property "Reference" "BLU1"
+			(at 118.11 44.4499 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "~"
+			(at 118.11 46.355 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Connector_PinSocket_1.27mm:PinSocket_1x06_P1.27mm_Vertical"
+			(at 109.22 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 109.22 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 109.22 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "39dafd96-ad3b-43e5-89a7-336c1f7a154e")
+		)
+		(pin "5"
+			(uuid "1cbb52ab-d305-4371-a55a-c9ed0c92490c")
+		)
+		(pin "6"
+			(uuid "6cc152cc-7de8-4ca4-ad4c-95b74c78a8e8")
+		)
+		(pin "2"
+			(uuid "ba98eb40-e69f-40f5-94af-7fdcd267329d")
+		)
+		(pin "4"
+			(uuid "7352e82b-5885-493e-ba4f-f459404cf513")
+		)
+		(pin "3"
+			(uuid "6ea35333-2fa6-4ed9-9526-e7a02a03a514")
+		)
+		(instances
+			(project ""
+				(path "/8b2e4a81-52b6-4667-8a39-1aa7e9632131"
+					(reference "BLU1")
 					(unit 1)
 				)
 			)
