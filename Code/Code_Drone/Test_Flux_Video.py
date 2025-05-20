@@ -1,74 +1,78 @@
 import os
-import glob
-import cv2
 import time
+import cv2
 from pyparrot.Bebop import Bebop
 from pyparrot.DroneVision import DroneVision
 
 # === CONFIGURATION ===
 IMAGES_DIR = "C:/Users/Baptiste/anaconda3/Lib/site-packages/pyparrot/images"
-MAX_IMAGES = 15
-DISPLAY_INTERVAL = 1 / 5  # 5 FPS
-last_display_time = 0
+MAX_CAPTURE = 2
+captured_files = []
+capture_done = False
 
-def afficher_image(_):
-    global last_display_time
+# === CALLBACK de capture ===
+def capture_images(_):
+    global captured_files, capture_done
 
-    now = time.time()
-    if now - last_display_time < DISPLAY_INTERVAL:
-        return
+    fichiers = sorted(
+        [f for f in os.listdir(IMAGES_DIR) if f.endswith(".png")],
+        key=lambda x: os.path.getmtime(os.path.join(IMAGES_DIR, x))
+    )
 
-    last_display_time = now
+    if len(fichiers) > 0:
+        last_image = fichiers[-1]
+        full_path = os.path.join(IMAGES_DIR, last_image)
+        if full_path not in captured_files:
+            captured_files.append(full_path)
+            print(f"📸 Capturée : {last_image}")
 
-    try:
-        fichiers = sorted(
-            glob.glob(os.path.join(IMAGES_DIR, "image_*.png")),
-            key=os.path.getmtime
-        )
+    if len(captured_files) >= MAX_CAPTURE and not capture_done:
+        capture_done = True
+        print("✅ 2 images capturées. Fermeture du flux.")
+        bebopVision.close_video()
+        bebop.disconnect()
 
-        # Supprimer seulement les plus anciens (hors des 5 derniers)
-        if len(fichiers) > MAX_IMAGES:
-            for f in fichiers[:-5]:  # ← garde un petit historique
-                try:
-                    os.remove(f)
-                except:
-                    pass  # on ignore proprement
-
-        if fichiers:
-            derniere = fichiers[-1]
-            frame = cv2.imread(derniere)
-
-            if frame is not None:
-                cv2.imshow("🖼️ Flux Bebop2 (5 FPS)", frame)
-                cv2.waitKey(1)
-
-    except:
-        pass  # on ignore toute erreur d’affichage sans log
-
-# === CONNEXION DRONE & VISION ===
+# === Connexion au drone ===
 bebop = Bebop()
 bebop.drone_ip = "192.168.42.1"
 
 print("Connexion au drone...")
 if bebop.connect(10):
-    print("✅ Connecté au drone.")
+    print("✅ Connecté.")
+    bebopVision = DroneVision(bebop, is_bebop=True)
+    bebopVision.set_user_callback_function(capture_images)
 
-    vision = DroneVision(bebop, is_bebop=True)
-    vision.set_user_callback_function(afficher_image)
-
-    if vision.open_video():
-        print("🎥 Flux vidéo actif. Ctrl+C pour quitter.")
-        try:
-            while True:
-                time.sleep(1)
-        except KeyboardInterrupt:
-            print("⏹ Arrêt manuel.")
-        finally:
-            vision.close_video()
-            bebop.disconnect()
-            cv2.destroyAllWindows()
+    if bebopVision.open_video():
+        print("🎥 Capture en cours (2 images)...")
+        while not capture_done:
+            time.sleep(1)
     else:
-        print("❌ Impossible d'ouvrir le flux vidéo.")
+        print("❌ Erreur ouverture flux vidéo.")
         bebop.disconnect()
+        exit()
 else:
-    print("❌ Connexion échouée.")
+    print("❌ Erreur connexion drone.")
+    exit()
+
+# === AFFICHAGE DES 2 IMAGES CAPTURÉES ===
+print("🖼️ Chargement des images...")
+frames = []
+for f in captured_files:
+    img = cv2.imread(f)
+    if img is not None:
+        frames.append(img)
+
+if len(frames) < 2:
+    print("❌ Moins de 2 images lisibles. Abandon.")
+    exit()
+
+print("▶️ Affichage alterné. Appuyez sur 'q' pour quitter.")
+
+i = 0
+while True:
+    cv2.imshow("Flux Alterné (Test)", frames[i % 2])
+    if cv2.waitKey(500) & 0xFF == ord('q'):
+        break
+    i += 1
+
+cv2.destroyAllWindows()
