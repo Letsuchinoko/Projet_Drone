@@ -129,16 +129,16 @@ Un thread secondaire supprime automatiquement les anciennes images (> 10 derniè
 
 ## 🧩 Modules à venir (hors scope ici)
 
-- 🧭 Contrôle du drone automatique
+- 🧭 Contrôle du drone avec l'utilisation de L'IA
 - 🎯 Suivi du gant dans l’image
 - 🎒 Capture de dataset automatique
-- 📡 Streaming + affichage web en direct
+- 📡 Streaming + affichage en direct
 
 ---
 
 ## 👤 Auteur
 
-Projet encadré — Université 2025  
+Projet encadré — Université Paris-Saclay - IUT de Cachan 2025  
 Réalisé par Rayan
 Encadrant : Mr.Mininger
 
