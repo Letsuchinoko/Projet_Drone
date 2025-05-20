@@ -8,11 +8,22 @@ from pyparrot.DroneVision import DroneVision
 # === CONFIGURATION ===
 IMAGES_DIR = "C:/Users/Baptiste/anaconda3/Lib/site-packages/pyparrot/images"
 MAX_IMAGES = 15
+DISPLAY_INTERVAL = 1 / 20  # 20 FPS = 0.05 sec
 
+last_display_time = 0  # Pour contrôler le rythme d'affichage
+
+# === CALLBACK pour afficher le flux vidéo ===
 def afficher_image(image):
-    # On ignore le paramètre image (pas utilisable directement)
+    global last_display_time
+
+    now = time.time()
+    if now - last_display_time < DISPLAY_INTERVAL:
+        return  # Attendre pour respecter les 20 FPS
+
+    last_display_time = now
+
     try:
-        # Lister et trier les images par date
+        # Liste des fichiers image triés par date
         fichiers = sorted(glob.glob(os.path.join(IMAGES_DIR, "image_*.png")), key=os.path.getmtime)
 
         # Supprimer les plus anciennes
@@ -23,16 +34,16 @@ def afficher_image(image):
                 except:
                     pass
 
-        # Afficher la dernière image disponible
+        # Afficher la dernière image
         if fichiers:
             derniere = fichiers[-1]
             img = cv2.imread(derniere)
             if img is not None:
-                cv2.imshow("🖼️ Flux Bebop2 (image la plus récente)", img)
+                cv2.imshow("🖼️ Flux Bebop2 (dernière image)", img)
                 cv2.waitKey(1)
-
+                print(f"Affichage : {derniere}")
     except Exception as e:
-        print(f"⚠️ Erreur affichage : {e}")
+        print(f"⚠️ Erreur d'affichage : {e}")
 
 # === CONNEXION AU DRONE ===
 bebop = Bebop()
@@ -46,7 +57,7 @@ if bebop.connect(10):
     vision.set_user_callback_function(afficher_image)
 
     if vision.open_video():
-        print("🎥 Flux vidéo actif. Appuyez sur Ctrl+C pour arrêter.")
+        print("🎥 Flux vidéo actif. Ctrl+C pour quitter.")
         try:
             while True:
                 time.sleep(1)
@@ -57,7 +68,7 @@ if bebop.connect(10):
             bebop.disconnect()
             cv2.destroyAllWindows()
     else:
-        print("❌ Échec d’ouverture du flux vidéo.")
+        print("❌ Impossible d'ouvrir le flux vidéo.")
         bebop.disconnect()
 else:
-    print("❌ Échec de connexion au drone.")
+    print("❌ Connexion échouée.")
