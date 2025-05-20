@@ -9,7 +9,7 @@ from pyparrot.DroneVision import DroneVision
 # === CONFIGURATION ===
 IMAGES_DIR = "C:/Users/Baptiste/anaconda3/Lib/site-packages/pyparrot/images"
 FRAME_BUFFER_SIZE = 2
-DISPLAY_INTERVAL = 1 / 5  # 5 FPS
+DISPLAY_INTERVAL = 1 / 10  # 10 FPS
 
 last_display_time = 0
 frame_buffer = deque(maxlen=FRAME_BUFFER_SIZE)
