@@ -1,0 +1,1016 @@
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] no frame!
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+    Last message repeated 1 times
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] no frame!
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+    Last message repeated 1 times
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] no frame!
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+    Last message repeated 1 times
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] no frame!
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+    Last message repeated 1 times
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] no frame!
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+    Last message repeated 1 times
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] no frame!
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+    Last message repeated 1 times
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] no frame!
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+    Last message repeated 1 times
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] non-existing PPS 0 referenced
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] no frame!
+
+[sdp @ 000001e4ee30d640] max delay reached. need to consume packet
+
+[sdp @ 000001e4ee30d640] RTP: missed 174 packets
+
+[h264 @ 000001e4ee316740] concealing 702 DC, 702 AC, 702 MV errors in P frame
+
+[h264 @ 000001e4ee316740] concealing 162 DC, 162 AC, 162 MV errors in P frame
+
+[sdp @ 000001e4ee30d640] max delay reached. need to consume packet
+
+[sdp @ 000001e4ee30d640] RTP: missed 587 packets
+
+[h264 @ 000001e4ee316740] Frame num change from 7329 to 7352
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] Frame num change from 7329 to 7352
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] Frame num change from 7329 to 7352
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] Frame num change from 7329 to 7352
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] Frame num change from 7329 to 7352
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] Frame num change from 7329 to 7352
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] Frame num change from 7329 to 7352
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] Frame num change from 7329 to 7352
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] Frame num change from 7329 to 7352
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] Frame num change from 7329 to 7352
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] Frame num change from 7329 to 7352
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] Frame num change from 7329 to 7352
+
+[h264 @ 000001e4ee316740] decode_slice_header error
+
+[h264 @ 000001e4ee316740] concealing 1512 DC, 1512 AC, 1512 MV errors in P frame
+
+[sdp @ 000001e4ee30d640] max delay reached. need to consume packet
+
+[sdp @ 000001e4ee30d640] RTP: missed 603 packets
+
+[sdp @ 000001e4ee30d640] max delay reached. need to consume packet
+
+[sdp @ 000001e4ee30d640] RTP: missed 541 packets
+
+[sdp @ 000001e4ee30d640] max delay reached. need to consume packet
+
+[sdp @ 000001e4ee30d640] RTP: missed 525 packets
+
+Input #0, sdp, from 'C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\utils/bebop.sdp':
+
+  Duration: N/A, start: 3.470144, bitrate: N/A
+
+  Stream #0:0: Video: h264 (Constrained Baseline), yuv420p(progressive), 856x480 [SAR 1:1 DAR 107:60], 29.97 fps, 29.97 tbr, 90k tbn
+
+Stream mapping:
+
+  Stream #0:0 -> #0:0 (h264 (native) -> png (native))
+
+🎥 Flux vidéo actif. Ctrl+C pour quitter.
+Affichage : C:/Users/Baptiste/anaconda3/Lib/site-packages/pyparrot/images\image_039.png
+⏹ Arrêt manuel.
+Killing the ffmpeg subprocess
+Sending a second kill call to the ffmpeg process
+ disconnecting 
