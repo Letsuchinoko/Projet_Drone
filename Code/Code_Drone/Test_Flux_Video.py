@@ -8,44 +8,44 @@ from pyparrot.DroneVision import DroneVision
 # === CONFIGURATION ===
 IMAGES_DIR = "C:/Users/Baptiste/anaconda3/Lib/site-packages/pyparrot/images"
 MAX_IMAGES = 15
-DISPLAY_INTERVAL = 1 / 20  # 20 FPS = 0.05 sec
+DISPLAY_INTERVAL = 1 / 5  # 5 FPS
+last_display_time = 0
 
-last_display_time = 0  # Pour contrôler le rythme d'affichage
-
-# === CALLBACK pour afficher le flux vidéo ===
-def afficher_image(image):
+def afficher_image(_):
     global last_display_time
 
     now = time.time()
     if now - last_display_time < DISPLAY_INTERVAL:
-        return  # Attendre pour respecter les 20 FPS
+        return
 
     last_display_time = now
 
     try:
-        # Liste des fichiers image triés par date
-        fichiers = sorted(glob.glob(os.path.join(IMAGES_DIR, "image_*.png")), key=os.path.getmtime)
+        fichiers = sorted(
+            glob.glob(os.path.join(IMAGES_DIR, "image_*.png")),
+            key=os.path.getmtime
+        )
 
-        # Supprimer les plus anciennes
+        # Supprimer seulement les plus anciens (hors des 5 derniers)
         if len(fichiers) > MAX_IMAGES:
-            for f in fichiers[:-MAX_IMAGES]:
+            for f in fichiers[:-5]:  # ← garde un petit historique
                 try:
                     os.remove(f)
                 except:
-                    pass
+                    pass  # on ignore proprement
 
-        # Afficher la dernière image
         if fichiers:
             derniere = fichiers[-1]
-            img = cv2.imread(derniere)
-            if img is not None:
-                cv2.imshow("🖼️ Flux Bebop2 (dernière image)", img)
-                cv2.waitKey(1)
-                print(f"Affichage : {derniere}")
-    except Exception as e:
-        print(f"⚠️ Erreur d'affichage : {e}")
+            frame = cv2.imread(derniere)
 
-# === CONNEXION AU DRONE ===
+            if frame is not None:
+                cv2.imshow("🖼️ Flux Bebop2 (5 FPS)", frame)
+                cv2.waitKey(1)
+
+    except:
+        pass  # on ignore toute erreur d’affichage sans log
+
+# === CONNEXION DRONE & VISION ===
 bebop = Bebop()
 bebop.drone_ip = "192.168.42.1"
 
