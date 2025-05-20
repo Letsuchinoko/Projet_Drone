@@ -12,11 +12,22 @@ Il s'agit ici **de la branche "Vision"**, dédiée à la récupération du flux 
 Projet_Drone/Code/Code_Drone/
 │
 ├── Code_Flux_Avec_Detection/   # Code principal pour communication, traitement, détection
-│   ├── Detection_Live.py                       # Détection gant en direct (ce dépôt)
+│   │
+│   └── Detection_Live.py                       # Détection gant en direct
 │   └── README.md                               # Ce fichier (ce dépôt)
 │
-├── Code_Flux_Video/
-│   ├── Test_Flux_Video.py                      # Code de test pour lecture flux ffmpeg + affichage
+├── Code_Flux_Video/            # Code tests pour communication, récupération du flux
+│   │
+│   └── Test_Flux_Video.py                      # Code de test pour lecture flux ffmpeg + affichage
+│
+├── Tests_Gants/                # Code tests detection gant
+│   │
+│   ├── Capture_Gant.py                          # Script principal de traitement d’images
+│   ├── images/                                  # 📥 Images à analyser
+│   ├── detection/                               # 📤 Images annotées avec gant détecté
+│   ├── masks/                                   # 📤 Gants détourés (sur fond noir)
+│   └── redzones/                                # 📤 Zones rouges détectées (debug HSV)
+├── README.md                   # Ce fichier (ce dépôt)
 └── 
 ```
 
