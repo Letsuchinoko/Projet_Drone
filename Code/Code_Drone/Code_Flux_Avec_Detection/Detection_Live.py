@@ -4,7 +4,6 @@ import cv2
 import time
 import numpy as np
 import threading
-from collections import deque
 from pyparrot.Bebop import Bebop
 from pyparrot.DroneVision import DroneVision
 
@@ -21,12 +20,22 @@ def detect_gant(image):
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     img_h, img_w = image.shape[:2]
 
-    # Plage de rouge
-    lower_red = np.array([0, 80, 30])
-    upper_red = np.array([15, 255, 255])
-    mask = cv2.inRange(hsv, lower_red, upper_red)
+    # Plages HSV pour le gant (brique/rouge/orangé)
+    lower1 = np.array([0, 80, 40])
+    upper1 = np.array([10, 255, 255])
 
-    # Nettoyage masque
+    lower2 = np.array([10, 100, 50])
+    upper2 = np.array([25, 255, 255])
+
+    lower3 = np.array([170, 50, 40])
+    upper3 = np.array([180, 255, 255])
+
+    mask1 = cv2.inRange(hsv, lower1, upper1)
+    mask2 = cv2.inRange(hsv, lower2, upper2)
+    mask3 = cv2.inRange(hsv, lower3, upper3)
+    mask = cv2.bitwise_or(mask1, cv2.bitwise_or(mask2, mask3))
+
+    # Nettoyage
     kernel = np.ones((5, 5), np.uint8)
     mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
     mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
@@ -54,10 +63,9 @@ def detect_gant(image):
         center_x = x + w // 2
         center_y = y + h // 2
 
-        # Filtres
         if center_y < img_h * 0.25 and img_w * 0.3 < center_x < img_w * 0.7:
             continue
-        if area < 800 or area > img_w * img_h * 0.6:
+        if area < 600 or area > img_w * img_h * 0.6:
             continue
         if aspect_ratio < 0.25 or aspect_ratio > 2.5:
             continue
@@ -72,7 +80,6 @@ def detect_gant(image):
             best_cnt = cnt
 
     if best_cnt is not None:
-        # Dessin sur image
         cv2.drawContours(image, [best_cnt], -1, (0, 255, 0), 2)
         x, y, w, h = cv2.boundingRect(best_cnt)
         cv2.putText(image, "Gant detecte", (x, y - 10),
@@ -124,7 +131,8 @@ def vision_callback(_):
             img = cv2.resize(img, (800, int(img.shape[0] * 800 / img.shape[1])))
             img = detect_gant(img)
             cv2.imshow("🧤 Détection Gant Rouge", img)
-            cv2.waitKey(1)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                raise KeyboardInterrupt
     except Exception as e:
         print(f"⚠️ Vision error: {e}")
 
@@ -136,7 +144,6 @@ print("Connexion au drone...")
 if bebop.connect(10):
     print("✅ Connecté.")
 
-    # Thread nettoyage
     threading.Thread(target=nettoyer_images, daemon=True).start()
 
     vision = DroneVision(bebop, is_bebop=True)
