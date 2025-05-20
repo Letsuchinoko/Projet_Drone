@@ -138,7 +138,7 @@ Un thread secondaire supprime automatiquement les anciennes images (> 10 derniè
 
 ## 👤 Auteur
 
-Projet encadré — Université 2025  
+Projet encadré — Université Paris-Saclay - IUT de Cachan 2025  
 Réalisé par Rayan
 Encadrant : Mr.Mininger
 
