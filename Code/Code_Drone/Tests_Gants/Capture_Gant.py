@@ -1,6 +1,9 @@
 import cv2
 import numpy as np
 import os
+import sys
+
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 # === DOSSIERS ===
 input_dir = "images"
