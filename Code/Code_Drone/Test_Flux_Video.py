@@ -8,15 +8,15 @@ from pyparrot.DroneVision import DroneVision
 
 # === CONFIGURATION ===
 IMAGES_DIR = "C:/Users/Baptiste/anaconda3/Lib/site-packages/pyparrot/images"
-FRAME_BUFFER_SIZE = 2
-DISPLAY_INTERVAL = 1 / 10  # 10 FPS
+DISPLAY_INTERVAL = 1 /10  # 5 FPS
+BUFFER_IMAGES_TO_KEEP = 5
 
 last_display_time = 0
-frame_buffer = deque(maxlen=FRAME_BUFFER_SIZE)
-dernier_fichier_affiche = None
+last_image_name = None
 
+# === CALLBACK appelé à chaque frame ===
 def vision_callback(_):
-    global last_display_time, frame_buffer, dernier_fichier_affiche
+    global last_display_time, last_image_name
 
     now = time.time()
     if now - last_display_time < DISPLAY_INTERVAL:
@@ -30,27 +30,27 @@ def vision_callback(_):
     if not fichiers:
         return
 
-    # Ne traiter que la nouvelle image
+    last_display_time = now
     derniere = fichiers[-1]
-    if derniere == dernier_fichier_affiche:
+
+    # Ne pas retraiter la même image
+    if derniere == last_image_name:
         return
 
-    dernier_fichier_affiche = derniere
-    last_display_time = now
+    last_image_name = derniere
 
     try:
         img = cv2.imread(derniere)
         if img is not None:
-            frame_buffer.append(img)
-            cv2.imshow("🖼️ Flux Bebop2 (stable)", img)
+            cv2.imshow("🖼️ Flux Bebop2 (final)", img)
             cv2.waitKey(1)
     except:
         pass
 
-    # Nettoyage des anciennes images
+    # Suppression décalée des anciennes images (hors des 5 dernières)
     try:
-        for f in fichiers[:-FRAME_BUFFER_SIZE]:
-            if f != dernier_fichier_affiche:
+        for f in fichiers[:-BUFFER_IMAGES_TO_KEEP]:
+            if f != derniere:
                 os.remove(f)
     except:
         pass
@@ -77,7 +77,7 @@ if bebop.connect(10):
             bebop.disconnect()
             cv2.destroyAllWindows()
     else:
-        print("❌ Erreur ouverture flux.")
+        print("❌ Impossible d’ouvrir le flux.")
         bebop.disconnect()
 else:
-    print("❌ Erreur connexion drone.")
+    print("❌ Connexion échouée.")
