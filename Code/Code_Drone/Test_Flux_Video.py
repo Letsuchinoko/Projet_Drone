@@ -1,53 +1,62 @@
-from pyparrot.Bebop import Bebop
-from pyparrot.DroneVision import DroneVision
-import cv2
-import time
 import os
 import glob
-import re
+import cv2
+import time
+from pyparrot.Bebop import Bebop
+from pyparrot.DroneVision import DroneVision
 
 # === CONFIGURATION ===
-MAX_IMAGES = 15
 IMAGES_DIR = "C:/Users/Baptiste/anaconda3/Lib/site-packages/pyparrot/images"
+MAX_IMAGES = 15
+DISPLAY_INTERVAL = 1 / 20  # 20 FPS = 0.05 sec
 
-# === CALLBACK pour le flux vidéo ===
-def show_and_manage_images(image):
-    if image is None:
-        return
+last_display_time = 0  # Pour contrôler le rythme d'affichage
 
-    # Supprimer les fichiers les plus anciens (garder seulement les 15 derniers)
-    image_files = sorted(glob.glob(os.path.join(IMAGES_DIR, "image_*.png")), key=os.path.getmtime)
+# === CALLBACK pour afficher le flux vidéo ===
+def afficher_image(image):
+    global last_display_time
 
-    if len(image_files) > MAX_IMAGES:
-        for f in image_files[:-MAX_IMAGES]:
-            try:
-                os.remove(f)
-            except Exception as e:
-                print(f"⚠️ Erreur suppression {f} : {e}")
+    now = time.time()
+    if now - last_display_time < DISPLAY_INTERVAL:
+        return  # Attendre pour respecter les 20 FPS
 
-    # Afficher la dernière image du dossier
-    if image_files:
-        last_img_path = image_files[-1]
-        try:
-            frame = cv2.imread(last_img_path)
-            if frame is not None:
-                cv2.imshow("Flux vidéo (image la plus récente)", frame)
+    last_display_time = now
+
+    try:
+        # Liste des fichiers image triés par date
+        fichiers = sorted(glob.glob(os.path.join(IMAGES_DIR, "image_*.png")), key=os.path.getmtime)
+
+        # Supprimer les plus anciennes
+        if len(fichiers) > MAX_IMAGES:
+            for f in fichiers[:-MAX_IMAGES]:
+                try:
+                    os.remove(f)
+                except:
+                    pass
+
+        # Afficher la dernière image
+        if fichiers:
+            derniere = fichiers[-1]
+            img = cv2.imread(derniere)
+            if img is not None:
+                cv2.imshow("🖼️ Flux Bebop2 (dernière image)", img)
                 cv2.waitKey(1)
-        except Exception as e:
-            print(f"⚠️ Erreur lecture image : {e}")
+                print(f"Affichage : {derniere}")
+    except Exception as e:
+        print(f"⚠️ Erreur d'affichage : {e}")
 
-# === INITIALISATION DU DRONE ===
+# === CONNEXION AU DRONE ===
 bebop = Bebop()
 bebop.drone_ip = "192.168.42.1"
+
 print("Connexion au drone...")
-
 if bebop.connect(10):
-    print("✅ Connecté au drone !")
+    print("✅ Connecté au drone.")
 
-    bebopVision = DroneVision(bebop, is_bebop=True)
-    bebopVision.set_user_callback_function(show_and_manage_images)
+    vision = DroneVision(bebop, is_bebop=True)
+    vision.set_user_callback_function(afficher_image)
 
-    if bebopVision.open_video():
+    if vision.open_video():
         print("🎥 Flux vidéo actif. Ctrl+C pour quitter.")
         try:
             while True:
@@ -55,7 +64,7 @@ if bebop.connect(10):
         except KeyboardInterrupt:
             print("⏹ Arrêt manuel.")
         finally:
-            bebopVision.close_video()
+            vision.close_video()
             bebop.disconnect()
             cv2.destroyAllWindows()
     else:
