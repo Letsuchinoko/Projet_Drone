@@ -9,16 +9,15 @@ Il s'agit ici **de la branche "Vision"**, dédiée à la récupération du flux 
 ## 🧱 Structure du projet global
 
 ```bash
-Projet_Drone/
+Projet_Drone/Code/Code_Drone/
 │
-├── Code_Drone/                   # Code principal pour communication, traitement, détection
-│   ├── Detection_Live.py        # Détection gant en direct (ce dépôt)
-│   └── Test_Flux_Video.py       # Code de test pour lecture flux ffmpeg + affichage
+├── Code_Flux_Avec_Detection/   # Code principal pour communication, traitement, détection
+│   ├── Detection_Live.py                       # Détection gant en direct (ce dépôt)
+│   └── README.md                               # Ce fichier (ce dépôt)
 │
-├── Flight_Control/              # (à part) Contrôle automatique, stabilisation, etc.
-├── Training/                    # Scripts de collecte de données, labellisation, modèles IA
-├── Docs/                        # Présentations, schémas, documentation, captures
-└── README.md                    # Ce fichier
+├── Code_Flux_Video/
+│   ├── Test_Flux_Video.py                      # Code de test pour lecture flux ffmpeg + affichage
+└── 
 ```
 
 ---
