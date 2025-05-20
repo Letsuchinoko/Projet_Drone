@@ -1,116 +1,83 @@
-import cv2
-import numpy as np
 import os
+import glob
+import cv2
+import time
+from collections import deque
+from pyparrot.Bebop import Bebop
+from pyparrot.DroneVision import DroneVision
 
-# === DOSSIERS ===
-input_dir = "images"
-output_detection = "detection"
-output_masks = "masks"
-output_red = "redzones"
+# === CONFIGURATION ===
+IMAGES_DIR = "C:/Users/Baptiste/anaconda3/Lib/site-packages/pyparrot/images"
+FRAME_BUFFER_SIZE = 2
+DISPLAY_INTERVAL = 1 / 5  # 5 FPS
 
-os.makedirs(output_detection, exist_ok=True)
-os.makedirs(output_masks, exist_ok=True)
-os.makedirs(output_red, exist_ok=True)
+last_display_time = 0
+frame_buffer = deque(maxlen=FRAME_BUFFER_SIZE)
+dernier_fichier_affiche = None
 
-def process_image(filename):
-    path = os.path.join(input_dir, filename)
-    image = cv2.imread(path)
-    if image is None:
-        print(f"⚠️ Impossible de lire {filename}")
+def vision_callback(_):
+    global last_display_time, frame_buffer, dernier_fichier_affiche
+
+    now = time.time()
+    if now - last_display_time < DISPLAY_INTERVAL:
         return
 
-    # Resize pour homogénéiser
-    image = cv2.resize(image, (800, int(image.shape[0] * 800 / image.shape[1])))
-    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-    img_h, img_w = image.shape[:2]
+    fichiers = sorted(
+        glob.glob(os.path.join(IMAGES_DIR, "image_*.png")),
+        key=os.path.getmtime
+    )
 
-    # ✅ PLAGE ROUGE LÉGÈREMENT ÉLARGIE
-    lower_red = np.array([2, 100, 40])   # plus permissif que [2, 120, 60]
-    upper_red = np.array([10, 255, 255])
-    mask = cv2.inRange(hsv, lower_red, upper_red)
+    if not fichiers:
+        return
 
-    # DEBUG : Affiche uniquement les zones rouges détectées
-    red_visible = cv2.bitwise_and(image, image, mask=mask)
-    cv2.imwrite(os.path.join(output_red, filename), red_visible)
+    # Ne traiter que la nouvelle image
+    derniere = fichiers[-1]
+    if derniere == dernier_fichier_affiche:
+        return
 
-    # Nettoyage
-    kernel = np.ones((3, 3), np.uint8)
-    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+    dernier_fichier_affiche = derniere
+    last_display_time = now
 
-    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    best_cnt = None
-    best_mask = np.zeros_like(mask)
-    image_with_contour = image.copy()
-    max_score = 0
+    try:
+        img = cv2.imread(derniere)
+        if img is not None:
+            frame_buffer.append(img)
+            cv2.imshow("🖼️ Flux Bebop2 (stable)", img)
+            cv2.waitKey(1)
+    except:
+        pass
 
-    for cnt in contours:
-        area = cv2.contourArea(cnt)
-        perimeter = cv2.arcLength(cnt, True)
-        x, y, w, h = cv2.boundingRect(cnt)
-        hull = cv2.convexHull(cnt)
-        hull_area = cv2.contourArea(hull)
-        if hull_area == 0 or perimeter == 0:
-            continue
+    # Nettoyage des anciennes images
+    try:
+        for f in fichiers[:-FRAME_BUFFER_SIZE]:
+            if f != dernier_fichier_affiche:
+                os.remove(f)
+    except:
+        pass
 
-        aspect_ratio = w / float(h)
-        solidity = float(area) / hull_area
-        complexity = area / perimeter
-        center_x = x + w // 2
-        center_y = y + h // 2
+# === Connexion ===
+bebop = Bebop()
+bebop.drone_ip = "192.168.42.1"
 
-        # FILTRE POSITION (anti-visage haut-centre)
-        if center_y < img_h * 0.25 and img_w * 0.3 < center_x < img_w * 0.7:
-            continue
+print("Connexion au drone...")
+if bebop.connect(10):
+    print("✅ Connecté.")
+    vision = DroneVision(bebop, is_bebop=True)
+    vision.set_user_callback_function(vision_callback)
 
-        # FILTRES GÉOMÉTRIQUES (ajustés)
-        if area < 800 or area > img_w * img_h * 0.45:
-            continue
-        if aspect_ratio < 0.3 or aspect_ratio > 1.8:
-            continue
-        if solidity > 0.98:
-            continue
-        if complexity > 28:
-            continue
-
-        # Score pondéré
-        score = area * (1 - solidity) * complexity
-
-        # Debug console (peut être désactivé)
-        print(f"[{filename}] ✅ Test contour → Area={area:.0f}, Solidity={solidity:.2f}, "
-              f"Complexity={complexity:.2f}, Score={score:.1f}")
-
-        if score > max_score:
-            max_score = score
-            best_cnt = cnt
-
-    if best_cnt is not None:
-        # Masque gant avec érosion douce
-        mask_gant = np.zeros_like(mask)
-        cv2.drawContours(mask_gant, [best_cnt], -1, 255, thickness=cv2.FILLED)
-        mask_gant = cv2.erode(mask_gant, kernel, iterations=1)
-
-        # Annoter l'image
-        cv2.drawContours(image_with_contour, [best_cnt], -1, (0, 255, 0), 2)
-        x, y, w, h = cv2.boundingRect(best_cnt)
-        cv2.putText(image_with_contour, "Gant detecte", (x, y - 10),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-
-        # Gant détouré
-        detailed = cv2.bitwise_and(image, image, mask=mask_gant)
-
-        # Sauvegardes
-        cv2.imwrite(os.path.join(output_detection, filename), image_with_contour)
-        cv2.imwrite(os.path.join(output_masks, filename), detailed)
+    if vision.open_video():
+        print("🎥 Flux vidéo actif. Ctrl+C pour arrêter.")
+        try:
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            print("⏹ Arrêt manuel.")
+        finally:
+            vision.close_video()
+            bebop.disconnect()
+            cv2.destroyAllWindows()
     else:
-        print(f"❌ Aucun gant détecté dans {filename}")
-        cv2.imwrite(os.path.join(output_detection, filename), image)
-
-    print(f"✅ {filename} terminé.")
-
-# === BOUCLE SUR TOUT LE DOSSIER
-for file in os.listdir(input_dir):
-    if file.lower().endswith(('.jpg', '.jpeg', '.png')):
-        process_image(file)
-
-print("\n🎯 Traitement terminé — Résultats dans 'detection/', 'masks/' et 'redzones/'")
+        print("❌ Erreur ouverture flux.")
+        bebop.disconnect()
+else:
+    print("❌ Erreur connexion drone.")
