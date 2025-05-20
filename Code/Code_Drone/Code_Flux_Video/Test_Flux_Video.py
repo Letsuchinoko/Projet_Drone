@@ -12,7 +12,7 @@ IMAGES_DIR = "C:/Users/Baptiste/anaconda3/Lib/site-packages/pyparrot/images"
 FRAME_BUFFER_SIZE = 2
 KEEP_LAST = 10  # On garde au moins 10 images
 CLEANUP_INTERVAL = 15  # Nettoyage toutes les 15 sec
-DISPLAY_INTERVAL = 1 / 10  # 5 FPS
+DISPLAY_INTERVAL = 1 / 5  # 5 FPS
 
 last_display_time = 0
 frame_buffer = deque(maxlen=FRAME_BUFFER_SIZE)
