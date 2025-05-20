@@ -40,7 +40,7 @@ Projet_Drone/
 - 🎥 Flux vidéo live récupéré sous forme de fichiers image
 - 🧠 Détection d’objet (gant) sur plage HSV définie manuellement
 - 🧼 Nettoyage automatique des images trop anciennes
-- 🪄 Affichage temps réel avec surlignage en vert de l’objet détecté
+- 🖍 Affichage temps réel avec surlignage en vert de l’objet détecté
 - 🚀 Performant sous Windows + Python 3.11 + Anaconda
 
 ---
