@@ -15,12 +15,12 @@ KEEP_LAST = 10
 last_display_time = 0
 last_image_name = None
 
-# === Détection du gant rouge ===
+# === Détection du gant rouge / brique ===
 def detect_gant(image):
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     img_h, img_w = image.shape[:2]
 
-    # Plages HSV pour le gant (brique/rouge/orangé)
+    # Plages HSV personnalisées
     lower1 = np.array([0, 80, 40])
     upper1 = np.array([10, 255, 255])
 
@@ -33,6 +33,7 @@ def detect_gant(image):
     mask1 = cv2.inRange(hsv, lower1, upper1)
     mask2 = cv2.inRange(hsv, lower2, upper2)
     mask3 = cv2.inRange(hsv, lower3, upper3)
+
     mask = cv2.bitwise_or(mask1, cv2.bitwise_or(mask2, mask3))
 
     # Nettoyage
@@ -87,13 +88,19 @@ def detect_gant(image):
 
     return image
 
-# === Nettoyage images (thread) ===
+# === Nettoyage images obsolètes ===
 def nettoyer_images():
     while True:
-        fichiers = sorted(
-            glob.glob(os.path.join(IMAGES_DIR, "image_*.png")),
-            key=os.path.getmtime
-        )
+        raw_files = glob.glob(os.path.join(IMAGES_DIR, "image_*.png"))
+        fichiers = []
+        for f in raw_files:
+            try:
+                fichiers.append((f, os.path.getmtime(f)))
+            except FileNotFoundError:
+                continue
+
+        fichiers = [f[0] for f in sorted(fichiers, key=lambda x: x[1])]
+
         if len(fichiers) > KEEP_LAST:
             for f in fichiers[:-KEEP_LAST]:
                 try:
@@ -102,7 +109,7 @@ def nettoyer_images():
                     pass
         time.sleep(15)
 
-# === CALLBACK vidéo ===
+# === Callback vidéo appelé à chaque image ===
 def vision_callback(_):
     global last_display_time, last_image_name
 
@@ -110,10 +117,15 @@ def vision_callback(_):
     if now - last_display_time < DISPLAY_INTERVAL:
         return
 
-    fichiers = sorted(
-        glob.glob(os.path.join(IMAGES_DIR, "image_*.png")),
-        key=os.path.getmtime
-    )
+    raw_files = glob.glob(os.path.join(IMAGES_DIR, "image_*.png"))
+    fichiers = []
+    for f in raw_files:
+        try:
+            fichiers.append((f, os.path.getmtime(f)))
+        except FileNotFoundError:
+            continue
+
+    fichiers = [f[0] for f in sorted(fichiers, key=lambda x: x[1])]
 
     if not fichiers:
         return
@@ -136,7 +148,7 @@ def vision_callback(_):
     except Exception as e:
         print(f"⚠️ Vision error: {e}")
 
-# === Connexion ===
+# === Connexion au drone ===
 bebop = Bebop()
 bebop.drone_ip = "192.168.42.1"
 
