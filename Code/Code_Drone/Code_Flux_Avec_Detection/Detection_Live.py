@@ -8,7 +8,7 @@ from pyparrot.Bebop import Bebop
 from pyparrot.DroneVision import DroneVision
 
 # === CONFIGURATION ===
-IMAGES_DIR = "C:/Users/Baptiste/Documents/GitHub/Projet_Drone/Code/Code_Drone/Code_Prototypage_Data_Analysis/images"
+IMAGES_DIR = "C:/Users/Baptiste/anaconda3/Lib/site-packages/pyparrot/images"
 DISPLAY_INTERVAL = 1 / 5  # 5 FPS
 KEEP_LAST = 10
 
