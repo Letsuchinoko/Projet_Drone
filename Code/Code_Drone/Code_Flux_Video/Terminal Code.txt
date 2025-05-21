@@ -1,4 +1,4 @@
-PS C:\Users\Baptiste\Documents\GitHub\Projet_Drone> & C:/Users/Baptiste/anaconda3/python.exe c:/Users/Baptiste/Documents/GitHub/Projet_Drone/Code/Code_Drone/Code_Prototypage_Data_Analysis/main.py    
+PS C:\Users\Baptiste\Documents\GitHub\Projet_Drone> & C:/Users/Baptiste/anaconda3/python.exe c:/Users/Baptiste/Documents/GitHub/Projet_Drone/Code/Code_Drone/Code_Prototypage_Data_Analysis/main.py
 Connexion au drone...
 Setting up mDNS listener since this is not a Mambo
 Making a browser for _arsdk-090c._udp.local.
@@ -6,11 +6,11 @@ Service Bebop2-050319._arsdk-090c._udp.local. added, service info: ServiceInfo(t
 {"d2c_port": 43210, "controller_type": "computer", "controller_name": "pyparrot", "arstream2_client_stream_port": 55004, "arstream2_client_control_port": 55005}
 {'status': 0, 'c2d_port': 54321, 'c2d_update_port': 51, 'c2d_user_port': 21, 'qos_mode': 0, 'arstream2_server_stream_port': 5004, 'arstream2_server_control_port': 5005}
 c2d_port is 54321
-starting listening at
- Success in setting up the wifi network to the drone!
+starting listening at 
+ Success in setting up the wifi network to the drone! 
 ✅ Connecté.
 Traceback (most recent call last):
   File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 163, in <module>
-    bebop.use_custom_ffmpeg_output(IMAGES_DIR)
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-AttributeError: 'Bebop' object has no attribute 'use_custom_ffmpeg_output'
+    vision = DroneVision(bebop, is_bebop=True, image_path=IMAGES_DIR)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: DroneVision.__init__() got an unexpected keyword argument 'image_path'
