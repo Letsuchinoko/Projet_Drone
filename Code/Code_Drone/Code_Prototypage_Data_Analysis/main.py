@@ -181,6 +181,7 @@ if bebop.connect(10):
 
     vision = DroneVision(bebop, is_bebop=True)
     vision.set_user_callback_function(vision_callback)
+    vision.image_path = IMAGES_DIR
 
     if vision.open_video():
         print("🎥 Détection en direct. Ctrl+C pour quitter.")
