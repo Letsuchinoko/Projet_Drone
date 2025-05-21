@@ -21,82 +21,51 @@ os.makedirs(GANT_OUTPUT_DIR, exist_ok=True)
 last_display_time = 0
 last_image_name = None
 
-# === Détection du gant rouge ===
+# === Détection du gant rouge ===a
 def detect_gant(image):
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-    img_h, img_w = image.shape[:2]
 
-    # Plages HSV élargies (rouge profond → orange clair)
-    ranges = [
-        (np.array([0, 50, 50]),   np.array([10, 255, 255])),  # rouge foncé
-        (np.array([11, 100, 60]), np.array([25, 255, 255])),  # orange
-        (np.array([160, 50, 50]), np.array([180, 255, 255]))  # rouge clair
-    ]
-
-    mask = sum([cv2.inRange(hsv, low, high) for (low, high) in ranges])
+    # Plages élargies
+    mask = cv2.inRange(hsv, np.array([0, 50, 40]), np.array([25, 255, 255]))
 
     # Nettoyage
-    kernel = np.ones((5, 5), np.uint8)
-    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((5, 5), np.uint8))
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, np.ones((5, 5), np.uint8))
+
+    # Affichage du masque
+    cv2.imshow("MASK DEBUG", mask)
 
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    best_cnt = None
-    max_score = 0
+    if not contours:
+        print("Aucun contour détecté")
+        return image
 
-    for cnt in contours:
-        area = cv2.contourArea(cnt)
-        perimeter = cv2.arcLength(cnt, True)
-        if perimeter == 0:
-            continue
+    print(f"{len(contours)} contour(s) trouvés")
+    best = max(contours, key=cv2.contourArea)
+    area = cv2.contourArea(best)
+    print(f"→ Meilleur contour : {area:.0f} px")
 
-        x, y, w, h = cv2.boundingRect(cnt)
-        hull = cv2.convexHull(cnt)
-        hull_area = cv2.contourArea(hull)
-        if hull_area == 0:
-            continue
+    if area < 500:
+        print("Contour trop petit, ignoré.")
+        return image
 
-        aspect_ratio = w / float(h)
-        solidity = float(area) / hull_area
-        complexity = area / perimeter
-        center_y = y + h // 2
+    # Dessin et sauvegarde
+    mask_final = np.zeros_like(mask)
+    cv2.drawContours(mask_final, [best], -1, 255, cv2.FILLED)
 
-        # Anti-visage
-        if center_y < img_h * 0.25:
-            continue
+    gant_only = cv2.bitwise_and(image, image, mask=mask_final)
+    fond_noir = np.zeros_like(image)
+    fond_noir[mask_final == 255] = gant_only[mask_final == 255]
 
-        # Filtres plus permissifs
-        if area < 500 or area > img_w * img_h * 0.7:
-            continue
-        if solidity > 0.995 or complexity > 45:
-            continue
+    out_path = os.path.join("gant_only", f"debug_{int(time.time()*1000)%100000}.png")
+    os.makedirs("gant_only", exist_ok=True)
+    cv2.imwrite(out_path, fond_noir)
+    print(f"✅ Image sauvegardée : {out_path}")
 
-        score = area * (1 - solidity) * complexity
-        if score > max_score:
-            max_score = score
-            best_cnt = cnt
-
-    if best_cnt is not None:
-        # Affichage sur image
-        cv2.drawContours(image, [best_cnt], -1, (0, 255, 0), 2)
-        x, y, w, h = cv2.boundingRect(best_cnt)
-        cv2.putText(image, "Gant detecte", (x, y - 10),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-
-        # Masque gant pour fond noir
-        mask_gant = np.zeros(image.shape[:2], dtype=np.uint8)
-        cv2.drawContours(mask_gant, [best_cnt], -1, 255, cv2.FILLED)
-
-        gant_seul = cv2.bitwise_and(image, image, mask=mask_gant)
-        fond_noir = np.zeros_like(image)
-        fond_noir[mask_gant == 255] = gant_seul[mask_gant == 255]
-
-        # Enregistrement pour IA
-        filename = f"gant_{int(time.time()*1000)%100000}.png"
-        cv2.imwrite(os.path.join(GANT_OUTPUT_DIR, filename), fond_noir)
-
+    cv2.drawContours(image, [best], -1, (0, 255, 0), 2)
     return image
+
 
 # === Nettoyage images obsolètes ===
 def nettoyer_images():
