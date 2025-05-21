@@ -10,10 +10,13 @@ from pyparrot.DroneVision import DroneVision
 # === CONFIGURATION ===
 LOCAL_IMAGE_DIR = os.path.join(os.path.dirname(__file__), "images")
 PYPARROT_IMAGE_DIR = os.path.join(os.path.dirname(__file__), "C:/Users/Baptiste/anaconda3/Lib/site-packages/pyparrot/images")
+GANT_OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "gant_only")
+
 DISPLAY_INTERVAL = 1 / 10  # 10 FPS
 KEEP_LAST = 10
 
 os.makedirs(LOCAL_IMAGE_DIR, exist_ok=True)
+os.makedirs(GANT_OUTPUT_DIR, exist_ok=True)
 
 last_display_time = 0
 last_image_name = None
@@ -23,19 +26,16 @@ def detect_gant(image):
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     img_h, img_w = image.shape[:2]
 
-    # Plages HSV personnalisées pour rouge/brique
-    lower1 = np.array([0, 80, 40])
-    upper1 = np.array([10, 255, 255])
-    lower2 = np.array([10, 100, 50])
-    upper2 = np.array([25, 255, 255])
-    lower3 = np.array([170, 50, 40])
-    upper3 = np.array([180, 255, 255])
+    # Plages HSV élargies (rouge profond → orange clair)
+    ranges = [
+        (np.array([0, 50, 50]),   np.array([10, 255, 255])),  # rouge foncé
+        (np.array([11, 100, 60]), np.array([25, 255, 255])),  # orange
+        (np.array([160, 50, 50]), np.array([180, 255, 255]))  # rouge clair
+    ]
 
-    mask = cv2.bitwise_or(
-        cv2.inRange(hsv, lower1, upper1),
-        cv2.bitwise_or(cv2.inRange(hsv, lower2, upper2), cv2.inRange(hsv, lower3, upper3))
-    )
+    mask = sum([cv2.inRange(hsv, low, high) for (low, high) in ranges])
 
+    # Nettoyage
     kernel = np.ones((5, 5), np.uint8)
     mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
     mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
@@ -60,18 +60,16 @@ def detect_gant(image):
         aspect_ratio = w / float(h)
         solidity = float(area) / hull_area
         complexity = area / perimeter
-        center_x = x + w // 2
         center_y = y + h // 2
 
-        if center_y < img_h * 0.25 and img_w * 0.3 < center_x < img_w * 0.7:
+        # Anti-visage
+        if center_y < img_h * 0.25:
             continue
-        if area < 600 or area > img_w * img_h * 0.6:
+
+        # Filtres plus permissifs
+        if area < 500 or area > img_w * img_h * 0.7:
             continue
-        if aspect_ratio < 0.25 or aspect_ratio > 2.5:
-            continue
-        if solidity > 0.995:
-            continue
-        if complexity > 35:
+        if solidity > 0.995 or complexity > 45:
             continue
 
         score = area * (1 - solidity) * complexity
@@ -80,10 +78,23 @@ def detect_gant(image):
             best_cnt = cnt
 
     if best_cnt is not None:
+        # Affichage sur image
         cv2.drawContours(image, [best_cnt], -1, (0, 255, 0), 2)
         x, y, w, h = cv2.boundingRect(best_cnt)
         cv2.putText(image, "Gant detecte", (x, y - 10),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+
+        # Masque gant pour fond noir
+        mask_gant = np.zeros(image.shape[:2], dtype=np.uint8)
+        cv2.drawContours(mask_gant, [best_cnt], -1, 255, cv2.FILLED)
+
+        gant_seul = cv2.bitwise_and(image, image, mask=mask_gant)
+        fond_noir = np.zeros_like(image)
+        fond_noir[mask_gant == 255] = gant_seul[mask_gant == 255]
+
+        # Enregistrement pour IA
+        filename = f"gant_{int(time.time()*1000)%100000}.png"
+        cv2.imwrite(os.path.join(GANT_OUTPUT_DIR, filename), fond_noir)
 
     return image
 
