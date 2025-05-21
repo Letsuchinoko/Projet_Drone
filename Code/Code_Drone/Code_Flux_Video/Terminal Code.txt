@@ -1,90 +1,16 @@
-[h264 @ 0000017263e16b80] non-existing PPS 0 referenced
-
-[h264 @ 0000017263e16b80] decode_slice_header error
-
-[h264 @ 0000017263e16b80] non-existing PPS 0 referenced
-
-[h264 @ 0000017263e16b80] decode_slice_header error
-
-[h264 @ 0000017263e16b80] non-existing PPS 0 referenced
-
-[h264 @ 0000017263e16b80] decode_slice_header error
-
-[h264 @ 0000017263e16b80] non-existing PPS 0 referenced
-
-[h264 @ 0000017263e16b80] decode_slice_header error
-
-[h264 @ 0000017263e16b80] non-existing PPS 0 referenced
-
-[h264 @ 0000017263e16b80] decode_slice_header error
-
-[h264 @ 0000017263e16b80] non-existing PPS 0 referenced
-
-[h264 @ 0000017263e16b80] decode_slice_header error
-
-[h264 @ 0000017263e16b80] non-existing PPS 0 referenced
-
-[h264 @ 0000017263e16b80] decode_slice_header error
-
-[h264 @ 0000017263e16b80] non-existing PPS 0 referenced
-
-[h264 @ 0000017263e16b80] decode_slice_header error
-
-[h264 @ 0000017263e16b80] no frame!
-
-[sdp @ 0000017263dee900] max delay reached. need to consume packet
-
-[sdp @ 0000017263dee900] RTP: missed 208 packets
-
-[h264 @ 0000017263e16b80] concealing 810 DC, 810 AC, 810 MV errors in P frame
-
-[sdp @ 0000017263dee900] max delay reached. need to consume packet
-
-[sdp @ 0000017263dee900] RTP: missed 521 packets
-
-[sdp @ 0000017263dee900] max delay reached. need to consume packet
-
-[sdp @ 0000017263dee900] RTP: missed 627 packets
-
-[h264 @ 0000017263e16b80] concealing 810 DC, 810 AC, 810 MV errors in P frame
-
-[sdp @ 0000017263dee900] max delay reached. need to consume packet
-
-[sdp @ 0000017263dee900] RTP: missed 638 packets
-
-[sdp @ 0000017263dee900] max delay reached. need to consume packet
-
-[sdp @ 0000017263dee900] RTP: missed 598 packets
-
-[sdp @ 0000017263dee900] max delay reached. need to consume packet
-
-[sdp @ 0000017263dee900] RTP: missed 580 packets
-
-Input #0, sdp, from 'C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\utils/bebop.sdp':
-
-  Duration: N/A, start: 4.904911, bitrate: N/A
-
-  Stream #0:0: Video: h264 (Constrained Baseline), yuv420p(progressive), 856x480 [SAR 1:1 DAR 107:60], 29.97 fps, 29.97 tbr, 90k tbn
-
-Stream mapping:
-
-  Stream #0:0 -> #0:0 (h264 (native) -> png (native))
-
-🎥 Détection en direct. Ctrl+C pour quitter.
-Exception in thread Thread-4 (_user_callback):
+PS C:\Users\Baptiste\Documents\GitHub\Projet_Drone> & C:/Users/Baptiste/anaconda3/python.exe c:/Users/Baptiste/Documents/GitHub/Projet_Drone/Code/Code_Drone/Code_Prototypage_Data_Analysis/main.py    
+Connexion au drone...
+Setting up mDNS listener since this is not a Mambo
+Making a browser for _arsdk-090c._udp.local.
+Service Bebop2-050319._arsdk-090c._udp.local. added, service info: ServiceInfo(type='_arsdk-090c._udp.local.', name='Bebop2-050319._arsdk-090c._udp.local.', addresses=[b'\xc0\xa8*\x01'], port=44444, weight=0, priority=0, server='Bebop2-050319.local.', properties={b'{"device_id":"PI040384AB6B050319"}': None})
+{"d2c_port": 43210, "controller_type": "computer", "controller_name": "pyparrot", "arstream2_client_stream_port": 55004, "arstream2_client_control_port": 55005}
+{'status': 0, 'c2d_port': 54321, 'c2d_update_port': 51, 'c2d_user_port': 21, 'qos_mode': 0, 'arstream2_server_stream_port': 5004, 'arstream2_server_control_port': 5005}
+c2d_port is 54321
+starting listening at
+ Success in setting up the wifi network to the drone!
+✅ Connecté.
 Traceback (most recent call last):
-  File "C:\Users\Baptiste\anaconda3\Lib\threading.py", line 1073, in _bootstrap_inner
-    self.run()
-  File "C:\Users\Baptiste\anaconda3\Lib\threading.py", line 1010, in run
-    self._target(*self._args, **self._kwargs)
-  File "C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\DroneVision.py", line 196, in _user_callback
-    user_vision_function(user_args)
-  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 129, in vision_callback        
-    fichiers = sorted(
-               ^^^^^^^
-  File "<frozen genericpath>", line 67, in getmtime
-FileNotFoundError: [WinError 2] Le fichier spécifié est introuvable: 'c:\\Users\\Baptiste\\Documents\\GitHub\\Projet_Drone\\Code\\Code_Drone\\Code_Prototypage_Data_Analysis\\images\\image_073.png'
-⏹ Arrêt manuel.
-Killing the ffmpeg subprocess
-Sending a second kill call to the ffmpeg process
- disconnecting 
+  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 163, in <module>
+    bebop.use_custom_ffmpeg_output(IMAGES_DIR)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Bebop' object has no attribute 'use_custom_ffmpeg_output'
