@@ -8,23 +8,21 @@ from pyparrot.Bebop import Bebop
 from pyparrot.DroneVision import DroneVision
 
 # === CONFIGURATION ===
-LOCAL_DIR = os.path.dirname(os.path.abspath(__file__))
-IMAGES_DIR = os.path.join(LOCAL_DIR, "images")
-MASKS_DIR = os.path.join(LOCAL_DIR, "masks")
-os.makedirs(IMAGES_DIR, exist_ok=True)
-os.makedirs(MASKS_DIR, exist_ok=True)
-
+LOCAL_IMAGE_DIR = os.path.join(os.path.dirname(__file__), "images")
 DISPLAY_INTERVAL = 1 / 10  # 10 FPS
 KEEP_LAST = 10
+
+os.makedirs(LOCAL_IMAGE_DIR, exist_ok=True)
+
 last_display_time = 0
 last_image_name = None
 
-# === Détection + sauvegarde fond noir ===
-def detect_gant_and_save_mask(image, filename):
+# === Détection du gant rouge ===
+def detect_gant(image):
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     img_h, img_w = image.shape[:2]
 
-    # Plages HSV personnalisées (gant rouge/brique)
+    # Plages HSV personnalisées pour rouge/brique
     lower1 = np.array([0, 80, 40])
     upper1 = np.array([10, 255, 255])
     lower2 = np.array([10, 100, 50])
@@ -42,6 +40,7 @@ def detect_gant_and_save_mask(image, filename):
     mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
 
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
     best_cnt = None
     max_score = 0
 
@@ -50,6 +49,7 @@ def detect_gant_and_save_mask(image, filename):
         perimeter = cv2.arcLength(cnt, True)
         if perimeter == 0:
             continue
+
         x, y, w, h = cv2.boundingRect(cnt)
         hull = cv2.convexHull(cnt)
         hull_area = cv2.contourArea(hull)
@@ -79,11 +79,6 @@ def detect_gant_and_save_mask(image, filename):
             best_cnt = cnt
 
     if best_cnt is not None:
-        final_mask = np.zeros_like(mask)
-        cv2.drawContours(final_mask, [best_cnt], -1, 255, thickness=cv2.FILLED)
-        result = cv2.bitwise_and(image, image, mask=final_mask)
-        cv2.imwrite(os.path.join(MASKS_DIR, filename), result)
-
         cv2.drawContours(image, [best_cnt], -1, (0, 255, 0), 2)
         x, y, w, h = cv2.boundingRect(best_cnt)
         cv2.putText(image, "Gant detecte", (x, y - 10),
@@ -91,31 +86,21 @@ def detect_gant_and_save_mask(image, filename):
 
     return image
 
-# === Lecture protégée ===
-def lire_image_sans_crash(path, essais=5, delai=0.05):
-    for _ in range(essais):
-        if os.path.exists(path):
-            img = cv2.imread(path)
-            if img is not None:
-                return img
-        time.sleep(delai)
-    return None
-
-# === Nettoyage images ===
+# === Nettoyage images obsolètes ===
 def nettoyer_images():
+    pyparrot_dir = os.path.join(os.path.dirname(__file__), "../../../../../anaconda3/Lib/site-packages/pyparrot/images")
     while True:
-        fichiers = sorted(
-            glob.glob(os.path.join(IMAGES_DIR, "image_*.png")),
-            key=os.path.getmtime
-        )
-        for f in fichiers[:-KEEP_LAST]:
-            try:
-                os.remove(f)
-            except:
-                continue
-        time.sleep(10)
+        fichiers = glob.glob(os.path.join(pyparrot_dir, "image_*.png"))
+        fichiers = sorted(fichiers, key=os.path.getmtime)
+        if len(fichiers) > KEEP_LAST:
+            for f in fichiers[:-KEEP_LAST]:
+                try:
+                    os.remove(f)
+                except:
+                    pass
+        time.sleep(5)
 
-# === Callback vidéo ===
+# === Callback vidéo appelé à chaque image ===
 def vision_callback(_):
     global last_display_time, last_image_name
 
@@ -123,32 +108,45 @@ def vision_callback(_):
     if now - last_display_time < DISPLAY_INTERVAL:
         return
 
-    fichiers = sorted(
-        glob.glob(os.path.join(IMAGES_DIR, "image_*.png")),
-        key=os.path.getmtime
-    )
+    pyparrot_dir = os.path.join(os.path.dirname(__file__), "../../../../../anaconda3/Lib/site-packages/pyparrot/images")
+    fichiers = []
+    for f in glob.glob(os.path.join(pyparrot_dir, "image_*.png")):
+        try:
+            fichiers.append((f, os.path.getmtime(f)))
+        except FileNotFoundError:
+            continue
+
+    fichiers = [f[0] for f in sorted(fichiers, key=lambda x: x[1])]
     if not fichiers:
         return
 
     derniere = fichiers[-1]
     if derniere == last_image_name:
         return
+
     last_image_name = derniere
     last_display_time = now
 
     try:
-        image = lire_image_sans_crash(derniere)
-        if image is None:
-            return
+        img = cv2.imread(derniere)
+        if img is not None:
+            img = cv2.resize(img, (800, int(img.shape[0] * 800 / img.shape[1])))
+            img = detect_gant(img)
 
-        image = cv2.resize(image, (800, int(image.shape[0] * 800 / image.shape[1])))
-        image = detect_gant_and_save_mask(image, os.path.basename(derniere))
-        cv2.imshow("🧤 Gant Detecté", image)
-        cv2.waitKey(1)
+            # Affiche l’image
+            cv2.imshow("🧤 Gant Détecté (Live)", img)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                raise KeyboardInterrupt
+
+            # Sauvegarde en local
+            local_name = os.path.basename(derniere)
+            local_path = os.path.join(LOCAL_IMAGE_DIR, local_name)
+            cv2.imwrite(local_path, img)
+
     except Exception as e:
-        print(f"⚠️ Callback crash évité : {e}")
+        print(f"⚠️ Erreur image : {e}")
 
-# === Connexion drone ===
+# === Connexion au drone ===
 bebop = Bebop()
 bebop.drone_ip = "192.168.42.1"
 
@@ -156,11 +154,9 @@ print("Connexion au drone...")
 if bebop.connect(10):
     print("✅ Connecté.")
 
-    # Nettoyage en fond
     threading.Thread(target=nettoyer_images, daemon=True).start()
 
-    # Dossier d’enregistrement dans PyParrot modifié
-    vision = DroneVision(bebop, is_bebop=True, image_path=IMAGES_DIR)
+    vision = DroneVision(bebop, is_bebop=True)
     vision.set_user_callback_function(vision_callback)
 
     if vision.open_video():
