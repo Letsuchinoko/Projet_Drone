@@ -1,226 +1,68 @@
-[h264 @ 00000202d7466740] non-existing PPS 0 referenced
+[h264 @ 0000017263e16b80] non-existing PPS 0 referenced
 
-[h264 @ 00000202d7466740] decode_slice_header error
+[h264 @ 0000017263e16b80] decode_slice_header error
 
-[h264 @ 00000202d7466740] non-existing PPS 0 referenced
+[h264 @ 0000017263e16b80] non-existing PPS 0 referenced
 
-[h264 @ 00000202d7466740] decode_slice_header error
+[h264 @ 0000017263e16b80] decode_slice_header error
 
-[h264 @ 00000202d7466740] non-existing PPS 0 referenced
+[h264 @ 0000017263e16b80] non-existing PPS 0 referenced
 
-[h264 @ 00000202d7466740] decode_slice_header error
+[h264 @ 0000017263e16b80] decode_slice_header error
 
-[h264 @ 00000202d7466740] non-existing PPS 0 referenced
+[h264 @ 0000017263e16b80] non-existing PPS 0 referenced
 
-[h264 @ 00000202d7466740] decode_slice_header error
+[h264 @ 0000017263e16b80] decode_slice_header error
 
-[h264 @ 00000202d7466740] non-existing PPS 0 referenced
+[h264 @ 0000017263e16b80] non-existing PPS 0 referenced
 
-[h264 @ 00000202d7466740] decode_slice_header error
+[h264 @ 0000017263e16b80] decode_slice_header error
 
-[h264 @ 00000202d7466740] non-existing PPS 0 referenced
+[h264 @ 0000017263e16b80] non-existing PPS 0 referenced
 
-[h264 @ 00000202d7466740] decode_slice_header error
+[h264 @ 0000017263e16b80] decode_slice_header error
 
-[h264 @ 00000202d7466740] non-existing PPS 0 referenced
+[h264 @ 0000017263e16b80] non-existing PPS 0 referenced
 
-[h264 @ 00000202d7466740] decode_slice_header error
+[h264 @ 0000017263e16b80] decode_slice_header error
 
-[h264 @ 00000202d7466740] no frame!
+[h264 @ 0000017263e16b80] non-existing PPS 0 referenced
 
-[sdp @ 00000202d745d640] max delay reached. need to consume packet
+[h264 @ 0000017263e16b80] decode_slice_header error
 
-[sdp @ 00000202d745d640] RTP: missed 240 packets
+[h264 @ 0000017263e16b80] no frame!
 
-[h264 @ 00000202d7466740] concealing 1296 DC, 1296 AC, 1296 MV errors in P frame
+[sdp @ 0000017263dee900] max delay reached. need to consume packet
 
-[h264 @ 00000202d7466740] concealing 162 DC, 162 AC, 162 MV errors in P frame
+[sdp @ 0000017263dee900] RTP: missed 208 packets
 
-[sdp @ 00000202d745d640] max delay reached. need to consume packet
+[h264 @ 0000017263e16b80] concealing 810 DC, 810 AC, 810 MV errors in P frame
 
-[sdp @ 00000202d745d640] RTP: missed 599 packets
+[sdp @ 0000017263dee900] max delay reached. need to consume packet
 
-[h264 @ 00000202d7466740] concealing 54 DC, 54 AC, 54 MV errors in P frame
+[sdp @ 0000017263dee900] RTP: missed 521 packets
 
-[sdp @ 00000202d745d640] max delay reached. need to consume packet
+[sdp @ 0000017263dee900] max delay reached. need to consume packet
 
-[sdp @ 00000202d745d640] RTP: missed 568 packets
+[sdp @ 0000017263dee900] RTP: missed 627 packets
 
-[h264 @ 00000202d7466740] corrupted macroblock 41 3 (total_coeff=-1)
+[h264 @ 0000017263e16b80] concealing 810 DC, 810 AC, 810 MV errors in P frame
 
-[h264 @ 00000202d7466740] error while decoding MB 41 3
+[sdp @ 0000017263dee900] max delay reached. need to consume packet
 
-[h264 @ 00000202d7466740] concealing 1458 DC, 1458 AC, 1458 MV errors in P frame
+[sdp @ 0000017263dee900] RTP: missed 638 packets
 
-[sdp @ 00000202d745d640] max delay reached. need to consume packet
+[sdp @ 0000017263dee900] max delay reached. need to consume packet
 
-[sdp @ 00000202d745d640] RTP: missed 538 packets
+[sdp @ 0000017263dee900] RTP: missed 598 packets
 
-[h264 @ 00000202d7466740] concealing 1512 DC, 1512 AC, 1512 MV errors in P frame
+[sdp @ 0000017263dee900] max delay reached. need to consume packet
 
-[sdp @ 00000202d745d640] max delay reached. need to consume packet
-
-[sdp @ 00000202d745d640] RTP: missed 529 packets
-
-[h264 @ 00000202d7466740] concealing 216 DC, 216 AC, 216 MV errors in P frame
-
-[sdp @ 00000202d745d640] max delay reached. need to consume packet
-
-[sdp @ 00000202d745d640] RTP: missed 542 packets
-
-[h264 @ 00000202d7466740] concealing 756 DC, 756 AC, 756 MV errors in P frame
-
-[h264 @ 00000202d7466740] concealing 216 DC, 216 AC, 216 MV errors in P frame
-
-[sdp @ 00000202d745d640] max delay reached. need to consume packet
-
-[sdp @ 00000202d745d640] RTP: missed 485 packets
-
-[h264 @ 00000202d7466740] concealing 972 DC, 972 AC, 972 MV errors in P frame
-
-[h264 @ 00000202d7466740] concealing 540 DC, 540 AC, 540 MV errors in P frame
-
-[sdp @ 00000202d745d640] max delay reached. need to consume packet
-
-[sdp @ 00000202d745d640] RTP: missed 619 packets
-
-[h264 @ 00000202d7466740] concealing 972 DC, 972 AC, 972 MV errors in P frame
-
-[sdp @ 00000202d745d640] max delay reached. need to consume packet
-
-[sdp @ 00000202d745d640] RTP: missed 506 packets
-
-[h264 @ 00000202d7466740] concealing 162 DC, 162 AC, 162 MV errors in P frame
-
-[sdp @ 00000202d745d640] max delay reached. need to consume packet
-
-[sdp @ 00000202d745d640] RTP: missed 576 packets
-
-[h264 @ 00000202d7466740] Frame num change from 26276 to 26298
-
-[h264 @ 00000202d7466740] decode_slice_header error
-
-[h264 @ 00000202d7466740] Frame num change from 26276 to 26298
-
-[h264 @ 00000202d7466740] decode_slice_header error
-
-[h264 @ 00000202d7466740] Frame num change from 26276 to 26298
-
-[h264 @ 00000202d7466740] decode_slice_header error
-
-[h264 @ 00000202d7466740] Frame num change from 26276 to 26298
-
-[h264 @ 00000202d7466740] decode_slice_header error
-
-[h264 @ 00000202d7466740] Frame num change from 26276 to 26298
-
-[h264 @ 00000202d7466740] decode_slice_header error
-
-[h264 @ 00000202d7466740] Frame num change from 26276 to 26298
-
-[h264 @ 00000202d7466740] decode_slice_header error
-
-[h264 @ 00000202d7466740] Frame num change from 26276 to 26298
-
-[h264 @ 00000202d7466740] decode_slice_header error
-
-[h264 @ 00000202d7466740] Frame num change from 26276 to 26298
-
-[h264 @ 00000202d7466740] decode_slice_header error
-
-[h264 @ 00000202d7466740] Frame num change from 26276 to 26298
-
-[h264 @ 00000202d7466740] decode_slice_header error
-
-[h264 @ 00000202d7466740] Frame num change from 26276 to 26298
-
-[h264 @ 00000202d7466740] decode_slice_header error
-
-[h264 @ 00000202d7466740] Frame num change from 26276 to 26298
-
-[h264 @ 00000202d7466740] decode_slice_header error
-
-[h264 @ 00000202d7466740] Frame num change from 26276 to 26298
-
-[h264 @ 00000202d7466740] decode_slice_header error
-
-[h264 @ 00000202d7466740] Frame num change from 26276 to 26298
-
-[h264 @ 00000202d7466740] decode_slice_header error
-
-[h264 @ 00000202d7466740] Frame num change from 26276 to 26298
-
-[h264 @ 00000202d7466740] decode_slice_header error
-
-[h264 @ 00000202d7466740] Frame num change from 26276 to 26298
-
-[h264 @ 00000202d7466740] decode_slice_header error
-
-[h264 @ 00000202d7466740] Frame num change from 26276 to 26298
-
-[h264 @ 00000202d7466740] decode_slice_header error
-
-[h264 @ 00000202d7466740] Frame num change from 26276 to 26298
-
-[h264 @ 00000202d7466740] decode_slice_header error
-
-[h264 @ 00000202d7466740] Frame num change from 26276 to 26298
-
-[h264 @ 00000202d7466740] decode_slice_header error
-
-[h264 @ 00000202d7466740] Frame num change from 26276 to 26298
-
-[h264 @ 00000202d7466740] decode_slice_header error
-
-[h264 @ 00000202d7466740] Frame num change from 26276 to 26298
-
-[h264 @ 00000202d7466740] decode_slice_header error
-
-[h264 @ 00000202d7466740] concealing 1134 DC, 1134 AC, 1134 MV errors in P frame
-
-[sdp @ 00000202d745d640] max delay reached. need to consume packet
-
-[sdp @ 00000202d745d640] RTP: missed 607 packets
-
-[h264 @ 00000202d7466740] concealing 1188 DC, 1188 AC, 1188 MV errors in P frame
-
-[sdp @ 00000202d745d640] max delay reached. need to consume packet
-
-[sdp @ 00000202d745d640] RTP: missed 568 packets
-
-[h264 @ 00000202d7466740] concealing 324 DC, 324 AC, 324 MV errors in P frame
-
-[h264 @ 00000202d7466740] concealing 1134 DC, 1134 AC, 1134 MV errors in I frame
-
-[sdp @ 00000202d745d640] max delay reached. need to consume packet
-
-[sdp @ 00000202d745d640] RTP: missed 622 packets
-
-[h264 @ 00000202d7466740] Invalid level prefix
-
-[h264 @ 00000202d7466740] error while decoding MB 24 10
-
-[h264 @ 00000202d7466740] concealing 1080 DC, 1080 AC, 1080 MV errors in P frame
-
-[sdp @ 00000202d745d640] max delay reached. need to consume packet
-
-[sdp @ 00000202d745d640] RTP: missed 617 packets
-
-[sdp @ 00000202d745d640] max delay reached. need to consume packet
-
-[sdp @ 00000202d745d640] RTP: missed 594 packets
-
-[sdp @ 00000202d745d640] max delay reached. need to consume packet
-
-[sdp @ 00000202d745d640] RTP: missed 577 packets
-
-[sdp @ 00000202d745d640] max delay reached. need to consume packet
-
-[sdp @ 00000202d745d640] RTP: missed 553 packets
+[sdp @ 0000017263dee900] RTP: missed 580 packets
 
 Input #0, sdp, from 'C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\utils/bebop.sdp':
 
-  Duration: N/A, start: 23.008167, bitrate: N/A
+  Duration: N/A, start: 4.904911, bitrate: N/A
 
   Stream #0:0: Video: h264 (Constrained Baseline), yuv420p(progressive), 856x480 [SAR 1:1 DAR 107:60], 29.97 fps, 29.97 tbr, 90k tbn
 
@@ -237,14 +79,12 @@ Traceback (most recent call last):
     self._target(*self._args, **self._kwargs)
   File "C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\DroneVision.py", line 196, in _user_callback
     user_vision_function(user_args)
-  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Flux_Avec_Detection\Detection_Live.py", line 113, in vision_callback    
+  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 129, in vision_callback        
     fichiers = sorted(
                ^^^^^^^
   File "<frozen genericpath>", line 67, in getmtime
-FileNotFoundError: [WinError 2] Le fichier spécifié est introuvable: 'C:/Users/Baptiste/anaconda3/Lib/site-packages/pyparrot/images\\image_393.png'  
-timeout - trying again
+FileNotFoundError: [WinError 2] Le fichier spécifié est introuvable: 'c:\\Users\\Baptiste\\Documents\\GitHub\\Projet_Drone\\Code\\Code_Drone\\Code_Prototypage_Data_Analysis\\images\\image_073.png'
 ⏹ Arrêt manuel.
 Killing the ffmpeg subprocess
-timeout - trying again
 Sending a second kill call to the ffmpeg process
- disconnecting
+ disconnecting 
