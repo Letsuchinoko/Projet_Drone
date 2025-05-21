@@ -9,6 +9,7 @@ from pyparrot.DroneVision import DroneVision
 
 # === CONFIGURATION ===
 LOCAL_IMAGE_DIR = os.path.join(os.path.dirname(__file__), "images")
+PYPARROT_IMAGE_DIR = os.path.join(os.path.dirname(__file__), "C:/Users/Baptiste/anaconda3/Lib/site-packages/pyparrot/images")
 DISPLAY_INTERVAL = 1 / 10  # 10 FPS
 KEEP_LAST = 10
 
@@ -108,9 +109,8 @@ def vision_callback(_):
     if now - last_display_time < DISPLAY_INTERVAL:
         return
 
-    pyparrot_dir = os.path.join(os.path.dirname(__file__), "../../../../../anaconda3/Lib/site-packages/pyparrot/images")
     fichiers = []
-    for f in glob.glob(os.path.join(pyparrot_dir, "image_*.png")):
+    for f in glob.glob(os.path.join(PYPARROT_IMAGE_DIR, "image_*.png")):
         try:
             fichiers.append((f, os.path.getmtime(f)))
         except FileNotFoundError:
@@ -128,23 +128,32 @@ def vision_callback(_):
     last_display_time = now
 
     try:
-        img = cv2.imread(derniere)
-        if img is not None:
-            img = cv2.resize(img, (800, int(img.shape[0] * 800 / img.shape[1])))
-            img = detect_gant(img)
+        # 🔁 Lecture robuste de l'image (attente si en cours d'écriture)
+        for _ in range(3):
+            img = cv2.imread(derniere)
+            if img is not None:
+                break
+            time.sleep(0.05)  # 50ms
 
-            # Affiche l’image
-            cv2.imshow("🧤 Gant Détecté (Live)", img)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                raise KeyboardInterrupt
+        if img is None:
+            print("⚠️ Image corrompue ou non disponible")
+            return
 
-            # Sauvegarde en local
-            local_name = os.path.basename(derniere)
-            local_path = os.path.join(LOCAL_IMAGE_DIR, local_name)
-            cv2.imwrite(local_path, img)
+        img = cv2.resize(img, (800, int(img.shape[0] * 800 / img.shape[1])))
+        img = detect_gant(img)
+
+        # Affiche l’image
+        cv2.imshow("🧤 Gant Détecté (Live)", img)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            raise KeyboardInterrupt
+
+        # Sauvegarde locale
+        local_name = os.path.basename(derniere)
+        local_path = os.path.join(LOCAL_IMAGE_DIR, local_name)
+        cv2.imwrite(local_path, img)
 
     except Exception as e:
-        print(f"⚠️ Erreur image : {e}")
+        print(f"⚠️ Erreur vision_callback : {e}")
 
 # === Connexion au drone ===
 bebop = Bebop()
