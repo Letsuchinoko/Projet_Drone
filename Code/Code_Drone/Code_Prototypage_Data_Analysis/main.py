@@ -126,8 +126,10 @@ def vision_callback(_):
     if now - last_display_time < DISPLAY_INTERVAL:
         return
 
-    fichiers = sorted(glob.glob(os.path.join(IMAGES_DIR, "image_*.png")),
-                      key=os.path.getmtime)
+    fichiers = sorted(
+        glob.glob(os.path.join(IMAGES_DIR, "image_*.png")),
+        key=os.path.getmtime
+    )
 
     if not fichiers:
         return
@@ -136,19 +138,30 @@ def vision_callback(_):
     if derniere == last_image_name:
         return
 
+    # Attendre que ffmpeg ait bien fini d'écrire le fichier (max 200ms)
+    for _ in range(5):
+        try:
+            img = cv2.imread(derniere)
+            if img is not None:
+                break
+        except:
+            pass
+        time.sleep(0.05)
+    else:
+        return  # image toujours illisible → on skip
+
     last_image_name = derniere
     last_display_time = now
 
     try:
-        img = cv2.imread(derniere)
-        if img is not None:
-            img = cv2.resize(img, (800, int(img.shape[0] * 800 / img.shape[1])))
-            img = detect_gant_and_save_mask(img, derniere)
-            cv2.imshow("🧤 Détection Gant Rouge", img)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                raise KeyboardInterrupt
+        img = cv2.resize(img, (800, int(img.shape[0] * 800 / img.shape[1])))
+        img = detect_gant_and_save_mask(img, derniere)
+        cv2.imshow("🧤 Détection Gant Rouge", img)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            raise KeyboardInterrupt
     except Exception as e:
         print(f"⚠️ Vision error: {e}")
+
 
 # === Connexion au drone ===
 bebop = Bebop()
