@@ -1,4 +1,4 @@
-25597572341592845
+25601067917009736
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -67871,6 +67871,20 @@ MODULE_NUCLEO-F303K8
 0
 30
 30
+Librairie_Drone
+PinSocket_1x03_P1.27mm_Vertical_2
+Through hole straight socket strip, 1x03, 1.27mm pitch, single row (from Kicad 4.0.7), script generated
+Through hole socket strip THT 1x03 1.27mm single row
+0
+3
+3
+Librairie_Drone
+PinSocket_1x06_P1.27mm_Vertical_2
+Through hole straight socket strip, 1x06, 1.27mm pitch, single row (from Kicad 4.0.7), script generated
+Through hole socket strip THT 1x06 1.27mm single row
+0
+6
+6
 Module
 A20_OLINUXINO_LIME2
 A20 Olinuxino LIME2, 1.2GHz, 512-1024MB RAM, Micro-SD, NAND or eMMC, 1000Mbit Ethernet
