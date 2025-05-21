@@ -160,9 +160,7 @@ if bebop.connect(10):
     threading.Thread(target=nettoyer_images, daemon=True).start()
 
     # Dossier d’enregistrement dans PyParrot modifié
-    bebop.use_custom_ffmpeg_output(IMAGES_DIR)
-
-    vision = DroneVision(bebop, is_bebop=True)
+    vision = DroneVision(bebop, is_bebop=True, image_path=IMAGES_DIR)
     vision.set_user_callback_function(vision_callback)
 
     if vision.open_video():
