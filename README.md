@@ -121,8 +121,16 @@ Utilisation de **TensorFlow**, **HuggingFace** et **Teachable Machine** pour :
 
 ## 🔐 Licence
 
-Ce projet est sous licence **Creative Commons Attribution – NonCommercial 4.0 International (CC BY-NC 4.0)**  
-📖 [Lire la licence](https://creativecommons.org/licenses/by-nc/4.0/)
+Ce projet est sous licence **Creative Commons Attribution - NonCommercial 4.0 International (CC BY-NC 4.0)**.  
+Vous êtes libre de :
+- **Partager** — copier, distribuer et communiquer le matériel par tous moyens et sous tous formats
+- **Adapter** — remixer, transformer et créer à partir du matériel
+
+Sous les conditions suivantes :
+- **Attribution** — Vous devez créditer le projet, fournir un lien vers la licence, et indiquer si des modifications ont été effectuées.
+- **Pas d'utilisation commerciale** — Vous ne pouvez pas faire un usage commercial de ce contenu.
+
+📖 [Consulter la licence complète](https://creativecommons.org/licenses/by-nc/4.0/)
 
 ---
 
