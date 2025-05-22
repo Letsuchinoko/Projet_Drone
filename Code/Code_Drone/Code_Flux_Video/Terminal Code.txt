@@ -1,3 +1,6 @@
 PS C:\Users\Baptiste\Documents\GitHub\Projet_Drone> & C:/Users/Baptiste/anaconda3/python.exe c:/Users/Baptiste/Documents/GitHub/Projet_Drone/Code/Code_Drone/Code_Prototypage_Data_Analysis/main.py
-[rtp @ 0000014145b07d80] Protocol 'rtp' not on whitelist 'file,crypto,data'!
-❌ Impossible d'ouvrir le flux vidéo à c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\bebop.sdp   
+Traceback (most recent call last):
+  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 16, in <module>
+    from pyparrot.DroneVision import IMAGE_DIR  # Ce répertoire contient bebop.sdp
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ImportError: cannot import name 'IMAGE_DIR' from 'pyparrot.DroneVision' (C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\DroneVision.py)
