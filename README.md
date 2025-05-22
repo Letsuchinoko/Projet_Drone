@@ -9,7 +9,7 @@ Projet réalisé à l’IUT de Cachan – Université Paris-Saclay
 
 Développer un **drone autonome piloté par reconnaissance gestuelle via IA**, capable de se déplacer dans des **zones difficiles d’accès** pour effectuer des **mesures sonores** (niveau en dB) à proximité d'une enceinte.
 
-### 🔍 Fonctionnement global :
+### 🔍 Fonctions :
 - 🎮 L’utilisateur dirige le drone à l’aide de **gestes manuels**, détectés par la **caméra du drone**.
 - 🧠 Une **IA traite les mouvements** pour piloter le drone.
 - 📡 Le drone embarque une carte STM32 avec **capteurs GPS et niveau sonore**.
