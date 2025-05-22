@@ -22,12 +22,12 @@ Développer un **drone autonome piloté par reconnaissance gestuelle via IA**, c
 ```
 Projet_Drone/
 │
-├── Carte_Drone/                  # ⚙️ Conception de la carte électronique (KiCad)
+├── Carte_Drone/                 # ⚙️ Conception de la carte électronique (KiCad)
 │
 ├── Code/
 │   ├── Code_Drone/              # 🎥 Vision embarquée (détection main + OpenCV)
-│   ├── Code_API_Drone/         # 📱 App Android pour affichage données capteurs
-│   └── Code_general/           # 🔧 (Extensions futures / archives)
+│   ├── Code_API_Drone/          # 📱 App Android pour affichage données capteurs
+│   └── Code_general/            # 🔧 (Extensions futures / archives)
 │
 ├── Documents/                   # 📄 Carte mentale, matériel, visuels, images
 │   ├── Carte mentale.drawio
@@ -90,10 +90,10 @@ Utilisation de **TensorFlow**, **HuggingFace** et **Teachable Machine** pour :
 
 | Prénom           | Pseudo GitHub       | Rôle principal                                      | Tâches principales |
 |------------------|---------------------|-----------------------------------------------------|---------------------|
-| **Bouna**        | `weeduck12`         | Capteurs & instrumentation                         | Configuration capteurs, acquisition GPS, mesure dB, visualisation |
-| **Baptiste**     | `Letsuchinoko`      | Carte électronique                                 | Design KiCad, soudure, tests continuité, liaison Bluetooth |
-| **Abderrahmane** | `Abderra-boutka`    | Application mobile (API)                           | Dev Android Studio, réception Bluetooth, affichage, tests multiplateforme |
-| **Rayan**        | `RayKill`           | IA & pilotage du drone                             | Détection main, reconnaissance de geste, entraînement IA, contrôle drone |
+| **Bouna**        | `weeduck12`         | Capteurs & instrumentation                          | Configuration capteurs, acquisition GPS, mesure dB, visualisation |
+| **Baptiste**     | `Letsuchinoko`      | Carte électronique                                  | Design KiCad, soudure, tests continuité, liaison Bluetooth |
+| **Abderrahmane** | `Abderra-boutka`    | Application mobile (API)                            | Dev Android Studio, réception Bluetooth, affichage, tests multiplateforme |
+| **Rayan**        | `RayKill`           | IA & pilotage du drone                              | Détection main, reconnaissance de geste, entraînement IA, contrôle drone |
 
 ---
 
@@ -110,11 +110,11 @@ Utilisation de **TensorFlow**, **HuggingFace** et **Teachable Machine** pour :
 
 ## 📅 Avancement
 
-| Module                    | État       |
-|--------------------------|------------|
-| Détection main / IA      | ✅ Fonctionnel |
-| Carte électronique        | 🛠️ En test    |
-| App mobile Android        | 🔧 En cours  |
+| Module                    | État              |
+|---------------------------|-------------------|
+| Détection main / IA       | ✅ Fonctionnel    |
+| Carte électronique        | 🛠️ En test        |
+| App mobile Android        | 🔧 En cours       |
 | Contrôle IA du drone      | 🔜 En intégration |
 
 ---
@@ -129,4 +129,4 @@ Ce projet est sous licence **Creative Commons Attribution – NonCommercial 4.0 
 ## 🏁 Remerciements
 
 Projet encadré par **Mr. Mininger**  
-Formation BUT GEII – IUT de Cachan – Université Paris-Saclay – Promo 2025
+Formation LP MECSE GEII – IUT de Cachan – Université Paris-Saclay – Promo 2025
