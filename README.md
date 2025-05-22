@@ -112,7 +112,7 @@ Utilisation de **TensorFlow**, **HuggingFace** et **Teachable Machine** pour :
 
 | Module                    | État              |
 |---------------------------|-------------------|
-| Détection main + flux     | ✅ Fonctionnel    |
+| Détection gant + flux     | ✅ Fonctionnel    |
 | Carte électronique        | 🛠️ En test        |
 | App mobile Android        | 🔧 En cours       |
 | Contrôle IA du drone      | 🔜 En intégration |
