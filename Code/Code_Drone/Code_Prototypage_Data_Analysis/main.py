@@ -26,19 +26,22 @@ def detect_gant(image):
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     img_h, img_w = image.shape[:2]
 
+    # Plages personnalisées selon tes couleurs de gant
     lower1 = np.array([0, 80, 40])
     upper1 = np.array([10, 255, 255])
+
     lower2 = np.array([10, 100, 50])
     upper2 = np.array([25, 255, 255])
+
     lower3 = np.array([170, 50, 40])
     upper3 = np.array([180, 255, 255])
 
     mask1 = cv2.inRange(hsv, lower1, upper1)
     mask2 = cv2.inRange(hsv, lower2, upper2)
     mask3 = cv2.inRange(hsv, lower3, upper3)
-
     mask = cv2.bitwise_or(mask1, cv2.bitwise_or(mask2, mask3))
 
+    # Nettoyage
     kernel = np.ones((5, 5), np.uint8)
     mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
     mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
@@ -82,21 +85,21 @@ def detect_gant(image):
             max_score = score
             best_cnt = cnt
 
+    final_mask = None
     if best_cnt is not None:
-        x, y, w, h = cv2.boundingRect(best_cnt)
+        mask_gant = np.zeros_like(mask)
+        cv2.drawContours(mask_gant, [best_cnt], -1, 255, thickness=cv2.FILLED)
+
+        blurred = cv2.GaussianBlur(mask_gant, (7, 7), 0)
+        _, final_mask = cv2.threshold(blurred, 50, 255, cv2.THRESH_BINARY)
+
+        # Annotation sur image originale
         cv2.drawContours(image, [best_cnt], -1, (0, 255, 0), 2)
+        x, y, w, h = cv2.boundingRect(best_cnt)
         cv2.putText(image, "Gant detecte", (x, y - 10),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
-        mask_gant = np.zeros(image.shape[:2], dtype=np.uint8)
-        cv2.drawContours(mask_gant, [best_cnt], -1, 255, -1)
-        gant_only = cv2.bitwise_and(image, image, mask=mask_gant)
-
-        filename = f"debug_{int(time.time()*1000)%100000}.png"
-        out_path = os.path.join(GANT_ONLY_DIR, filename)
-        cv2.imwrite(out_path, gant_only)
-
-    return image
+    return image, final_mask
 
 def affichage_thread(queue):
     while True:
