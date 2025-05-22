@@ -121,30 +121,39 @@ def vision_callback(_):
     if now - last_display_time < DISPLAY_INTERVAL:
         return
 
-    raw_files = glob.glob(os.path.join(IMAGES_DIR, "image_*.png"))
-    fichiers = [(f, os.path.getmtime(f)) for f in raw_files if os.path.exists(f)]
-    fichiers = [f[0] for f in sorted(fichiers, key=lambda x: x[1])]
-
-    if not fichiers:
-        return
-
-    derniere = fichiers[-1]
-    if derniere == last_image_name:
-        return
-
-    last_image_name = derniere
-    last_display_time = now
-
     try:
-        img = cv2.imread(derniere)
-        if img is not None:
-            img = cv2.resize(img, (800, int(img.shape[0] * 800 / img.shape[1])))
-            img = detect_gant(img)
-            cv2.imshow("🧤 Détection Gant Rouge", img)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                raise KeyboardInterrupt
+        raw_files = glob.glob(os.path.join(IMAGES_DIR, "image_*.png"))
+        fichiers = [(f, os.path.getmtime(f)) for f in raw_files if os.path.exists(f)]
+        fichiers = [f[0] for f in sorted(fichiers, key=lambda x: x[1])]
+
+        if not fichiers:
+            return
+
+        derniere = fichiers[-1]
+        if derniere == last_image_name:
+            return
+
+        last_image_name = derniere
+        last_display_time = now
+
+        # Attente si l'image est en cours d'écriture
+        for _ in range(3):
+            img = cv2.imread(derniere)
+            if img is not None:
+                break
+            time.sleep(0.05)
+        else:
+            print(f"⚠️ Impossible de lire {derniere}")
+            return
+
+        img = cv2.resize(img, (800, int(img.shape[0] * 800 / img.shape[1])))
+        img = detect_gant(img)
+        cv2.imshow("🧤 Détection Gant Rouge", img)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            raise KeyboardInterrupt
+
     except Exception as e:
-        print(f"⚠️ Vision error: {e}")
+        print(f"❌ Erreur dans vision_callback: {e}")
 
 # === Connexion au drone et lancement ===
 bebop = Bebop()
