@@ -1,26 +1,50 @@
+import subprocess
+import numpy as np
 import cv2
 import os
 
-# 🧠 Résout dynamiquement le chemin du fichier .sdp à partir de ce script
+# Chemin vers bebop.sdp dans le même dossier que le script
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sdp_path = os.path.join(current_dir, "bebop.sdp")
 
-# 👇 Assure-toi que ffmpeg le trouve
-cap = cv2.VideoCapture(sdp_path, cv2.CAP_FFMPEG)
+if not os.path.exists(sdp_path):
+    print("❌ Le fichier bebop.sdp est introuvable.")
+    exit()
 
-if not cap.isOpened():
-    print(f"❌ Impossible d'ouvrir le flux vidéo à {sdp_path}")
-else:
-    print("✅ Flux vidéo ouvert.")
+print("🎥 Démarrage du flux via FFmpeg en lecture mémoire...")
+
+# Commande FFmpeg avec protocol_whitelist
+cmd = [
+    "ffmpeg",
+    "-protocol_whitelist", "file,rtp,udp",
+    "-i", sdp_path,
+    "-f", "rawvideo",
+    "-pix_fmt", "bgr24",
+    "-"
+]
+
+# Taille des images attendues (856x480), modifiable si besoin
+width, height = 856, 480
+frame_size = width * height * 3  # bgr24 = 3 bytes par pixel
+
+# Lancement de FFmpeg
+proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+
+try:
     while True:
-        ret, frame = cap.read()
-        if not ret:
-            print("⚠️ Trame incomplète")
-            continue
+        raw_frame = proc.stdout.read(frame_size)
+        if not raw_frame:
+            print("⚠️ Flux interrompu")
+            break
 
-        cv2.imshow("🎥 Flux direct Bebop", frame)
+        frame = np.frombuffer(raw_frame, np.uint8).reshape((height, width, 3))
+        cv2.imshow("🎥 Flux Bebop direct", frame)
+
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-    cap.release()
+except KeyboardInterrupt:
+    print("⏹ Arrêt manuel.")
+finally:
+    proc.terminate()
     cv2.destroyAllWindows()
