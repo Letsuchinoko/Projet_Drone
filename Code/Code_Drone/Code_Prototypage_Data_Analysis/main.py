@@ -3,84 +3,72 @@ import cv2
 import time
 import numpy as np
 import subprocess
-from pyparrot.Bebop import Bebop
+import threading
 
 # === CONFIGURATION ===
-WIDTH, HEIGHT = 856, 480  # Résolution native du Bebop2
+WIDTH, HEIGHT = 1280, 720  # Résolution souhaitée
 PIX_FMT = "bgr24"
 SDP_FILENAME = "bebop.sdp"
 FFMPEG_BIN = "ffmpeg"
 DISPLAY_INTERVAL = 1 / 10  # 10 FPS
 
-# === Chemin absolu du fichier .sdp ===
+# === Préparation chemins ===
 script_dir = os.path.dirname(os.path.abspath(__file__))
 sdp_path = os.path.join(script_dir, SDP_FILENAME)
 
-# === Connexion au drone ===
-bebop = Bebop()
-print("Connexion au drone...")
-if not bebop.connect(10):
-    print("❌ Connexion échouée.")
+# === Vérifie que le fichier SDP existe ===
+if not os.path.exists(sdp_path):
+    print(f"❌ Fichier SDP introuvable : {sdp_path}")
     exit(1)
 
-print("✅ Connecté.")
-
-# === Vérifie que le fichier SDP est prêt ===
-sdp_template = """v=0
-o=- 0 0 IN IP4 127.0.0.1
-s=Parrot Bebop2 Video
-c=IN IP4 224.1.1.1
-t=0 0
-m=video 5004 RTP/AVP 96
-a=rtpmap:96 H264/90000
-"""
-
-try:
-    with open(sdp_path, 'w') as f:
-        f.write(sdp_template)
-except Exception as e:
-    print(f"❌ Erreur lors de l'écriture du fichier SDP : {e}")
-    bebop.disconnect()
-    exit(1)
-
-# === Lancer ffmpeg pour lire directement le flux vidéo ===
+# === Démarrage du flux ffmpeg ===
+print("🎥 Démarrage du flux vidéo direct...")
 cmd = [
     FFMPEG_BIN,
     "-protocol_whitelist", "file,udp,rtp",
     "-fflags", "nobuffer",
+    "-flags", "low_delay",
+    "-analyzeduration", "0",
+    "-probesize", "32",
     "-i", sdp_path,
     "-f", "rawvideo",
     "-pix_fmt", PIX_FMT,
     "-"
 ]
 
-print("🎥 Lancement du flux vidéo...")
 try:
     process = subprocess.Popen(
         cmd,
         stdout=subprocess.PIPE,
-        stderr=subprocess.DEVNULL  # ignore les logs ffmpeg
+        stderr=subprocess.DEVNULL  # ignorer les erreurs flood
     )
+    time.sleep(2)  # Laisse ffmpeg initier le flux correctement
 except Exception as e:
-    print(f"❌ Erreur lancement ffmpeg : {e}")
-    bebop.disconnect()
+    print(f"❌ Impossible de lancer ffmpeg : {e}")
     exit(1)
 
-frame_size = WIDTH * HEIGHT * 3  # chaque pixel = 3 bytes (bgr)
+frame_size = WIDTH * HEIGHT * 3
 last_display = 0
 
 try:
+    # Attente de la première frame complète
     while True:
         raw_frame = process.stdout.read(frame_size)
-        if not raw_frame or len(raw_frame) != frame_size:
-            print("⚠️ Trame incomplète")
+        if len(raw_frame) == frame_size:
+            break
+        time.sleep(0.01)
+
+    while True:
+        raw_frame = process.stdout.read(frame_size)
+        if len(raw_frame) != frame_size:
+            time.sleep(0.01)
             continue
 
-        frame = np.frombuffer(raw_frame, dtype=np.uint8).reshape((HEIGHT, WIDTH, 3))
-        now = time.time()
+        frame = np.frombuffer(raw_frame, np.uint8).reshape((HEIGHT, WIDTH, 3))
 
+        now = time.time()
         if now - last_display >= DISPLAY_INTERVAL:
-            cv2.imshow("🎥 Bebop2 - Flux Live", frame)
+            cv2.imshow("🎥 Bebop2 Live Stream", frame)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
             last_display = now
@@ -89,7 +77,6 @@ except KeyboardInterrupt:
     print("\n⏹ Arrêt manuel.")
 
 finally:
-    print("🔌 Déconnexion et fermeture...")
+    print("Fermeture du flux...")
     process.kill()
-    bebop.disconnect()
     cv2.destroyAllWindows()
