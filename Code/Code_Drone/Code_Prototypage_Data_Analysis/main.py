@@ -1,50 +1,72 @@
+import os
+import cv2
+import time
+import shutil
 import subprocess
 import numpy as np
-import cv2
-import os
+import pyparrot
 
-# Chemin vers bebop.sdp dans le même dossier que le script
-current_dir = os.path.dirname(os.path.abspath(__file__))
-sdp_path = os.path.join(current_dir, "bebop.sdp")
+# === CONSTANTES ===
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+SDP_SOURCE = os.path.join(os.path.dirname(pyparrot.__file__), "utils", "bebop.sdp")
+SDP_LOCAL = os.path.join(SCRIPT_DIR, "bebop.sdp")
 
-if not os.path.exists(sdp_path):
-    print("❌ Le fichier bebop.sdp est introuvable.")
-    exit()
+# === COPIE SDP LOCAL ===
+def copier_sdp_local():
+    if os.path.exists(SDP_SOURCE):
+        shutil.copy2(SDP_SOURCE, SDP_LOCAL)
+        print(f"✅ bebop.sdp copié dans le dossier local.")
+    else:
+        print("❌ Fichier bebop.sdp introuvable dans pyparrot.")
 
-print("🎥 Démarrage du flux via FFmpeg en lecture mémoire...")
+# === DÉCODAGE FLUX EN DIRECT ===
+def lire_flux_video_direct(path_sdp):
+    if not os.path.exists(path_sdp):
+        print(f"❌ Fichier SDP introuvable : {path_sdp}")
+        return
 
-# Commande FFmpeg avec protocol_whitelist
-cmd = [
-    "ffmpeg",
-    "-protocol_whitelist", "file,rtp,udp",
-    "-i", sdp_path,
-    "-f", "rawvideo",
-    "-pix_fmt", "bgr24",
-    "-"
-]
+    print("🎥 Démarrage du flux vidéo direct...")
 
-# Taille des images attendues (856x480), modifiable si besoin
-width, height = 856, 480
-frame_size = width * height * 3  # bgr24 = 3 bytes par pixel
+    ffmpeg_cmd = [
+        "ffmpeg",
+        "-protocol_whitelist", "file,rtp,udp",
+        "-i", path_sdp,
+        "-f", "image2pipe",
+        "-pix_fmt", "bgr24",
+        "-vcodec", "rawvideo",
+        "-"
+    ]
 
-# Lancement de FFmpeg
-proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    try:
+        process = subprocess.Popen(
+            ffmpeg_cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,  # désactive les logs bruyants
+            bufsize=10**8
+        )
 
-try:
-    while True:
-        raw_frame = proc.stdout.read(frame_size)
-        if not raw_frame:
-            print("⚠️ Flux interrompu")
-            break
+        width, height = 856, 480  # dimensions par défaut
+        frame_size = width * height * 3
 
-        frame = np.frombuffer(raw_frame, np.uint8).reshape((height, width, 3))
-        cv2.imshow("🎥 Flux Bebop direct", frame)
+        while True:
+            raw_frame = process.stdout.read(frame_size)
+            if len(raw_frame) != frame_size:
+                print("⚠️ Trame incomplète")
+                break
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+            frame = np.frombuffer(raw_frame, np.uint8).reshape((height, width, 3))
+            cv2.imshow("📡 Flux Drone Direct", frame)
+            if cv2.waitKey(1) & 0xFF == ord("q"):
+                break
 
-except KeyboardInterrupt:
-    print("⏹ Arrêt manuel.")
-finally:
-    proc.terminate()
-    cv2.destroyAllWindows()
+    except Exception as e:
+        print(f"❌ Erreur durant le décodage : {e}")
+
+    finally:
+        cv2.destroyAllWindows()
+        process.kill()
+
+# === POINT D’ENTRÉE ===
+if __name__ == "__main__":
+    copier_sdp_local()
+    lire_flux_video_direct(SDP_LOCAL)
