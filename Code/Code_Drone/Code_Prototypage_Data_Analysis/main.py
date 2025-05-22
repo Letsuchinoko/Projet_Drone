@@ -5,6 +5,7 @@ import shutil
 import subprocess
 import numpy as np
 import pyparrot
+import json
 
 # === CONSTANTES ===
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -19,13 +20,38 @@ def copier_sdp_local():
     else:
         print("❌ Fichier bebop.sdp introuvable dans pyparrot.")
 
-# === DÉCODAGE FLUX EN DIRECT ===
+# === DÉTECTION AUTOMATIQUE DE LA TAILLE VIA Ffprobe ===
+def get_resolution(sdp_path):
+    cmd = [
+        "ffprobe",
+        "-v", "quiet",
+        "-print_format", "json",
+        "-show_streams",
+        sdp_path
+    ]
+    try:
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
+        info = json.loads(result.stdout)
+        video_stream = next((s for s in info["streams"] if s["codec_type"] == "video"), None)
+        if video_stream:
+            width = int(video_stream["width"])
+            height = int(video_stream["height"])
+            return width, height
+    except Exception as e:
+        print(f"❌ Erreur détection résolution : {e}")
+    return 856, 480  # fallback
+
+# === LECTURE FLUX VIDEO EN TEMPS RÉEL ===
 def lire_flux_video_direct(path_sdp):
     if not os.path.exists(path_sdp):
         print(f"❌ Fichier SDP introuvable : {path_sdp}")
         return
 
     print("🎥 Démarrage du flux vidéo direct...")
+
+    width, height = get_resolution(path_sdp)
+    print(f"🖼️ Résolution détectée : {width}x{height}")
+    frame_size = width * height * 3
 
     ffmpeg_cmd = [
         "ffmpeg",
@@ -41,12 +67,9 @@ def lire_flux_video_direct(path_sdp):
         process = subprocess.Popen(
             ffmpeg_cmd,
             stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,  # désactive les logs bruyants
+            stderr=subprocess.DEVNULL,
             bufsize=10**8
         )
-
-        width, height = 856, 480  # dimensions par défaut
-        frame_size = width * height * 3
 
         while True:
             raw_frame = process.stdout.read(frame_size)
