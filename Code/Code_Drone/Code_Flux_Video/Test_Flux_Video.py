@@ -1,76 +1,94 @@
 import os
+import glob
 import cv2
 import time
-import numpy as np
-import subprocess
+import threading
+from collections import deque
 from pyparrot.Bebop import Bebop
+from pyparrot.DroneVision import DroneVision
 
 # === CONFIGURATION ===
-WIDTH, HEIGHT = 856, 480  # Résolution du Bebop2
-PIX_FMT = "bgr24"
-DISPLAY_INTERVAL = 1 / 10  # 10 FPS
-FFMPEG_BIN = "ffmpeg"
-SDP_NAME = "bebop.sdp"
+IMAGES_DIR = "C:/Users/Baptiste/anaconda3/Lib/site-packages/pyparrot/images"
+FRAME_BUFFER_SIZE = 2
+KEEP_LAST = 10  # On garde au moins 10 images
+CLEANUP_INTERVAL = 15  # Nettoyage toutes les 15 sec
+DISPLAY_INTERVAL = 1 / 5  # 5 FPS
 
-# === Récupérer chemin absolu vers le .sdp généré par pyparrot ===
-from pyparrot.DroneVision import IMAGE_DIR  # Ce répertoire contient bebop.sdp
-SDP_PATH = os.path.join(IMAGE_DIR, SDP_NAME)
+last_display_time = 0
+frame_buffer = deque(maxlen=FRAME_BUFFER_SIZE)
 
-# === Connexion PyParrot ===
-bebop = Bebop()
-print("Connexion au drone...")
-if not bebop.connect(10):
-    print("❌ Erreur de connexion")
-    exit(1)
-print("✅ Connecté")
-
-# === Lancer le flux vidéo ffmpeg en RAM (stdout) ===
-print("🎥 Démarrage du flux vidéo direct...")
-cmd = [
-    FFMPEG_BIN,
-    "-protocol_whitelist", "file,udp,rtp",
-    "-fflags", "nobuffer",
-    "-i", SDP_PATH,
-    "-f", "rawvideo",
-    "-pix_fmt", PIX_FMT,
-    "-"
-]
-
-try:
-    process = subprocess.Popen(
-        cmd,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.DEVNULL  # cacher logs ffmpeg
-    )
-except Exception as e:
-    print(f"❌ Impossible de lancer ffmpeg : {e}")
-    bebop.disconnect()
-    exit(1)
-
-frame_size = WIDTH * HEIGHT * 3
-last_display = 0
-
-try:
+# === THREAD de nettoyage ===
+def nettoyer_images():
     while True:
-        raw_frame = process.stdout.read(frame_size)
-        if not raw_frame or len(raw_frame) != frame_size:
-            print("⚠️ Trame incomplète")
-            continue
+        fichiers = sorted(
+            glob.glob(os.path.join(IMAGES_DIR, "image_*.png")),
+            key=os.path.getmtime
+        )
+        if len(fichiers) > KEEP_LAST:
+            for f in fichiers[:-KEEP_LAST]:
+                try:
+                    os.remove(f)
+                except:
+                    pass
+        time.sleep(CLEANUP_INTERVAL)
 
-        frame = np.frombuffer(raw_frame, np.uint8).reshape((HEIGHT, WIDTH, 3))
-        now = time.time()
+# === CALLBACK vidéo ===
+def vision_callback(_):
+    global last_display_time, frame_buffer
 
-        if now - last_display >= DISPLAY_INTERVAL:
-            cv2.imshow("🎥 Bebop2 Live (RAM only)", frame)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-            last_display = now
+    now = time.time()
+    if now - last_display_time < DISPLAY_INTERVAL:
+        return
 
-except KeyboardInterrupt:
-    print("⏹ Arrêt manuel.")
+    last_display_time = now
 
-finally:
-    print("🧹 Fermeture...")
-    process.kill()
-    bebop.disconnect()
-    cv2.destroyAllWindows()
+    try:
+        fichiers = sorted(
+            glob.glob(os.path.join(IMAGES_DIR, "image_*.png")),
+            key=os.path.getmtime
+        )
+
+        if not fichiers:
+            return
+
+        derniere = fichiers[-1]
+        img = cv2.imread(derniere)
+        if img is not None:
+            frame_buffer.append(img)
+            cv2.imshow("🖼️ Flux Bebop2 Live (RAM buffer)", frame_buffer[-1])
+            cv2.waitKey(1)
+
+    except Exception as e:
+        print(f"⚠️ Erreur d'affichage : {e}")
+
+# === Connexion ===
+bebop = Bebop()
+bebop.drone_ip = "192.168.42.1"
+
+print("Connexion au drone...")
+if bebop.connect(10):
+    print("✅ Connecté.")
+
+    # Lancer le thread de nettoyage
+    cleaner_thread = threading.Thread(target=nettoyer_images, daemon=True)
+    cleaner_thread.start()
+
+    vision = DroneVision(bebop, is_bebop=True)
+    vision.set_user_callback_function(vision_callback)
+
+    if vision.open_video():
+        print("🎥 Flux vidéo actif. Ctrl+C pour arrêter.")
+        try:
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            print("⏹ Arrêt manuel.")
+        finally:
+            vision.close_video()
+            bebop.disconnect()
+            cv2.destroyAllWindows()
+    else:
+        print("❌ Impossible d’ouvrir le flux.")
+        bebop.disconnect()
+else:
+    print("❌ Connexion échouée.")
