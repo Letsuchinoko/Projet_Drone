@@ -2,66 +2,95 @@ import os
 import glob
 import cv2
 import time
+import numpy as np
 import threading
-from collections import deque
 from pyparrot.Bebop import Bebop
 from pyparrot.DroneVision import DroneVision
 
 # === CONFIGURATION ===
-IMAGES_DIR = "C:/Users/Baptiste/anaconda3/Lib/site-packages/pyparrot/images"
-FRAME_BUFFER_SIZE = 2
-KEEP_LAST = 10  # On garde au moins 10 images
-CLEANUP_INTERVAL = 15  # Nettoyage toutes les 15 sec
-DISPLAY_INTERVAL = 1 / 5  # 5 FPS
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+IMAGES_DIR = os.path.join(SCRIPT_DIR, "images")
+os.makedirs(IMAGES_DIR, exist_ok=True)
+
+DISPLAY_INTERVAL = 1 / 10  # 10 FPS
+KEEP_LAST = 10
 
 last_display_time = 0
-frame_buffer = deque(maxlen=FRAME_BUFFER_SIZE)
+last_image_name = None
 
-# === THREAD de nettoyage ===
+# === Détection Gant (simplifié pour test) ===
+def detect_gant(image):
+    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
+    mask1 = cv2.inRange(hsv, (0, 80, 40), (10, 255, 255))
+    mask2 = cv2.inRange(hsv, (10, 100, 50), (25, 255, 255))
+    mask3 = cv2.inRange(hsv, (170, 50, 40), (180, 255, 255))
+    mask = cv2.bitwise_or(mask1, cv2.bitwise_or(mask2, mask3))
+
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    if contours:
+        cv2.drawContours(image, contours, -1, (0, 255, 0), 2)
+    return image
+
+# === Nettoyage régulier ===
 def nettoyer_images():
     while True:
-        fichiers = sorted(
-            glob.glob(os.path.join(IMAGES_DIR, "image_*.png")),
-            key=os.path.getmtime
-        )
+        raw_files = glob.glob(os.path.join(IMAGES_DIR, "image_*.png"))
+        fichiers = []
+        for f in raw_files:
+            try:
+                fichiers.append((f, os.path.getmtime(f)))
+            except FileNotFoundError:
+                continue
+        fichiers = [f[0] for f in sorted(fichiers, key=lambda x: x[1])]
         if len(fichiers) > KEEP_LAST:
             for f in fichiers[:-KEEP_LAST]:
                 try:
                     os.remove(f)
                 except:
                     pass
-        time.sleep(CLEANUP_INTERVAL)
+        time.sleep(10)
 
-# === CALLBACK vidéo ===
+# === Callback appelé à chaque image ===
 def vision_callback(_):
-    global last_display_time, frame_buffer
+    global last_display_time, last_image_name
 
     now = time.time()
     if now - last_display_time < DISPLAY_INTERVAL:
         return
 
+    raw_files = glob.glob(os.path.join(IMAGES_DIR, "image_*.png"))
+    fichiers = []
+    for f in raw_files:
+        try:
+            fichiers.append((f, os.path.getmtime(f)))
+        except FileNotFoundError:
+            continue
+
+    fichiers = [f[0] for f in sorted(fichiers, key=lambda x: x[1])]
+    if not fichiers:
+        return
+
+    derniere = fichiers[-1]
+    if derniere == last_image_name:
+        return
+
+    last_image_name = derniere
     last_display_time = now
 
     try:
-        fichiers = sorted(
-            glob.glob(os.path.join(IMAGES_DIR, "image_*.png")),
-            key=os.path.getmtime
-        )
-
-        if not fichiers:
-            return
-
-        derniere = fichiers[-1]
         img = cv2.imread(derniere)
-        if img is not None:
-            frame_buffer.append(img)
-            cv2.imshow("🖼️ Flux Bebop2 Live (RAM buffer)", frame_buffer[-1])
-            cv2.waitKey(1)
-
+        if img is None:
+            return
+        img = cv2.resize(img, (800, int(img.shape[0] * 800 / img.shape[1])))
+        img = detect_gant(img)
+        cv2.imshow("🧤 Gant Detection", img)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            raise KeyboardInterrupt
     except Exception as e:
-        print(f"⚠️ Erreur d'affichage : {e}")
+        print(f"⚠️ Vision error: {e}")
 
-# === Connexion ===
+# === Connexion au drone ===
 bebop = Bebop()
 bebop.drone_ip = "192.168.42.1"
 
@@ -69,15 +98,17 @@ print("Connexion au drone...")
 if bebop.connect(10):
     print("✅ Connecté.")
 
-    # Lancer le thread de nettoyage
-    cleaner_thread = threading.Thread(target=nettoyer_images, daemon=True)
-    cleaner_thread.start()
+    threading.Thread(target=nettoyer_images, daemon=True).start()
+
+    # Patch : on modifie le path dans le script temporairement
+    import pyparrot.DroneVision
+    pyparrot.DroneVision.IMAGE_DIR = IMAGES_DIR
 
     vision = DroneVision(bebop, is_bebop=True)
     vision.set_user_callback_function(vision_callback)
 
     if vision.open_video():
-        print("🎥 Flux vidéo actif. Ctrl+C pour arrêter.")
+        print("🎥 Détection en direct. Ctrl+C pour quitter.")
         try:
             while True:
                 time.sleep(1)
@@ -88,7 +119,7 @@ if bebop.connect(10):
             bebop.disconnect()
             cv2.destroyAllWindows()
     else:
-        print("❌ Impossible d’ouvrir le flux.")
+        print("❌ Erreur ouverture flux.")
         bebop.disconnect()
 else:
-    print("❌ Connexion échouée.")
+    print("❌ Erreur connexion.")
