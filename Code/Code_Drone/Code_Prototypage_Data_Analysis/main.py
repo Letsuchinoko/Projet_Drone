@@ -148,19 +148,44 @@ def vision_callback(_):
         if derniere == last_image_name:
             return
 
-        last_image_name = derniere
-        last_display_time = now
+        # Attente active : on s’assure que l’image est bien "finie"
+        for _ in range(10):  # max 0.5 sec
+            try:
+                with open(derniere, 'rb') as f:
+                    data = f.read()
+                    if data:
+                        break
+            except Exception:
+                time.sleep(0.05)
+        else:
+            print(f"⚠️ Timeout lecture {derniere}")
+            return
 
-        img = cv2.imread(derniere)
+        img = cv2.imdecode(np.frombuffer(data, np.uint8), cv2.IMREAD_COLOR)
         if img is None:
+            print("⚠️ Image corrompue")
             return
 
         img = cv2.resize(img, (800, int(img.shape[0] * 800 / img.shape[1])))
-        img = detect_gant(img)
-        image_queue.put(img)
+        img, mask = detect_gant(img)
+
+        # Enregistrement (fond noir)
+        gant_path = os.path.join(GANT_ONLY_DIR, os.path.basename(derniere))
+        black_bg = np.zeros_like(img)
+        if mask is not None:
+            masked = cv2.bitwise_and(img, img, mask=mask)
+            cv2.imwrite(gant_path, masked)
+
+        cv2.imshow("🧤 Détection Gant Rouge", img)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            raise KeyboardInterrupt
+
+        last_display_time = now
+        last_image_name = derniere
 
     except Exception as e:
-        print(f"⚠️ Vision callback error : {e}")
+        print(f"❌ Callback error : {e}")
+
 
 # === Connexion au drone et lancement ===
 bebop = Bebop()
