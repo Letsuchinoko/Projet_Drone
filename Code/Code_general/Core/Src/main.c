@@ -103,22 +103,15 @@ int main(void)
 	  if (HAL_UART_Receive(&huart1, &c, 1, 10) == HAL_OK)
 	      {
 	          gps_rx_buffer[gps_rx_index++] = c;
-
-
 	          if (gps_rx_index >= GPS_BUFFER_SIZE - 1)
 	              gps_rx_index = 0;
-
-
 	          if (gps_rx_index >= 2 &&
 	              gps_rx_buffer[gps_rx_index - 2] == '\r' &&
 	              gps_rx_buffer[gps_rx_index - 1] == '\n')
 	          {
-
 	              gps_rx_buffer[gps_rx_index] = '\0';
 
-
 	              HAL_UART_Transmit(&huart2, gps_rx_buffer, gps_rx_index, HAL_MAX_DELAY);
-
 
 	              gps_rx_index = 0;
 	          }
