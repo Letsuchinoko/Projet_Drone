@@ -1,6 +1,3 @@
 PS C:\Users\Baptiste\Documents\GitHub\Projet_Drone> & C:/Users/Baptiste/anaconda3/python.exe c:/Users/Baptiste/Documents/GitHub/Projet_Drone/Code/Code_Drone/Code_Prototypage_Data_Analysis/main.py
-🎥 Démarrage du flux vidéo direct...
-[in#0 @ 00000227f18fdd80] Error opening input: No such file or directory
-Error opening input file bebop.sdp.
-Error opening input files: No such file or directory
-⚠️ Trame incomplète
+[rtp @ 0000014145b07d80] Protocol 'rtp' not on whitelist 'file,crypto,data'!
+❌ Impossible d'ouvrir le flux vidéo à c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\bebop.sdp   
