@@ -1,71 +1,75 @@
 import os
 import cv2
-import subprocess
+import time
 import numpy as np
+import subprocess
+import threading
 
-# === Configuration ===
-FFMPEG_BIN = "ffmpeg"
-SDP_FILENAME = "bebop.sdp"
-WIDTH, HEIGHT = 1920, 1080  # Résolution fixée
+# === CONFIGURATION ===
+WIDTH, HEIGHT = 1280, 720  # Résolution temporairement réduite
 PIX_FMT = "bgr24"
-FPS = 10
+SDP_FILENAME = "bebop.sdp"
+FFMPEG_BIN = "ffmpeg"
+DISPLAY_INTERVAL = 1 / 10  # 10 FPS
 
-# === Génère le fichier .sdp requis pour le flux Bebop2 ===
-def create_sdp_file(path):
-    sdp_content = """v=0
-o=- 0 0 IN IP4 127.0.0.1
-s=Parrot Bebop2
-c=IN IP4 224.1.1.1
-t=0 0
-a=recvonly
-m=video 5004 RTP/AVP 96
-a=rtpmap:96 H264/90000
-"""
-    with open(path, "w") as f:
-        f.write(sdp_content)
+# === Préparation chemins ===
+script_dir = os.path.dirname(os.path.abspath(__file__))
+sdp_path = os.path.join(script_dir, SDP_FILENAME)
 
-# === Initialise et lance ffmpeg pour lire le flux vidéo ===
-def open_ffmpeg_stream(sdp_path):
-    cmd = [
-        FFMPEG_BIN,
-        "-protocol_whitelist", "file,udp,rtp",
-        "-fflags", "nobuffer",
-        "-i", sdp_path,
-        "-f", "rawvideo",
-        "-pix_fmt", PIX_FMT,
-        "-"
-    ]
-    return subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+# === Vérifie que le fichier SDP existe ===
+if not os.path.exists(sdp_path):
+    print(f"❌ Fichier SDP introuvable : {sdp_path}")
+    exit(1)
 
-# === Affichage boucle principale ===
-def stream_and_display():
-    sdp_path = os.path.join(os.path.dirname(__file__), SDP_FILENAME)
-    create_sdp_file(sdp_path)
+# === Démarrage du flux ffmpeg ===
+print("🎥 Démarrage du flux vidéo direct...")
+cmd = [
+    FFMPEG_BIN,
+    "-protocol_whitelist", "file,udp,rtp",
+    "-fflags", "nobuffer",
+    "-timeout", "5000000",  # 5 secondes
+    "-i", sdp_path,
+    "-f", "rawvideo",
+    "-pix_fmt", PIX_FMT,
+    "-"
+]
 
-    print("🎥 Démarrage du flux vidéo direct...")
-    process = open_ffmpeg_stream(sdp_path)
-    frame_size = WIDTH * HEIGHT * 3  # bgr24 = 3 bytes par pixel
+# === Démarrer ffmpeg ===
+try:
+    process = subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE  # temporairement utile pour debug
+    )
+    time.sleep(2)  # attendre que le flux démarre vraiment
+except Exception as e:
+    print(f"❌ Impossible de lancer ffmpeg : {e}")
+    exit(1)
 
-    try:
-        while True:
-            raw_frame = process.stdout.read(frame_size)
-            if len(raw_frame) != frame_size:
-                print("⚠️ Trame incomplète")
-                continue
+frame_size = WIDTH * HEIGHT * 3  # 3 bytes per pixel (bgr24)
+last_display = 0
 
-            frame = np.frombuffer(raw_frame, dtype=np.uint8).reshape((HEIGHT, WIDTH, 3))
-            frame = cv2.resize(frame, (960, 540))  # Affichage réduit
-            cv2.imshow("🎥 Flux Bebop2 direct", frame)
+try:
+    while True:
+        raw_frame = process.stdout.read(frame_size)
 
-            if cv2.waitKey(int(1000 / FPS)) & 0xFF == ord('q'):
+        if not raw_frame or len(raw_frame) != frame_size:
+            print("⚠️ Trame incomplète")
+            continue
+
+        frame = np.frombuffer(raw_frame, np.uint8).reshape((HEIGHT, WIDTH, 3))
+
+        now = time.time()
+        if now - last_display >= DISPLAY_INTERVAL:
+            cv2.imshow("🎥 Bebop2 Live Stream", frame)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
+            last_display = now
 
-    except KeyboardInterrupt:
-        print("\n⏹ Arrêt manuel.")
-    finally:
-        process.kill()
-        cv2.destroyAllWindows()
+except KeyboardInterrupt:
+    print("\n⏹ Arrêt manuel.")
 
-# === Lancement ===
-if __name__ == "__main__":
-    stream_and_display()
+finally:
+    print("Fermeture du flux...")
+    process.kill()
+    cv2.destroyAllWindows()
