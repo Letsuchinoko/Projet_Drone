@@ -6,6 +6,7 @@ import numpy as np
 import threading
 from pyparrot.Bebop import Bebop
 from pyparrot.DroneVision import DroneVision
+from queue import Queue, Empty
 
 # === RÉPERTOIRES ===
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -97,6 +98,21 @@ def detect_gant(image):
 
     return image
 
+def affichage_thread(queue):
+    while True:
+        try:
+            img = queue.get(timeout=1)
+            cv2.imshow("🧤 Détection Gant Rouge", img)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+        except Empty:
+            continue
+        except Exception as e:
+            print(f"❌ Erreur dans le thread d’affichage : {e}")
+            break
+    cv2.destroyAllWindows()
+
+
 # === Suppression des images anciennes ===
 def nettoyer_images():
     while True:
@@ -122,13 +138,12 @@ def vision_callback(_):
         return
 
     try:
-        raw_files = glob.glob(os.path.join(IMAGES_DIR, "image_*.png"))
-        fichiers = [(f, os.path.getmtime(f)) for f in raw_files if os.path.exists(f)]
-        fichiers = [f[0] for f in sorted(fichiers, key=lambda x: x[1])]
-
+        fichiers = glob.glob(os.path.join(IMAGES_DIR, "image_*.png"))
+        fichiers = [f for f in fichiers if os.path.exists(f)]
         if not fichiers:
             return
 
+        fichiers.sort(key=os.path.getmtime)
         derniere = fichiers[-1]
         if derniere == last_image_name:
             return
@@ -136,24 +151,16 @@ def vision_callback(_):
         last_image_name = derniere
         last_display_time = now
 
-        # Attente si l'image est en cours d'écriture
-        for _ in range(3):
-            img = cv2.imread(derniere)
-            if img is not None:
-                break
-            time.sleep(0.05)
-        else:
-            print(f"⚠️ Impossible de lire {derniere}")
+        img = cv2.imread(derniere)
+        if img is None:
             return
 
         img = cv2.resize(img, (800, int(img.shape[0] * 800 / img.shape[1])))
         img = detect_gant(img)
-        cv2.imshow("🧤 Détection Gant Rouge", img)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            raise KeyboardInterrupt
+        image_queue.put(img)
 
     except Exception as e:
-        print(f"❌ Erreur dans vision_callback: {e}")
+        print(f"⚠️ Vision callback error : {e}")
 
 # === Connexion au drone et lancement ===
 bebop = Bebop()
@@ -167,6 +174,11 @@ if bebop.connect(10):
     vision = DroneVision(bebop, is_bebop=True)
     vision.image_path = IMAGES_DIR  # Rediriger vers notre dossier local
     vision.set_user_callback_function(vision_callback)
+
+    # Lancer le thread d'affichage
+    image_queue = Queue()
+    threading.Thread(target=affichage_thread, args=(image_queue,), daemon=True).start()
+
 
     if vision.open_video():
         print("🎥 Détection en direct. Ctrl+C pour quitter.")
