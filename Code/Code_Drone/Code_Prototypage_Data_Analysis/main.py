@@ -1,68 +1,56 @@
-import os
-import glob
+import ffmpeg
+import numpy as np
 import cv2
-import time
-from pyparrot.Bebop import Bebop
-from pyparrot.DroneVision import DroneVision
+import subprocess
 
-DISPLAY_INTERVAL = 1 / 10  # 10 FPS
-last_display_time = 0
-last_image_name = None
+# === Flux vidéo du Bebop 2 (via UDP multicast par défaut)
+SDP_PATH = "bebop.sdp"
 
-def vision_callback(_):
-    global last_display_time, last_image_name
+# ⚠️ Chemin vers un fichier bebop.sdp contenant :
+# v=0
+# m=video 55004 RTP/AVP 96
+# a=rtpmap:96 H264/90000
+# c=IN IP4 0.0.0.0
 
-    now = time.time()
-    if now - last_display_time < DISPLAY_INTERVAL:
-        return
+FFMPEG_CMD = [
+    'ffmpeg',
+    '-protocol_whitelist', 'file,udp,rtp',
+    '-i', SDP_PATH,
+    '-f', 'image2pipe',
+    '-pix_fmt', 'bgr24',
+    '-vcodec', 'rawvideo',
+    '-loglevel', 'error',
+    '-r', '10',  # 10 FPS
+    '-'
+]
 
-    images_dir = os.path.join(os.path.dirname(__file__), "images")
-    files = glob.glob(os.path.join(images_dir, "image_*.png"))
+try:
+    print("🎥 Démarrage du flux vidéo direct...")
 
-    try:
-        files = sorted(files, key=os.path.getmtime)
-        if not files:
-            return
-        last_file = files[-1]
-        if last_file == last_image_name:
-            return
+    # Lance ffmpeg pour streamer le flux vers stdout
+    process = subprocess.Popen(
+        FFMPEG_CMD, stdout=subprocess.PIPE, bufsize=10**8
+    )
 
-        last_image_name = last_file
-        last_display_time = now
+    width, height = 856, 480  # résolution par défaut du Bebop 2
 
-        img = cv2.imread(last_file)
-        if img is not None:
-            img = cv2.resize(img, (img.shape[1] * 2, img.shape[0] * 2))  # x2 pour lisibilité
-            cv2.imshow("🎥 Flux Bebop2", img)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                raise KeyboardInterrupt
+    while True:
+        # Lit une image brute (bgr24)
+        raw_frame = process.stdout.read(width * height * 3)
+        if len(raw_frame) != width * height * 3:
+            print("⚠️ Trame incomplète")
+            break
 
-    except Exception as e:
-        print(f"⚠️ Callback error: {e}")
+        # Transforme en image OpenCV (numpy)
+        frame = np.frombuffer(raw_frame, np.uint8).reshape((height, width, 3))
+        cv2.imshow("🎥 Flux Bebop2 Direct (ffmpeg + numpy)", frame)
 
-# === Drone connection ===
-bebop = Bebop()
-bebop.drone_ip = "192.168.42.1"
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
-print("Connexion au drone...")
-if bebop.connect(10):
-    print("✅ Connecté.")
-    vision = DroneVision(bebop, is_bebop=True)
-    vision.set_user_callback_function(vision_callback)
+except KeyboardInterrupt:
+    print("⏹ Interruption manuelle.")
 
-    if vision.open_video():
-        print("🎥 Flux actif. Ctrl+C pour quitter.")
-        try:
-            while True:
-                time.sleep(1)
-        except KeyboardInterrupt:
-            print("⏹ Arrêt manuel.")
-        finally:
-            vision.close_video()
-            bebop.disconnect()
-            cv2.destroyAllWindows()
-    else:
-        print("❌ Erreur ouverture flux.")
-        bebop.disconnect()
-else:
-    print("❌ Erreur connexion.")
+finally:
+    process.kill()
+    cv2.destroyAllWindows()
