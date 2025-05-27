@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "stdio.h"
+#include "string.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -48,11 +49,19 @@ UART_HandleTypeDef huart2;
 #define GPS_BUFFER_SIZE 256
 uint8_t gps_rx_buffer[GPS_BUFFER_SIZE];
 uint16_t gps_rx_index = 0;
+<<<<<<< HEAD
 uint8_t valeur_son = 0;
 int __io_putchar(int ch) {
     HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
     return ch;
 }
+=======
+uint8_t c;
+uint32_t adc_value = 0;
+char msg[32];
+
+
+>>>>>>> bf0bc2cf061d6289383d26a454225d19b5e9c906
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -102,17 +111,55 @@ int main(void)
   MX_USART2_UART_Init();
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
+<<<<<<< HEAD
 
+=======
+  while (1)
+   {
+//gps
+	  if (HAL_UART_Receive(&huart1, &c, 1, 10) == HAL_OK)
+	      {
+	          gps_rx_buffer[gps_rx_index++] = c;
+	          if (gps_rx_index >= GPS_BUFFER_SIZE - 1)
+	              gps_rx_index = 0;
+	          if (gps_rx_index >= 2 &&
+	              gps_rx_buffer[gps_rx_index - 2] == '\r' &&
+	              gps_rx_buffer[gps_rx_index - 1] == '\n')
+	          {
+	              gps_rx_buffer[gps_rx_index] = '\0';
+
+	              HAL_UART_Transmit(&huart2, gps_rx_buffer, gps_rx_index, HAL_MAX_DELAY);
+
+	              gps_rx_index = 0;
+	          }
+	      }
+	  //sound sensor v2.2
+	  if(HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK){
+		  adc_value = HAL_ADC_GetValue(&hadc1);
+		  sprintf(msg, "Sound: %lu\r\n", adc_value);
+		  HAL_UART_Transmit(&huart2, (uint8_t*)msg,strlen(msg), HAL_MAX_DELAY);
+	  }
+	  HAL_Delay(200);
+   }
+>>>>>>> bf0bc2cf061d6289383d26a454225d19b5e9c906
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+<<<<<<< HEAD
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
   }
+=======
+  /* Infinite loop */
+
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
+>>>>>>> bf0bc2cf061d6289383d26a454225d19b5e9c906
   /* USER CODE END 3 */
 }
 
@@ -134,7 +181,11 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+<<<<<<< HEAD
   RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL2;
+=======
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL4;
+>>>>>>> bf0bc2cf061d6289383d26a454225d19b5e9c906
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
