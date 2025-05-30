@@ -103,9 +103,13 @@ int main(void)
   MX_USART2_UART_Init();
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
+  HAL_UART_Transmit(&huart2, (uint8_t*)"Test UART\r\n", 11, HAL_MAX_DELAY);
   while (1)
    {
 //gps
+	  HAL_UART_Transmit(&huart2, (uint8_t*)"HELLO\r\n", 7, HAL_MAX_DELAY);
+	     HAL_Delay(1000);
+    HAL_ADC_Start(&hadc1);
 	  if (HAL_UART_Receive(&huart1, &c, 1, 10) == HAL_OK)
 	      {
 	          gps_rx_buffer[gps_rx_index++] = c;
@@ -125,7 +129,7 @@ int main(void)
 	  //sound sensor v2.2
 	  if(HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK){
 		  adc_value = HAL_ADC_GetValue(&hadc1);
-		  sprintf(msg, "Sound: %lu\r\n", adc_value);
+		  sprintf(msg, "%lu\r\n", adc_value);
 		  HAL_UART_Transmit(&huart2, (uint8_t*)msg,strlen(msg), HAL_MAX_DELAY);
 	  }
 	  HAL_Delay(200);
