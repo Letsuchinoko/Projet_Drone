@@ -1,56 +1,82 @@
-import ffmpeg
-import numpy as np
+import os
 import cv2
+import time
+import numpy as np
 import subprocess
+import threading
 
-# === Flux vidéo du Bebop 2 (via UDP multicast par défaut)
-SDP_PATH = "bebop.sdp"
+# === CONFIGURATION ===
+WIDTH, HEIGHT = 1280, 720  # Résolution souhaitée
+PIX_FMT = "bgr24"
+SDP_FILENAME = "bebop.sdp"
+FFMPEG_BIN = "ffmpeg"
+DISPLAY_INTERVAL = 1 / 10  # 10 FPS
 
-# ⚠️ Chemin vers un fichier bebop.sdp contenant :
-# v=0
-# m=video 55004 RTP/AVP 96
-# a=rtpmap:96 H264/90000
-# c=IN IP4 0.0.0.0
+# === Préparation chemins ===
+script_dir = os.path.dirname(os.path.abspath(__file__))
+sdp_path = os.path.join(script_dir, SDP_FILENAME)
 
-FFMPEG_CMD = [
-    'ffmpeg',
-    '-protocol_whitelist', 'file,udp,rtp',
-    '-i', SDP_PATH,
-    '-f', 'image2pipe',
-    '-pix_fmt', 'bgr24',
-    '-vcodec', 'rawvideo',
-    '-loglevel', 'error',
-    '-r', '10',  # 10 FPS
-    '-'
+# === Vérifie que le fichier SDP existe ===
+if not os.path.exists(sdp_path):
+    print(f"❌ Fichier SDP introuvable : {sdp_path}")
+    exit(1)
+
+# === Démarrage du flux ffmpeg ===
+print("🎥 Démarrage du flux vidéo direct...")
+cmd = [
+    FFMPEG_BIN,
+    "-protocol_whitelist", "file,udp,rtp",
+    "-fflags", "nobuffer",
+    "-flags", "low_delay",
+    "-analyzeduration", "0",
+    "-probesize", "32",
+    "-i", sdp_path,
+    "-f", "rawvideo",
+    "-pix_fmt", PIX_FMT,
+    "-"
 ]
 
 try:
-    print("🎥 Démarrage du flux vidéo direct...")
-
-    # Lance ffmpeg pour streamer le flux vers stdout
     process = subprocess.Popen(
-        FFMPEG_CMD, stdout=subprocess.PIPE, bufsize=10**8
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL  # ignorer les erreurs flood
     )
+    time.sleep(2)  # Laisse ffmpeg initier le flux correctement
+except Exception as e:
+    print(f"❌ Impossible de lancer ffmpeg : {e}")
+    exit(1)
 
-    width, height = 856, 480  # résolution par défaut du Bebop 2
+frame_size = WIDTH * HEIGHT * 3
+last_display = 0
+
+try:
+    # Attente de la première frame complète
+    while True:
+        raw_frame = process.stdout.read(frame_size)
+        if len(raw_frame) == frame_size:
+            break
+        time.sleep(0.01)
 
     while True:
-        # Lit une image brute (bgr24)
-        raw_frame = process.stdout.read(width * height * 3)
-        if len(raw_frame) != width * height * 3:
-            print("⚠️ Trame incomplète")
-            break
+        raw_frame = process.stdout.read(frame_size)
+        if len(raw_frame) != frame_size:
+            time.sleep(0.01)
+            continue
 
-        # Transforme en image OpenCV (numpy)
-        frame = np.frombuffer(raw_frame, np.uint8).reshape((height, width, 3))
-        cv2.imshow("🎥 Flux Bebop2 Direct (ffmpeg + numpy)", frame)
+        frame = np.frombuffer(raw_frame, np.uint8).reshape((HEIGHT, WIDTH, 3))
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        now = time.time()
+        if now - last_display >= DISPLAY_INTERVAL:
+            cv2.imshow("🎥 Bebop2 Live Stream", frame)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+            last_display = now
 
 except KeyboardInterrupt:
-    print("⏹ Interruption manuelle.")
+    print("\n⏹ Arrêt manuel.")
 
 finally:
+    print("Fermeture du flux...")
     process.kill()
     cv2.destroyAllWindows()

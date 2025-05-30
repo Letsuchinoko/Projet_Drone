@@ -49,6 +49,11 @@ UART_HandleTypeDef huart2;
 #define GPS_BUFFER_SIZE 256
 uint8_t gps_rx_buffer[GPS_BUFFER_SIZE];
 uint16_t gps_rx_index = 0;
+uint8_t valeur_son = 0;
+int __io_putchar(int ch) {
+    HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
+    return ch;
+}
 uint8_t c;
 uint32_t adc_value = 0;
 char msg[32];
@@ -105,35 +110,32 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_UART_Transmit(&huart2, (uint8_t*)"Test UART\r\n", 11, HAL_MAX_DELAY);
   while (1)
-   {
-//gps
-	  HAL_UART_Transmit(&huart2, (uint8_t*)"HELLO\r\n", 7, HAL_MAX_DELAY);
-	     HAL_Delay(1000);
+  {
+    // GPS
+    if (HAL_UART_Receive(&huart1, &c, 1, 10) == HAL_OK)
+    {
+        gps_rx_buffer[gps_rx_index++] = c;
+        if (gps_rx_index >= GPS_BUFFER_SIZE - 1)
+            gps_rx_index = 0;
+        if (gps_rx_index >= 2 &&
+            gps_rx_buffer[gps_rx_index - 2] == '\r' &&
+            gps_rx_buffer[gps_rx_index - 1] == '\n')
+        {
+            gps_rx_buffer[gps_rx_index] = '\0';
+            HAL_UART_Transmit(&huart2, gps_rx_buffer, gps_rx_index, HAL_MAX_DELAY);
+            gps_rx_index = 0;
+        }
+    }
+    // Sound sensor v2.2
     HAL_ADC_Start(&hadc1);
-	  if (HAL_UART_Receive(&huart1, &c, 1, 10) == HAL_OK)
-	      {
-	          gps_rx_buffer[gps_rx_index++] = c;
-	          if (gps_rx_index >= GPS_BUFFER_SIZE - 1)
-	              gps_rx_index = 0;
-	          if (gps_rx_index >= 2 &&
-	              gps_rx_buffer[gps_rx_index - 2] == '\r' &&
-	              gps_rx_buffer[gps_rx_index - 1] == '\n')
-	          {
-	              gps_rx_buffer[gps_rx_index] = '\0';
-
-	              HAL_UART_Transmit(&huart2, gps_rx_buffer, gps_rx_index, HAL_MAX_DELAY);
-
-	              gps_rx_index = 0;
-	          }
-	      }
-	  //sound sensor v2.2
-	  if(HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK){
-		  adc_value = HAL_ADC_GetValue(&hadc1);
-		  sprintf(msg, "%lu\r\n", adc_value);
-		  HAL_UART_Transmit(&huart2, (uint8_t*)msg,strlen(msg), HAL_MAX_DELAY);
-	  }
-	  HAL_Delay(200);
-   }
+    if (HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK) {
+        adc_value = HAL_ADC_GetValue(&hadc1);
+        valeur_son = (uint8_t)(adc_value >> 4); // 12 bits -> 8 bits
+        sprintf(msg, "Sound: %lu\r\n", adc_value);
+        HAL_UART_Transmit(&huart2, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
+    }
+    HAL_Delay(200);
+  }
   /* USER CODE END 2 */
 
   /* Infinite loop */
