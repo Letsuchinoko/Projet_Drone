@@ -12,6 +12,7 @@ import sys
 from collections import deque
 import glob
 
+# === CONFIGURATION ===
 DISPLAY_FPS = 20
 MAX_QUEUE_SIZE = 3
 IMAGES_DIR = "C:/Users/Baptiste/anaconda3/Lib/site-packages/pyparrot/images"
@@ -45,7 +46,7 @@ logger = logging.getLogger(__name__)
 
 class ImprovedGloveDetector:
     def __init__(self):
-        self.detection_history = deque(maxlen=10)
+        self.detection_history = deque(maxlen=25)
         self.min_area = 400
         self.max_area = 70000
         self.min_contour_points = 10
@@ -68,10 +69,20 @@ class ImprovedGloveDetector:
             work_frame = cv2.GaussianBlur(work_frame, (5, 5), 0)
             hsv = cv2.cvtColor(work_frame, cv2.COLOR_BGR2HSV)
 
-            # Masque couleurs gants: H de 3 à 22 (adapte si besoin !)
-            lower = np.array([3, 60, 60])
-            upper = np.array([22, 255, 255])
-            mask = cv2.inRange(hsv, lower, upper)
+            # --- Masque couleur peau (à exclure) ---
+            skin_lower = np.array([0, 30, 80])
+            skin_upper = np.array([25, 130, 255])
+            mask_skin = cv2.inRange(hsv, skin_lower, skin_upper)
+
+            # --- Masque orange vif du gant ---
+            glove_lower = np.array([10, 130, 140])
+            glove_upper = np.array([23, 255, 255])
+            mask_gant = cv2.inRange(hsv, glove_lower, glove_upper)
+
+            # --- On retire la peau ---
+            mask = cv2.bitwise_and(mask_gant, cv2.bitwise_not(mask_skin))
+
+            # --- Nettoyage morpho ---
             mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, self.kernel_open)
             mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, self.kernel_close)
 
@@ -157,7 +168,7 @@ class ImprovedGloveDetector:
                 detection_rate = (frame_stats['detection_count'] / max(frame_stats['frame_count'], 1)) * 100
                 stats_text = f"Frames: {frame_stats['frame_count']} | Detections: {frame_stats['detection_count']} ({detection_rate:.1f}%)"
             cv2.putText(frame, stats_text, (10, h - 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-            history_text = "Historique: " + "".join(["●" if x else "○" for x in list(self.detection_history)[-10:]])
+            history_text = "Historique: " + "".join(["●" if x else "○" for x in list(self.detection_history)[-25:]])
             cv2.putText(frame, history_text, (10, h - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
             timestamp = time.strftime("%H:%M:%S")
             cv2.putText(frame, timestamp, (w - 100, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
@@ -208,7 +219,6 @@ def cleanup_thread():
         try:
             with image_dir_lock:
                 files = glob.glob(os.path.join(IMAGES_DIR, "image_*.png"))
-                logger.debug(f"Cleanup: {len(files)} image files present.")
                 if len(files) > MAX_IMAGE_FILES:
                     files_sorted = sorted(files, key=os.path.getmtime, reverse=True)
                     files_to_remove = files_sorted[IMAGE_KEEP_COUNT:]
@@ -223,10 +233,10 @@ def cleanup_thread():
                         logger.info(f"Cleaned up {removed_count} old image files")
         except Exception as e:
             logger.debug(f"Cleanup error: {e}")
-        for _ in range(50):
+        for _ in range(25):
             if not processing_active.is_set():
                 break
-            time.sleep(0.2)
+            time.sleep(0.4)
     logger.info("Cleanup thread terminated")
 
 def display_thread():
@@ -290,10 +300,8 @@ def connection_monitor_thread():
         time_since_last_frame = time.time() - last_received_time
         with image_dir_lock:
             files = glob.glob(os.path.join(IMAGES_DIR, "image_*.png"))
-        logger.debug(f"Monitor: frames={current_frames}, files={len(files)}, time_since_last={time_since_last_frame:.1f}s")
         if frame_diff == 0 or time_since_last_frame > WATCHDOG_TIMEOUT:
             logger.warning("No new frames received for monitoring (stream may be frozen). Manual restart required.")
-            # Ne tente PAS de relancer le flux, juste log
         else:
             avg_fps = frame_diff / check_interval
             detection_rate = (detections / max(current_frames, 1)) * 100
