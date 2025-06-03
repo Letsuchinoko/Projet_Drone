@@ -1,32 +1,12 @@
-[h264 @ 0000020cf89b6a80] non-existing PPS 0 referenced
+[h264 @ 000001d4790f6a80] non-existing PPS 0 referenced
 
-[h264 @ 0000020cf89b6a80] decode_slice_header error
+[h264 @ 000001d4790f6a80] decode_slice_header error
 
-[h264 @ 0000020cf89b6a80] non-existing PPS 0 referenced
-
-[h264 @ 0000020cf89b6a80] decode_slice_header error
-
-[h264 @ 0000020cf89b6a80] non-existing PPS 0 referenced
-
-[h264 @ 0000020cf89b6a80] decode_slice_header error
-
-[h264 @ 0000020cf89b6a80] non-existing PPS 0 referenced
-
-[h264 @ 0000020cf89b6a80] decode_slice_header error
-
-[h264 @ 0000020cf89b6a80] non-existing PPS 0 referenced
-
-[h264 @ 0000020cf89b6a80] decode_slice_header error
-
-[h264 @ 0000020cf89b6a80] no frame!
-
-[sdp @ 0000020cf89ad980] max delay reached. need to consume packet
-
-[sdp @ 0000020cf89ad980] RTP: missed 42 packets
+[h264 @ 000001d4790f6a80] no frame!
 
 Input #0, sdp, from 'C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\utils/bebop.sdp':
 
-  Duration: N/A, start: 1.334667, bitrate: N/A
+  Duration: N/A, start: 1.267944, bitrate: N/A
 
   Stream #0:0: Video: h264 (Constrained Baseline), yuv420p(progressive), 856x480 [SAR 1:1 DAR 107:60], 29.97 fps, 29.97 tbr, 90k tbn
 
@@ -34,282 +14,28 @@ Stream mapping:
 
   Stream #0:0 -> #0:0 (h264 (native) -> png (native))
 
-2025-06-03 10:05:15,361 - INFO - 🎥 Flux vidéo ouvert avec succès
---- Logging error ---
-Traceback (most recent call last):
-  File "C:\Users\Baptiste\anaconda3\Lib\logging\__init__.py", line 1163, in emit
-    stream.write(msg + self.terminator)
-  File "C:\Users\Baptiste\anaconda3\Lib\encodings\cp1252.py", line 19, in encode
-    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f3a5' in position 33: character maps to <undefined>
-Call stack:
-  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 651, in <module>
-    success = main()
-  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 570, in main
-    logger.info("🎥 Flux vidéo ouvert avec succès")
-Message: '🎥 Flux vidéo ouvert avec succès'
-Arguments: ()
-2025-06-03 10:05:15,363 - INFO - 🎯 Détection active - Contrôles:
---- Logging error ---
-Traceback (most recent call last):
-  File "C:\Users\Baptiste\anaconda3\Lib\logging\__init__.py", line 1163, in emit
-    stream.write(msg + self.terminator)
-  File "C:\Users\Baptiste\anaconda3\Lib\encodings\cp1252.py", line 19, in encode
-    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f3af' in position 33: character maps to <undefined>
-Call stack:
-  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 651, in <module>
-    success = main()
-  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 584, in main
-    logger.info("🎯 Détection active - Contrôles:")
-Message: '🎯 Détection active - Contrôles:'
-Arguments: ()
-2025-06-03 10:05:15,364 - INFO -    • 'q' ou ESC: Quitter
-2025-06-03 10:05:15,364 - INFO -    • 'r': Reset statistiques
-2025-06-03 10:05:15,364 - INFO -    • Ctrl+C: Arrêt d'urgence
-2025-06-03 10:05:25,032 - INFO - Frame 100: Détection 80.0%, Temps traitement: 0.002s
-2025-06-03 10:05:35,199 - INFO - Frame 200: Détection 90.0%, Temps traitement: 0.002s
-2025-06-03 10:05:45,321 - INFO - Frame 300: Détection 100.0%, Temps traitement: 0.002s
-2025-06-03 10:05:54,152 - WARNING - ⚠️ Aucune frame depuis plusieurs secondes
---- Logging error ---
-Traceback (most recent call last):
-  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 368, in display_thread
-    frame = frame_queue.get(timeout=0.5)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Baptiste\anaconda3\Lib\queue.py", line 179, in get
-    raise Empty
-_queue.Empty
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "C:\Users\Baptiste\anaconda3\Lib\logging\__init__.py", line 1163, in emit
-    stream.write(msg + self.terminator)
-  File "C:\Users\Baptiste\anaconda3\Lib\encodings\cp1252.py", line 19, in encode
-    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-UnicodeEncodeError: 'charmap' codec can't encode characters in position 36-37: character maps to <undefined>
-Call stack:
-  File "C:\Users\Baptiste\anaconda3\Lib\threading.py", line 1030, in _bootstrap
-    self._bootstrap_inner()
-  File "C:\Users\Baptiste\anaconda3\Lib\threading.py", line 1073, in _bootstrap_inner
-    self.run()
-  File "C:\Users\Baptiste\anaconda3\Lib\threading.py", line 1010, in run
-    self._target(*self._args, **self._kwargs)
-  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 373, in display_thread
-    logger.warning("⚠️ Aucune frame depuis plusieurs secondes")
-Message: '⚠️ Aucune frame depuis plusieurs secondes'
-Arguments: ()
-2025-06-03 10:05:57,232 - WARNING - ⚠️ Aucune frame depuis plusieurs secondes
---- Logging error ---
-Traceback (most recent call last):
-  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 368, in display_thread
-    frame = frame_queue.get(timeout=0.5)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Baptiste\anaconda3\Lib\queue.py", line 179, in get
-    raise Empty
-_queue.Empty
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "C:\Users\Baptiste\anaconda3\Lib\logging\__init__.py", line 1163, in emit
-    stream.write(msg + self.terminator)
-  File "C:\Users\Baptiste\anaconda3\Lib\encodings\cp1252.py", line 19, in encode
-    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-UnicodeEncodeError: 'charmap' codec can't encode characters in position 36-37: character maps to <undefined>
-Call stack:
-  File "C:\Users\Baptiste\anaconda3\Lib\threading.py", line 1030, in _bootstrap
-    self._bootstrap_inner()
-  File "C:\Users\Baptiste\anaconda3\Lib\threading.py", line 1073, in _bootstrap_inner
-    self.run()
-  File "C:\Users\Baptiste\anaconda3\Lib\threading.py", line 1010, in run
-    self._target(*self._args, **self._kwargs)
-  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 373, in display_thread
-    logger.warning("⚠️ Aucune frame depuis plusieurs secondes")
-Message: '⚠️ Aucune frame depuis plusieurs secondes'
-Arguments: ()
-2025-06-03 10:05:59,031 - INFO - 🛑 Signal d'arrêt reçu
---- Logging error ---
-Traceback (most recent call last):
-  File "C:\Users\Baptiste\anaconda3\Lib\logging\__init__.py", line 1163, in emit
-    stream.write(msg + self.terminator)
-  File "C:\Users\Baptiste\anaconda3\Lib\encodings\cp1252.py", line 19, in encode
-    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f6d1' in position 33: character maps to <undefined>
-Call stack:
-  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 651, in <module>
-    success = main()
-  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 595, in main
-    time.sleep(0.5)
-  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 498, in signal_handler
-    logger.info("🛑 Signal d'arrêt reçu")
-Message: "🛑 Signal d'arrêt reçu"
-Arguments: ()
-2025-06-03 10:05:59,078 - INFO - 🧹 Thread de nettoyage terminé
---- Logging error ---
-Traceback (most recent call last):
-  File "C:\Users\Baptiste\anaconda3\Lib\logging\__init__.py", line 1163, in emit
-    stream.write(msg + self.terminator)
-  File "C:\Users\Baptiste\anaconda3\Lib\encodings\cp1252.py", line 19, in encode
-    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f9f9' in position 33: character maps to <undefined>
-Call stack:
-  File "C:\Users\Baptiste\anaconda3\Lib\threading.py", line 1030, in _bootstrap
-    self._bootstrap_inner()
-  File "C:\Users\Baptiste\anaconda3\Lib\threading.py", line 1073, in _bootstrap_inner
-    self.run()
-  File "C:\Users\Baptiste\anaconda3\Lib\threading.py", line 1010, in run
-    self._target(*self._args, **self._kwargs)
-  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 461, in cleanup_thread
-    logger.info("🧹 Thread de nettoyage terminé")
-Message: '🧹 Thread de nettoyage terminé'
-Arguments: ()
-2025-06-03 10:05:59,302 - INFO - 🎬 Thread d'affichage terminé
---- Logging error ---
-Traceback (most recent call last):
-  File "C:\Users\Baptiste\anaconda3\Lib\logging\__init__.py", line 1163, in emit
-    stream.write(msg + self.terminator)
-  File "C:\Users\Baptiste\anaconda3\Lib\encodings\cp1252.py", line 19, in encode
-    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f3ac' in position 33: character maps to <undefined>
-Call stack:
-  File "C:\Users\Baptiste\anaconda3\Lib\threading.py", line 1030, in _bootstrap
-    self._bootstrap_inner()
-  File "C:\Users\Baptiste\anaconda3\Lib\threading.py", line 1073, in _bootstrap_inner
-    self.run()
-  File "C:\Users\Baptiste\anaconda3\Lib\threading.py", line 1010, in run
-    self._target(*self._args, **self._kwargs)
-  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 422, in display_thread
-    logger.info("🎬 Thread d'affichage terminé")
-Message: "🎬 Thread d'affichage terminé"
-Arguments: ()
-2025-06-03 10:05:59,415 - INFO - 🪟 Fenêtre fermée
---- Logging error ---
-Traceback (most recent call last):
-  File "C:\Users\Baptiste\anaconda3\Lib\logging\__init__.py", line 1163, in emit
-    stream.write(msg + self.terminator)
-  File "C:\Users\Baptiste\anaconda3\Lib\encodings\cp1252.py", line 19, in encode
-    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-UnicodeEncodeError: 'charmap' codec can't encode character '\U0001fa9f' in position 33: character maps to <undefined>
-Call stack:
-  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 651, in <module>
-    success = main()
-  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 601, in main
-    logger.info("🪟 Fenêtre fermée")
-Message: '🪟 Fenêtre fermée'
-Arguments: ()
-2025-06-03 10:05:59,416 - INFO - 🔄 Nettoyage final en cours...
---- Logging error ---
-Traceback (most recent call last):
-  File "C:\Users\Baptiste\anaconda3\Lib\logging\__init__.py", line 1163, in emit
-    stream.write(msg + self.terminator)
-  File "C:\Users\Baptiste\anaconda3\Lib\encodings\cp1252.py", line 19, in encode
-    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f504' in position 33: character maps to <undefined>
-Call stack:
-  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 651, in <module>
-    success = main()
-  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 614, in main
-    logger.info("🔄 Nettoyage final en cours...")
-Message: '🔄 Nettoyage final en cours...'
-Arguments: ()
-2025-06-03 10:06:00,747 - WARNING - 📡 Aucune nouvelle frame reçue
---- Logging error ---
-Traceback (most recent call last):
-  File "C:\Users\Baptiste\anaconda3\Lib\logging\__init__.py", line 1163, in emit
-    stream.write(msg + self.terminator)
-  File "C:\Users\Baptiste\anaconda3\Lib\encodings\cp1252.py", line 19, in encode
-    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f4e1' in position 36: character maps to <undefined>
-Call stack:
-  File "C:\Users\Baptiste\anaconda3\Lib\threading.py", line 1030, in _bootstrap
-    self._bootstrap_inner()
-  File "C:\Users\Baptiste\anaconda3\Lib\threading.py", line 1073, in _bootstrap_inner
-    self.run()
-  File "C:\Users\Baptiste\anaconda3\Lib\threading.py", line 1010, in run
-    self._target(*self._args, **self._kwargs)
-  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 482, in connection_monitor     
-    logger.warning("📡 Aucune nouvelle frame reçue")
-Message: '📡 Aucune nouvelle frame reçue'
-Arguments: ()
-2025-06-03 10:06:00,747 - INFO - 📡 Monitoring de connexion terminé
---- Logging error ---
-Traceback (most recent call last):
-  File "C:\Users\Baptiste\anaconda3\Lib\logging\__init__.py", line 1163, in emit
-    stream.write(msg + self.terminator)
-  File "C:\Users\Baptiste\anaconda3\Lib\encodings\cp1252.py", line 19, in encode
-    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f4e1' in position 33: character maps to <undefined>
-Call stack:
-  File "C:\Users\Baptiste\anaconda3\Lib\threading.py", line 1030, in _bootstrap
-    self._bootstrap_inner()
-  File "C:\Users\Baptiste\anaconda3\Lib\threading.py", line 1073, in _bootstrap_inner
-    self.run()
-  File "C:\Users\Baptiste\anaconda3\Lib\threading.py", line 1010, in run
-    self._target(*self._args, **self._kwargs)
-  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 494, in connection_monitor     
-    logger.info("📡 Monitoring de connexion terminé")
-Message: '📡 Monitoring de connexion terminé'
-Arguments: ()
+2025-06-03 10:47:58,904 - INFO - [OK] Video stream opened successfully
+2025-06-03 10:47:58,904 - INFO - [DETECT] Detection system active
+2025-06-03 10:47:58,904 - INFO - Controls: 'q'/ESC=Quit, 'r'=Reset stats, 's'=Screenshot, Ctrl+C=Emergency stop
+2025-06-03 10:48:05,262 - INFO - [STATS] Frames: 93, FPS: 9.3, Detections: 98.9%, Errors: 0
+2025-06-03 10:48:15,263 - INFO - [STATS] Frames: 245, FPS: 15.2, Detections: 99.6%, Errors: 0
+2025-06-03 10:48:19,766 - WARNING - [WARNING] No frames received for several seconds
+2025-06-03 10:48:24,794 - WARNING - [WARNING] No frames received for several seconds
+2025-06-03 10:48:25,263 - INFO - [STATS] Frames: 265, FPS: 2.0, Detections: 99.6%, Errors: 0
+2025-06-03 10:48:29,824 - WARNING - [WARNING] No frames received for several seconds
+2025-06-03 10:48:34,862 - WARNING - [WARNING] No frames received for several seconds
+2025-06-03 10:48:35,264 - WARNING - [MONITOR] No new frames received
+2025-06-03 10:48:39,910 - WARNING - [WARNING] No frames received for several seconds
+2025-06-03 10:48:44,047 - INFO - [STOP] Stop signal received
+2025-06-03 10:48:44,119 - INFO - [CLEANUP] Thread terminated
+2025-06-03 10:48:44,935 - INFO - [REFRESH] Starting cleanup process...
+2025-06-03 10:48:44,957 - WARNING - [WARNING] No frames received for several seconds
+2025-06-03 10:48:44,974 - INFO - [DISPLAY] Thread terminated
+2025-06-03 10:48:45,265 - WARNING - [MONITOR] No new frames received
+2025-06-03 10:48:45,265 - INFO - [MONITOR] Connection monitoring terminated
 Killing the ffmpeg subprocess
 Sending a second kill call to the ffmpeg process
-2025-06-03 10:06:07,921 - INFO - 🎥 Flux vidéo fermé
---- Logging error ---
-Traceback (most recent call last):
-  File "C:\Users\Baptiste\anaconda3\Lib\logging\__init__.py", line 1163, in emit
-    stream.write(msg + self.terminator)
-  File "C:\Users\Baptiste\anaconda3\Lib\encodings\cp1252.py", line 19, in encode
-    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f3a5' in position 33: character maps to <undefined>
-Call stack:
-  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 651, in <module>
-    success = main()
-  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 624, in main
-    logger.info("🎥 Flux vidéo fermé")
-Message: '🎥 Flux vidéo fermé'
-Arguments: ()
+2025-06-03 10:48:52,438 - INFO - [VIDEO] Video stream closed
  disconnecting 
-2025-06-03 10:06:08,426 - INFO - 🔗 Drone déconnecté
---- Logging error ---
-Traceback (most recent call last):
-  File "C:\Users\Baptiste\anaconda3\Lib\logging\__init__.py", line 1163, in emit
-    stream.write(msg + self.terminator)
-  File "C:\Users\Baptiste\anaconda3\Lib\encodings\cp1252.py", line 19, in encode
-    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f517' in position 33: character maps to <undefined>
-Call stack:
-  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 651, in <module>
-    success = main()
-  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 632, in main
-    logger.info("🔗 Drone déconnecté")
-Message: '🔗 Drone déconnecté'
-Arguments: ()
-2025-06-03 10:06:08,428 - INFO - ✅ Nettoyage terminé - Programme arrêté proprement
---- Logging error ---
-Traceback (most recent call last):
-  File "C:\Users\Baptiste\anaconda3\Lib\logging\__init__.py", line 1163, in emit
-    stream.write(msg + self.terminator)
-  File "C:\Users\Baptiste\anaconda3\Lib\encodings\cp1252.py", line 19, in encode
-    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 33: character maps to <undefined>
-Call stack:
-  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 651, in <module>
-    success = main()
-  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 646, in main
-    logger.info("✅ Nettoyage terminé - Programme arrêté proprement")
-Message: '✅ Nettoyage terminé - Programme arrêté proprement'
-Arguments: ()
+2025-06-03 10:48:52,941 - INFO - [CONNECT] Drone disconnected
+2025-06-03 10:48:52,942 - INFO - [OK] Cleanup completed - Program terminated properly
