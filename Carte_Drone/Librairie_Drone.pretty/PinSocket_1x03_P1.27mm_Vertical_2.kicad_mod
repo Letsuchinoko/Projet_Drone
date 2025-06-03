@@ -95,7 +95,7 @@
 	(pad "1" thru_hole rect
 		(at 2.66 0)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(uuid "f3517151-c431-4bea-bb65-2a835fe06350")
@@ -103,7 +103,7 @@
 	(pad "2" thru_hole circle
 		(at 2.66 2.54)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(uuid "12873240-515e-4ae9-a82b-5450f0340326")
@@ -111,7 +111,7 @@
 	(pad "3" thru_hole circle
 		(at 2.66 5.08)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(uuid "9b0cd064-9802-412b-a7b5-621d151050a8")

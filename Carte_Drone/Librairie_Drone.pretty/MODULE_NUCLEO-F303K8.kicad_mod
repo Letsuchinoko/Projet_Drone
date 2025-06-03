@@ -184,7 +184,7 @@
 	(pad "1" thru_hole rect
 		(at 7.62 -17.78)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
@@ -193,7 +193,7 @@
 	(pad "2" thru_hole circle
 		(at 7.62 -15.24)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
@@ -202,7 +202,7 @@
 	(pad "3" thru_hole circle
 		(at 7.62 -12.7)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
@@ -211,7 +211,7 @@
 	(pad "4" thru_hole circle
 		(at 7.62 -10.16)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
@@ -220,7 +220,7 @@
 	(pad "5" thru_hole circle
 		(at 7.62 -7.62)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
@@ -229,7 +229,7 @@
 	(pad "6" thru_hole circle
 		(at 7.62 -5.08)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
@@ -238,7 +238,7 @@
 	(pad "7" thru_hole circle
 		(at 7.62 -2.54)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
@@ -247,7 +247,7 @@
 	(pad "8" thru_hole circle
 		(at 7.62 0)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
@@ -256,7 +256,7 @@
 	(pad "9" thru_hole circle
 		(at 7.62 2.54)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
@@ -265,7 +265,7 @@
 	(pad "10" thru_hole circle
 		(at 7.62 5.08)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
@@ -274,7 +274,7 @@
 	(pad "11" thru_hole circle
 		(at 7.62 7.62)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
@@ -283,7 +283,7 @@
 	(pad "12" thru_hole circle
 		(at 7.62 10.16)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
@@ -292,7 +292,7 @@
 	(pad "13" thru_hole circle
 		(at 7.62 12.7)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
@@ -301,7 +301,7 @@
 	(pad "14" thru_hole circle
 		(at 7.62 15.24)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
@@ -310,7 +310,7 @@
 	(pad "15" thru_hole circle
 		(at 7.62 17.78)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
@@ -319,7 +319,7 @@
 	(pad "16" thru_hole circle
 		(at -7.62 17.78)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
@@ -328,7 +328,7 @@
 	(pad "17" thru_hole circle
 		(at -7.62 15.24)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
@@ -337,7 +337,7 @@
 	(pad "18" thru_hole circle
 		(at -7.62 12.7)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
@@ -346,7 +346,7 @@
 	(pad "19" thru_hole circle
 		(at -7.62 10.16)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
@@ -355,7 +355,7 @@
 	(pad "20" thru_hole circle
 		(at -7.62 7.62)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
@@ -364,7 +364,7 @@
 	(pad "21" thru_hole circle
 		(at -7.62 5.08)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
@@ -373,7 +373,7 @@
 	(pad "22" thru_hole circle
 		(at -7.62 2.54)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
@@ -382,7 +382,7 @@
 	(pad "23" thru_hole circle
 		(at -7.62 0)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
@@ -391,7 +391,7 @@
 	(pad "24" thru_hole circle
 		(at -7.62 -2.54)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
@@ -400,7 +400,7 @@
 	(pad "25" thru_hole circle
 		(at -7.62 -5.08)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
@@ -409,7 +409,7 @@
 	(pad "26" thru_hole circle
 		(at -7.62 -7.62)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
@@ -418,7 +418,7 @@
 	(pad "27" thru_hole circle
 		(at -7.62 -10.16)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
@@ -427,7 +427,7 @@
 	(pad "28" thru_hole circle
 		(at -7.62 -12.7)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
@@ -436,7 +436,7 @@
 	(pad "29" thru_hole circle
 		(at -7.62 -15.24)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
@@ -445,7 +445,7 @@
 	(pad "30" thru_hole rect
 		(at -7.62 -17.78)
 		(size 2 2)
-		(drill 1.02)
+		(drill 0.8)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(solder_mask_margin 0.102)
