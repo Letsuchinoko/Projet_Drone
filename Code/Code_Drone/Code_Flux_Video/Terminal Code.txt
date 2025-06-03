@@ -1,64 +1,120 @@
-[h264 @ 00000204a47b6a80] decode_slice_header error
+[h264 @ 000002cc0da46a80] non-existing PPS 0 referenced
 
-[h264 @ 00000204a47b6a80] non-existing PPS 0 referenced
+[h264 @ 000002cc0da46a80] decode_slice_header error
 
-[h264 @ 00000204a47b6a80] decode_slice_header error
+[h264 @ 000002cc0da46a80] non-existing PPS 0 referenced
 
-[h264 @ 00000204a47b6a80] no frame!
+[h264 @ 000002cc0da46a80] decode_slice_header error
 
-[sdp @ 00000204a47ad980] max delay reached. need to consume packet
+[h264 @ 000002cc0da46a80] no frame!
 
-[sdp @ 00000204a47ad980] RTP: missed 7 packets
+[sdp @ 000002cc0da3d980] max delay reached. need to consume packet
 
-[sdp @ 00000204a47ad980] max delay reached. need to consume packet
+[sdp @ 000002cc0da3d980] RTP: missed 165 packets
 
-[sdp @ 00000204a47ad980] RTP: missed 395 packets
+[h264 @ 000002cc0da46a80] concealing 918 DC, 918 AC, 918 MV errors in P frame
 
-[h264 @ 00000204a47b6a80] concealing 648 DC, 648 AC, 648 MV errors in P frame
+[sdp @ 000002cc0da3d980] max delay reached. need to consume packet
 
-[sdp @ 00000204a47ad980] max delay reached. need to consume packet
+[sdp @ 000002cc0da3d980] RTP: missed 577 packets
 
-[sdp @ 00000204a47ad980] RTP: missed 416 packets
+[h264 @ 000002cc0da46a80] concealing 1404 DC, 1404 AC, 1404 MV errors in P frame
 
-[sdp @ 00000204a47ad980] max delay reached. need to consume packet
+[sdp @ 000002cc0da3d980] max delay reached. need to consume packet
 
-[sdp @ 00000204a47ad980] RTP: missed 412 packets
+[sdp @ 000002cc0da3d980] RTP: missed 522 packets
 
-[sdp @ 00000204a47ad980] max delay reached. need to consume packet
+[h264 @ 000002cc0da46a80] corrupted macroblock 32 3 (total_coeff=-1)
 
-[sdp @ 00000204a47ad980] RTP: missed 393 packets
+[h264 @ 000002cc0da46a80] error while decoding MB 32 3
 
-[sdp @ 00000204a47ad980] max delay reached. need to consume packet
+[h264 @ 000002cc0da46a80] concealing 1458 DC, 1458 AC, 1458 MV errors in P frame
 
-[sdp @ 00000204a47ad980] RTP: missed 448 packets
+[sdp @ 000002cc0da3d980] max delay reached. need to consume packet
 
-[sdp @ 00000204a47ad980] max delay reached. need to consume packet
+[sdp @ 000002cc0da3d980] RTP: missed 498 packets
 
-[sdp @ 00000204a47ad980] RTP: missed 496 packets
+[h264 @ 000002cc0da46a80] concealing 702 DC, 702 AC, 702 MV errors in P frame
 
-[sdp @ 00000204a47ad980] max delay reached. need to consume packet
+[sdp @ 000002cc0da3d980] max delay reached. need to consume packet
 
-[sdp @ 00000204a47ad980] RTP: missed 427 packets
+[sdp @ 000002cc0da3d980] RTP: missed 538 packets
 
-[sdp @ 00000204a47ad980] max delay reached. need to consume packet
+[h264 @ 000002cc0da46a80] Invalid level prefix
 
-[sdp @ 00000204a47ad980] RTP: missed 433 packets
+[h264 @ 000002cc0da46a80] error while decoding MB 36 23
 
-[sdp @ 00000204a47ad980] max delay reached. need to consume packet
+[h264 @ 000002cc0da46a80] concealing 378 DC, 378 AC, 378 MV errors in P frame
 
-[sdp @ 00000204a47ad980] RTP: missed 421 packets
+[sdp @ 000002cc0da3d980] max delay reached. need to consume packet
 
-[sdp @ 00000204a47ad980] max delay reached. need to consume packet
+[sdp @ 000002cc0da3d980] RTP: missed 479 packets
 
-[sdp @ 00000204a47ad980] RTP: missed 443 packets
+[h264 @ 000002cc0da46a80] concealing 1404 DC, 1404 AC, 1404 MV errors in P frame
 
-[sdp @ 00000204a47ad980] max delay reached. need to consume packet
+[sdp @ 000002cc0da3d980] max delay reached. need to consume packet
 
-[sdp @ 00000204a47ad980] RTP: missed 442 packets
+[sdp @ 000002cc0da3d980] RTP: missed 549 packets
+
+[h264 @ 000002cc0da46a80] concealing 1026 DC, 1026 AC, 1026 MV errors in P frame
+
+[sdp @ 000002cc0da3d980] max delay reached. need to consume packet
+
+[sdp @ 000002cc0da3d980] RTP: missed 527 packets
+
+[h264 @ 000002cc0da46a80] concealing 1512 DC, 1512 AC, 1512 MV errors in I frame
+
+[sdp @ 000002cc0da3d980] max delay reached. need to consume packet
+
+[sdp @ 000002cc0da3d980] RTP: missed 610 packets
+
+[h264 @ 000002cc0da46a80] concealing 540 DC, 540 AC, 540 MV errors in P frame
+
+[h264 @ 000002cc0da46a80] concealing 918 DC, 918 AC, 918 MV errors in I frame
+
+[sdp @ 000002cc0da3d980] max delay reached. need to consume packet
+
+[sdp @ 000002cc0da3d980] RTP: missed 542 packets
+
+[h264 @ 000002cc0da46a80] concealing 1242 DC, 1242 AC, 1242 MV errors in P frame
+
+[h264 @ 000002cc0da46a80] concealing 270 DC, 270 AC, 270 MV errors in P frame
+
+[sdp @ 000002cc0da3d980] max delay reached. need to consume packet
+
+[sdp @ 000002cc0da3d980] RTP: missed 579 packets
+
+[h264 @ 000002cc0da46a80] corrupted macroblock 28 23 (total_coeff=-1)
+
+[h264 @ 000002cc0da46a80] error while decoding MB 28 23
+
+[h264 @ 000002cc0da46a80] concealing 378 DC, 378 AC, 378 MV errors in P frame
+
+[sdp @ 000002cc0da3d980] max delay reached. need to consume packet
+
+[sdp @ 000002cc0da3d980] RTP: missed 586 packets
+
+[h264 @ 000002cc0da46a80] corrupted macroblock 21 18 (total_coeff=-1)
+
+[h264 @ 000002cc0da46a80] error while decoding MB 21 18
+
+[h264 @ 000002cc0da46a80] concealing 648 DC, 648 AC, 648 MV errors in P frame
+
+[sdp @ 000002cc0da3d980] max delay reached. need to consume packet
+
+[sdp @ 000002cc0da3d980] RTP: missed 536 packets
+
+[sdp @ 000002cc0da3d980] max delay reached. need to consume packet
+
+[sdp @ 000002cc0da3d980] RTP: missed 528 packets
+
+[sdp @ 000002cc0da3d980] max delay reached. need to consume packet
+
+[sdp @ 000002cc0da3d980] RTP: missed 559 packets
 
 Input #0, sdp, from 'C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\utils/bebop.sdp':
 
-  Duration: N/A, start: 3.069744, bitrate: N/A
+  Duration: N/A, start: 18.485156, bitrate: N/A
 
   Stream #0:0: Video: h264 (Constrained Baseline), yuv420p(progressive), 856x480 [SAR 1:1 DAR 107:60], 29.97 fps, 29.97 tbr, 90k tbn
 
@@ -66,9 +122,15 @@ Stream mapping:
 
   Stream #0:0 -> #0:0 (h264 (native) -> png (native))
 
-2025-06-03 09:48:09,466 - INFO - 🎥 Flux vidéo ouvert - Détection en cours...
-2025-06-03 09:48:09,505 - INFO - Appuyez sur 'q' dans la fenêtre vidéo pour quitter
-2025-06-03 09:48:32,867 - INFO - ⏹ Arrêt manuel détecté
-2025-06-03 09:48:32,869 - INFO - 🔄 Nettoyage en cours...
+2025-06-03 09:53:34,572 - INFO - 🎥 Flux vidéo ouvert - Détection en cours...
+2025-06-03 09:53:34,574 - INFO - 💡 Appuyez sur 'q' ou 'ESC' dans la fenêtre vidéo pour quitter
+2025-06-03 09:53:34,574 - INFO - 💡 Ou utilisez Ctrl+C dans le terminal
+2025-06-03 09:53:43,241 - WARNING - ⚠️ Aucune nouvelle frame depuis 5 secondes
+2025-06-03 09:53:52,310 - INFO - ⏹ Arrêt manuel détecté
+2025-06-03 09:53:52,310 - INFO - 🔄 Nettoyage en cours...
+2025-06-03 09:53:52,471 - INFO - Thread d'affichage terminé
 Killing the ffmpeg subprocess
-2025-06-03 09:48:33,136 - INFO - Thread d'affichage terminé
+Sending a second kill call to the ffmpeg process
+2025-06-03 09:53:58,077 - WARNING - ⚠️ Aucune frame reçue, possible problème de connexion
+ disconnecting 
+2025-06-03 09:54:00,316 - INFO - ✅ Programme terminé proprement
