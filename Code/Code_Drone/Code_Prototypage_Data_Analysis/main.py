@@ -11,20 +11,19 @@ import signal
 import sys
 from collections import deque
 import glob
+import subprocess
+import platform
+import gc
 
 # === CONFIGURATION OPTIMISÉE ===
 DISPLAY_FPS = 20
 MAX_QUEUE_SIZE = 3
 IMAGES_DIR = "C:/Users/Baptiste/anaconda3/Lib/site-packages/pyparrot/images"
 CONNECTION_TIMEOUT = 15
-VISION_TIMEOUT = 20
-MAX_WAIT_TIME = 2.0
-DISPLAY_INTERVAL = 1.0 / DISPLAY_FPS
 MAX_IMAGE_FILES = 30
 IMAGE_KEEP_COUNT = 12
 WATCHDOG_TIMEOUT = 8  # secondes sans frame -> restart flux
 
-# Variables globales thread-safe
 frame_queue = Queue(maxsize=MAX_QUEUE_SIZE)
 processing_active = threading.Event()
 processing_active.set()
@@ -38,6 +37,7 @@ frame_stats = {
     'last_processed_file': None
 }
 stats_lock = threading.Lock()
+image_dir_lock = threading.Lock()  # LOCK GLOBAL
 
 # Logging
 logging.basicConfig(
@@ -50,12 +50,20 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+def kill_ffmpeg():
+    if platform.system() == "Windows":
+        try:
+            subprocess.call('taskkill /F /IM ffmpeg.exe', shell=True)
+            logger.info("Killed all ffmpeg.exe processes.")
+        except Exception as e:
+            logger.warning(f"Erreur lors de la fermeture de ffmpeg.exe : {e}")
+
 class ImprovedGloveDetector:
     def __init__(self):
         self.detection_history = deque(maxlen=10)
-        self.min_area = 800
-        self.max_area = 50000
-        self.min_contour_points = 20
+        self.min_area = 400  # abaissé car zone plus restreinte ?
+        self.max_area = 70000
+        self.min_contour_points = 10
         self.kernel_open = np.ones((3, 3), np.uint8)
         self.kernel_close = np.ones((7, 7), np.uint8)
         self.stable_detections = deque(maxlen=5)
@@ -63,7 +71,6 @@ class ImprovedGloveDetector:
     def detect_glove(self, frame):
         if frame is None:
             return frame, False
-
         original_frame = frame.copy()
         h, w = frame.shape[:2]
         try:
@@ -76,19 +83,24 @@ class ImprovedGloveDetector:
             work_frame = cv2.GaussianBlur(work_frame, (5, 5), 0)
             hsv = cv2.cvtColor(work_frame, cv2.COLOR_BGR2HSV)
 
-            mask_red1 = cv2.inRange(hsv, np.array([0, 80, 80]), np.array([15, 255, 255]))
-            mask_red2 = cv2.inRange(hsv, np.array([165, 80, 80]), np.array([180, 255, 255]))
-            mask_orange = cv2.inRange(hsv, np.array([15, 80, 80]), np.array([35, 255, 255]))
+            # --- Masques couleurs adaptés à tes gants ---
+            # On cible H de 3 à 22, S de 60 à 255, V de 60 à 255 pour limiter le bruit
+            lower = np.array([3, 60, 60])
+            upper = np.array([22, 255, 255])
+            mask = cv2.inRange(hsv, lower, upper)
 
-            mask_combined = cv2.bitwise_or(mask_red1, cv2.bitwise_or(mask_red2, mask_orange))
-            mask_combined = cv2.morphologyEx(mask_combined, cv2.MORPH_OPEN, self.kernel_open)
-            mask_combined = cv2.morphologyEx(mask_combined, cv2.MORPH_CLOSE, self.kernel_close)
+            # Ajout d'un mode debug si tu veux voir le masque pur :
+            # cv2.imshow("MASK", mask)
+            # Nettoyage morphologique
+            mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, self.kernel_open)
+            mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, self.kernel_close)
 
-            contours, _ = cv2.findContours(mask_combined, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             best_contour = self._select_best_contour(contours, work_frame.shape)
             detected = best_contour is not None
             self.stable_detections.append(detected)
-            stable_detection = sum(self.stable_detections) >= 3
+            stable_detection = sum(self.stable_detections) >= 2  # plus tolérant
+
             self.detection_history.append(stable_detection)
 
             if stable_detection and best_contour is not None:
@@ -97,7 +109,7 @@ class ImprovedGloveDetector:
                 self._draw_detection(original_frame, best_contour)
                 with stats_lock:
                     frame_stats['detection_count'] += 1
-            result_frame = self._add_overlay(original_frame, stable_detection, mask_combined)
+            result_frame = self._add_overlay(original_frame, stable_detection, mask)
             return result_frame, stable_detection
 
         except Exception as e:
@@ -120,18 +132,18 @@ class ImprovedGloveDetector:
                 continue
             x, y, w_rect, h_rect = cv2.boundingRect(contour)
             aspect_ratio = w_rect / float(h_rect)
-            if not (0.3 <= aspect_ratio <= 3.0):
+            if not (0.2 <= aspect_ratio <= 4.0):
                 continue
-            if x < 10 or y < 10 or (x + w_rect) > (w - 10) or (y + h_rect) > (h - 10):
+            if x < 5 or y < 5 or (x + w_rect) > (w - 5) or (y + h_rect) > (h - 5):
                 continue
             hull = cv2.convexHull(contour)
             hull_area = cv2.contourArea(hull)
             if hull_area > 0:
                 solidity = area / hull_area
-                if solidity < 0.5:
+                if solidity < 0.35:
                     continue
-            position_score = 1.0 if y > h * 0.2 else 0.5
-            area_score = min(area / 5000.0, 1.0)
+            position_score = 1.0 if y > h * 0.1 else 0.5
+            area_score = min(area / 4000.0, 1.0)
             score = area_score * position_score
             if score > best_score:
                 best_score = score
@@ -183,31 +195,27 @@ class ImprovedGloveDetector:
 
 def vision_callback(args):
     try:
-        pattern = os.path.join(IMAGES_DIR, "image_*.png")
-        files = glob.glob(pattern)
-        if not files:
-            return
-        latest_file = max(files, key=os.path.getmtime)
-        if not os.path.exists(latest_file) or os.path.getsize(latest_file) < 1000:
-            return
-        time.sleep(0.02)
-        frame = cv2.imread(latest_file)
-        if frame is None:
-            return
-        h, w = frame.shape[:2]
-        if h < 200 or w < 200:
-            return
-        # Ajoute la frame à la queue (évite la latence)
-        try:
+        with image_dir_lock:
+            pattern = os.path.join(IMAGES_DIR, "image_*.png")
+            files = glob.glob(pattern)
+            if not files:
+                return
+            latest_file = max(files, key=os.path.getmtime)
+            if not os.path.exists(latest_file) or os.path.getsize(latest_file) < 1000:
+                return
+            time.sleep(0.01)
+            frame = cv2.imread(latest_file)
+            if frame is None:
+                return
+            h, w = frame.shape[:2]
+            if h < 150 or w < 150:
+                return
             if frame_queue.full():
                 try:
                     frame_queue.get_nowait()
                 except Empty:
                     pass
             frame_queue.put_nowait(frame)
-        except:
-            pass
-        # Log de debug frame
         logger.debug(f"Vision callback: new frame {os.path.basename(latest_file)}")
         with stats_lock:
             frame_stats['frame_count'] += 1
@@ -219,20 +227,21 @@ def cleanup_thread():
     logger.info("Cleanup thread started")
     while processing_active.is_set():
         try:
-            files = glob.glob(os.path.join(IMAGES_DIR, "image_*.png"))
-            logger.debug(f"Cleanup: {len(files)} image files present.")
-            if len(files) > MAX_IMAGE_FILES:
-                files_sorted = sorted(files, key=os.path.getmtime, reverse=True)
-                files_to_remove = files_sorted[IMAGE_KEEP_COUNT:]
-                removed_count = 0
-                for file_path in files_to_remove:
-                    try:
-                        os.remove(file_path)
-                        removed_count += 1
-                    except OSError:
-                        pass
-                if removed_count > 0:
-                    logger.info(f"Cleaned up {removed_count} old image files")
+            with image_dir_lock:
+                files = glob.glob(os.path.join(IMAGES_DIR, "image_*.png"))
+                logger.debug(f"Cleanup: {len(files)} image files present.")
+                if len(files) > MAX_IMAGE_FILES:
+                    files_sorted = sorted(files, key=os.path.getmtime, reverse=True)
+                    files_to_remove = files_sorted[IMAGE_KEEP_COUNT:]
+                    removed_count = 0
+                    for file_path in files_to_remove:
+                        try:
+                            os.remove(file_path)
+                            removed_count += 1
+                        except OSError:
+                            pass
+                    if removed_count > 0:
+                        logger.info(f"Cleaned up {removed_count} old image files")
         except Exception as e:
             logger.debug(f"Cleanup error: {e}")
         for _ in range(50):
@@ -289,7 +298,6 @@ def display_thread():
 def connection_monitor_thread(vision_obj):
     logger.info("Connection monitor started")
     last_frame_count = 0
-    last_frame_time = time.time()
     check_interval = 4
     while processing_active.is_set():
         time.sleep(check_interval)
@@ -301,19 +309,29 @@ def connection_monitor_thread(vision_obj):
         frame_diff = current_frames - last_frame_count
         last_frame_count = current_frames
         time_since_last_frame = time.time() - last_received_time
-        files = glob.glob(os.path.join(IMAGES_DIR, "image_*.png"))
+        with image_dir_lock:
+            files = glob.glob(os.path.join(IMAGES_DIR, "image_*.png"))
         logger.debug(f"Monitor: frames={current_frames}, files={len(files)}, time_since_last={time_since_last_frame:.1f}s")
         if frame_diff == 0 or time_since_last_frame > WATCHDOG_TIMEOUT:
             logger.warning("No new frames received for monitoring, attempting to recover video stream...")
             try:
-                if vision_obj:
-                    vision_obj.close_video()
-                    time.sleep(2)
-                    opened = vision_obj.open_video()
-                    if opened:
-                        logger.info("Video stream successfully recovered (watchdog)")
-                    else:
-                        logger.error("Failed to recover video stream (watchdog)")
+                kill_ffmpeg()
+                with image_dir_lock:
+                    files = glob.glob(os.path.join(IMAGES_DIR, "image_*.png"))
+                    for file_path in files:
+                        try:
+                            os.remove(file_path)
+                        except OSError:
+                            pass
+                gc.collect()
+                time.sleep(0.3)
+                vision_obj.close_video()
+                time.sleep(1)
+                opened = vision_obj.open_video()
+                if opened:
+                    logger.info("Video stream successfully recovered (watchdog)")
+                else:
+                    logger.error("Failed to recover video stream (watchdog)")
             except Exception as e:
                 logger.error(f"Failed to recover video: {e}")
             connection_stable.clear()
