@@ -1,58 +1,108 @@
-2025-06-03 12:14:53,283 - INFO - Starting Bebop 2 glove detection system
-2025-06-03 12:14:53,306 - INFO - Connecting to Bebop 2...
-2025-06-03 12:14:54,328 - INFO - Drone connected successfully
-2025-06-03 12:14:54,329 - INFO - Display thread started
-2025-06-03 12:14:54,329 - INFO - Cleanup thread started
-2025-06-03 12:14:54,330 - INFO - Connection monitor started
-2025-06-03 12:14:54,330 - INFO - All threads started (display, cleanup, monitor)
-2025-06-03 12:14:54,330 - INFO - Opening video stream...
-2025-06-03 12:14:56,419 - WARNING - No frames received for 2 seconds
-2025-06-03 12:14:58,333 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
-2025-06-03 12:14:58,457 - WARNING - No frames received for 2 seconds
-2025-06-03 12:15:00,467 - WARNING - No frames received for 2 seconds
-2025-06-03 12:15:02,353 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
-2025-06-03 12:15:02,493 - WARNING - No frames received for 2 seconds
-2025-06-03 12:15:04,534 - WARNING - No frames received for 2 seconds
-2025-06-03 12:15:06,394 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
-2025-06-03 12:15:06,564 - WARNING - No frames received for 2 seconds
-2025-06-03 12:15:08,465 - INFO - Video stream opened successfully
-2025-06-03 12:15:08,502 - INFO - Detection system active
-2025-06-03 12:15:08,506 - INFO - Controls: 'q'/ESC=Quit, 'r'=Reset stats, 's'=Screenshot
-2025-06-03 12:15:09,550 - INFO - FPS: 2.0
-2025-06-03 12:15:10,412 - INFO - STATS - Frames: 52, FPS: 13.0, Detections: 94.2%, Errors: 0
-2025-06-03 12:15:10,747 - INFO - FPS: 25.1
-2025-06-03 12:15:11,977 - INFO - FPS: 24.4
-2025-06-03 12:15:13,286 - INFO - FPS: 22.9
-2025-06-03 12:15:14,414 - INFO - STATS - Frames: 147, FPS: 23.8, Detections: 49.7%, Errors: 0
-2025-06-03 12:15:14,553 - INFO - FPS: 23.7
-2025-06-03 12:15:14,669 - INFO - Cleaned up 301 old image files
-2025-06-03 12:15:16,710 - WARNING - No frames received for 2 seconds
-2025-06-03 12:15:18,415 - INFO - STATS - Frames: 152, FPS: 1.2, Detections: 51.3%, Errors: 0
-2025-06-03 12:15:18,711 - WARNING - No frames received for 2 seconds
-2025-06-03 12:15:20,722 - WARNING - No frames received for 2 seconds
-2025-06-03 12:15:22,418 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
-2025-06-03 12:15:22,723 - WARNING - No frames received for 2 seconds
-2025-06-03 12:15:24,737 - WARNING - No frames received for 2 seconds
-2025-06-03 12:15:24,755 - INFO - Cleaned up 306 old image files
-2025-06-03 12:15:26,419 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
-2025-06-03 12:15:26,752 - WARNING - No frames received for 2 seconds
-2025-06-03 12:15:28,765 - WARNING - No frames received for 2 seconds
-2025-06-03 12:15:30,421 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
-2025-06-03 12:15:30,768 - WARNING - No frames received for 2 seconds
-2025-06-03 12:15:32,770 - WARNING - No frames received for 2 seconds
-2025-06-03 12:15:34,423 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
-2025-06-03 12:15:34,785 - WARNING - No frames received for 2 seconds
-2025-06-03 12:15:34,837 - INFO - Cleaned up 204 old image files
-2025-06-03 12:15:36,795 - WARNING - No frames received for 2 seconds
-2025-06-03 12:15:38,424 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
-2025-06-03 12:15:38,800 - WARNING - No frames received for 2 seconds
-2025-06-03 12:15:39,269 - INFO - Stop signal received
-2025-06-03 12:15:39,446 - INFO - Cleanup thread terminated
-2025-06-03 12:15:39,522 - INFO - Starting cleanup...
-2025-06-03 12:15:40,814 - WARNING - No frames received for 2 seconds
-2025-06-03 12:15:40,819 - INFO - Display thread terminated
-2025-06-03 12:15:42,425 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
-2025-06-03 12:15:42,425 - INFO - Connection monitor terminated
-2025-06-03 12:15:48,025 - INFO - Video stream closed
-2025-06-03 12:15:48,528 - INFO - Drone disconnected
-2025-06-03 12:15:48,528 - INFO - Cleanup completed
+2025-06-03 12:30:45,490 - INFO - Starting Bebop 2 glove detection system
+2025-06-03 12:30:45,511 - INFO - Connecting to Bebop 2...
+2025-06-03 12:30:46,531 - INFO - Drone connected successfully
+2025-06-03 12:30:46,532 - INFO - Display thread started
+2025-06-03 12:30:46,532 - INFO - Cleanup thread started
+2025-06-03 12:30:46,532 - INFO - Connection monitor started
+2025-06-03 12:30:46,532 - INFO - All threads started (display, cleanup, monitor)
+2025-06-03 12:30:46,532 - INFO - Opening video stream...
+2025-06-03 12:30:48,559 - WARNING - No frames received for 2 seconds
+2025-06-03 12:30:49,965 - INFO - Video stream opened successfully
+2025-06-03 12:30:49,965 - INFO - Detection system active
+2025-06-03 12:30:49,966 - INFO - Controls: 'q'/ESC=Quit, 'r'=Reset stats, 's'=Screenshot
+2025-06-03 12:30:50,538 - INFO - STATS - Frames: 19, FPS: 4.8, Detections: 0.0%, Errors: 0
+2025-06-03 12:30:50,892 - INFO - FPS: 6.9
+2025-06-03 12:30:52,080 - INFO - FPS: 25.3
+2025-06-03 12:30:53,368 - INFO - FPS: 23.3
+2025-06-03 12:30:54,542 - INFO - STATS - Frames: 115, FPS: 24.0, Detections: 0.0%, Errors: 0
+2025-06-03 12:30:54,762 - INFO - FPS: 21.5
+2025-06-03 12:30:56,056 - INFO - FPS: 23.2
+2025-06-03 12:30:56,634 - INFO - Cleaned up 212 old image files
+2025-06-03 12:30:57,378 - INFO - FPS: 22.7
+2025-06-03 12:30:58,543 - INFO - STATS - Frames: 208, FPS: 23.2, Detections: 0.0%, Errors: 0
+2025-06-03 12:30:58,636 - INFO - FPS: 23.8
+2025-06-03 12:30:59,938 - INFO - FPS: 23.1
+2025-06-03 12:31:01,206 - INFO - FPS: 23.7
+2025-06-03 12:31:02,341 - INFO - FPS: 26.4
+2025-06-03 12:31:02,545 - INFO - STATS - Frames: 305, FPS: 24.2, Detections: 19.7%, Errors: 0
+2025-06-03 12:31:03,572 - INFO - FPS: 24.4
+2025-06-03 12:31:04,817 - INFO - FPS: 24.1
+2025-06-03 12:31:06,257 - INFO - FPS: 20.8
+2025-06-03 12:31:06,568 - INFO - STATS - Frames: 396, FPS: 22.8, Detections: 29.8%, Errors: 0
+2025-06-03 12:31:06,721 - INFO - Cleaned up 301 old image files
+2025-06-03 12:31:07,433 - INFO - FPS: 25.5
+2025-06-03 12:31:08,602 - INFO - FPS: 25.6
+2025-06-03 12:31:09,810 - INFO - FPS: 24.9
+2025-06-03 12:31:10,575 - INFO - STATS - Frames: 499, FPS: 25.8, Detections: 40.3%, Errors: 0
+2025-06-03 12:31:10,973 - INFO - FPS: 25.8
+2025-06-03 12:31:12,208 - INFO - FPS: 24.3
+2025-06-03 12:31:13,615 - INFO - FPS: 21.3
+2025-06-03 12:31:14,582 - INFO - STATS - Frames: 592, FPS: 23.2, Detections: 49.7%, Errors: 0
+2025-06-03 12:31:14,914 - INFO - FPS: 23.1
+2025-06-03 12:31:16,338 - INFO - FPS: 21.1
+2025-06-03 12:31:16,802 - INFO - Cleaned up 302 old image files
+2025-06-03 12:31:17,624 - INFO - FPS: 23.3
+2025-06-03 12:31:18,596 - INFO - STATS - Frames: 682, FPS: 22.5, Detections: 56.3%, Errors: 0
+2025-06-03 12:31:18,911 - INFO - FPS: 23.3
+2025-06-03 12:31:20,134 - INFO - FPS: 24.5
+2025-06-03 12:31:21,447 - INFO - FPS: 22.9
+2025-06-03 12:31:22,615 - INFO - STATS - Frames: 776, FPS: 23.5, Detections: 60.6%, Errors: 0
+2025-06-03 12:31:22,760 - INFO - FPS: 22.9
+2025-06-03 12:31:24,031 - INFO - FPS: 23.6
+2025-06-03 12:31:25,452 - INFO - FPS: 21.1
+2025-06-03 12:31:26,632 - INFO - STATS - Frames: 864, FPS: 22.0, Detections: 62.2%, Errors: 0
+2025-06-03 12:31:26,887 - INFO - Cleaned up 302 old image files
+2025-06-03 12:31:26,939 - INFO - FPS: 20.2
+2025-06-03 12:31:28,122 - INFO - FPS: 25.4
+2025-06-03 12:31:29,360 - INFO - FPS: 24.2
+2025-06-03 12:31:30,604 - INFO - FPS: 24.1
+2025-06-03 12:31:30,633 - INFO - STATS - Frames: 961, FPS: 24.2, Detections: 65.2%, Errors: 0
+2025-06-03 12:31:31,886 - INFO - FPS: 23.4
+2025-06-03 12:31:33,283 - INFO - FPS: 21.5
+2025-06-03 12:31:34,635 - INFO - STATS - Frames: 1049, FPS: 22.0, Detections: 67.7%, Errors: 0
+2025-06-03 12:31:34,665 - INFO - FPS: 21.7
+2025-06-03 12:31:36,135 - INFO - FPS: 20.4
+2025-06-03 12:31:36,964 - INFO - Cleaned up 301 old image files
+2025-06-03 12:31:37,519 - INFO - FPS: 21.7
+2025-06-03 12:31:38,640 - INFO - STATS - Frames: 1135, FPS: 21.5, Detections: 68.7%, Errors: 0
+2025-06-03 12:31:38,821 - INFO - FPS: 23.0
+2025-06-03 12:31:40,037 - INFO - FPS: 24.7
+2025-06-03 12:31:41,320 - INFO - FPS: 23.4
+2025-06-03 12:31:42,633 - INFO - FPS: 22.9
+2025-06-03 12:31:42,641 - INFO - STATS - Frames: 1230, FPS: 23.8, Detections: 71.1%, Errors: 0
+2025-06-03 12:31:44,031 - INFO - FPS: 21.5
+2025-06-03 12:31:45,649 - INFO - FPS: 18.5
+2025-06-03 12:31:46,657 - INFO - STATS - Frames: 1307, FPS: 19.2, Detections: 70.4%, Errors: 0
+2025-06-03 12:31:47,046 - INFO - Cleaned up 303 old image files
+2025-06-03 12:31:47,217 - INFO - FPS: 19.1
+2025-06-03 12:31:48,293 - INFO - FPS: 27.9
+2025-06-03 12:31:49,538 - INFO - FPS: 24.1
+2025-06-03 12:31:50,660 - INFO - STATS - Frames: 1405, FPS: 24.5, Detections: 68.8%, Errors: 0
+2025-06-03 12:31:50,833 - INFO - FPS: 23.2
+2025-06-03 12:31:52,225 - INFO - FPS: 21.6
+2025-06-03 12:31:53,464 - INFO - FPS: 24.2
+2025-06-03 12:31:54,662 - INFO - STATS - Frames: 1494, FPS: 22.2, Detections: 70.6%, Errors: 0
+2025-06-03 12:31:54,958 - INFO - FPS: 20.1
+2025-06-03 12:31:56,374 - INFO - FPS: 21.2
+2025-06-03 12:31:57,115 - INFO - Cleaned up 303 old image files
+2025-06-03 12:31:57,736 - INFO - FPS: 22.0
+2025-06-03 12:31:58,664 - INFO - STATS - Frames: 1583, FPS: 22.2, Detections: 72.2%, Errors: 0
+2025-06-03 12:31:58,939 - INFO - FPS: 25.0
+2025-06-03 12:32:01,314 - WARNING - No frames received for 2 seconds
+2025-06-03 12:32:02,666 - INFO - STATS - Frames: 1599, FPS: 4.0, Detections: 72.5%, Errors: 0
+2025-06-03 12:32:03,328 - WARNING - No frames received for 2 seconds
+2025-06-03 12:32:05,340 - WARNING - No frames received for 2 seconds
+2025-06-03 12:32:06,667 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
+2025-06-03 12:32:07,140 - INFO - Cleaned up 66 old image files
+2025-06-03 12:32:07,348 - WARNING - No frames received for 2 seconds
+2025-06-03 12:32:09,363 - WARNING - No frames received for 2 seconds
+2025-06-03 12:32:10,468 - INFO - Stop signal received
+2025-06-03 12:32:10,669 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
+2025-06-03 12:32:10,669 - INFO - Connection monitor terminated
+2025-06-03 12:32:10,743 - INFO - Cleanup thread terminated
+2025-06-03 12:32:11,097 - INFO - Starting cleanup...
+2025-06-03 12:32:11,374 - WARNING - No frames received for 2 seconds
+2025-06-03 12:32:11,378 - INFO - Display thread terminated
+2025-06-03 12:32:19,600 - INFO - Video stream closed
+2025-06-03 12:32:20,102 - INFO - Drone disconnected
+2025-06-03 12:32:20,102 - INFO - Cleanup completed
