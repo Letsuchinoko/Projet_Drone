@@ -1,82 +1,285 @@
-import os
 import cv2
 import time
 import numpy as np
-import subprocess
 import threading
+from pyparrot.Bebop import Bebop
+from pyparrot.DroneVision import DroneVision
+from queue import Queue, Empty
+import logging
 
 # === CONFIGURATION ===
-WIDTH, HEIGHT = 1280, 720  # Résolution souhaitée
-PIX_FMT = "bgr24"
-SDP_FILENAME = "bebop.sdp"
-FFMPEG_BIN = "ffmpeg"
-DISPLAY_INTERVAL = 1 / 10  # 10 FPS
+DISPLAY_FPS = 5
+DISPLAY_INTERVAL = 1.0 / DISPLAY_FPS
+MAX_QUEUE_SIZE = 3  # Limite la taille de la queue pour éviter l'accumulation
 
-# === Préparation chemins ===
-script_dir = os.path.dirname(os.path.abspath(__file__))
-sdp_path = os.path.join(script_dir, SDP_FILENAME)
+# Variables globales
+frame_queue = Queue(maxsize=MAX_QUEUE_SIZE)
+last_display_time = 0
+processing_active = True
 
-# === Vérifie que le fichier SDP existe ===
-if not os.path.exists(sdp_path):
-    print(f"❌ Fichier SDP introuvable : {sdp_path}")
-    exit(1)
+# Configuration du logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
-# === Démarrage du flux ffmpeg ===
-print("🎥 Démarrage du flux vidéo direct...")
-cmd = [
-    FFMPEG_BIN,
-    "-protocol_whitelist", "file,udp,rtp",
-    "-fflags", "nobuffer",
-    "-flags", "low_delay",
-    "-analyzeduration", "0",
-    "-probesize", "32",
-    "-i", sdp_path,
-    "-f", "rawvideo",
-    "-pix_fmt", PIX_FMT,
-    "-"
-]
+class FrameProcessor:
+    """Classe pour gérer le traitement des frames en mémoire"""
+    
+    def __init__(self):
+        self.last_frame = None
+        self.frame_count = 0
+    
+    def detect_gant(self, image):
+        """Détection du gant rouge/orange optimisée"""
+        try:
+            if image is None or image.size == 0:
+                return None
+                
+            hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+            img_h, img_w = image.shape[:2]
 
-try:
-    process = subprocess.Popen(
-        cmd,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.DEVNULL  # ignorer les erreurs flood
-    )
-    time.sleep(2)  # Laisse ffmpeg initier le flux correctement
-except Exception as e:
-    print(f"❌ Impossible de lancer ffmpeg : {e}")
-    exit(1)
+            # Plages HSV pour détecter rouge/orange
+            lower_ranges = [
+                np.array([0, 80, 40]),   # Rouge bas
+                np.array([10, 100, 50]), # Orange
+                np.array([170, 50, 40])  # Rouge haut
+            ]
+            
+            upper_ranges = [
+                np.array([10, 255, 255]),
+                np.array([25, 255, 255]),
+                np.array([180, 255, 255])
+            ]
 
-frame_size = WIDTH * HEIGHT * 3
-last_display = 0
+            # Création du masque combiné
+            masks = [cv2.inRange(hsv, lower, upper) 
+                    for lower, upper in zip(lower_ranges, upper_ranges)]
+            
+            mask = masks[0]
+            for m in masks[1:]:
+                mask = cv2.bitwise_or(mask, m)
 
-try:
-    # Attente de la première frame complète
-    while True:
-        raw_frame = process.stdout.read(frame_size)
-        if len(raw_frame) == frame_size:
-            break
-        time.sleep(0.01)
+            # Nettoyage morphologique
+            kernel = np.ones((5, 5), np.uint8)
+            mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+            mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
 
-    while True:
-        raw_frame = process.stdout.read(frame_size)
-        if len(raw_frame) != frame_size:
-            time.sleep(0.01)
-            continue
+            # Détection des contours
+            contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-        frame = np.frombuffer(raw_frame, np.uint8).reshape((HEIGHT, WIDTH, 3))
+            best_contour = self._find_best_glove_contour(contours, img_w, img_h)
+            
+            if best_contour is not None:
+                self._draw_detection(image, best_contour)
+            
+            return image
+            
+        except Exception as e:
+            logger.error(f"Erreur lors de la détection: {e}")
+            return image
+    
+    def _find_best_glove_contour(self, contours, img_w, img_h):
+        """Trouve le meilleur contour correspondant à un gant"""
+        best_contour = None
+        max_score = 0
 
+        for contour in contours:
+            try:
+                area = cv2.contourArea(contour)
+                if area < 600:  # Trop petit
+                    continue
+                    
+                perimeter = cv2.arcLength(contour, True)
+                if perimeter == 0:
+                    continue
+
+                x, y, w, h = cv2.boundingRect(contour)
+                
+                # Filtrage par position (éviter le haut de l'image)
+                center_x = x + w // 2
+                center_y = y + h // 2
+                
+                if center_y < img_h * 0.25 and img_w * 0.3 < center_x < img_w * 0.7:
+                    continue
+                
+                # Filtrage par taille
+                if area > img_w * img_h * 0.6:  # Trop grand
+                    continue
+                
+                # Calculs géométriques
+                hull = cv2.convexHull(contour)
+                hull_area = cv2.contourArea(hull)
+                if hull_area == 0:
+                    continue
+
+                aspect_ratio = w / float(h)
+                solidity = float(area) / hull_area
+                complexity = area / perimeter
+
+                # Filtres géométriques
+                if not (0.25 <= aspect_ratio <= 2.5):
+                    continue
+                if solidity > 0.995:  # Trop régulier
+                    continue
+                if complexity > 35:
+                    continue
+
+                # Score de détection
+                score = area * (1 - solidity) * complexity
+                if score > max_score:
+                    max_score = score
+                    best_contour = contour
+                    
+            except Exception as e:
+                logger.warning(f"Erreur lors de l'analyse du contour: {e}")
+                continue
+
+        return best_contour
+    
+    def _draw_detection(self, image, contour):
+        """Dessine la détection sur l'image"""
+        try:
+            cv2.drawContours(image, [contour], -1, (0, 255, 0), 2)
+            x, y, w, h = cv2.boundingRect(contour)
+            cv2.putText(image, "Gant detecte", (x, y - 10),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+        except Exception as e:
+            logger.warning(f"Erreur lors du dessin: {e}")
+
+def vision_callback(args):
+    """Callback appelé pour chaque frame reçue du drone"""
+    global last_display_time
+    
+    try:
+        # Vérification du timing pour limiter à 5 FPS
         now = time.time()
-        if now - last_display >= DISPLAY_INTERVAL:
-            cv2.imshow("🎥 Bebop2 Live Stream", frame)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-            last_display = now
+        if now - last_display_time < DISPLAY_INTERVAL:
+            return
+        
+        # Récupération de la frame depuis DroneVision
+        if hasattr(args, 'data') and args.data is not None:
+            # Conversion des données en image OpenCV
+            frame_data = args.data
+            
+            # Si les données sont sous forme de bytes, les convertir
+            if isinstance(frame_data, bytes):
+                nparr = np.frombuffer(frame_data, np.uint8)
+                frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+            else:
+                frame = frame_data
+                
+            if frame is not None and frame.size > 0:
+                # Ajouter la frame à la queue (non-bloquant)
+                try:
+                    frame_queue.put_nowait(frame.copy())
+                    last_display_time = now
+                except:
+                    # Queue pleine, on ignore cette frame
+                    pass
+                    
+    except Exception as e:
+        logger.error(f"Erreur dans vision_callback: {e}")
 
-except KeyboardInterrupt:
-    print("\n⏹ Arrêt manuel.")
+def display_thread():
+    """Thread dédié à l'affichage et au traitement des frames"""
+    global processing_active
+    
+    processor = FrameProcessor()
+    
+    while processing_active:
+        try:
+            # Récupération d'une frame avec timeout
+            frame = frame_queue.get(timeout=1.0)
+            
+            if frame is not None:
+                # Redimensionnement pour l'affichage
+                height, width = frame.shape[:2]
+                if width > 800:
+                    new_width = 800
+                    new_height = int(height * new_width / width)
+                    frame = cv2.resize(frame, (new_width, new_height))
+                
+                # Détection du gant
+                processed_frame = processor.detect_gant(frame)
+                
+                if processed_frame is not None:
+                    # Affichage
+                    cv2.imshow("🧤 Détection Gant Rouge - Direct Stream", processed_frame)
+                    
+                    # Vérification de la touche 'q' pour quitter
+                    key = cv2.waitKey(1) & 0xFF
+                    if key == ord('q'):
+                        logger.info("Arrêt demandé par l'utilisateur")
+                        processing_active = False
+                        break
+                        
+        except Empty:
+            # Timeout normal, on continue
+            continue
+        except Exception as e:
+            logger.error(f"Erreur dans display_thread: {e}")
+            time.sleep(0.1)
 
-finally:
-    print("Fermeture du flux...")
-    process.kill()
-    cv2.destroyAllWindows()
+def main():
+    """Fonction principale"""
+    global processing_active
+    
+    # Initialisation du drone
+    bebop = Bebop()
+    bebop.drone_ip = "192.168.42.1"
+    
+    logger.info("Connexion au drone Bebop 2...")
+    
+    try:
+        if not bebop.connect(10):
+            logger.error("❌ Impossible de se connecter au drone")
+            return
+        
+        logger.info("✅ Connecté au drone")
+        
+        # Initialisation de la vision
+        vision = DroneVision(bebop, is_bebop=True)
+        vision.set_user_callback_function(vision_callback)
+        
+        # Démarrage du thread d'affichage
+        display_thread_obj = threading.Thread(target=display_thread, daemon=True)
+        display_thread_obj.start()
+        
+        # Ouverture du flux vidéo
+        if vision.open_video():
+            logger.info("🎥 Flux vidéo ouvert - Détection en cours...")
+            logger.info("Appuyez sur 'q' dans la fenêtre vidéo pour quitter")
+            
+            try:
+                # Boucle principale
+                while processing_active:
+                    time.sleep(0.1)  # Évite une boucle trop intensive
+                    
+            except KeyboardInterrupt:
+                logger.info("⏹ Arrêt manuel détecté")
+                
+        else:
+            logger.error("❌ Impossible d'ouvrir le flux vidéo")
+            
+    except Exception as e:
+        logger.error(f"Erreur générale: {e}")
+        
+    finally:
+        logger.info("🔄 Nettoyage en cours...")
+        processing_active = False
+        
+        # Nettoyage
+        try:
+            vision.close_video()
+        except:
+            pass
+            
+        try:
+            bebop.disconnect()
+        except:
+            pass
+            
+        cv2.destroyAllWindows()
+        logger.info("✅ Programme terminé proprement")
+
+if __name__ == "__main__":
+    main()
