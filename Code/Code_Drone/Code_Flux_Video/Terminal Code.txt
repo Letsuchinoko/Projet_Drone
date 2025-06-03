@@ -1,6 +1,74 @@
-PS C:\Users\Baptiste\Documents\GitHub\Projet_Drone> & C:/Users/Baptiste/anaconda3/python.exe c:/Users/Baptiste/Documents/GitHub/Projet_Drone/Code/Code_Drone/Code_Prototypage_Data_Analysis/main.py
-Traceback (most recent call last):
-  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Prototypage_Data_Analysis\main.py", line 16, in <module>
-    from pyparrot.DroneVision import IMAGE_DIR  # Ce répertoire contient bebop.sdp
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-ImportError: cannot import name 'IMAGE_DIR' from 'pyparrot.DroneVision' (C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\DroneVision.py)
+[h264 @ 00000204a47b6a80] decode_slice_header error
+
+[h264 @ 00000204a47b6a80] non-existing PPS 0 referenced
+
+[h264 @ 00000204a47b6a80] decode_slice_header error
+
+[h264 @ 00000204a47b6a80] no frame!
+
+[sdp @ 00000204a47ad980] max delay reached. need to consume packet
+
+[sdp @ 00000204a47ad980] RTP: missed 7 packets
+
+[sdp @ 00000204a47ad980] max delay reached. need to consume packet
+
+[sdp @ 00000204a47ad980] RTP: missed 395 packets
+
+[h264 @ 00000204a47b6a80] concealing 648 DC, 648 AC, 648 MV errors in P frame
+
+[sdp @ 00000204a47ad980] max delay reached. need to consume packet
+
+[sdp @ 00000204a47ad980] RTP: missed 416 packets
+
+[sdp @ 00000204a47ad980] max delay reached. need to consume packet
+
+[sdp @ 00000204a47ad980] RTP: missed 412 packets
+
+[sdp @ 00000204a47ad980] max delay reached. need to consume packet
+
+[sdp @ 00000204a47ad980] RTP: missed 393 packets
+
+[sdp @ 00000204a47ad980] max delay reached. need to consume packet
+
+[sdp @ 00000204a47ad980] RTP: missed 448 packets
+
+[sdp @ 00000204a47ad980] max delay reached. need to consume packet
+
+[sdp @ 00000204a47ad980] RTP: missed 496 packets
+
+[sdp @ 00000204a47ad980] max delay reached. need to consume packet
+
+[sdp @ 00000204a47ad980] RTP: missed 427 packets
+
+[sdp @ 00000204a47ad980] max delay reached. need to consume packet
+
+[sdp @ 00000204a47ad980] RTP: missed 433 packets
+
+[sdp @ 00000204a47ad980] max delay reached. need to consume packet
+
+[sdp @ 00000204a47ad980] RTP: missed 421 packets
+
+[sdp @ 00000204a47ad980] max delay reached. need to consume packet
+
+[sdp @ 00000204a47ad980] RTP: missed 443 packets
+
+[sdp @ 00000204a47ad980] max delay reached. need to consume packet
+
+[sdp @ 00000204a47ad980] RTP: missed 442 packets
+
+Input #0, sdp, from 'C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\utils/bebop.sdp':
+
+  Duration: N/A, start: 3.069744, bitrate: N/A
+
+  Stream #0:0: Video: h264 (Constrained Baseline), yuv420p(progressive), 856x480 [SAR 1:1 DAR 107:60], 29.97 fps, 29.97 tbr, 90k tbn
+
+Stream mapping:
+
+  Stream #0:0 -> #0:0 (h264 (native) -> png (native))
+
+2025-06-03 09:48:09,466 - INFO - 🎥 Flux vidéo ouvert - Détection en cours...
+2025-06-03 09:48:09,505 - INFO - Appuyez sur 'q' dans la fenêtre vidéo pour quitter
+2025-06-03 09:48:32,867 - INFO - ⏹ Arrêt manuel détecté
+2025-06-03 09:48:32,869 - INFO - 🔄 Nettoyage en cours...
+Killing the ffmpeg subprocess
+2025-06-03 09:48:33,136 - INFO - Thread d'affichage terminé
