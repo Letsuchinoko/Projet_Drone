@@ -11,24 +11,18 @@ import signal
 import sys
 from collections import deque
 import glob
-import subprocess
-import platform
-import gc
 
-# === CONFIGURATION OPTIMISÉE ===
 DISPLAY_FPS = 20
 MAX_QUEUE_SIZE = 3
 IMAGES_DIR = "C:/Users/Baptiste/anaconda3/Lib/site-packages/pyparrot/images"
 CONNECTION_TIMEOUT = 15
 MAX_IMAGE_FILES = 30
 IMAGE_KEEP_COUNT = 12
-WATCHDOG_TIMEOUT = 8  # secondes sans frame -> restart flux
+WATCHDOG_TIMEOUT = 8
 
 frame_queue = Queue(maxsize=MAX_QUEUE_SIZE)
 processing_active = threading.Event()
 processing_active.set()
-connection_stable = threading.Event()
-connection_stable.set()
 frame_stats = {
     'frame_count': 0,
     'detection_count': 0,
@@ -37,9 +31,8 @@ frame_stats = {
     'last_processed_file': None
 }
 stats_lock = threading.Lock()
-image_dir_lock = threading.Lock()  # LOCK GLOBAL
+image_dir_lock = threading.Lock()
 
-# Logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -50,18 +43,10 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-def kill_ffmpeg():
-    if platform.system() == "Windows":
-        try:
-            subprocess.call('taskkill /F /IM ffmpeg.exe', shell=True)
-            logger.info("Killed all ffmpeg.exe processes.")
-        except Exception as e:
-            logger.warning(f"Erreur lors de la fermeture de ffmpeg.exe : {e}")
-
 class ImprovedGloveDetector:
     def __init__(self):
         self.detection_history = deque(maxlen=10)
-        self.min_area = 400  # abaissé car zone plus restreinte ?
+        self.min_area = 400
         self.max_area = 70000
         self.min_contour_points = 10
         self.kernel_open = np.ones((3, 3), np.uint8)
@@ -83,15 +68,10 @@ class ImprovedGloveDetector:
             work_frame = cv2.GaussianBlur(work_frame, (5, 5), 0)
             hsv = cv2.cvtColor(work_frame, cv2.COLOR_BGR2HSV)
 
-            # --- Masques couleurs adaptés à tes gants ---
-            # On cible H de 3 à 22, S de 60 à 255, V de 60 à 255 pour limiter le bruit
+            # Masque couleurs gants: H de 3 à 22 (adapte si besoin !)
             lower = np.array([3, 60, 60])
             upper = np.array([22, 255, 255])
             mask = cv2.inRange(hsv, lower, upper)
-
-            # Ajout d'un mode debug si tu veux voir le masque pur :
-            # cv2.imshow("MASK", mask)
-            # Nettoyage morphologique
             mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, self.kernel_open)
             mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, self.kernel_close)
 
@@ -99,8 +79,7 @@ class ImprovedGloveDetector:
             best_contour = self._select_best_contour(contours, work_frame.shape)
             detected = best_contour is not None
             self.stable_detections.append(detected)
-            stable_detection = sum(self.stable_detections) >= 2  # plus tolérant
-
+            stable_detection = sum(self.stable_detections) >= 2
             self.detection_history.append(stable_detection)
 
             if stable_detection and best_contour is not None:
@@ -295,7 +274,7 @@ def display_thread():
     cv2.destroyAllWindows()
     logger.info("Display thread terminated")
 
-def connection_monitor_thread(vision_obj):
+def connection_monitor_thread():
     logger.info("Connection monitor started")
     last_frame_count = 0
     check_interval = 4
@@ -313,30 +292,9 @@ def connection_monitor_thread(vision_obj):
             files = glob.glob(os.path.join(IMAGES_DIR, "image_*.png"))
         logger.debug(f"Monitor: frames={current_frames}, files={len(files)}, time_since_last={time_since_last_frame:.1f}s")
         if frame_diff == 0 or time_since_last_frame > WATCHDOG_TIMEOUT:
-            logger.warning("No new frames received for monitoring, attempting to recover video stream...")
-            try:
-                kill_ffmpeg()
-                with image_dir_lock:
-                    files = glob.glob(os.path.join(IMAGES_DIR, "image_*.png"))
-                    for file_path in files:
-                        try:
-                            os.remove(file_path)
-                        except OSError:
-                            pass
-                gc.collect()
-                time.sleep(0.3)
-                vision_obj.close_video()
-                time.sleep(1)
-                opened = vision_obj.open_video()
-                if opened:
-                    logger.info("Video stream successfully recovered (watchdog)")
-                else:
-                    logger.error("Failed to recover video stream (watchdog)")
-            except Exception as e:
-                logger.error(f"Failed to recover video: {e}")
-            connection_stable.clear()
+            logger.warning("No new frames received for monitoring (stream may be frozen). Manual restart required.")
+            # Ne tente PAS de relancer le flux, juste log
         else:
-            connection_stable.set()
             avg_fps = frame_diff / check_interval
             detection_rate = (detections / max(current_frames, 1)) * 100
             logger.info(f"STATS - Frames: {current_frames}, FPS: {avg_fps:.1f}, Detections: {detection_rate:.1f}%, Errors: {errors}")
@@ -368,7 +326,7 @@ def main():
         vision.set_user_callback_function(vision_callback)
         display_thread_obj = threading.Thread(target=display_thread, daemon=True)
         cleanup_thread_obj = threading.Thread(target=cleanup_thread, daemon=True)
-        monitor_thread_obj = threading.Thread(target=connection_monitor_thread, args=(vision,), daemon=True)
+        monitor_thread_obj = threading.Thread(target=connection_monitor_thread, daemon=True)
         threads = [display_thread_obj, cleanup_thread_obj, monitor_thread_obj]
         for thread in threads:
             thread.start()
