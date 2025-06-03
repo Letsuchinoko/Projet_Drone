@@ -1,0 +1,6 @@
+2025-06-03 10:05:15,364 - INFO -    • 'q' ou ESC: Quitter
+2025-06-03 10:05:15,364 - INFO -    • 'r': Reset statistiques
+2025-06-03 10:05:15,364 - INFO -    • Ctrl+C: Arrêt d'urgence
+2025-06-03 10:05:25,032 - INFO - Frame 100: Détection 80.0%, Temps traitement: 0.002s
+2025-06-03 10:05:35,199 - INFO - Frame 200: Détection 90.0%, Temps traitement: 0.002s
+2025-06-03 10:05:45,321 - INFO - Frame 300: Détection 100.0%, Temps traitement: 0.002s
