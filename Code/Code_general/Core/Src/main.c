@@ -49,7 +49,7 @@ UART_HandleTypeDef huart2;
 #define GPS_BUFFER_SIZE 256
 uint8_t gps_rx_buffer[GPS_BUFFER_SIZE];
 uint16_t gps_rx_index = 0;
-uint8_t valeur_son = 0;
+int valeur_son;
 int __io_putchar(int ch) {
     HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
     return ch;
@@ -111,7 +111,7 @@ int main(void)
   HAL_UART_Transmit(&huart2, (uint8_t*)"Test UART\r\n", 11, HAL_MAX_DELAY);
   while (1)
   {
-    // GPS
+    // gps
     if (HAL_UART_Receive(&huart1, &c, 1, 10) == HAL_OK)
     {
         gps_rx_buffer[gps_rx_index++] = c;
@@ -126,15 +126,16 @@ int main(void)
             gps_rx_index = 0;
         }
     }
-    // Sound sensor v2.2
+    HAL_Delay(500);
+    // capteur Son
     HAL_ADC_Start(&hadc1);
     if (HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK) {
         adc_value = HAL_ADC_GetValue(&hadc1);
-        valeur_son = (uint8_t)(adc_value >> 4); // 12 bits -> 8 bits
-        sprintf(msg, "Sound: %lu\r\n", adc_value);
+        valeur_son = (adc_value * 100) / 4095;
+        sprintf(msg, "Son: %d db\r\n", valeur_son);
         HAL_UART_Transmit(&huart2, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
     }
-    HAL_Delay(200);
+    HAL_Delay(500);
   }
   /* USER CODE END 2 */
 
@@ -345,13 +346,19 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3|GPIO_PIN_6, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : PB3 */
-  GPIO_InitStruct.Pin = GPIO_PIN_3;
+  /*Configure GPIO pins : PB3 PB6 */
+  GPIO_InitStruct.Pin = GPIO_PIN_3|GPIO_PIN_6;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PB7 */
+  GPIO_InitStruct.Pin = GPIO_PIN_7;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 }
