@@ -6,16 +6,20 @@ from pyparrot.Bebop import Bebop
 from pyparrot.DroneVision import DroneVision
 from queue import Queue, Empty
 import logging
+import os
+import glob
 
 # === CONFIGURATION ===
 DISPLAY_FPS = 5
 DISPLAY_INTERVAL = 1.0 / DISPLAY_FPS
-MAX_QUEUE_SIZE = 3  # Limite la taille de la queue pour éviter l'accumulation
+MAX_QUEUE_SIZE = 3
+IMAGES_DIR = "C:/Users/Baptiste/anaconda3/Lib/site-packages/pyparrot/images"
 
 # Variables globales
 frame_queue = Queue(maxsize=MAX_QUEUE_SIZE)
 last_display_time = 0
 processing_active = True
+last_processed_file = None
 
 # Configuration du logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -25,7 +29,6 @@ class FrameProcessor:
     """Classe pour gérer le traitement des frames en mémoire"""
     
     def __init__(self):
-        self.last_frame = None
         self.frame_count = 0
     
     def detect_gant(self, image):
@@ -85,7 +88,7 @@ class FrameProcessor:
         for contour in contours:
             try:
                 area = cv2.contourArea(contour)
-                if area < 600:  # Trop petit
+                if area < 600:
                     continue
                     
                 perimeter = cv2.arcLength(contour, True)
@@ -93,19 +96,14 @@ class FrameProcessor:
                     continue
 
                 x, y, w, h = cv2.boundingRect(contour)
-                
-                # Filtrage par position (éviter le haut de l'image)
                 center_x = x + w // 2
                 center_y = y + h // 2
                 
                 if center_y < img_h * 0.25 and img_w * 0.3 < center_x < img_w * 0.7:
                     continue
-                
-                # Filtrage par taille
-                if area > img_w * img_h * 0.6:  # Trop grand
+                if area > img_w * img_h * 0.6:
                     continue
                 
-                # Calculs géométriques
                 hull = cv2.convexHull(contour)
                 hull_area = cv2.contourArea(hull)
                 if hull_area == 0:
@@ -115,15 +113,13 @@ class FrameProcessor:
                 solidity = float(area) / hull_area
                 complexity = area / perimeter
 
-                # Filtres géométriques
                 if not (0.25 <= aspect_ratio <= 2.5):
                     continue
-                if solidity > 0.995:  # Trop régulier
+                if solidity > 0.995:
                     continue
                 if complexity > 35:
                     continue
 
-                # Score de détection
                 score = area * (1 - solidity) * complexity
                 if score > max_score:
                     max_score = score
@@ -147,7 +143,7 @@ class FrameProcessor:
 
 def vision_callback(args):
     """Callback appelé pour chaque frame reçue du drone"""
-    global last_display_time
+    global last_display_time, last_processed_file
     
     try:
         # Vérification du timing pour limiter à 5 FPS
@@ -155,27 +151,42 @@ def vision_callback(args):
         if now - last_display_time < DISPLAY_INTERVAL:
             return
         
-        # Récupération de la frame depuis DroneVision
-        if hasattr(args, 'data') and args.data is not None:
-            # Conversion des données en image OpenCV
-            frame_data = args.data
+        # Méthode alternative : lire la dernière image du dossier mais la charger en mémoire
+        raw_files = glob.glob(os.path.join(IMAGES_DIR, "image_*.png"))
+        if not raw_files:
+            return
             
-            # Si les données sont sous forme de bytes, les convertir
-            if isinstance(frame_data, bytes):
-                nparr = np.frombuffer(frame_data, np.uint8)
-                frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-            else:
-                frame = frame_data
-                
-            if frame is not None and frame.size > 0:
+        # Trier par date de modification
+        fichiers = []
+        for f in raw_files:
+            try:
+                fichiers.append((f, os.path.getmtime(f)))
+            except FileNotFoundError:
+                continue
+
+        if not fichiers:
+            return
+            
+        fichiers = [f[0] for f in sorted(fichiers, key=lambda x: x[1])]
+        latest_file = fichiers[-1]
+        
+        # Éviter de retraiter la même image
+        if latest_file == last_processed_file:
+            return
+            
+        # Charger l'image en mémoire
+        frame = cv2.imread(latest_file)
+        if frame is not None and frame.size > 0:
+            try:
                 # Ajouter la frame à la queue (non-bloquant)
-                try:
-                    frame_queue.put_nowait(frame.copy())
-                    last_display_time = now
-                except:
-                    # Queue pleine, on ignore cette frame
-                    pass
-                    
+                frame_queue.put_nowait(frame.copy())
+                last_display_time = now
+                last_processed_file = latest_file
+                logger.debug(f"Frame ajoutée à la queue: {latest_file}")
+            except:
+                # Queue pleine, on ignore cette frame
+                pass
+                
     except Exception as e:
         logger.error(f"Erreur dans vision_callback: {e}")
 
@@ -184,6 +195,7 @@ def display_thread():
     global processing_active
     
     processor = FrameProcessor()
+    logger.info("Thread d'affichage démarré")
     
     while processing_active:
         try:
@@ -191,6 +203,8 @@ def display_thread():
             frame = frame_queue.get(timeout=1.0)
             
             if frame is not None:
+                logger.debug("Traitement d'une frame")
+                
                 # Redimensionnement pour l'affichage
                 height, width = frame.shape[:2]
                 if width > 800:
@@ -214,14 +228,49 @@ def display_thread():
                         
         except Empty:
             # Timeout normal, on continue
+            logger.debug("Timeout - pas de nouvelle frame")
             continue
         except Exception as e:
             logger.error(f"Erreur dans display_thread: {e}")
             time.sleep(0.1)
+    
+    logger.info("Thread d'affichage terminé")
+
+def cleanup_old_images():
+    """Nettoie les anciennes images pour éviter l'accumulation"""
+    while processing_active:
+        try:
+            raw_files = glob.glob(os.path.join(IMAGES_DIR, "image_*.png"))
+            if len(raw_files) > 15:  # Garder seulement les 15 plus récentes
+                fichiers = []
+                for f in raw_files:
+                    try:
+                        fichiers.append((f, os.path.getmtime(f)))
+                    except FileNotFoundError:
+                        continue
+                
+                fichiers = [f[0] for f in sorted(fichiers, key=lambda x: x[1])]
+                
+                # Supprimer les plus anciennes
+                for f in fichiers[:-15]:
+                    try:
+                        os.remove(f)
+                    except:
+                        pass
+                        
+        except Exception as e:
+            logger.warning(f"Erreur lors du nettoyage: {e}")
+            
+        time.sleep(10)  # Nettoie toutes les 10 secondes
 
 def main():
     """Fonction principale"""
     global processing_active
+    
+    # Vérification du dossier d'images
+    if not os.path.exists(IMAGES_DIR):
+        logger.error(f"❌ Le dossier d'images n'existe pas: {IMAGES_DIR}")
+        return
     
     # Initialisation du drone
     bebop = Bebop()
@@ -244,15 +293,22 @@ def main():
         display_thread_obj = threading.Thread(target=display_thread, daemon=True)
         display_thread_obj.start()
         
+        # Démarrage du thread de nettoyage
+        cleanup_thread_obj = threading.Thread(target=cleanup_old_images, daemon=True)
+        cleanup_thread_obj.start()
+        
         # Ouverture du flux vidéo
         if vision.open_video():
             logger.info("🎥 Flux vidéo ouvert - Détection en cours...")
             logger.info("Appuyez sur 'q' dans la fenêtre vidéo pour quitter")
             
+            # Attendre un peu pour que les premières images arrivent
+            time.sleep(2)
+            
             try:
                 # Boucle principale
                 while processing_active:
-                    time.sleep(0.1)  # Évite une boucle trop intensive
+                    time.sleep(0.1)
                     
             except KeyboardInterrupt:
                 logger.info("⏹ Arrêt manuel détecté")
