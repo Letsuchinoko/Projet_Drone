@@ -1,40 +1,40 @@
-2025-06-03 11:10:48,835 - INFO - Starting Bebop 2 glove detection system
-2025-06-03 11:10:48,857 - INFO - Connecting to Bebop 2...
-2025-06-03 11:10:49,890 - INFO - Drone connected successfully
-2025-06-03 11:10:49,891 - INFO - Display thread started
-2025-06-03 11:10:49,892 - INFO - Cleanup thread started
-2025-06-03 11:10:49,896 - INFO - Connection monitor started
-2025-06-03 11:10:49,896 - INFO - All threads started (display, cleanup, monitor)
-2025-06-03 11:10:49,896 - INFO - Opening video stream...
-2025-06-03 11:10:51,928 - WARNING - No frames received for 2 seconds
-2025-06-03 11:10:53,967 - WARNING - No frames received for 2 seconds
-2025-06-03 11:10:55,973 - WARNING - No frames received for 2 seconds
-2025-06-03 11:10:57,979 - WARNING - No frames received for 2 seconds
-2025-06-03 11:10:59,897 - WARNING - No new frames received in monitoring
-2025-06-03 11:11:00,007 - WARNING - No frames received for 2 seconds
-2025-06-03 11:11:02,047 - WARNING - No frames received for 2 seconds
-2025-06-03 11:11:04,058 - WARNING - No frames received for 2 seconds
-2025-06-03 11:11:06,130 - WARNING - No frames received for 2 seconds
-2025-06-03 11:11:07,578 - INFO - Video stream opened successfully
-2025-06-03 11:11:07,578 - INFO - Detection system active
-2025-06-03 11:11:07,578 - INFO - Controls: 'q'/ESC=Quit, 'r'=Reset stats, 's'=Screenshot
-2025-06-03 11:11:09,148 - INFO - FPS: 1.6
-2025-06-03 11:11:09,898 - INFO - STATS - Frames: 43, FPS: 4.3, Detections: 4.7%, Errors: 0
-2025-06-03 11:11:10,842 - INFO - FPS: 17.7
-2025-06-03 11:11:13,623 - WARNING - No frames received for 2 seconds
-2025-06-03 11:11:15,636 - WARNING - No frames received for 2 seconds
-2025-06-03 11:11:17,641 - WARNING - No frames received for 2 seconds
-2025-06-03 11:11:19,652 - WARNING - No frames received for 2 seconds
-2025-06-03 11:11:19,899 - INFO - STATS - Frames: 73, FPS: 3.0, Detections: 2.7%, Errors: 0
-2025-06-03 11:11:21,654 - WARNING - No frames received for 2 seconds
-2025-06-03 11:11:23,668 - WARNING - No frames received for 2 seconds
-2025-06-03 11:11:24,861 - INFO - Stop signal received
-2025-06-03 11:11:24,901 - INFO - Cleanup thread terminated
-2025-06-03 11:11:25,584 - INFO - Starting cleanup...
-2025-06-03 11:11:25,669 - WARNING - No frames received for 2 seconds
-2025-06-03 11:11:25,675 - INFO - Display thread terminated
-2025-06-03 11:11:29,899 - WARNING - No new frames received in monitoring
-2025-06-03 11:11:29,900 - INFO - Connection monitor terminated
-2025-06-03 11:11:34,089 - INFO - Video stream closed
-2025-06-03 11:11:34,591 - INFO - Drone disconnected
-2025-06-03 11:11:34,592 - INFO - Cleanup completed
+2025-06-03 11:24:03,063 - INFO - Starting Bebop 2 glove detection system
+2025-06-03 11:24:03,088 - INFO - Connecting to Bebop 2...
+2025-06-03 11:24:04,125 - INFO - Drone connected successfully
+2025-06-03 11:24:04,125 - INFO - Display thread started
+2025-06-03 11:24:04,126 - INFO - Cleanup thread started
+2025-06-03 11:24:04,126 - INFO - Connection monitor started
+2025-06-03 11:24:04,126 - INFO - All threads started (display, cleanup, monitor)
+2025-06-03 11:24:04,126 - INFO - Opening video stream...
+2025-06-03 11:24:06,178 - WARNING - No frames received for 2 seconds
+2025-06-03 11:24:06,994 - INFO - Video stream opened successfully
+2025-06-03 11:24:06,997 - INFO - Detection system active
+2025-06-03 11:24:06,997 - INFO - Controls: 'q'/ESC=Quit, 'r'=Reset stats, 's'=Screenshot
+2025-06-03 11:24:08,436 - INFO - FPS: 7.0
+2025-06-03 11:24:10,074 - INFO - FPS: 18.3
+2025-06-03 11:24:12,042 - INFO - FPS: 15.3
+2025-06-03 11:24:13,663 - INFO - FPS: 18.5
+2025-06-03 11:24:14,127 - INFO - STATS - Frames: 128, FPS: 12.8, Detections: 31.2%, Errors: 0
+2025-06-03 11:24:15,284 - INFO - FPS: 18.5
+2025-06-03 11:24:16,951 - INFO - FPS: 18.0
+2025-06-03 11:24:18,579 - INFO - FPS: 18.4
+2025-06-03 11:24:20,329 - INFO - FPS: 17.1
+2025-06-03 11:24:21,988 - INFO - FPS: 18.1
+2025-06-03 11:24:23,765 - INFO - FPS: 16.9
+2025-06-03 11:24:24,128 - INFO - STATS - Frames: 305, FPS: 17.7, Detections: 56.4%, Errors: 0
+2025-06-03 11:24:25,813 - INFO - FPS: 14.7
+2025-06-03 11:24:28,495 - WARNING - No frames received for 2 seconds
+2025-06-03 11:24:30,501 - WARNING - No frames received for 2 seconds
+2025-06-03 11:24:32,517 - WARNING - No frames received for 2 seconds
+2025-06-03 11:24:34,129 - INFO - STATS - Frames: 340, FPS: 3.5, Detections: 58.2%, Errors: 0
+2025-06-03 11:24:34,518 - WARNING - No frames received for 2 seconds
+2025-06-03 11:24:35,304 - INFO - Stop signal received
+2025-06-03 11:24:35,369 - INFO - Cleanup thread terminated
+2025-06-03 11:24:36,041 - INFO - Starting cleanup...
+2025-06-03 11:24:36,518 - WARNING - No frames received for 2 seconds
+2025-06-03 11:24:36,525 - INFO - Display thread terminated
+2025-06-03 11:24:44,130 - WARNING - No new frames received in monitoring
+2025-06-03 11:24:44,130 - INFO - Connection monitor terminated
+2025-06-03 11:24:44,544 - INFO - Video stream closed
+2025-06-03 11:24:45,047 - INFO - Drone disconnected
+2025-06-03 11:24:45,047 - INFO - Cleanup completed
