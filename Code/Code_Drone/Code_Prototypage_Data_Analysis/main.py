@@ -7,462 +7,373 @@ from pyparrot.DroneVision import DroneVision
 from queue import Queue, Empty
 import logging
 import os
-import glob
 import signal
 import sys
 from collections import deque
-import io
 
 # === CONFIGURATION OPTIMISÉE ===
-DISPLAY_FPS = 15
-DISPLAY_INTERVAL = 1.0 / DISPLAY_FPS
-MAX_QUEUE_SIZE = 2  # Queue très petite pour réduire latence
+DISPLAY_FPS = 20
+MAX_QUEUE_SIZE = 3
 IMAGES_DIR = "C:/Users/Baptiste/anaconda3/Lib/site-packages/pyparrot/images"
+CONNECTION_TIMEOUT = 15
+VISION_TIMEOUT = 20
 MAX_WAIT_TIME = 2.0
-CONNECTION_TIMEOUT = 20
-VISION_TIMEOUT = 25
+DISPLAY_INTERVAL = 1.0 / DISPLAY_FPS
 
 # Variables globales thread-safe
 frame_queue = Queue(maxsize=MAX_QUEUE_SIZE)
 processing_active = threading.Event()
 processing_active.set()
 connection_stable = threading.Event()
+connection_stable.set()
 frame_stats = {
-    'last_frame_time': time.time(),
     'frame_count': 0,
+    'detection_count': 0,
     'error_count': 0,
-    'last_processed_file': None,
-    'detection_count': 0
+    'last_frame_time': time.time(),
+    'last_processed_file': None
 }
 stats_lock = threading.Lock()
 
-# Configuration du logging corrigée pour Windows
-class UTF8StreamHandler(logging.StreamHandler):
-    """Handler personnalisé pour gérer l'UTF-8 sur Windows"""
-    def __init__(self, stream=None):
-        super().__init__(stream)
-        
-    def emit(self, record):
-        try:
-            msg = self.format(record)
-            # Remplacer les emojis par du texte pour éviter les erreurs d'encodage
-            msg = self._clean_message(msg)
-            stream = self.stream
-            stream.write(msg + self.terminator)
-            self.flush()
-        except Exception:
-            self.handleError(record)
-    
-    def _clean_message(self, msg):
-        """Remplace les emojis par du texte ASCII"""
-        emoji_replacements = {
-            '🚁': '[DRONE]',
-            '🔗': '[CONNECT]',
-            '✅': '[OK]',
-            '❌': '[ERROR]',
-            '🎥': '[VIDEO]',
-            '🎬': '[DISPLAY]',
-            '🧹': '[CLEANUP]',
-            '📡': '[MONITOR]',
-            '🎯': '[DETECT]',
-            '🛑': '[STOP]',
-            '⚠️': '[WARNING]',
-            '🪟': '[WINDOW]',
-            '🔄': '[REFRESH]',
-            '📊': '[STATS]',
-            '🧤': '[GLOVE]'
-        }
-        
-        for emoji, replacement in emoji_replacements.items():
-            msg = msg.replace(emoji, replacement)
-        
-        return msg
-
-# Configuration du logging avec handler personnalisé
+# Configuration logging simplifiée
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        UTF8StreamHandler(sys.stdout),
-        logging.FileHandler('bebop_detection.log', mode='a', encoding='utf-8')
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler('bebop_detection.log', mode='w', encoding='utf-8')
     ]
 )
 logger = logging.getLogger(__name__)
 
-class OptimizedFrameProcessor:
-    """Processeur de frames ultra-optimisé pour temps réel"""
+class ImprovedGloveDetector:
+    """Détecteur de gants amélioré avec filtres robustes"""
     
     def __init__(self):
-        self.frame_count = 0
-        self.detection_history = deque(maxlen=5)  # Historique réduit
-        self.last_detection_time = 0
+        self.detection_history = deque(maxlen=10)
+        self.min_area = 800  # Augmenté pour éviter les faux positifs
+        self.max_area = 50000  # Limite supérieure
+        self.min_contour_points = 20  # Contour minimum pour être valide
         
-        # Paramètres de détection simplifiés
-        self.min_area = 300
-        self.max_area_ratio = 0.3
+        # Kernels pour morphologie
+        self.kernel_open = np.ones((3, 3), np.uint8)
+        self.kernel_close = np.ones((7, 7), np.uint8)
         
-        # Cache des kernels
-        self.kernel_small = np.ones((3, 3), np.uint8)
-        self.kernel_medium = np.ones((5, 5), np.uint8)
+        # Historique pour stabilité
+        self.stable_detections = deque(maxlen=5)
         
-        # Variables de performance
-        self.skip_frames = 0
-        self.process_every_n = 2  # Traiter 1 frame sur 2 pour les performances
-    
-    def detect_glove_fast(self, image):
-        """Détection ultra-rapide optimisée pour le temps réel"""
+    def detect_glove(self, frame):
+        """Détection de gants avec filtres améliorés"""
+        if frame is None:
+            return frame, False
+        
+        original_frame = frame.copy()
+        h, w = frame.shape[:2]
+        
         try:
-            if image is None or image.size == 0:
-                return image
-            
-            self.frame_count += 1
-            
-            # Skip frames pour améliorer les performances
-            if self.skip_frames > 0:
-                self.skip_frames -= 1
-                return self._add_overlay_info(image, detected=False)
-            
-            start_time = time.time()
-            
-            # Réduction agressive de la résolution pour le traitement
-            h, w = image.shape[:2]
-            if w > 480:  # Réduction plus agressive
-                scale = 480.0 / w
-                new_w, new_h = int(w * scale), int(h * scale)
-                work_img = cv2.resize(image, (new_w, new_h))
-                scale_back = w / 480.0
+            # Réduction de résolution pour traitement
+            scale_factor = 1.0
+            if w > 640:
+                scale_factor = 640.0 / w
+                work_frame = cv2.resize(frame, (int(w * scale_factor), int(h * scale_factor)))
             else:
-                work_img = image
-                scale_back = 1.0
+                work_frame = frame.copy()
             
-            # Conversion HSV rapide
-            hsv = cv2.cvtColor(work_img, cv2.COLOR_BGR2HSV)
+            # Lissage pour réduire le bruit
+            work_frame = cv2.GaussianBlur(work_frame, (5, 5), 0)
             
-            # Masque couleur simplifié - focus sur rouge/orange principal
-            mask1 = cv2.inRange(hsv, np.array([0, 70, 50]), np.array([15, 255, 255]))    # Rouge
-            mask2 = cv2.inRange(hsv, np.array([15, 70, 50]), np.array([25, 255, 255]))   # Orange
-            mask3 = cv2.inRange(hsv, np.array([170, 70, 50]), np.array([180, 255, 255])) # Rouge haut
+            # Conversion HSV
+            hsv = cv2.cvtColor(work_frame, cv2.COLOR_BGR2HSV)
             
-            combined_mask = cv2.bitwise_or(mask1, cv2.bitwise_or(mask2, mask3))
+            # Masques couleur améliorés pour rouge/orange
+            # Rouge bas (0-15)
+            mask_red1 = cv2.inRange(hsv, np.array([0, 80, 80]), np.array([15, 255, 255]))
+            # Rouge haut (165-180)  
+            mask_red2 = cv2.inRange(hsv, np.array([165, 80, 80]), np.array([180, 255, 255]))
+            # Orange (15-35)
+            mask_orange = cv2.inRange(hsv, np.array([15, 80, 80]), np.array([35, 255, 255]))
             
-            # Nettoyage minimal
-            combined_mask = cv2.morphologyEx(combined_mask, cv2.MORPH_OPEN, self.kernel_small)
-            combined_mask = cv2.morphologyEx(combined_mask, cv2.MORPH_CLOSE, self.kernel_medium)
+            # Combinaison des masques
+            mask_combined = cv2.bitwise_or(mask_red1, cv2.bitwise_or(mask_red2, mask_orange))
             
-            # Détection de contours rapide
-            contours, _ = cv2.findContours(combined_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            # Nettoyage morphologique
+            mask_combined = cv2.morphologyEx(mask_combined, cv2.MORPH_OPEN, self.kernel_open)
+            mask_combined = cv2.morphologyEx(mask_combined, cv2.MORPH_CLOSE, self.kernel_close)
             
-            best_contour = None
-            best_area = 0
+            # Détection de contours
+            contours, _ = cv2.findContours(mask_combined, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             
-            # Sélection rapide du meilleur contour
-            for contour in contours:
-                area = cv2.contourArea(contour)
-                if area < self.min_area:
-                    continue
-                    
-                if area > best_area:
-                    # Vérifications basiques
-                    x, y, w_rect, h_rect = cv2.boundingRect(contour)
-                    aspect_ratio = w_rect / float(h_rect)
-                    
-                    # Filtres simples
-                    if 0.2 <= aspect_ratio <= 5.0 and y > work_img.shape[0] * 0.1:
-                        best_contour = contour
-                        best_area = area
+            # Sélection du meilleur contour
+            best_contour = self._select_best_contour(contours, work_frame.shape)
             
             detected = best_contour is not None
             
-            # Dessiner la détection sur l'image originale
-            if detected:
-                # Redimensionner le contour si nécessaire
-                if scale_back != 1.0:
-                    best_contour = (best_contour * scale_back).astype(np.int32)
+            # Stabilisation des détections
+            self.stable_detections.append(detected)
+            stable_detection = sum(self.stable_detections) >= 3  # Au moins 3/5 détections
+            
+            # Mise à jour historique
+            self.detection_history.append(stable_detection)
+            
+            # Dessin sur l'image originale
+            if stable_detection and best_contour is not None:
+                # Redimensionnement du contour si nécessaire
+                if scale_factor != 1.0:
+                    best_contour = (best_contour / scale_factor).astype(np.int32)
                 
-                self._draw_detection_simple(image, best_contour)
-                self.last_detection_time = time.time()
+                self._draw_detection(original_frame, best_contour)
                 
                 with stats_lock:
                     frame_stats['detection_count'] += 1
             
-            # Ajuster la fréquence de traitement selon les performances
-            processing_time = time.time() - start_time
-            if processing_time > 0.05:  # Si > 50ms, skip plus de frames
-                self.skip_frames = min(3, self.skip_frames + 1)
-            elif processing_time < 0.02:  # Si < 20ms, peut traiter plus souvent
-                self.skip_frames = max(0, self.skip_frames - 1)
+            # Ajout des informations overlay
+            result_frame = self._add_overlay(original_frame, stable_detection, mask_combined)
             
-            # Mise à jour historique
-            self.detection_history.append(detected)
-            
-            return self._add_overlay_info(image, detected, processing_time)
+            return result_frame, stable_detection
             
         except Exception as e:
-            logger.error(f"Detection error frame {self.frame_count}: {e}")
+            logger.error(f"Detection error: {e}")
             with stats_lock:
                 frame_stats['error_count'] += 1
-            return image
+            return original_frame, False
     
-    def _draw_detection_simple(self, image, contour):
-        """Affichage simplifié pour les performances"""
+    def _select_best_contour(self, contours, frame_shape):
+        """Sélection intelligente du meilleur contour"""
+        if not contours:
+            return None
+        
+        h, w = frame_shape[:2]
+        best_contour = None
+        best_score = 0
+        
+        for contour in contours:
+            area = cv2.contourArea(contour)
+            
+            # Filtrage par aire
+            if area < self.min_area or area > self.max_area:
+                continue
+            
+            # Filtrage par nombre de points
+            if len(contour) < self.min_contour_points:
+                continue
+            
+            # Rectangle englobant
+            x, y, w_rect, h_rect = cv2.boundingRect(contour)
+            
+            # Filtres géométriques
+            aspect_ratio = w_rect / float(h_rect)
+            if not (0.3 <= aspect_ratio <= 3.0):  # Forme raisonnable
+                continue
+            
+            # Éviter les détections en bordure d'image
+            if x < 10 or y < 10 or (x + w_rect) > (w - 10) or (y + h_rect) > (h - 10):
+                continue
+            
+            # Calcul de la convexité
+            hull = cv2.convexHull(contour)
+            hull_area = cv2.contourArea(hull)
+            if hull_area > 0:
+                solidity = area / hull_area
+                if solidity < 0.5:  # Forme trop irrégulière
+                    continue
+            
+            # Score basé sur l'aire et la position (éviter le haut de l'image)
+            position_score = 1.0 if y > h * 0.2 else 0.5
+            area_score = min(area / 5000.0, 1.0)  # Normalisation
+            
+            score = area_score * position_score
+            
+            if score > best_score:
+                best_score = score
+                best_contour = contour
+        
+        return best_contour
+    
+    def _draw_detection(self, frame, contour):
+        """Dessin de la détection"""
         try:
-            # Contour vert
-            cv2.drawContours(image, [contour], -1, (0, 255, 0), 2)
+            # Contour principal
+            cv2.drawContours(frame, [contour], -1, (0, 255, 0), 3)
             
             # Rectangle englobant
             x, y, w, h = cv2.boundingRect(contour)
-            cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), 2)
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
             
-            # Point central
-            cx, cy = x + w // 2, y + h // 2
-            cv2.circle(image, (cx, cy), 3, (0, 0, 255), -1)
+            # Centre de masse
+            M = cv2.moments(contour)
+            if M["m00"] != 0:
+                cx = int(M["m10"] / M["m00"])
+                cy = int(M["m01"] / M["m00"])
+                cv2.circle(frame, (cx, cy), 5, (0, 0, 255), -1)
             
-            # Texte simple
-            cv2.putText(image, "GANT DETECTE", (x, max(y - 10, 15)),
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-                       
+            # Informations
+            area = cv2.contourArea(contour)
+            cv2.putText(frame, f"GANT DETECTE", (x, max(y - 10, 25)),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
+            cv2.putText(frame, f"Aire: {int(area)}", (x, max(y - 35, 50)),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+            
         except Exception as e:
-            logger.debug(f"Draw error: {e}")
+            logger.debug(f"Drawing error: {e}")
     
-    def _add_overlay_info(self, image, detected=False, proc_time=None):
-        """Ajoute les informations overlay"""
+    def _add_overlay(self, frame, detected, mask=None):
+        """Ajout des informations overlay"""
         try:
-            h, w = image.shape[:2]
+            h, w = frame.shape[:2]
             
-            # Status de détection
-            status = "DETECTE" if detected else "RECHERCHE"
+            # Statut de détection
+            status = "GANT DETECTE" if detected else "RECHERCHE..."
             color = (0, 255, 0) if detected else (0, 255, 255)
-            cv2.putText(image, f"Status: {status}", (10, 30),
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
+            cv2.putText(frame, status, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2)
             
             # Statistiques
             with stats_lock:
-                stats_text = f"Frames: {frame_stats['frame_count']} | Detections: {frame_stats['detection_count']}"
+                detection_rate = (frame_stats['detection_count'] / max(frame_stats['frame_count'], 1)) * 100
+                stats_text = f"Frames: {frame_stats['frame_count']} | Detections: {frame_stats['detection_count']} ({detection_rate:.1f}%)"
             
-            cv2.putText(image, stats_text, (10, h - 40),
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+            cv2.putText(frame, stats_text, (10, h - 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
             
-            # Temps de traitement si disponible
-            if proc_time:
-                time_text = f"Proc: {proc_time*1000:.1f}ms"
-                cv2.putText(image, time_text, (10, h - 20),
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+            # Historique de détection
+            history_text = "Historique: " + "".join(["●" if x else "○" for x in list(self.detection_history)[-10:]])
+            cv2.putText(frame, history_text, (10, h - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
             
             # Timestamp
             timestamp = time.strftime("%H:%M:%S")
-            cv2.putText(image, timestamp, (w - 100, 30),
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+            cv2.putText(frame, timestamp, (w - 100, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
             
-            return image
+            # Affichage du masque en petit (debug)
+            if mask is not None and mask.size > 0:
+                mask_small = cv2.resize(mask, (160, 120))
+                mask_colored = cv2.applyColorMap(mask_small, cv2.COLORMAP_HOT)
+                frame[10:130, w-170:w-10] = mask_colored
+                cv2.rectangle(frame, (w-170, 10), (w-10, 130), (255, 255, 255), 1)
+                cv2.putText(frame, "Masque", (w-160, 150), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
             
-        except Exception:
-            return image
-
-def robust_vision_callback(args):
-    """Callback robuste avec gestion d'erreurs améliorée"""
-    global frame_stats
-    
-    try:
-        # Throttling intelligent
-        now = time.time()
-        with stats_lock:
-            time_since_last = now - frame_stats['last_frame_time']
-            if time_since_last < DISPLAY_INTERVAL * 0.7:
-                return
-        
-        # Recherche sécurisée du fichier le plus récent
-        try:
-            pattern = os.path.join(IMAGES_DIR, "image_*.png")
-            files = glob.glob(pattern)
-            
-            if not files:
-                return
-            
-            # Trouve le fichier le plus récent par timestamp
-            latest_file = max(files, key=lambda f: os.path.getmtime(f))
-            
-        except (OSError, ValueError, TypeError) as e:
-            logger.debug(f"File search error: {e}")
-            return
-        
-        # Éviter le retraitement du même fichier
-        with stats_lock:
-            if latest_file == frame_stats['last_processed_file']:
-                return
-        
-        # Chargement robuste avec vérifications
-        try:
-            # Vérifier la taille du fichier
-            if not os.path.exists(latest_file):
-                return
-                
-            file_size = os.path.getsize(latest_file)
-            if file_size < 500:  # Fichier trop petit
-                return
-            
-            # Attendre un peu si le fichier semble en cours d'écriture
-            time.sleep(0.01)
-            
-            # Charger l'image
-            frame = cv2.imread(latest_file, cv2.IMREAD_COLOR)
-            if frame is None or frame.size == 0:
-                return
-            
-            # Vérifier les dimensions
-            h, w = frame.shape[:2]
-            if h < 100 or w < 100:  # Image trop petite
-                return
-            
-            # Gestion de la queue - éviter l'accumulation
-            try:
-                # Vider complètement la queue pour éviter la latence
-                while True:
-                    frame_queue.get_nowait()
-            except Empty:
-                pass
-            
-            # Ajouter la nouvelle frame
-            try:
-                frame_queue.put_nowait(frame.copy())
-            except:
-                # Queue pleine, on ignore cette frame
-                return
-            
-            # Mise à jour des statistiques
-            with stats_lock:
-                frame_stats['last_frame_time'] = now
-                frame_stats['last_processed_file'] = latest_file
-                frame_stats['frame_count'] += 1
-            
-            connection_stable.set()
+            return frame
             
         except Exception as e:
-            logger.debug(f"Frame loading error {latest_file}: {e}")
-            with stats_lock:
-                frame_stats['error_count'] += 1
-                
-    except Exception as e:
-        logger.warning(f"Vision callback error: {e}")
+            logger.debug(f"Overlay error: {e}")
+            return frame
 
-def optimized_display_thread():
-    """Thread d'affichage ultra-optimisé"""
-    processor = OptimizedFrameProcessor()
-    logger.info("[DISPLAY] Thread started")
-    
-    window_name = "Bebop 2 - Detection Gant Rouge/Orange [OPTIMIZED]"
-    cv2.namedWindow(window_name, cv2.WINDOW_AUTOSIZE | cv2.WINDOW_KEEPRATIO)
-    
-    no_frame_warnings = 0
-    last_log_time = time.time()
-    
+def vision_callback(args):
+    """Callback robuste pour la vision"""
     try:
-        while processing_active.is_set():
-            try:
-                # Récupération frame avec timeout adaptatif
+        # Recherche du fichier le plus récent
+        import glob
+        pattern = os.path.join(IMAGES_DIR, "image_*.png")
+        files = glob.glob(pattern)
+        
+        if not files:
+            return
+        
+        latest_file = max(files, key=os.path.getmtime)
+        
+        # Vérification de l'existence et de la taille
+        if not os.path.exists(latest_file) or os.path.getsize(latest_file) < 1000:
+            return
+        
+        # Petit délai pour s'assurer que l'écriture est terminée
+        time.sleep(0.02)
+        
+        # Chargement de l'image
+        frame = cv2.imread(latest_file)
+        if frame is None:
+            return
+        
+        # Validation de l'image
+        h, w = frame.shape[:2]
+        if h < 200 or w < 200:
+            return
+        
+        # Ajout à la queue (non-bloquant)
+        try:
+            # Vider la queue si elle est pleine (éviter la latence)
+            if frame_queue.full():
                 try:
-                    frame = frame_queue.get(timeout=1.0)
-                    no_frame_warnings = 0
+                    frame_queue.get_nowait()
                 except Empty:
-                    no_frame_warnings += 1
-                    if no_frame_warnings >= 3:  # 3 secondes sans frame
-                        now = time.time()
-                        if now - last_log_time > 5:  # Log max toutes les 5s
-                            logger.warning("[WARNING] No frames received for several seconds")
-                            last_log_time = now
-                    continue
-                
-                if frame is not None:
-                    # Redimensionnement pour l'affichage si nécessaire
-                    display_frame = frame.copy()
-                    h, w = display_frame.shape[:2]
-                    
-                    # Limitation de taille d'affichage
-                    if w > 800:
-                        scale = 800.0 / w
-                        new_w, new_h = int(w * scale), int(h * scale)
-                        display_frame = cv2.resize(display_frame, (new_w, new_h))
-                    
-                    # Traitement de détection
-                    processed_frame = processor.detect_glove_fast(display_frame)
-                    
-                    if processed_frame is not None:
-                        # Affichage
-                        cv2.imshow(window_name, processed_frame)
-                        
-                        # Gestion des touches
-                        key = cv2.waitKey(1) & 0xFF
-                        if key == ord('q') or key == 27:  # 'q' ou ESC
-                            logger.info("[STOP] User requested stop")
-                            processing_active.clear()
-                            break
-                        elif key == ord('r'):  # Reset statistiques
-                            with stats_lock:
-                                frame_stats['frame_count'] = 0
-                                frame_stats['error_count'] = 0
-                                frame_stats['detection_count'] = 0
-                            logger.info("[STATS] Statistics reset")
-                        elif key == ord('s'):  # Screenshot
-                            screenshot_name = f"detection_screenshot_{int(time.time())}.png"
-                            cv2.imwrite(screenshot_name, processed_frame)
-                            logger.info(f"[CAPTURE] Screenshot saved: {screenshot_name}")
-                
-            except Exception as e:
-                logger.error(f"Display thread error: {e}")
-                time.sleep(0.1)
-                
+                    pass
+            
+            frame_queue.put_nowait(frame)
+            
+        except:
+            pass  # Queue pleine, on ignore cette frame
+        
+        # Mise à jour des stats
+        with stats_lock:
+            frame_stats['frame_count'] += 1
+            frame_stats['last_frame_time'] = time.time()
+            
     except Exception as e:
-        logger.error(f"Critical display error: {e}")
-    finally:
-        cv2.destroyAllWindows()
-        logger.info("[DISPLAY] Thread terminated")
+        logger.debug(f"Vision callback error: {e}")
 
-def efficient_cleanup_thread():
-    """Thread de nettoyage efficace"""
-    logger.info("[CLEANUP] Thread started")
+def display_thread():
+    """Thread d'affichage principal"""
+    detector = ImprovedGloveDetector()
+    logger.info("Display thread started")
     
-    cleanup_interval = 5  # Nettoyage toutes les 5 secondes
+    window_name = "Bebop 2 - Detection Gant Amelioree"
+    cv2.namedWindow(window_name, cv2.WINDOW_AUTOSIZE)
+    
+    fps_counter = 0
+    fps_start_time = time.time()
     
     while processing_active.is_set():
         try:
-            files = glob.glob(os.path.join(IMAGES_DIR, "image_*.png"))
+            # Récupération de la frame
+            try:
+                frame = frame_queue.get(timeout=2.0)
+            except Empty:
+                logger.warning("No frames received for 2 seconds")
+                continue
             
-            if len(files) > 10:  # Garder seulement les 10 plus récentes
-                try:
-                    # Tri par temps de modification
-                    files_sorted = sorted(files, key=os.path.getmtime, reverse=True)
-                    files_to_remove = files_sorted[10:]
-                    
-                    removed_count = 0
-                    for file_path in files_to_remove:
-                        try:
-                            os.remove(file_path)
-                            removed_count += 1
-                        except OSError:
-                            pass
-                    
-                    if removed_count > 0:
-                        logger.debug(f"[CLEANUP] Removed {removed_count} old files")
-                        
-                except Exception as e:
-                    logger.debug(f"Cleanup sorting error: {e}")
-                    
-        except Exception as e:
-            logger.debug(f"Cleanup error: {e}")
-        
-        # Attente interruptible
-        for _ in range(cleanup_interval * 10):  # Check toutes les 0.1s
-            if not processing_active.is_set():
+            if frame is None:
+                continue
+            
+            # Traitement de détection
+            processed_frame, detected = detector.detect_glove(frame)
+            
+            # Affichage FPS
+            fps_counter += 1
+            if fps_counter % 30 == 0:
+                fps_elapsed = time.time() - fps_start_time
+                current_fps = 30 / fps_elapsed if fps_elapsed > 0 else 0
+                logger.info(f"FPS: {current_fps:.1f}")
+                fps_start_time = time.time()
+            
+            # Affichage
+            cv2.imshow(window_name, processed_frame)
+            
+            # Gestion des touches
+            key = cv2.waitKey(1) & 0xFF
+            if key == ord('q') or key == 27:  # ESC
+                logger.info("User requested quit")
+                processing_active.clear()
                 break
+            elif key == ord('r'):  # Reset stats
+                with stats_lock:
+                    frame_stats['frame_count'] = 0
+                    frame_stats['detection_count'] = 0
+                    frame_stats['error_count'] = 0
+                logger.info("Statistics reset")
+            elif key == ord('s'):  # Screenshot
+                screenshot_name = f"screenshot_{int(time.time())}.png"
+                cv2.imwrite(screenshot_name, processed_frame)
+                logger.info(f"Screenshot saved: {screenshot_name}")
+            
+        except Exception as e:
+            logger.error(f"Display thread error: {e}")
             time.sleep(0.1)
     
-    logger.info("[CLEANUP] Thread terminated")
+    cv2.destroyAllWindows()
+    logger.info("Display thread terminated")
 
 def connection_monitor_thread():
-    """Monitoring de connexion léger"""
-    logger.info("[MONITOR] Connection monitoring started")
+    """Thread de monitoring de connexion"""
+    logger.info("Connection monitor started")
     
     last_frame_count = 0
-    check_interval = 10  # Check toutes les 10 secondes
+    check_interval = 10
     
     while processing_active.is_set():
         time.sleep(check_interval)
@@ -476,34 +387,68 @@ def connection_monitor_thread():
         last_frame_count = current_frames
         
         if frame_diff == 0:
-            logger.warning("[MONITOR] No new frames received")
+            logger.warning("No new frames received in monitoring")
             connection_stable.clear()
         else:
             connection_stable.set()
             avg_fps = frame_diff / check_interval
             detection_rate = (detections / max(current_frames, 1)) * 100
             
-            logger.info(f"[STATS] Frames: {current_frames}, FPS: {avg_fps:.1f}, "
+            logger.info(f"STATS - Frames: {current_frames}, FPS: {avg_fps:.1f}, "
                        f"Detections: {detection_rate:.1f}%, Errors: {errors}")
     
-    logger.info("[MONITOR] Connection monitoring terminated")
+    logger.info("Connection monitor terminated")
+
+def cleanup_thread():
+    """Thread de nettoyage des fichiers"""
+    logger.info("Cleanup thread started")
+    
+    while processing_active.is_set():
+        try:
+            import glob
+            files = glob.glob(os.path.join(IMAGES_DIR, "image_*.png"))
+            
+            if len(files) > 15:  # Garder les 15 plus récents
+                files_sorted = sorted(files, key=os.path.getmtime, reverse=True)
+                files_to_remove = files_sorted[15:]
+                
+                removed_count = 0
+                for file_path in files_to_remove:
+                    try:
+                        os.remove(file_path)
+                        removed_count += 1
+                    except OSError:
+                        pass
+                
+                if removed_count > 0:
+                    logger.debug(f"Cleaned up {removed_count} old files")
+        
+        except Exception as e:
+            logger.debug(f"Cleanup error: {e}")
+        
+        # Attente de 10 secondes
+        for _ in range(100):
+            if not processing_active.is_set():
+                break
+            time.sleep(0.1)
+    
+    logger.info("Cleanup thread terminated")
 
 def signal_handler(sig, frame):
-    """Gestionnaire de signaux amélioré"""
-    logger.info("[STOP] Stop signal received")
+    """Gestionnaire de signaux"""
+    logger.info("Stop signal received")
     processing_active.clear()
 
 def main():
-    """Fonction principale robuste"""
-    # Configuration des signaux
+    """Fonction principale"""
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
     
-    logger.info("[DRONE] Starting Bebop 2 detection system")
+    logger.info("Starting Bebop 2 glove detection system")
     
-    # Vérifications préliminaires
+    # Vérifications
     if not os.path.exists(IMAGES_DIR):
-        logger.error(f"[ERROR] Images directory not found: {IMAGES_DIR}")
+        logger.error(f"Images directory not found: {IMAGES_DIR}")
         return False
     
     bebop = None
@@ -511,129 +456,98 @@ def main():
     threads = []
     
     try:
-        # Initialisation du drone
+        # Connexion au drone
         bebop = Bebop()
-        logger.info("[CONNECT] Connecting to Bebop 2...")
+        logger.info("Connecting to Bebop 2...")
         
-        # Tentatives de connexion avec retry intelligent
-        max_attempts = 3
-        for attempt in range(max_attempts):
-            try:
-                success = bebop.connect(CONNECTION_TIMEOUT)
-                if success:
-                    logger.info("[OK] Drone connection established")
-                    break
-                else:
-                    logger.warning(f"[ERROR] Connection attempt {attempt + 1}/{max_attempts} failed")
-                    if attempt < max_attempts - 1:
-                        time.sleep(3)
-            except Exception as e:
-                logger.error(f"Connection error attempt {attempt + 1}: {e}")
-                if attempt < max_attempts - 1:
-                    time.sleep(3)
-        else:
-            logger.error("[ERROR] Failed to connect after multiple attempts")
+        success = bebop.connect(CONNECTION_TIMEOUT)
+        if not success:
+            logger.error("Failed to connect to drone")
             return False
         
-        # Initialisation vision avec buffer optimisé
-        vision = DroneVision(bebop, is_bebop=True, buffer_size=256)
-        vision.set_user_callback_function(robust_vision_callback)
+        logger.info("Drone connected successfully")
+        
+        # Initialisation de la vision
+        vision = DroneVision(bebop, is_bebop=True)
+        vision.set_user_callback_function(vision_callback)
         
         # Démarrage des threads
-        thread_functions = [
-            ("Display", optimized_display_thread),
-            ("Cleanup", efficient_cleanup_thread),
-            ("Monitor", connection_monitor_thread)
-        ]
+        display_thread_obj = threading.Thread(target=display_thread, daemon=True)
+        cleanup_thread_obj = threading.Thread(target=cleanup_thread, daemon=True)
+        monitor_thread_obj = threading.Thread(target=connection_monitor_thread, daemon=True)
         
-        for name, func in thread_functions:
-            thread = threading.Thread(target=func, name=name, daemon=True)
+        threads = [display_thread_obj, cleanup_thread_obj, monitor_thread_obj]
+        
+        for thread in threads:
             thread.start()
-            threads.append(thread)
-            logger.info(f"[OK] {name} thread started")
         
-        # Ouverture du flux vidéo avec retry
-        logger.info("[VIDEO] Opening video stream...")
+        logger.info("All threads started (display, cleanup, monitor)")
         
-        video_attempts = 3
-        for attempt in range(video_attempts):
-            try:
-                if vision.open_video():
-                    logger.info("[OK] Video stream opened successfully")
-                    break
-                else:
-                    logger.warning(f"[ERROR] Video opening failed (attempt {attempt + 1}/{video_attempts})")
-                    time.sleep(3)
-            except Exception as e:
-                logger.error(f"Video opening error: {e}")
-                time.sleep(3)
-        else:
-            logger.error("[ERROR] Failed to open video stream")
+        # Ouverture du flux vidéo
+        logger.info("Opening video stream...")
+        if not vision.open_video():
+            logger.error("Failed to open video stream")
             return False
         
-        # Messages d'information
-        logger.info("[DETECT] Detection system active")
-        logger.info("Controls: 'q'/ESC=Quit, 'r'=Reset stats, 's'=Screenshot, Ctrl+C=Emergency stop")
+        logger.info("Video stream opened successfully")
+        logger.info("Detection system active")
+        logger.info("Controls: 'q'/ESC=Quit, 'r'=Reset stats, 's'=Screenshot")
         
-        # Attente de stabilisation
-        time.sleep(2)
-        
-        # Boucle principale non-bloquante
+        # Boucle principale
         try:
             while processing_active.is_set():
                 time.sleep(1)
                 
-                # Vérification fenêtre OpenCV
+                # Vérification de l'état de la fenêtre
                 try:
-                    window_name = "Bebop 2 - Detection Gant Rouge/Orange [OPTIMIZED]"
-                    if cv2.getWindowProperty(window_name, cv2.WND_PROP_VISIBLE) < 1:
-                        logger.info("[WINDOW] Window closed by user")
+                    if cv2.getWindowProperty("Bebop 2 - Detection Gant Amelioree", cv2.WND_PROP_VISIBLE) < 1:
+                        logger.info("Window closed")
                         break
                 except:
                     pass
                     
         except KeyboardInterrupt:
-            logger.info("[STOP] Keyboard interrupt detected")
+            logger.info("Keyboard interrupt")
             
     except Exception as e:
-        logger.error(f"[ERROR] Critical error: {e}")
+        logger.error(f"Critical error: {e}")
         return False
         
     finally:
-        logger.info("[REFRESH] Starting cleanup process...")
+        logger.info("Starting cleanup...")
         processing_active.clear()
         
-        # Délai pour permettre aux threads de se terminer proprement
-        time.sleep(1)
+        # Attendre un peu pour que les threads se terminent
+        time.sleep(2)
         
-        # Nettoyage vision
+        # Fermeture de la vision
         if vision:
             try:
                 vision.close_video()
-                logger.info("[VIDEO] Video stream closed")
-            except Exception as e:
-                logger.warning(f"Video closing error: {e}")
+                logger.info("Video stream closed")
+            except:
+                pass
         
-        # Nettoyage drone
+        # Déconnexion du drone
         if bebop:
             try:
                 bebop.disconnect()
-                logger.info("[CONNECT] Drone disconnected")
-            except Exception as e:
-                logger.warning(f"Disconnection error: {e}")
+                logger.info("Drone disconnected")
+            except:
+                pass
         
         # Nettoyage OpenCV
         cv2.destroyAllWindows()
         
-        # Attendre les threads avec timeout
+        # Attendre les threads
         for thread in threads:
             try:
                 thread.join(timeout=3)
             except:
                 pass
         
-        logger.info("[OK] Cleanup completed - Program terminated properly")
-        
+        logger.info("Cleanup completed")
+    
     return True
 
 if __name__ == "__main__":
@@ -641,5 +555,5 @@ if __name__ == "__main__":
         success = main()
         sys.exit(0 if success else 1)
     except Exception as e:
-        logger.error(f"[ERROR] Unhandled exception: {e}")
+        logger.error(f"Unhandled exception: {e}")
         sys.exit(1)
