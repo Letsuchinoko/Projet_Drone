@@ -1,40 +1,60 @@
-2025-06-03 11:24:03,063 - INFO - Starting Bebop 2 glove detection system
-2025-06-03 11:24:03,088 - INFO - Connecting to Bebop 2...
-2025-06-03 11:24:04,125 - INFO - Drone connected successfully
-2025-06-03 11:24:04,125 - INFO - Display thread started
-2025-06-03 11:24:04,126 - INFO - Cleanup thread started
-2025-06-03 11:24:04,126 - INFO - Connection monitor started
-2025-06-03 11:24:04,126 - INFO - All threads started (display, cleanup, monitor)
-2025-06-03 11:24:04,126 - INFO - Opening video stream...
-2025-06-03 11:24:06,178 - WARNING - No frames received for 2 seconds
-2025-06-03 11:24:06,994 - INFO - Video stream opened successfully
-2025-06-03 11:24:06,997 - INFO - Detection system active
-2025-06-03 11:24:06,997 - INFO - Controls: 'q'/ESC=Quit, 'r'=Reset stats, 's'=Screenshot
-2025-06-03 11:24:08,436 - INFO - FPS: 7.0
-2025-06-03 11:24:10,074 - INFO - FPS: 18.3
-2025-06-03 11:24:12,042 - INFO - FPS: 15.3
-2025-06-03 11:24:13,663 - INFO - FPS: 18.5
-2025-06-03 11:24:14,127 - INFO - STATS - Frames: 128, FPS: 12.8, Detections: 31.2%, Errors: 0
-2025-06-03 11:24:15,284 - INFO - FPS: 18.5
-2025-06-03 11:24:16,951 - INFO - FPS: 18.0
-2025-06-03 11:24:18,579 - INFO - FPS: 18.4
-2025-06-03 11:24:20,329 - INFO - FPS: 17.1
-2025-06-03 11:24:21,988 - INFO - FPS: 18.1
-2025-06-03 11:24:23,765 - INFO - FPS: 16.9
-2025-06-03 11:24:24,128 - INFO - STATS - Frames: 305, FPS: 17.7, Detections: 56.4%, Errors: 0
-2025-06-03 11:24:25,813 - INFO - FPS: 14.7
-2025-06-03 11:24:28,495 - WARNING - No frames received for 2 seconds
-2025-06-03 11:24:30,501 - WARNING - No frames received for 2 seconds
-2025-06-03 11:24:32,517 - WARNING - No frames received for 2 seconds
-2025-06-03 11:24:34,129 - INFO - STATS - Frames: 340, FPS: 3.5, Detections: 58.2%, Errors: 0
-2025-06-03 11:24:34,518 - WARNING - No frames received for 2 seconds
-2025-06-03 11:24:35,304 - INFO - Stop signal received
-2025-06-03 11:24:35,369 - INFO - Cleanup thread terminated
-2025-06-03 11:24:36,041 - INFO - Starting cleanup...
-2025-06-03 11:24:36,518 - WARNING - No frames received for 2 seconds
-2025-06-03 11:24:36,525 - INFO - Display thread terminated
-2025-06-03 11:24:44,130 - WARNING - No new frames received in monitoring
-2025-06-03 11:24:44,130 - INFO - Connection monitor terminated
-2025-06-03 11:24:44,544 - INFO - Video stream closed
-2025-06-03 11:24:45,047 - INFO - Drone disconnected
-2025-06-03 11:24:45,047 - INFO - Cleanup completed
+2025-06-03 11:48:09,112 - INFO - Starting Bebop 2 glove detection system
+2025-06-03 11:48:09,134 - INFO - Connecting to Bebop 2...
+2025-06-03 11:48:10,154 - INFO - Drone connected successfully
+2025-06-03 11:48:10,155 - INFO - Display thread started
+2025-06-03 11:48:10,157 - INFO - Cleanup thread started
+2025-06-03 11:48:10,159 - INFO - Connection monitor started
+2025-06-03 11:48:10,159 - INFO - All threads started (display, cleanup, monitor)
+2025-06-03 11:48:10,159 - INFO - Opening video stream...
+2025-06-03 11:48:10,166 - INFO - Cleaned up 31 old image files
+2025-06-03 11:48:12,193 - WARNING - No frames received for 2 seconds
+2025-06-03 11:48:14,186 - WARNING - No new frames received for monitoring, attempting to recover video stream...
+2025-06-03 11:48:14,201 - WARNING - No frames received for 2 seconds
+2025-06-03 11:48:16,247 - WARNING - No frames received for 2 seconds
+2025-06-03 11:48:18,269 - WARNING - No frames received for 2 seconds
+2025-06-03 11:48:20,283 - WARNING - No frames received for 2 seconds
+2025-06-03 11:48:22,307 - WARNING - No frames received for 2 seconds
+2025-06-03 11:48:23,399 - ERROR - Failed to recover video: [WinError 32] Le processus ne peut pas accéder au fichier car ce fichier est utilisé par un autre processus: 'C:\\Users\\Baptiste\\anaconda3\\Lib\\site-packages\\pyparrot\\images'
+2025-06-03 11:48:24,359 - WARNING - No frames received for 2 seconds
+2025-06-03 11:48:26,381 - WARNING - No frames received for 2 seconds
+2025-06-03 11:48:27,476 - WARNING - No new frames received for monitoring, attempting to recover video stream...
+2025-06-03 11:48:28,401 - WARNING - No frames received for 2 seconds
+2025-06-03 11:48:30,431 - WARNING - No frames received for 2 seconds
+2025-06-03 11:48:32,457 - WARNING - No frames received for 2 seconds
+2025-06-03 11:48:34,471 - WARNING - No frames received for 2 seconds
+2025-06-03 11:48:36,501 - WARNING - No frames received for 2 seconds
+2025-06-03 11:48:36,626 - ERROR - Failed to recover video: [WinError 32] Le processus ne peut pas accéder au fichier car ce fichier est utilisé par un autre processus: 'C:\\Users\\Baptiste\\anaconda3\\Lib\\site-packages\\pyparrot\\images'
+2025-06-03 11:48:38,556 - WARNING - No frames received for 2 seconds
+2025-06-03 11:48:40,599 - WARNING - No frames received for 2 seconds
+2025-06-03 11:48:40,706 - WARNING - No new frames received for monitoring, attempting to recover video stream...
+2025-06-03 11:48:42,636 - WARNING - No frames received for 2 seconds
+2025-06-03 11:48:44,691 - WARNING - No frames received for 2 seconds
+2025-06-03 11:48:46,749 - WARNING - No frames received for 2 seconds
+2025-06-03 11:48:48,810 - WARNING - No frames received for 2 seconds
+2025-06-03 11:48:50,205 - ERROR - Failed to recover video: [WinError 32] Le processus ne peut pas accéder au fichier car ce fichier est utilisé par un autre processus: 'C:\\Users\\Baptiste\\anaconda3\\Lib\\site-packages\\pyparrot\\images'
+2025-06-03 11:48:50,868 - WARNING - No frames received for 2 seconds
+2025-06-03 11:48:52,909 - WARNING - No frames received for 2 seconds
+2025-06-03 11:48:54,273 - WARNING - No new frames received for monitoring, attempting to recover video stream...
+2025-06-03 11:48:54,942 - WARNING - No frames received for 2 seconds
+2025-06-03 11:48:56,983 - WARNING - No frames received for 2 seconds
+2025-06-03 11:48:59,084 - WARNING - No frames received for 2 seconds
+2025-06-03 11:49:01,126 - WARNING - No frames received for 2 seconds
+2025-06-03 11:49:03,155 - WARNING - No frames received for 2 seconds
+2025-06-03 11:49:03,696 - ERROR - Failed to recover video: [WinError 32] Le processus ne peut pas accéder au fichier car ce fichier est utilisé par un autre processus: 'C:\\Users\\Baptiste\\anaconda3\\Lib\\site-packages\\pyparrot\\images'
+2025-06-03 11:49:05,234 - WARNING - No frames received for 2 seconds
+2025-06-03 11:49:07,306 - WARNING - No frames received for 2 seconds
+2025-06-03 11:49:07,800 - WARNING - No new frames received for monitoring, attempting to recover video stream...
+2025-06-03 11:49:09,340 - WARNING - No frames received for 2 seconds
+2025-06-03 11:49:09,745 - INFO - Stop signal received
+2025-06-03 11:49:09,862 - INFO - Video stream opened successfully
+2025-06-03 11:49:09,862 - INFO - Detection system active
+2025-06-03 11:49:09,862 - INFO - Controls: 'q'/ESC=Quit, 'r'=Reset stats, 's'=Screenshot
+2025-06-03 11:49:09,862 - INFO - Starting cleanup...
+2025-06-03 11:49:09,908 - INFO - Cleanup thread terminated
+2025-06-03 11:49:11,401 - WARNING - No frames received for 2 seconds
+2025-06-03 11:49:11,404 - INFO - Display thread terminated
+2025-06-03 11:49:16,852 - ERROR - Failed to recover video: [WinError 32] Le processus ne peut pas accéder au fichier car ce fichier est utilisé par un autre processus: 'C:\\Users\\Baptiste\\anaconda3\\Lib\\site-packages\\pyparrot\\images'
+2025-06-03 11:49:16,853 - INFO - Connection monitor terminated
+2025-06-03 11:49:18,367 - INFO - Video stream closed
+2025-06-03 11:49:18,870 - INFO - Drone disconnected
+2025-06-03 11:49:18,871 - INFO - Cleanup completed
