@@ -1,60 +1,43 @@
-2025-06-03 11:48:09,112 - INFO - Starting Bebop 2 glove detection system
-2025-06-03 11:48:09,134 - INFO - Connecting to Bebop 2...
-2025-06-03 11:48:10,154 - INFO - Drone connected successfully
-2025-06-03 11:48:10,155 - INFO - Display thread started
-2025-06-03 11:48:10,157 - INFO - Cleanup thread started
-2025-06-03 11:48:10,159 - INFO - Connection monitor started
-2025-06-03 11:48:10,159 - INFO - All threads started (display, cleanup, monitor)
-2025-06-03 11:48:10,159 - INFO - Opening video stream...
-2025-06-03 11:48:10,166 - INFO - Cleaned up 31 old image files
-2025-06-03 11:48:12,193 - WARNING - No frames received for 2 seconds
-2025-06-03 11:48:14,186 - WARNING - No new frames received for monitoring, attempting to recover video stream...
-2025-06-03 11:48:14,201 - WARNING - No frames received for 2 seconds
-2025-06-03 11:48:16,247 - WARNING - No frames received for 2 seconds
-2025-06-03 11:48:18,269 - WARNING - No frames received for 2 seconds
-2025-06-03 11:48:20,283 - WARNING - No frames received for 2 seconds
-2025-06-03 11:48:22,307 - WARNING - No frames received for 2 seconds
-2025-06-03 11:48:23,399 - ERROR - Failed to recover video: [WinError 32] Le processus ne peut pas accéder au fichier car ce fichier est utilisé par un autre processus: 'C:\\Users\\Baptiste\\anaconda3\\Lib\\site-packages\\pyparrot\\images'
-2025-06-03 11:48:24,359 - WARNING - No frames received for 2 seconds
-2025-06-03 11:48:26,381 - WARNING - No frames received for 2 seconds
-2025-06-03 11:48:27,476 - WARNING - No new frames received for monitoring, attempting to recover video stream...
-2025-06-03 11:48:28,401 - WARNING - No frames received for 2 seconds
-2025-06-03 11:48:30,431 - WARNING - No frames received for 2 seconds
-2025-06-03 11:48:32,457 - WARNING - No frames received for 2 seconds
-2025-06-03 11:48:34,471 - WARNING - No frames received for 2 seconds
-2025-06-03 11:48:36,501 - WARNING - No frames received for 2 seconds
-2025-06-03 11:48:36,626 - ERROR - Failed to recover video: [WinError 32] Le processus ne peut pas accéder au fichier car ce fichier est utilisé par un autre processus: 'C:\\Users\\Baptiste\\anaconda3\\Lib\\site-packages\\pyparrot\\images'
-2025-06-03 11:48:38,556 - WARNING - No frames received for 2 seconds
-2025-06-03 11:48:40,599 - WARNING - No frames received for 2 seconds
-2025-06-03 11:48:40,706 - WARNING - No new frames received for monitoring, attempting to recover video stream...
-2025-06-03 11:48:42,636 - WARNING - No frames received for 2 seconds
-2025-06-03 11:48:44,691 - WARNING - No frames received for 2 seconds
-2025-06-03 11:48:46,749 - WARNING - No frames received for 2 seconds
-2025-06-03 11:48:48,810 - WARNING - No frames received for 2 seconds
-2025-06-03 11:48:50,205 - ERROR - Failed to recover video: [WinError 32] Le processus ne peut pas accéder au fichier car ce fichier est utilisé par un autre processus: 'C:\\Users\\Baptiste\\anaconda3\\Lib\\site-packages\\pyparrot\\images'
-2025-06-03 11:48:50,868 - WARNING - No frames received for 2 seconds
-2025-06-03 11:48:52,909 - WARNING - No frames received for 2 seconds
-2025-06-03 11:48:54,273 - WARNING - No new frames received for monitoring, attempting to recover video stream...
-2025-06-03 11:48:54,942 - WARNING - No frames received for 2 seconds
-2025-06-03 11:48:56,983 - WARNING - No frames received for 2 seconds
-2025-06-03 11:48:59,084 - WARNING - No frames received for 2 seconds
-2025-06-03 11:49:01,126 - WARNING - No frames received for 2 seconds
-2025-06-03 11:49:03,155 - WARNING - No frames received for 2 seconds
-2025-06-03 11:49:03,696 - ERROR - Failed to recover video: [WinError 32] Le processus ne peut pas accéder au fichier car ce fichier est utilisé par un autre processus: 'C:\\Users\\Baptiste\\anaconda3\\Lib\\site-packages\\pyparrot\\images'
-2025-06-03 11:49:05,234 - WARNING - No frames received for 2 seconds
-2025-06-03 11:49:07,306 - WARNING - No frames received for 2 seconds
-2025-06-03 11:49:07,800 - WARNING - No new frames received for monitoring, attempting to recover video stream...
-2025-06-03 11:49:09,340 - WARNING - No frames received for 2 seconds
-2025-06-03 11:49:09,745 - INFO - Stop signal received
-2025-06-03 11:49:09,862 - INFO - Video stream opened successfully
-2025-06-03 11:49:09,862 - INFO - Detection system active
-2025-06-03 11:49:09,862 - INFO - Controls: 'q'/ESC=Quit, 'r'=Reset stats, 's'=Screenshot
-2025-06-03 11:49:09,862 - INFO - Starting cleanup...
-2025-06-03 11:49:09,908 - INFO - Cleanup thread terminated
-2025-06-03 11:49:11,401 - WARNING - No frames received for 2 seconds
-2025-06-03 11:49:11,404 - INFO - Display thread terminated
-2025-06-03 11:49:16,852 - ERROR - Failed to recover video: [WinError 32] Le processus ne peut pas accéder au fichier car ce fichier est utilisé par un autre processus: 'C:\\Users\\Baptiste\\anaconda3\\Lib\\site-packages\\pyparrot\\images'
-2025-06-03 11:49:16,853 - INFO - Connection monitor terminated
-2025-06-03 11:49:18,367 - INFO - Video stream closed
-2025-06-03 11:49:18,870 - INFO - Drone disconnected
-2025-06-03 11:49:18,871 - INFO - Cleanup completed
+2025-06-03 12:08:11,036 - INFO - Starting Bebop 2 glove detection system
+2025-06-03 12:08:11,060 - INFO - Connecting to Bebop 2...
+2025-06-03 12:08:12,083 - INFO - Drone connected successfully
+2025-06-03 12:08:12,085 - INFO - Display thread started
+2025-06-03 12:08:12,085 - INFO - Cleanup thread started
+2025-06-03 12:08:12,086 - INFO - Connection monitor started
+2025-06-03 12:08:12,086 - INFO - All threads started (display, cleanup, monitor)
+2025-06-03 12:08:12,087 - INFO - Opening video stream...
+2025-06-03 12:08:14,115 - WARNING - No frames received for 2 seconds
+2025-06-03 12:08:16,100 - WARNING - No new frames received for monitoring, attempting to recover video stream...
+2025-06-03 12:08:16,116 - WARNING - No frames received for 2 seconds
+2025-06-03 12:08:16,241 - INFO - Killed all ffmpeg.exe processes.
+2025-06-03 12:08:18,144 - WARNING - No frames received for 2 seconds
+2025-06-03 12:08:20,182 - WARNING - No frames received for 2 seconds
+2025-06-03 12:08:22,249 - WARNING - No frames received for 2 seconds
+2025-06-03 12:08:24,303 - WARNING - No frames received for 2 seconds
+2025-06-03 12:08:25,121 - ERROR - Failed to recover video: threads can only be started once
+2025-06-03 12:08:26,353 - WARNING - No frames received for 2 seconds
+2025-06-03 12:08:28,372 - WARNING - No frames received for 2 seconds
+2025-06-03 12:08:29,241 - WARNING - No new frames received for monitoring, attempting to recover video stream...
+2025-06-03 12:08:29,412 - INFO - Killed all ffmpeg.exe processes.
+2025-06-03 12:08:30,427 - WARNING - No frames received for 2 seconds
+2025-06-03 12:08:32,499 - WARNING - No frames received for 2 seconds
+2025-06-03 12:08:34,553 - WARNING - No frames received for 2 seconds
+2025-06-03 12:08:36,573 - WARNING - No frames received for 2 seconds
+2025-06-03 12:08:38,434 - ERROR - Failed to recover video: threads can only be started once
+2025-06-03 12:08:38,606 - WARNING - No frames received for 2 seconds
+2025-06-03 12:08:40,638 - WARNING - No frames received for 2 seconds
+2025-06-03 12:08:42,592 - WARNING - No new frames received for monitoring, attempting to recover video stream...
+2025-06-03 12:08:42,700 - WARNING - No frames received for 2 seconds
+2025-06-03 12:08:42,716 - INFO - Killed all ffmpeg.exe processes.
+2025-06-03 12:08:44,760 - WARNING - No frames received for 2 seconds
+2025-06-03 12:08:46,836 - WARNING - No frames received for 2 seconds
+2025-06-03 12:08:48,895 - WARNING - No frames received for 2 seconds
+2025-06-03 12:08:50,309 - INFO - Stop signal received
+2025-06-03 12:08:50,337 - INFO - Cleanup thread terminated
+2025-06-03 12:08:50,936 - WARNING - No frames received for 2 seconds
+2025-06-03 12:08:51,014 - INFO - Display thread terminated
+2025-06-03 12:08:51,876 - ERROR - Failed to recover video: threads can only be started once
+2025-06-03 12:08:51,891 - INFO - Connection monitor terminated
+2025-06-03 12:09:01,268 - INFO - Stop signal received
+2025-06-03 12:09:04,816 - INFO - Stop signal received
+2025-06-03 12:09:05,651 - INFO - Stop signal received
