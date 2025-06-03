@@ -12,14 +12,16 @@ import glob
 # === CONFIGURATION ===
 DISPLAY_FPS = 5
 DISPLAY_INTERVAL = 1.0 / DISPLAY_FPS
-MAX_QUEUE_SIZE = 3
+MAX_QUEUE_SIZE = 2  # Réduit pour éviter l'accumulation
 IMAGES_DIR = "C:/Users/Baptiste/anaconda3/Lib/site-packages/pyparrot/images"
+MAX_WAIT_TIME = 5.0  # Temps max d'attente pour une nouvelle image
 
 # Variables globales
 frame_queue = Queue(maxsize=MAX_QUEUE_SIZE)
 last_display_time = 0
 processing_active = True
 last_processed_file = None
+frame_received = False
 
 # Configuration du logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -126,7 +128,6 @@ class FrameProcessor:
                     best_contour = contour
                     
             except Exception as e:
-                logger.warning(f"Erreur lors de l'analyse du contour: {e}")
                 continue
 
         return best_contour
@@ -138,12 +139,12 @@ class FrameProcessor:
             x, y, w, h = cv2.boundingRect(contour)
             cv2.putText(image, "Gant detecte", (x, y - 10),
                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-        except Exception as e:
-            logger.warning(f"Erreur lors du dessin: {e}")
+        except:
+            pass
 
 def vision_callback(args):
     """Callback appelé pour chaque frame reçue du drone"""
-    global last_display_time, last_processed_file
+    global last_display_time, last_processed_file, frame_received
     
     try:
         # Vérification du timing pour limiter à 5 FPS
@@ -151,85 +152,101 @@ def vision_callback(args):
         if now - last_display_time < DISPLAY_INTERVAL:
             return
         
-        # Méthode alternative : lire la dernière image du dossier mais la charger en mémoire
+        # Lire la dernière image du dossier
         raw_files = glob.glob(os.path.join(IMAGES_DIR, "image_*.png"))
         if not raw_files:
             return
             
-        # Trier par date de modification
-        fichiers = []
-        for f in raw_files:
-            try:
-                fichiers.append((f, os.path.getmtime(f)))
-            except FileNotFoundError:
-                continue
-
-        if not fichiers:
+        # Trier par date de modification (plus rapide)
+        try:
+            latest_file = max(raw_files, key=os.path.getmtime)
+        except (OSError, ValueError):
             return
-            
-        fichiers = [f[0] for f in sorted(fichiers, key=lambda x: x[1])]
-        latest_file = fichiers[-1]
         
         # Éviter de retraiter la même image
         if latest_file == last_processed_file:
             return
             
-        # Charger l'image en mémoire
-        frame = cv2.imread(latest_file)
-        if frame is not None and frame.size > 0:
-            try:
-                # Ajouter la frame à la queue (non-bloquant)
+        # Charger l'image en mémoire avec gestion d'erreur robuste
+        try:
+            frame = cv2.imread(latest_file)
+            if frame is not None and frame.size > 0:
+                # Vider la queue si elle est pleine et ajouter la nouvelle frame
+                while not frame_queue.empty():
+                    try:
+                        frame_queue.get_nowait()
+                    except Empty:
+                        break
+                
                 frame_queue.put_nowait(frame.copy())
                 last_display_time = now
                 last_processed_file = latest_file
-                logger.debug(f"Frame ajoutée à la queue: {latest_file}")
-            except:
-                # Queue pleine, on ignore cette frame
-                pass
+                frame_received = True
+                
+        except Exception as e:
+            # Image corrompue ou en cours d'écriture, on ignore
+            logger.debug(f"Erreur lecture image {latest_file}: {e}")
+            return
                 
     except Exception as e:
-        logger.error(f"Erreur dans vision_callback: {e}")
+        logger.warning(f"Erreur dans vision_callback: {e}")
 
 def display_thread():
     """Thread dédié à l'affichage et au traitement des frames"""
-    global processing_active
+    global processing_active, frame_received
     
     processor = FrameProcessor()
     logger.info("Thread d'affichage démarré")
     
+    last_frame_time = time.time()
+    no_frame_warning_shown = False
+    
     while processing_active:
         try:
-            # Récupération d'une frame avec timeout
-            frame = frame_queue.get(timeout=1.0)
+            # Récupération d'une frame avec timeout court
+            try:
+                frame = frame_queue.get(timeout=0.5)
+                last_frame_time = time.time()
+                no_frame_warning_shown = False
+            except Empty:
+                # Vérifier si on reçoit encore des frames
+                if time.time() - last_frame_time > MAX_WAIT_TIME:
+                    if not no_frame_warning_shown:
+                        logger.warning("⚠️ Aucune nouvelle frame depuis 5 secondes")
+                        no_frame_warning_shown = True
+                continue
             
             if frame is not None:
-                logger.debug("Traitement d'une frame")
-                
-                # Redimensionnement pour l'affichage
-                height, width = frame.shape[:2]
-                if width > 800:
-                    new_width = 800
-                    new_height = int(height * new_width / width)
-                    frame = cv2.resize(frame, (new_width, new_height))
-                
-                # Détection du gant
-                processed_frame = processor.detect_gant(frame)
-                
-                if processed_frame is not None:
-                    # Affichage
-                    cv2.imshow("🧤 Détection Gant Rouge - Direct Stream", processed_frame)
+                try:
+                    # Redimensionnement pour l'affichage
+                    height, width = frame.shape[:2]
+                    if width > 800:
+                        new_width = 800
+                        new_height = int(height * new_width / width)
+                        frame = cv2.resize(frame, (new_width, new_height))
                     
-                    # Vérification de la touche 'q' pour quitter
-                    key = cv2.waitKey(1) & 0xFF
-                    if key == ord('q'):
-                        logger.info("Arrêt demandé par l'utilisateur")
-                        processing_active = False
-                        break
+                    # Détection du gant
+                    processed_frame = processor.detect_gant(frame)
+                    
+                    if processed_frame is not None:
+                        # Affichage avec gestion d'erreur
+                        cv2.imshow("🧤 Détection Gant Rouge - Bebop 2", processed_frame)
                         
-        except Empty:
-            # Timeout normal, on continue
-            logger.debug("Timeout - pas de nouvelle frame")
-            continue
+                        # Vérification de la touche 'q' pour quitter
+                        key = cv2.waitKey(1) & 0xFF
+                        if key == ord('q'):
+                            logger.info("Arrêt demandé par l'utilisateur")
+                            processing_active = False
+                            break
+                        elif key == 27:  # ESC
+                            logger.info("Arrêt demandé par ESC")
+                            processing_active = False
+                            break
+                            
+                except Exception as e:
+                    logger.error(f"Erreur affichage frame: {e}")
+                    time.sleep(0.1)
+                        
         except Exception as e:
             logger.error(f"Erreur dans display_thread: {e}")
             time.sleep(0.1)
@@ -241,27 +258,45 @@ def cleanup_old_images():
     while processing_active:
         try:
             raw_files = glob.glob(os.path.join(IMAGES_DIR, "image_*.png"))
-            if len(raw_files) > 15:  # Garder seulement les 15 plus récentes
-                fichiers = []
-                for f in raw_files:
-                    try:
-                        fichiers.append((f, os.path.getmtime(f)))
-                    except FileNotFoundError:
-                        continue
-                
-                fichiers = [f[0] for f in sorted(fichiers, key=lambda x: x[1])]
-                
-                # Supprimer les plus anciennes
-                for f in fichiers[:-15]:
-                    try:
-                        os.remove(f)
-                    except:
-                        pass
+            if len(raw_files) > 10:  # Garder seulement les 10 plus récentes
+                try:
+                    # Tri plus robuste
+                    files_with_time = []
+                    for f in raw_files:
+                        try:
+                            files_with_time.append((f, os.path.getmtime(f)))
+                        except OSError:
+                            continue
+                    
+                    if files_with_time:
+                        files_with_time.sort(key=lambda x: x[1])
+                        files_to_delete = files_with_time[:-10]
+                        
+                        for f, _ in files_to_delete:
+                            try:
+                                os.remove(f)
+                            except OSError:
+                                pass
+                                
+                except Exception as e:
+                    logger.debug(f"Erreur lors du tri des fichiers: {e}")
                         
         except Exception as e:
-            logger.warning(f"Erreur lors du nettoyage: {e}")
+            logger.debug(f"Erreur lors du nettoyage: {e}")
             
-        time.sleep(10)  # Nettoie toutes les 10 secondes
+        time.sleep(5)  # Nettoie toutes les 5 secondes
+
+def monitor_connection():
+    """Surveille la connexion et redémarre si nécessaire"""
+    global processing_active, frame_received
+    
+    while processing_active:
+        time.sleep(10)  # Vérification toutes les 10 secondes
+        
+        if not frame_received:
+            logger.warning("⚠️ Aucune frame reçue, possible problème de connexion")
+        else:
+            frame_received = False  # Reset pour la prochaine vérification
 
 def main():
     """Fonction principale"""
@@ -285,30 +320,38 @@ def main():
         
         logger.info("✅ Connecté au drone")
         
-        # Initialisation de la vision
+        # Initialisation de la vision avec paramètres optimisés
         vision = DroneVision(bebop, is_bebop=True)
         vision.set_user_callback_function(vision_callback)
         
-        # Démarrage du thread d'affichage
+        # Démarrage des threads
         display_thread_obj = threading.Thread(target=display_thread, daemon=True)
         display_thread_obj.start()
         
-        # Démarrage du thread de nettoyage
         cleanup_thread_obj = threading.Thread(target=cleanup_old_images, daemon=True)
         cleanup_thread_obj.start()
+        
+        monitor_thread_obj = threading.Thread(target=monitor_connection, daemon=True)
+        monitor_thread_obj.start()
         
         # Ouverture du flux vidéo
         if vision.open_video():
             logger.info("🎥 Flux vidéo ouvert - Détection en cours...")
-            logger.info("Appuyez sur 'q' dans la fenêtre vidéo pour quitter")
+            logger.info("💡 Appuyez sur 'q' ou 'ESC' dans la fenêtre vidéo pour quitter")
+            logger.info("💡 Ou utilisez Ctrl+C dans le terminal")
             
             # Attendre un peu pour que les premières images arrivent
-            time.sleep(2)
+            time.sleep(3)
             
             try:
-                # Boucle principale
+                # Boucle principale avec gestion d'interruption
                 while processing_active:
-                    time.sleep(0.1)
+                    time.sleep(0.2)
+                    
+                    # Vérifier si la fenêtre OpenCV est fermée
+                    if cv2.getWindowProperty("🧤 Détection Gant Rouge - Bebop 2", cv2.WND_PROP_VISIBLE) < 1:
+                        logger.info("Fenêtre fermée par l'utilisateur")
+                        break
                     
             except KeyboardInterrupt:
                 logger.info("⏹ Arrêt manuel détecté")
@@ -322,6 +365,9 @@ def main():
     finally:
         logger.info("🔄 Nettoyage en cours...")
         processing_active = False
+        
+        # Attendre un peu que les threads se terminent
+        time.sleep(1)
         
         # Nettoyage
         try:
