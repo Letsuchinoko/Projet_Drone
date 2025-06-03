@@ -1,43 +1,58 @@
-2025-06-03 12:08:11,036 - INFO - Starting Bebop 2 glove detection system
-2025-06-03 12:08:11,060 - INFO - Connecting to Bebop 2...
-2025-06-03 12:08:12,083 - INFO - Drone connected successfully
-2025-06-03 12:08:12,085 - INFO - Display thread started
-2025-06-03 12:08:12,085 - INFO - Cleanup thread started
-2025-06-03 12:08:12,086 - INFO - Connection monitor started
-2025-06-03 12:08:12,086 - INFO - All threads started (display, cleanup, monitor)
-2025-06-03 12:08:12,087 - INFO - Opening video stream...
-2025-06-03 12:08:14,115 - WARNING - No frames received for 2 seconds
-2025-06-03 12:08:16,100 - WARNING - No new frames received for monitoring, attempting to recover video stream...
-2025-06-03 12:08:16,116 - WARNING - No frames received for 2 seconds
-2025-06-03 12:08:16,241 - INFO - Killed all ffmpeg.exe processes.
-2025-06-03 12:08:18,144 - WARNING - No frames received for 2 seconds
-2025-06-03 12:08:20,182 - WARNING - No frames received for 2 seconds
-2025-06-03 12:08:22,249 - WARNING - No frames received for 2 seconds
-2025-06-03 12:08:24,303 - WARNING - No frames received for 2 seconds
-2025-06-03 12:08:25,121 - ERROR - Failed to recover video: threads can only be started once
-2025-06-03 12:08:26,353 - WARNING - No frames received for 2 seconds
-2025-06-03 12:08:28,372 - WARNING - No frames received for 2 seconds
-2025-06-03 12:08:29,241 - WARNING - No new frames received for monitoring, attempting to recover video stream...
-2025-06-03 12:08:29,412 - INFO - Killed all ffmpeg.exe processes.
-2025-06-03 12:08:30,427 - WARNING - No frames received for 2 seconds
-2025-06-03 12:08:32,499 - WARNING - No frames received for 2 seconds
-2025-06-03 12:08:34,553 - WARNING - No frames received for 2 seconds
-2025-06-03 12:08:36,573 - WARNING - No frames received for 2 seconds
-2025-06-03 12:08:38,434 - ERROR - Failed to recover video: threads can only be started once
-2025-06-03 12:08:38,606 - WARNING - No frames received for 2 seconds
-2025-06-03 12:08:40,638 - WARNING - No frames received for 2 seconds
-2025-06-03 12:08:42,592 - WARNING - No new frames received for monitoring, attempting to recover video stream...
-2025-06-03 12:08:42,700 - WARNING - No frames received for 2 seconds
-2025-06-03 12:08:42,716 - INFO - Killed all ffmpeg.exe processes.
-2025-06-03 12:08:44,760 - WARNING - No frames received for 2 seconds
-2025-06-03 12:08:46,836 - WARNING - No frames received for 2 seconds
-2025-06-03 12:08:48,895 - WARNING - No frames received for 2 seconds
-2025-06-03 12:08:50,309 - INFO - Stop signal received
-2025-06-03 12:08:50,337 - INFO - Cleanup thread terminated
-2025-06-03 12:08:50,936 - WARNING - No frames received for 2 seconds
-2025-06-03 12:08:51,014 - INFO - Display thread terminated
-2025-06-03 12:08:51,876 - ERROR - Failed to recover video: threads can only be started once
-2025-06-03 12:08:51,891 - INFO - Connection monitor terminated
-2025-06-03 12:09:01,268 - INFO - Stop signal received
-2025-06-03 12:09:04,816 - INFO - Stop signal received
-2025-06-03 12:09:05,651 - INFO - Stop signal received
+2025-06-03 12:14:53,283 - INFO - Starting Bebop 2 glove detection system
+2025-06-03 12:14:53,306 - INFO - Connecting to Bebop 2...
+2025-06-03 12:14:54,328 - INFO - Drone connected successfully
+2025-06-03 12:14:54,329 - INFO - Display thread started
+2025-06-03 12:14:54,329 - INFO - Cleanup thread started
+2025-06-03 12:14:54,330 - INFO - Connection monitor started
+2025-06-03 12:14:54,330 - INFO - All threads started (display, cleanup, monitor)
+2025-06-03 12:14:54,330 - INFO - Opening video stream...
+2025-06-03 12:14:56,419 - WARNING - No frames received for 2 seconds
+2025-06-03 12:14:58,333 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
+2025-06-03 12:14:58,457 - WARNING - No frames received for 2 seconds
+2025-06-03 12:15:00,467 - WARNING - No frames received for 2 seconds
+2025-06-03 12:15:02,353 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
+2025-06-03 12:15:02,493 - WARNING - No frames received for 2 seconds
+2025-06-03 12:15:04,534 - WARNING - No frames received for 2 seconds
+2025-06-03 12:15:06,394 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
+2025-06-03 12:15:06,564 - WARNING - No frames received for 2 seconds
+2025-06-03 12:15:08,465 - INFO - Video stream opened successfully
+2025-06-03 12:15:08,502 - INFO - Detection system active
+2025-06-03 12:15:08,506 - INFO - Controls: 'q'/ESC=Quit, 'r'=Reset stats, 's'=Screenshot
+2025-06-03 12:15:09,550 - INFO - FPS: 2.0
+2025-06-03 12:15:10,412 - INFO - STATS - Frames: 52, FPS: 13.0, Detections: 94.2%, Errors: 0
+2025-06-03 12:15:10,747 - INFO - FPS: 25.1
+2025-06-03 12:15:11,977 - INFO - FPS: 24.4
+2025-06-03 12:15:13,286 - INFO - FPS: 22.9
+2025-06-03 12:15:14,414 - INFO - STATS - Frames: 147, FPS: 23.8, Detections: 49.7%, Errors: 0
+2025-06-03 12:15:14,553 - INFO - FPS: 23.7
+2025-06-03 12:15:14,669 - INFO - Cleaned up 301 old image files
+2025-06-03 12:15:16,710 - WARNING - No frames received for 2 seconds
+2025-06-03 12:15:18,415 - INFO - STATS - Frames: 152, FPS: 1.2, Detections: 51.3%, Errors: 0
+2025-06-03 12:15:18,711 - WARNING - No frames received for 2 seconds
+2025-06-03 12:15:20,722 - WARNING - No frames received for 2 seconds
+2025-06-03 12:15:22,418 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
+2025-06-03 12:15:22,723 - WARNING - No frames received for 2 seconds
+2025-06-03 12:15:24,737 - WARNING - No frames received for 2 seconds
+2025-06-03 12:15:24,755 - INFO - Cleaned up 306 old image files
+2025-06-03 12:15:26,419 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
+2025-06-03 12:15:26,752 - WARNING - No frames received for 2 seconds
+2025-06-03 12:15:28,765 - WARNING - No frames received for 2 seconds
+2025-06-03 12:15:30,421 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
+2025-06-03 12:15:30,768 - WARNING - No frames received for 2 seconds
+2025-06-03 12:15:32,770 - WARNING - No frames received for 2 seconds
+2025-06-03 12:15:34,423 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
+2025-06-03 12:15:34,785 - WARNING - No frames received for 2 seconds
+2025-06-03 12:15:34,837 - INFO - Cleaned up 204 old image files
+2025-06-03 12:15:36,795 - WARNING - No frames received for 2 seconds
+2025-06-03 12:15:38,424 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
+2025-06-03 12:15:38,800 - WARNING - No frames received for 2 seconds
+2025-06-03 12:15:39,269 - INFO - Stop signal received
+2025-06-03 12:15:39,446 - INFO - Cleanup thread terminated
+2025-06-03 12:15:39,522 - INFO - Starting cleanup...
+2025-06-03 12:15:40,814 - WARNING - No frames received for 2 seconds
+2025-06-03 12:15:40,819 - INFO - Display thread terminated
+2025-06-03 12:15:42,425 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
+2025-06-03 12:15:42,425 - INFO - Connection monitor terminated
+2025-06-03 12:15:48,025 - INFO - Video stream closed
+2025-06-03 12:15:48,528 - INFO - Drone disconnected
+2025-06-03 12:15:48,528 - INFO - Cleanup completed
