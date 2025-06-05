@@ -1,61 +1,247 @@
-2025-06-05 12:12:34,898 - INFO - Starting Bebop 2 Zero Disk Usage Detection System
-2025-06-05 12:12:34,899 - INFO - Features: Temporary directory + Immediate cleanup + Buffer access
-2025-06-05 12:12:34,920 - INFO - Connecting to Bebop 2...
-2025-06-05 12:12:35,944 - INFO - Drone connected successfully
-2025-06-05 12:12:35,946 - INFO - Temporary directory created: C:\Users\Baptiste\AppData\Local\Temp\bebop_temp_0v8o3g5t
-2025-06-05 12:12:35,946 - INFO - Direct buffer access thread started
-2025-06-05 12:12:36,047 - INFO - Thread 1/3 started: DirectBuffer
-2025-06-05 12:12:36,048 - INFO - Display thread started
-2025-06-05 12:12:36,148 - INFO - Thread 2/3 started: Display
-2025-06-05 12:12:36,148 - INFO - Monitor thread started
-2025-06-05 12:12:36,249 - INFO - Thread 3/3 started: Monitor
-2025-06-05 12:12:36,249 - INFO - All threads started successfully
-2025-06-05 12:12:36,249 - INFO - Opening video stream with zero disk usage...
-2025-06-05 12:12:36,752 - INFO - Using temporary image path: C:\Users\Baptiste\AppData\Local\Temp\bebop_temp_0v8o3g5t
-2025-06-05 12:12:36,753 - INFO - Utils path: C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\utils
-2025-06-05 12:12:36,753 - INFO - No disk cleanup needed - using temporary directory
-2025-06-05 12:12:36,754 - INFO - Starting FFmpeg with temporary directory
-2025-06-05 12:12:36,754 - INFO - FFmpeg command: ffmpeg -protocol_whitelist "file,rtp,udp" -i C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\utils/bebop.sdp -r 30 image_%03d.png
-2025-06-05 12:12:36,761 - INFO - Starting memory-only vision thread
-2025-06-05 12:12:36,762 - INFO - Memory-only vision thread started
-2025-06-05 12:12:40,081 - INFO - First image found: C:\Users\Baptiste\AppData\Local\Temp\bebop_temp_0v8o3g5t/image_034.png
-2025-06-05 12:12:41,149 - INFO - MONITOR - Frames: 28 (+28), FPS: 5.6, Det: 0.0%, Err: 0
-2025-06-05 12:12:41,149 - INFO -          Buffer: 155 checks (+155, 31.0/s), Hit rate: 18.1%
-2025-06-05 12:12:41,149 - INFO -          Temp files: 32 created (+32, 6.4/s), Cleanup: 100.0% (32/32)
-2025-06-05 12:12:41,519 - INFO - Display FPS: 5.5
-2025-06-05 12:12:41,781 - ERROR - Failed to open FFmpeg stream
-2025-06-05 12:12:41,781 - ERROR - Failed to open video stream
-2025-06-05 12:12:41,781 - INFO - Starting comprehensive cleanup...
-2025-06-05 12:12:41,796 - INFO - Display thread terminated
-2025-06-05 12:12:41,809 - INFO - Direct buffer access thread terminated
-2025-06-05 12:12:41,809 - INFO - Thread DirectBuffer terminated successfully
-2025-06-05 12:12:41,810 - INFO - Thread Display terminated successfully
-2025-06-05 12:12:46,150 - INFO - Monitor thread terminated
-2025-06-05 12:12:46,150 - INFO - Thread Monitor terminated successfully
-2025-06-05 12:12:46,150 - INFO - Closing zero-disk vision...
-2025-06-05 12:12:46,150 - INFO - Closing video and cleaning up...
-2025-06-05 12:12:46,162 - INFO - Memory-only vision thread terminated
-2025-06-05 12:12:48,152 - INFO - FFmpeg process terminated
-2025-06-05 12:12:48,180 - WARNING - Error cleaning temporary directory: [WinError 32] Le processus ne peut pas accéder au fichier car ce fichier est utilisé par un autre processus: 'C:\\Users\\Baptiste\\AppData\\Local\\Temp\\bebop_temp_0v8o3g5t'
-2025-06-05 12:12:48,682 - INFO - Bebop video stream stopped
-2025-06-05 12:12:48,682 - INFO - Zero-disk vision closed successfully
-2025-06-05 12:12:48,683 - INFO - Disconnecting from Bebop...
-2025-06-05 12:12:49,186 - INFO - Bebop disconnected successfully
-2025-06-05 12:12:49,187 - INFO - OpenCV windows closed successfully
-2025-06-05 12:12:49,187 - INFO - ============================================================
-2025-06-05 12:12:49,188 - INFO - FINAL STATISTICS (ZERO DISK USAGE):
-2025-06-05 12:12:49,188 - INFO -   Total Runtime:          12.9s
-2025-06-05 12:12:49,189 - INFO -   Frames Processed:       47
-2025-06-05 12:12:49,189 - INFO -   Average Frame Rate:     3.6/s
-2025-06-05 12:12:49,190 - INFO -   Total Detections:       0
-2025-06-05 12:12:49,190 - INFO -   Detection Rate:         0.0%
-2025-06-05 12:12:49,190 - INFO -   Buffer Checks:          174
-2025-06-05 12:12:49,190 - INFO -   Buffer Hits:            47
-2025-06-05 12:12:49,190 - INFO -   Buffer Hit Rate:        27.0%
-2025-06-05 12:12:49,192 - INFO -   Temp Files Created:     182
-2025-06-05 12:12:49,192 - INFO -   Temp Files Cleaned:     182
-2025-06-05 12:12:49,192 - INFO -   Cleanup Efficiency:     100.0%
-2025-06-05 12:12:49,192 - INFO -   Processing Errors:      0
-2025-06-05 12:12:49,192 - INFO - ============================================================
-2025-06-05 12:12:49,192 - INFO - Zero Disk Usage system cleanup completed successfully
-2025-06-05 12:12:49,196 - INFO - Program exiting with code 1
+2025-06-05 12:19:21,003 - INFO - Starting Bebop 2 Zero Disk Usage Detection System
+2025-06-05 12:19:21,003 - INFO - Features: Temporary directory + Immediate cleanup + Buffer access
+2025-06-05 12:19:21,024 - INFO - Connecting to Bebop 2...
+2025-06-05 12:19:22,046 - INFO - Drone connected successfully
+2025-06-05 12:19:22,049 - INFO - Temporary directory created: C:\Users\Baptiste\AppData\Local\Temp\bebop_temp_il_qmden
+2025-06-05 12:19:22,050 - INFO - Direct buffer access thread started
+2025-06-05 12:19:22,151 - INFO - Thread 1/3 started: DirectBuffer
+2025-06-05 12:19:22,153 - INFO - Display thread started
+2025-06-05 12:19:22,252 - INFO - Thread 2/3 started: Display
+2025-06-05 12:19:22,252 - INFO - Monitor thread started
+2025-06-05 12:19:22,353 - INFO - Thread 3/3 started: Monitor
+2025-06-05 12:19:22,353 - INFO - All threads started successfully
+2025-06-05 12:19:22,353 - INFO - Opening video stream with zero disk usage...
+2025-06-05 12:19:22,855 - INFO - Using temporary image path: C:\Users\Baptiste\AppData\Local\Temp\bebop_temp_il_qmden
+2025-06-05 12:19:22,855 - INFO - Utils path: C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\utils
+2025-06-05 12:19:22,855 - INFO - No disk cleanup needed - using temporary directory
+2025-06-05 12:19:22,855 - INFO - Starting FFmpeg with temporary directory
+2025-06-05 12:19:22,855 - INFO - FFmpeg command: ffmpeg -protocol_whitelist "file,rtp,udp" -i C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\utils/bebop.sdp -r 30 image_%03d.png
+2025-06-05 12:19:22,862 - INFO - Starting memory-only vision thread
+2025-06-05 12:19:22,864 - INFO - Memory-only vision thread started
+2025-06-05 12:19:25,880 - WARNING - No explicit FFmpeg success message, but checking for images...
+2025-06-05 12:19:26,882 - INFO - First image found: C:\Users\Baptiste\AppData\Local\Temp\bebop_temp_il_qmden/image_041.png
+2025-06-05 12:19:27,254 - INFO - MONITOR - Frames: 9 (+9), FPS: 1.8, Det: 0.0%, Err: 0
+2025-06-05 12:19:27,254 - INFO -          Buffer: 156 checks (+156, 31.2/s), Hit rate: 5.8%
+2025-06-05 12:19:27,254 - INFO -          Temp files: 11 created (+11, 2.2/s), Cleanup: 100.0% (11/11)
+2025-06-05 12:19:27,892 - INFO - FFmpeg appears to be working - found 41 image files
+2025-06-05 12:19:27,892 - INFO - FFmpeg stream opened successfully
+2025-06-05 12:19:27,892 - INFO - Video stream opened successfully (5.5s)
+2025-06-05 12:19:27,893 - INFO - Zero Disk Usage Detection System is now active
+2025-06-05 12:19:27,893 - INFO - ============================================================
+2025-06-05 12:19:27,893 - INFO - SYSTEM INFO:
+2025-06-05 12:19:27,893 - INFO -   Mode:             Zero Disk Usage
+2025-06-05 12:19:27,894 - INFO -   Temp Directory:   C:\Users\Baptiste\AppData\Local\Temp\bebop_temp_il_qmden
+2025-06-05 12:19:27,894 - INFO -   Buffer Size:      50 frames
+2025-06-05 12:19:27,894 - INFO -   Immediate Cleanup: Enabled
+2025-06-05 12:19:27,894 - INFO - ============================================================
+2025-06-05 12:19:27,894 - INFO - CONTROLS:
+2025-06-05 12:19:27,894 - INFO -   'q' or ESC  = Quit
+2025-06-05 12:19:27,894 - INFO -   'r'         = Complete reset
+2025-06-05 12:19:27,894 - INFO -   's'         = Screenshot
+2025-06-05 12:19:27,894 - INFO -   'd'         = Debug stats
+2025-06-05 12:19:27,894 - INFO - ============================================================
+2025-06-05 12:19:28,311 - INFO - Display FPS: 4.9
+2025-06-05 12:19:29,707 - INFO - Display FPS: 21.5
+2025-06-05 12:19:31,102 - INFO - Display FPS: 21.5
+2025-06-05 12:19:32,255 - INFO - MONITOR - Frames: 138 (+129), FPS: 25.8, Det: 0.0%, Err: 0
+2025-06-05 12:19:32,255 - INFO -          Buffer: 301 checks (+145, 29.0/s), Hit rate: 45.8%
+2025-06-05 12:19:32,255 - INFO -          Temp files: 161 created (+150, 30.0/s), Cleanup: 100.0% (161/161)
+2025-06-05 12:19:32,498 - INFO - Display FPS: 21.5
+2025-06-05 12:19:33,898 - INFO - Display FPS: 21.5
+2025-06-05 12:19:35,295 - INFO - Display FPS: 21.5
+2025-06-05 12:19:36,684 - INFO - Display FPS: 21.6
+2025-06-05 12:19:37,256 - INFO - MONITOR - Frames: 266 (+128), FPS: 25.6, Det: 0.0%, Err: 0
+2025-06-05 12:19:37,256 - INFO -          Buffer: 446 checks (+145, 29.0/s), Hit rate: 59.6%
+2025-06-05 12:19:37,256 - INFO -          Temp files: 311 created (+150, 30.0/s), Cleanup: 100.0% (311/311)
+2025-06-05 12:19:38,073 - INFO - Display FPS: 21.6
+2025-06-05 12:19:39,467 - INFO - Display FPS: 21.5
+2025-06-05 12:19:40,863 - INFO - Display FPS: 21.5
+2025-06-05 12:19:42,254 - INFO - Display FPS: 21.6
+2025-06-05 12:19:42,257 - INFO - MONITOR - Frames: 395 (+129), FPS: 25.8, Det: 3.0%, Err: 0
+2025-06-05 12:19:42,257 - INFO -          Buffer: 591 checks (+145, 29.0/s), Hit rate: 66.8%
+2025-06-05 12:19:42,257 - INFO -          Temp files: 460 created (+149, 29.8/s), Cleanup: 100.0% (460/460)
+2025-06-05 12:19:43,654 - INFO - Display FPS: 21.4
+2025-06-05 12:19:45,045 - INFO - Display FPS: 21.6
+2025-06-05 12:19:46,433 - INFO - Display FPS: 21.6
+2025-06-05 12:19:47,258 - INFO - MONITOR - Frames: 529 (+134), FPS: 26.8, Det: 5.7%, Err: 0
+2025-06-05 12:19:47,258 - INFO -          Buffer: 736 checks (+145, 29.0/s), Hit rate: 71.9%
+2025-06-05 12:19:47,258 - INFO -          Temp files: 611 created (+151, 30.2/s), Cleanup: 100.0% (611/611)
+2025-06-05 12:19:47,830 - INFO - Display FPS: 21.5
+2025-06-05 12:19:47,920 - INFO - STATUS - Uptime: 20s
+2025-06-05 12:19:47,920 - INFO -        - Frame Rate: 27.3/s (Total: 547)
+2025-06-05 12:19:47,920 - INFO -        - Buffer Efficiency: 72.5%
+2025-06-05 12:19:47,921 - INFO -        - Temp Files: 630 created, 630 cleaned
+2025-06-05 12:19:47,921 - INFO -        - Cleanup Efficiency: 100.0%
+2025-06-05 12:19:47,921 - INFO -        - Detections: 30 | Errors: 0
+2025-06-05 12:19:47,922 - INFO -        - Temp directory status: 41 files remaining
+2025-06-05 12:19:47,922 - WARNING -        - WARNING: 41 temp files not cleaned!
+2025-06-05 12:19:49,225 - INFO - Display FPS: 21.5
+2025-06-05 12:19:50,625 - INFO - Display FPS: 21.5
+2025-06-05 12:19:52,020 - INFO - Display FPS: 21.5
+2025-06-05 12:19:52,258 - INFO - MONITOR - Frames: 658 (+129), FPS: 25.8, Det: 6.4%, Err: 0
+2025-06-05 12:19:52,258 - INFO -          Buffer: 881 checks (+145, 29.0/s), Hit rate: 74.7%
+2025-06-05 12:19:52,258 - INFO -          Temp files: 759 created (+148, 29.6/s), Cleanup: 100.0% (759/759)
+2025-06-05 12:19:53,416 - INFO - Display FPS: 21.5
+2025-06-05 12:19:54,811 - INFO - Display FPS: 21.5
+2025-06-05 12:19:56,209 - INFO - Display FPS: 21.5
+2025-06-05 12:19:57,259 - INFO - MONITOR - Frames: 786 (+128), FPS: 25.6, Det: 5.3%, Err: 0
+2025-06-05 12:19:57,259 - INFO -          Buffer: 1026 checks (+145, 29.0/s), Hit rate: 76.6%
+2025-06-05 12:19:57,260 - INFO -          Temp files: 909 created (+150, 30.0/s), Cleanup: 100.0% (909/909)
+2025-06-05 12:19:57,604 - INFO - Display FPS: 21.5
+2025-06-05 12:19:58,999 - INFO - Display FPS: 21.5
+2025-06-05 12:20:00,393 - INFO - Display FPS: 21.5
+2025-06-05 12:20:01,793 - INFO - Display FPS: 21.4
+2025-06-05 12:20:02,261 - INFO - MONITOR - Frames: 917 (+131), FPS: 26.2, Det: 4.9%, Err: 0
+2025-06-05 12:20:02,261 - INFO -          Buffer: 1171 checks (+145, 29.0/s), Hit rate: 78.3%
+2025-06-05 12:20:02,261 - INFO -          Temp files: 1059 created (+150, 30.0/s), Cleanup: 100.0% (1059/1059)
+2025-06-05 12:20:03,188 - INFO - Display FPS: 21.5
+2025-06-05 12:20:04,581 - INFO - Display FPS: 21.5
+2025-06-05 12:20:05,967 - INFO - Display FPS: 21.6
+2025-06-05 12:20:07,262 - INFO - MONITOR - Frames: 1045 (+128), FPS: 25.6, Det: 12.4%, Err: 0
+2025-06-05 12:20:07,262 - INFO -          Buffer: 1316 checks (+145, 29.0/s), Hit rate: 79.4%
+2025-06-05 12:20:07,262 - INFO -          Temp files: 1209 created (+150, 30.0/s), Cleanup: 100.0% (1209/1209)
+2025-06-05 12:20:07,363 - INFO - Display FPS: 21.5
+2025-06-05 12:20:07,943 - INFO - STATUS - Uptime: 40s
+2025-06-05 12:20:07,943 - INFO -        - Frame Rate: 26.5/s (Total: 1063)
+2025-06-05 12:20:07,943 - INFO -        - Buffer Efficiency: 79.6%
+2025-06-05 12:20:07,943 - INFO -        - Temp Files: 1229 created, 1229 cleaned
+2025-06-05 12:20:07,943 - INFO -        - Cleanup Efficiency: 100.0%
+2025-06-05 12:20:07,943 - INFO -        - Detections: 142 | Errors: 0
+2025-06-05 12:20:07,944 - INFO -        - Temp directory status: 41 files remaining
+2025-06-05 12:20:07,944 - WARNING -        - WARNING: 41 temp files not cleaned!
+2025-06-05 12:20:08,762 - INFO - Display FPS: 21.5
+2025-06-05 12:20:10,158 - INFO - Display FPS: 21.5
+2025-06-05 12:20:11,553 - INFO - Display FPS: 21.5
+2025-06-05 12:20:12,263 - INFO - MONITOR - Frames: 1179 (+134), FPS: 26.8, Det: 16.1%, Err: 0
+2025-06-05 12:20:12,263 - INFO -          Buffer: 1461 checks (+145, 29.0/s), Hit rate: 80.7%
+2025-06-05 12:20:12,263 - INFO -          Temp files: 1358 created (+149, 29.8/s), Cleanup: 100.0% (1358/1358)
+2025-06-05 12:20:12,952 - INFO - Display FPS: 21.4
+2025-06-05 12:20:14,349 - INFO - Display FPS: 21.5
+2025-06-05 12:20:15,744 - INFO - Display FPS: 21.5
+2025-06-05 12:20:17,143 - INFO - Display FPS: 21.4
+2025-06-05 12:20:17,264 - INFO - MONITOR - Frames: 1310 (+131), FPS: 26.2, Det: 14.5%, Err: 0
+2025-06-05 12:20:17,264 - INFO -          Buffer: 1606 checks (+145, 29.0/s), Hit rate: 81.6%
+2025-06-05 12:20:17,264 - INFO -          Temp files: 1509 created (+151, 30.2/s), Cleanup: 100.0% (1509/1509)
+2025-06-05 12:20:18,530 - INFO - Display FPS: 21.7
+2025-06-05 12:20:19,924 - INFO - Display FPS: 21.5
+2025-06-05 12:20:21,321 - INFO - Display FPS: 21.5
+2025-06-05 12:20:22,265 - INFO - MONITOR - Frames: 1445 (+135), FPS: 27.0, Det: 13.4%, Err: 0
+2025-06-05 12:20:22,265 - INFO -          Buffer: 1751 checks (+145, 29.0/s), Hit rate: 82.5%
+2025-06-05 12:20:22,265 - INFO -          Temp files: 1659 created (+150, 30.0/s), Cleanup: 100.0% (1659/1659)
+2025-06-05 12:20:22,716 - INFO - Display FPS: 21.5
+2025-06-05 12:20:24,109 - INFO - Display FPS: 21.6
+2025-06-05 12:20:25,500 - INFO - Display FPS: 21.6
+2025-06-05 12:20:26,893 - INFO - Display FPS: 21.5
+2025-06-05 12:20:27,266 - INFO - MONITOR - Frames: 1570 (+125), FPS: 25.0, Det: 12.4%, Err: 0
+2025-06-05 12:20:27,266 - INFO -          Buffer: 1896 checks (+145, 29.0/s), Hit rate: 82.8%
+2025-06-05 12:20:27,266 - INFO -          Temp files: 1809 created (+150, 30.0/s), Cleanup: 100.0% (1809/1809)
+2025-06-05 12:20:27,962 - INFO - STATUS - Uptime: 60s
+2025-06-05 12:20:27,962 - INFO -        - Frame Rate: 26.5/s (Total: 1590)
+2025-06-05 12:20:27,962 - INFO -        - Buffer Efficiency: 83.0%
+2025-06-05 12:20:27,962 - INFO -        - Temp Files: 1830 created, 1830 cleaned
+2025-06-05 12:20:27,963 - INFO -        - Cleanup Efficiency: 100.0%
+2025-06-05 12:20:27,963 - INFO -        - Detections: 194 | Errors: 0
+2025-06-05 12:20:27,963 - INFO -        - Temp directory status: 40 files remaining
+2025-06-05 12:20:27,963 - WARNING -        - WARNING: 40 temp files not cleaned!
+2025-06-05 12:20:28,295 - INFO - Display FPS: 21.4
+2025-06-05 12:20:29,690 - INFO - Display FPS: 21.5
+2025-06-05 12:20:31,089 - INFO - Display FPS: 21.4
+2025-06-05 12:20:32,267 - INFO - MONITOR - Frames: 1703 (+133), FPS: 26.6, Det: 12.2%, Err: 0
+2025-06-05 12:20:32,268 - INFO -          Buffer: 2040 checks (+144, 28.8/s), Hit rate: 83.5%
+2025-06-05 12:20:32,268 - INFO -          Temp files: 1959 created (+150, 30.0/s), Cleanup: 100.0% (1959/1959)
+2025-06-05 12:20:32,485 - INFO - Display FPS: 21.5
+2025-06-05 12:20:33,881 - INFO - Display FPS: 21.5
+2025-06-05 12:20:35,272 - INFO - Display FPS: 21.5
+2025-06-05 12:20:36,667 - INFO - Display FPS: 21.5
+2025-06-05 12:20:37,268 - INFO - MONITOR - Frames: 1838 (+135), FPS: 27.0, Det: 11.5%, Err: 0
+2025-06-05 12:20:37,268 - INFO -          Buffer: 2185 checks (+145, 29.0/s), Hit rate: 84.1%
+2025-06-05 12:20:37,269 - INFO -          Temp files: 2109 created (+150, 30.0/s), Cleanup: 100.0% (2109/2109)
+2025-06-05 12:20:38,062 - INFO - Display FPS: 21.5
+2025-06-05 12:20:39,457 - INFO - Display FPS: 21.5
+2025-06-05 12:20:40,854 - INFO - Display FPS: 21.5
+2025-06-05 12:20:42,236 - INFO - Display FPS: 21.7
+2025-06-05 12:20:42,269 - INFO - MONITOR - Frames: 1915 (+77), FPS: 15.4, Det: 11.5%, Err: 0
+2025-06-05 12:20:42,269 - INFO -          Buffer: 2332 checks (+147, 29.4/s), Hit rate: 82.1%
+2025-06-05 12:20:42,269 - INFO -          Temp files: 2197 created (+88, 17.6/s), Cleanup: 100.0% (2197/2197)
+2025-06-05 12:20:43,618 - INFO - Display FPS: 21.8
+2025-06-05 12:20:44,977 - INFO - Display FPS: 22.1
+2025-06-05 12:20:46,321 - INFO - Display FPS: 22.2
+2025-06-05 12:20:47,270 - WARNING - No new frames - buffer checks: 2482 (+150), hit rate: 77.2%, last frame 7.0s ago
+2025-06-05 12:20:47,271 - WARNING -               Temp files: 2197 created, 2197 cleaned, cleanup efficiency: 100.0%
+2025-06-05 12:20:47,633 - INFO - Display FPS: 22.9
+2025-06-05 12:20:47,994 - INFO - STATUS - Uptime: 80s
+2025-06-05 12:20:47,994 - INFO -        - Frame Rate: 23.9/s (Total: 1915)
+2025-06-05 12:20:47,994 - INFO -        - Buffer Efficiency: 76.5%
+2025-06-05 12:20:47,996 - INFO -        - Temp Files: 2197 created, 2197 cleaned
+2025-06-05 12:20:47,996 - INFO -        - Cleanup Efficiency: 100.0%
+2025-06-05 12:20:47,997 - INFO -        - Detections: 221 | Errors: 0
+2025-06-05 12:20:47,998 - INFO -        - Temp directory status: 40 files remaining
+2025-06-05 12:20:48,000 - WARNING -        - WARNING: 40 temp files not cleaned!
+2025-06-05 12:20:48,998 - INFO - Display FPS: 22.0
+2025-06-05 12:20:50,353 - INFO - Display FPS: 22.1
+2025-06-05 12:20:51,717 - INFO - Display FPS: 22.0
+2025-06-05 12:20:52,272 - WARNING - No new frames - buffer checks: 2632 (+150), hit rate: 72.8%, last frame 12.0s ago
+2025-06-05 12:20:52,273 - WARNING -               Temp files: 2197 created, 2197 cleaned, cleanup efficiency: 100.0%
+2025-06-05 12:20:53,075 - INFO - Display FPS: 22.1
+2025-06-05 12:20:54,419 - INFO - Display FPS: 22.3
+2025-06-05 12:20:55,759 - INFO - Display FPS: 22.4
+2025-06-05 12:20:57,095 - INFO - Display FPS: 22.5
+2025-06-05 12:20:57,274 - WARNING - No new frames - buffer checks: 2782 (+150), hit rate: 68.8%, last frame 17.0s ago
+2025-06-05 12:20:57,274 - WARNING -               Temp files: 2197 created, 2197 cleaned, cleanup efficiency: 100.0%
+2025-06-05 12:20:58,443 - INFO - Display FPS: 22.1
+2025-06-05 12:20:59,806 - INFO - Display FPS: 22.1
+2025-06-05 12:21:01,142 - INFO - Display FPS: 22.4
+2025-06-05 12:21:02,275 - WARNING - No new frames - buffer checks: 2932 (+150), hit rate: 65.3%, last frame 22.1s ago
+2025-06-05 12:21:02,275 - WARNING -               Temp files: 2197 created, 2197 cleaned, cleanup efficiency: 100.0%
+2025-06-05 12:21:02,504 - INFO - Display FPS: 22.0
+2025-06-05 12:21:03,850 - INFO - Display FPS: 22.4
+2025-06-05 12:21:05,184 - INFO - Display FPS: 22.4
+2025-06-05 12:21:06,547 - INFO - Display FPS: 22.0
+2025-06-05 12:21:07,277 - WARNING - No new frames - buffer checks: 3082 (+150), hit rate: 62.1%, last frame 27.1s ago
+2025-06-05 12:21:07,277 - WARNING -               Temp files: 2197 created, 2197 cleaned, cleanup efficiency: 100.0%
+2025-06-05 12:21:07,944 - INFO - Display FPS: 21.5
+2025-06-05 12:21:08,011 - INFO - STATUS - Uptime: 100s
+2025-06-05 12:21:08,011 - INFO -        - Frame Rate: 19.1/s (Total: 1915)
+2025-06-05 12:21:08,011 - INFO -        - Buffer Efficiency: 61.7%
+2025-06-05 12:21:08,011 - INFO -        - Temp Files: 2197 created, 2197 cleaned
+2025-06-05 12:21:08,011 - INFO -        - Cleanup Efficiency: 100.0%
+2025-06-05 12:21:08,012 - INFO -        - Detections: 221 | Errors: 0
+2025-06-05 12:21:08,012 - INFO -        - Temp directory status: 40 files remaining
+2025-06-05 12:21:08,012 - WARNING -        - WARNING: 40 temp files not cleaned!
+2025-06-05 12:21:09,292 - INFO - Signal 2 received - initiating shutdown
+2025-06-05 12:21:09,305 - INFO - Direct buffer access thread terminated
+2025-06-05 12:21:09,310 - INFO - Display thread terminated
+2025-06-05 12:21:10,022 - INFO - Display window was closed
+2025-06-05 12:21:10,022 - INFO - Starting comprehensive cleanup...
+2025-06-05 12:21:10,022 - INFO - Thread DirectBuffer terminated successfully
+2025-06-05 12:21:10,023 - INFO - Thread Display terminated successfully
+2025-06-05 12:21:12,277 - INFO - Monitor thread terminated
+2025-06-05 12:21:12,277 - INFO - Thread Monitor terminated successfully
+2025-06-05 12:21:12,278 - INFO - Closing zero-disk vision...
+2025-06-05 12:21:12,279 - INFO - Closing video and cleaning up...
+2025-06-05 12:21:12,284 - INFO - Memory-only vision thread terminated
+2025-06-05 12:21:14,281 - INFO - FFmpeg process terminated
+2025-06-05 12:21:17,803 - WARNING - Could not clean temporary directory after 3 attempts: [WinError 32] Le processus ne peut pas accéder au fichier car ce fichier est utilisé par un autre processus: 'C:\\Users\\Baptiste\\AppData\\Local\\Temp\\bebop_temp_il_qmden'
+2025-06-05 12:21:17,803 - INFO - Temporary directory will be cleaned by system: C:\Users\Baptiste\AppData\Local\Temp\bebop_temp_il_qmden
+2025-06-05 12:21:18,305 - INFO - Bebop video stream stopped
+2025-06-05 12:21:18,306 - INFO - Zero-disk vision closed successfully
+2025-06-05 12:21:18,306 - INFO - Disconnecting from Bebop...
+2025-06-05 12:21:18,810 - INFO - Bebop disconnected successfully
+2025-06-05 12:21:18,811 - INFO - OpenCV windows closed successfully
+2025-06-05 12:21:18,811 - INFO - ============================================================
+2025-06-05 12:21:18,812 - INFO - FINAL STATISTICS (ZERO DISK USAGE):
+2025-06-05 12:21:18,813 - INFO -   Total Runtime:          110.9s
+2025-06-05 12:21:18,813 - INFO -   Frames Processed:       1915
+2025-06-05 12:21:18,814 - INFO -   Average Frame Rate:     17.3/s
+2025-06-05 12:21:18,814 - INFO -   Total Detections:       221
+2025-06-05 12:21:18,815 - INFO -   Detection Rate:         11.5%
+2025-06-05 12:21:18,815 - INFO -   Buffer Checks:          3142
+2025-06-05 12:21:18,815 - INFO -   Buffer Hits:            1915
+2025-06-05 12:21:18,815 - INFO -   Buffer Hit Rate:        60.9%
+2025-06-05 12:21:18,815 - INFO -   Temp Files Created:     2197
+2025-06-05 12:21:18,815 - INFO -   Temp Files Cleaned:     2197
+2025-06-05 12:21:18,815 - INFO -   Cleanup Efficiency:     100.0%
+2025-06-05 12:21:18,815 - INFO -   Processing Errors:      0
+2025-06-05 12:21:18,816 - INFO - ============================================================
+2025-06-05 12:21:18,816 - INFO - Zero Disk Usage system cleanup completed successfully
+2025-06-05 12:21:18,820 - INFO - Program exiting with code 0
