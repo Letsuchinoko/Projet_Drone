@@ -191,6 +191,11 @@ def drone_control_thread(bebop):
           "  a = rotation gauche\n"
           "  c = rotation droite\n")
     while True:
+        try:
+            key = input("> ").strip().lower()
+        except EOFError:
+            print("Arrêt du thread contrôle drone (entrée clavier coupée).")
+            break
         key = input("> ").strip().lower()
         if key == 't':
             bebop.safe_takeoff(10)
