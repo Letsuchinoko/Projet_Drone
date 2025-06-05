@@ -1,0 +1,34 @@
+2025-06-05 14:06:29,009 - INFO - Starting Bebop 2 Robust Detection System
+2025-06-05 14:06:29,010 - INFO - Features: Zero disk usage + Robust frame capture + Optimized detection
+2025-06-05 14:06:29,010 - INFO - Connecting to Bebop 2...
+2025-06-05 14:06:30,088 - INFO - Drone connected successfully
+2025-06-05 14:06:30,094 - INFO - Temporary directory created: C:\Users\Baptiste\AppData\Local\Temp\bebop_robust_y3wv9ruf
+2025-06-05 14:06:30,096 - INFO - Opening video stream...
+2025-06-05 14:06:31,600 - INFO - Utils path: C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\utils
+2025-06-05 14:06:31,601 - INFO - Temp directory: C:\Users\Baptiste\AppData\Local\Temp\bebop_robust_y3wv9ruf
+2025-06-05 14:06:31,601 - INFO - Starting FFmpeg: ffmpeg -y -protocol_whitelist file,rtp,udp -i C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\utils/bebop.sdp -r 20 -f image2 -q:v 8 C:\Users\Baptiste\AppData\Local\Temp\bebop_robust_y3wv9ruf/frame_%06d.png
+2025-06-05 14:06:43,634 - ERROR - No frames received from FFmpeg
+2025-06-05 14:06:43,635 - ERROR - Failed to open video stream
+2025-06-05 14:06:43,636 - INFO - Starting system cleanup...
+2025-06-05 14:06:43,636 - INFO - Closing video system...
+2025-06-05 14:06:45,637 - INFO - FFmpeg process terminated
+2025-06-05 14:06:46,140 - INFO - Bebop video stream stopped
+2025-06-05 14:06:47,142 - INFO - Temporary directory cleaned: C:\Users\Baptiste\AppData\Local\Temp\bebop_robust_y3wv9ruf
+2025-06-05 14:06:47,143 - INFO - Vision system closed
+2025-06-05 14:06:47,647 - INFO - Drone disconnected
+2025-06-05 14:06:47,661 - INFO - OpenCV windows closed
+2025-06-05 14:06:47,662 - INFO - ============================================================
+2025-06-05 14:06:47,663 - INFO - FINAL STATISTICS:
+2025-06-05 14:06:47,663 - INFO -   Total Runtime:        18.7s
+2025-06-05 14:06:47,664 - INFO -   Frames Processed:     0
+2025-06-05 14:06:47,665 - INFO -   Average Frame Rate:   0.0 fps
+2025-06-05 14:06:47,665 - INFO -   Total Detections:     0
+2025-06-05 14:06:47,666 - INFO -   Detection Rate:       0.0%
+2025-06-05 14:06:47,666 - INFO -   Buffer Hits:          0
+2025-06-05 14:06:47,667 - INFO -   Temp Files Created:   0
+2025-06-05 14:06:47,668 - INFO -   Temp Files Cleaned:   0
+2025-06-05 14:06:47,668 - INFO -   Cleanup Efficiency:   0.0%
+2025-06-05 14:06:47,670 - INFO -   Processing Errors:    0
+2025-06-05 14:06:47,670 - INFO - ============================================================
+2025-06-05 14:06:47,671 - INFO - System shutdown completed successfully
+2025-06-05 14:06:47,673 - INFO - Program exiting with code 1
