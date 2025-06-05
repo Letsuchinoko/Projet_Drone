@@ -1,49 +1,38 @@
-2025-06-05 09:52:07,719 - INFO - Starting Advanced Bebop 2 detection with auto-restart
-2025-06-05 09:52:07,741 - INFO - Connecting to Bebop 2...
-2025-06-05 09:52:08,760 - INFO - Drone connected successfully
-2025-06-05 09:52:08,761 - INFO - Display thread started
-2025-06-05 09:52:08,962 - INFO - Conservative cleanup thread started
-2025-06-05 09:52:09,163 - INFO - Enhanced connection monitor started
-2025-06-05 09:52:09,364 - INFO - Vision restart manager started
-2025-06-05 09:52:09,565 - INFO - All threads started successfully
-2025-06-05 09:52:09,565 - INFO - Opening initial video stream...
-2025-06-05 09:52:13,170 - WARNING - Stream issue detected (failure #1). Last frame: 5.5s ago
-2025-06-05 09:52:17,177 - WARNING - Stream issue detected (failure #2). Last frame: 9.5s ago
-2025-06-05 09:52:17,193 - WARNING - Triggering automatic restart
-2025-06-05 09:52:17,209 - WARNING - Attempting vision restart #1
-2025-06-05 09:52:21,215 - WARNING - Stream issue detected (failure #3). Last frame: 13.5s ago
-2025-06-05 09:52:25,218 - WARNING - Stream issue detected (failure #4). Last frame: 17.5s ago
-2025-06-05 09:52:25,886 - INFO - Video stream closed for restart
-2025-06-05 09:52:28,913 - ERROR - Critical restart manager error: 'Bebop' object has no attribute 'is_alive'
-2025-06-05 09:52:29,223 - WARNING - Stream issue detected (failure #5). Last frame: 21.5s ago
-2025-06-05 09:52:33,225 - WARNING - Stream issue detected (failure #6). Last frame: 25.5s ago
-2025-06-05 09:52:37,258 - WARNING - Stream issue detected (failure #7). Last frame: 29.5s ago
-2025-06-05 09:52:38,930 - WARNING - Attempting vision restart #2
-2025-06-05 09:52:41,331 - WARNING - Stream issue detected (failure #8). Last frame: 33.6s ago
-2025-06-05 09:52:45,369 - WARNING - Stream issue detected (failure #9). Last frame: 37.6s ago
-2025-06-05 09:52:47,597 - INFO - Video stream closed for restart
-2025-06-05 09:52:49,425 - WARNING - Stream issue detected (failure #10). Last frame: 41.7s ago
-2025-06-05 09:52:50,642 - ERROR - Critical restart manager error: 'Bebop' object has no attribute 'is_alive'
-2025-06-05 09:52:53,454 - WARNING - Stream issue detected (failure #11). Last frame: 45.7s ago
-2025-06-05 09:52:53,669 - INFO - Initial video stream opened successfully
-2025-06-05 09:52:53,669 - INFO - Auto-restart detection system is now active
-2025-06-05 09:52:53,669 - INFO - Controls: 'q'/ESC=Quit, 'r'=Reset all, 's'=Screenshot, 'c'=Cache stats, 'v'=Manual restart
-2025-06-05 09:52:57,486 - WARNING - Stream issue detected (failure #12). Last frame: 49.8s ago
-2025-06-05 09:53:00,689 - WARNING - Attempting vision restart #3
-2025-06-05 09:53:01,487 - WARNING - Stream issue detected (failure #13). Last frame: 53.8s ago
-2025-06-05 09:53:05,488 - WARNING - Stream issue detected (failure #14). Last frame: 57.8s ago
-2025-06-05 09:53:08,578 - INFO - Display thread terminated
-2025-06-05 09:53:08,675 - INFO - Starting comprehensive cleanup...
-2025-06-05 09:53:08,675 - INFO - Waiting for threads to terminate...
-2025-06-05 09:53:09,193 - INFO - Video stream closed for restart
-2025-06-05 09:53:09,411 - INFO - Cleanup thread terminated
-2025-06-05 09:53:09,489 - INFO - Enhanced connection monitor terminated
-2025-06-05 09:53:12,194 - ERROR - Critical restart manager error: 'Bebop' object has no attribute 'is_alive'
-2025-06-05 09:53:19,491 - INFO - Signal 2 received - initiating graceful shutdown
-2025-06-05 09:53:19,491 - INFO - Cache and queue cleared
-2025-06-05 09:53:22,194 - INFO - Vision restart manager terminated
-2025-06-05 09:53:25,993 - INFO - Video stream closed
-2025-06-05 09:53:26,496 - INFO - Drone disconnected
-2025-06-05 09:53:26,497 - INFO - OpenCV windows closed
-2025-06-05 09:53:26,497 - INFO - Comprehensive cleanup completed successfully
-2025-06-05 09:53:26,498 - INFO - Program exiting with code 0
+2025-06-05 10:01:48,025 - INFO - Starting Advanced Bebop 2 detection with auto-restart
+2025-06-05 10:01:48,048 - INFO - Connecting to Bebop 2...
+2025-06-05 10:01:49,086 - INFO - Drone connected successfully
+2025-06-05 10:01:49,088 - INFO - Display thread started
+2025-06-05 10:01:49,288 - INFO - Conservative cleanup thread started
+2025-06-05 10:01:49,489 - INFO - Enhanced connection monitor started
+2025-06-05 10:01:49,691 - INFO - Vision restart manager started
+2025-06-05 10:01:49,891 - INFO - All threads started successfully
+2025-06-05 10:01:49,891 - INFO - Opening initial video stream...
+2025-06-05 10:01:53,492 - WARNING - Stream issue detected (failure #1). Last frame: 5.5s ago
+2025-06-05 10:01:57,505 - WARNING - Stream issue detected (failure #2). Last frame: 9.5s ago
+2025-06-05 10:01:57,520 - WARNING - Triggering automatic restart
+2025-06-05 10:01:57,535 - WARNING - Attempting vision restart #1
+2025-06-05 10:02:01,538 - WARNING - Stream issue detected (failure #3). Last frame: 13.5s ago
+2025-06-05 10:02:02,263 - INFO - Initial video stream opened successfully
+2025-06-05 10:02:02,263 - INFO - Auto-restart detection system is now active
+2025-06-05 10:02:02,264 - INFO - Controls: 'q'/ESC=Quit, 'r'=Reset all, 's'=Screenshot, 'c'=Cache stats, 'v'=Manual restart
+2025-06-05 10:02:05,554 - WARNING - Stream issue detected (failure #4). Last frame: 17.5s ago
+2025-06-05 10:02:06,092 - INFO - Video stream closed for restart
+2025-06-05 10:02:09,554 - WARNING - Stream issue detected (failure #5). Last frame: 21.5s ago
+2025-06-05 10:02:10,181 - ERROR - Vision restart error: [WinError 32] Le processus ne peut pas accéder au fichier car ce fichier est utilisé par un autre processus: 'C:\\Users\\Baptiste\\anaconda3\\Lib\\site-packages\\pyparrot\\images'
+2025-06-05 10:02:10,181 - ERROR - Vision restart failed
+2025-06-05 10:02:13,555 - WARNING - Stream issue detected (failure #6). Last frame: 25.5s ago
+2025-06-05 10:02:17,556 - WARNING - Stream issue detected (failure #7). Last frame: 29.5s ago
+2025-06-05 10:02:20,181 - WARNING - Attempting vision restart #2
+2025-06-05 10:02:21,556 - WARNING - Stream issue detected (failure #8). Last frame: 33.5s ago
+2025-06-05 10:02:23,800 - INFO - Signal 2 received - initiating graceful shutdown
+2025-06-05 10:02:24,272 - INFO - Starting comprehensive cleanup...
+2025-06-05 10:02:24,272 - INFO - Waiting for threads to terminate...
+2025-06-05 10:02:24,335 - INFO - Display thread terminated
+2025-06-05 10:02:24,360 - INFO - Cleanup thread terminated
+2025-06-05 10:02:25,561 - INFO - Enhanced connection monitor terminated
+2025-06-05 10:02:35,567 - INFO - Cache and queue cleared
+2025-06-05 10:02:42,152 - INFO - Video stream closed
+2025-06-05 10:02:42,726 - INFO - Drone disconnected
+2025-06-05 10:02:42,742 - INFO - OpenCV windows closed
+2025-06-05 10:02:42,757 - INFO - Comprehensive cleanup completed successfully
+2025-06-05 10:02:42,804 - INFO - Program exiting with code 0
