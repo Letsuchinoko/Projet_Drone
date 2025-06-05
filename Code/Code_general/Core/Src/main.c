@@ -21,6 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <math.h>
 #include "stdio.h"
 #include "string.h"
 /* USER CODE END Includes */
@@ -47,17 +48,16 @@ UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 #define GPS_BUFFER_SIZE 256
+
 uint8_t gps_rx_buffer[GPS_BUFFER_SIZE];
 uint16_t gps_rx_index = 0;
-int valeur_son;
-int __io_putchar(int ch) {
-    HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
-    return ch;
-}
 uint8_t c;
-uint32_t adc_value = 0;
-char msg[32];
+uint32_t adc_value;
+float voltage;
+float db;
 
+char msg[32];
+char msgtest[35];
 
 /* USER CODE END PV */
 
@@ -92,6 +92,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
+  // Exemple : SoftUART numéro 0, TX = PB3, RX = PB7
 
   /* USER CODE END Init */
 
@@ -108,10 +109,11 @@ int main(void)
   MX_USART2_UART_Init();
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
-  HAL_UART_Transmit(&huart2, (uint8_t*)"Test UART\r\n", 11, HAL_MAX_DELAY);
+  sprintf(msgtest,"TEST MODULE BLUETOOTH DRONE\r\n");
+  HAL_UART_Transmit(&huart2, (uint8_t*)msgtest, strlen(msgtest), HAL_MAX_DELAY);
   while (1)
   {
-    // gps
+    // GPS
     if (HAL_UART_Receive(&huart1, &c, 1, 10) == HAL_OK)
     {
         gps_rx_buffer[gps_rx_index++] = c;
@@ -127,15 +129,17 @@ int main(void)
         }
     }
     HAL_Delay(500);
-    // capteur Son
+    // sound Sensor
     HAL_ADC_Start(&hadc1);
     if (HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK) {
         adc_value = HAL_ADC_GetValue(&hadc1);
-        valeur_son = (adc_value * 100) / 4095;
-        sprintf(msg, "Son: %d db\r\n", valeur_son);
+        voltage = (adc_value / 4095.0f) * 3.3f;
+        db = 20.0f * log10f(voltage / 0.01f);
+
+        sprintf(msg, "Son: %.1f dB\r\n", db);
         HAL_UART_Transmit(&huart2, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
     }
-    HAL_Delay(500);
+    HAL_Delay(100);
   }
   /* USER CODE END 2 */
 
@@ -338,28 +342,11 @@ static void MX_USART2_UART_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOF_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3|GPIO_PIN_6, GPIO_PIN_RESET);
-
-  /*Configure GPIO pins : PB3 PB6 */
-  GPIO_InitStruct.Pin = GPIO_PIN_3|GPIO_PIN_6;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PB7 */
-  GPIO_InitStruct.Pin = GPIO_PIN_7;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 }
 

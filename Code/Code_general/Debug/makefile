@@ -61,7 +61,7 @@ main-build: stm_drone.elf secondary-outputs
 
 # Tool invocations
 stm_drone.elf stm_drone.map: $(OBJS) $(USER_OBJS) U:\DRONE\Projet_Drone\Code\Code_general\STM32F303K8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "stm_drone.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"U:\DRONE\Projet_Drone\Code\Code_general\STM32F303K8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="stm_drone.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+	arm-none-eabi-gcc -o "stm_drone.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"U:\DRONE\Projet_Drone\Code\Code_general\STM32F303K8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="stm_drone.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
