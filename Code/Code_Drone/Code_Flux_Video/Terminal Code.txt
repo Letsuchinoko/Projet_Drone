@@ -1,12 +1,4 @@
-Input #0, sdp, from 'C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\utils/bebop.sdp':
-
-  Duration: N/A, start: 14.681356, bitrate: N/A
-
-  Stream #0:0: Video: h264 (Constrained Baseline), yuv420p(progressive), 856x480 [SAR 1:1 DAR 107:60], 29.97 fps, 29.97 tbr, 90k tbn
-
-Stream mapping:
-
-  Stream #0:0 -> #0:0 (h264 (native) -> png (native))
-
-2025-06-05 12:05:56,821 - INFO - Flux vidéo demandé au drone (open_video).
-2025-06-05 12:05:58,822 - ERROR - Fichier SDP introuvable: c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Tests_FULLRAM\utils\bebop.sdp
+[udp @ 0000023829861ec0] bind failed: Error number -10048 occurred
+[in#0 @ 000002382982e900] Error opening input: Invalid data found when processing input
+Error opening input file C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\utils\bebop.sdp.
+Error opening input files: Invalid data found when processing input

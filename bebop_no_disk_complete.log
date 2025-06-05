@@ -1,0 +1,61 @@
+2025-06-05 12:12:34,898 - INFO - Starting Bebop 2 Zero Disk Usage Detection System
+2025-06-05 12:12:34,899 - INFO - Features: Temporary directory + Immediate cleanup + Buffer access
+2025-06-05 12:12:34,920 - INFO - Connecting to Bebop 2...
+2025-06-05 12:12:35,944 - INFO - Drone connected successfully
+2025-06-05 12:12:35,946 - INFO - Temporary directory created: C:\Users\Baptiste\AppData\Local\Temp\bebop_temp_0v8o3g5t
+2025-06-05 12:12:35,946 - INFO - Direct buffer access thread started
+2025-06-05 12:12:36,047 - INFO - Thread 1/3 started: DirectBuffer
+2025-06-05 12:12:36,048 - INFO - Display thread started
+2025-06-05 12:12:36,148 - INFO - Thread 2/3 started: Display
+2025-06-05 12:12:36,148 - INFO - Monitor thread started
+2025-06-05 12:12:36,249 - INFO - Thread 3/3 started: Monitor
+2025-06-05 12:12:36,249 - INFO - All threads started successfully
+2025-06-05 12:12:36,249 - INFO - Opening video stream with zero disk usage...
+2025-06-05 12:12:36,752 - INFO - Using temporary image path: C:\Users\Baptiste\AppData\Local\Temp\bebop_temp_0v8o3g5t
+2025-06-05 12:12:36,753 - INFO - Utils path: C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\utils
+2025-06-05 12:12:36,753 - INFO - No disk cleanup needed - using temporary directory
+2025-06-05 12:12:36,754 - INFO - Starting FFmpeg with temporary directory
+2025-06-05 12:12:36,754 - INFO - FFmpeg command: ffmpeg -protocol_whitelist "file,rtp,udp" -i C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\utils/bebop.sdp -r 30 image_%03d.png
+2025-06-05 12:12:36,761 - INFO - Starting memory-only vision thread
+2025-06-05 12:12:36,762 - INFO - Memory-only vision thread started
+2025-06-05 12:12:40,081 - INFO - First image found: C:\Users\Baptiste\AppData\Local\Temp\bebop_temp_0v8o3g5t/image_034.png
+2025-06-05 12:12:41,149 - INFO - MONITOR - Frames: 28 (+28), FPS: 5.6, Det: 0.0%, Err: 0
+2025-06-05 12:12:41,149 - INFO -          Buffer: 155 checks (+155, 31.0/s), Hit rate: 18.1%
+2025-06-05 12:12:41,149 - INFO -          Temp files: 32 created (+32, 6.4/s), Cleanup: 100.0% (32/32)
+2025-06-05 12:12:41,519 - INFO - Display FPS: 5.5
+2025-06-05 12:12:41,781 - ERROR - Failed to open FFmpeg stream
+2025-06-05 12:12:41,781 - ERROR - Failed to open video stream
+2025-06-05 12:12:41,781 - INFO - Starting comprehensive cleanup...
+2025-06-05 12:12:41,796 - INFO - Display thread terminated
+2025-06-05 12:12:41,809 - INFO - Direct buffer access thread terminated
+2025-06-05 12:12:41,809 - INFO - Thread DirectBuffer terminated successfully
+2025-06-05 12:12:41,810 - INFO - Thread Display terminated successfully
+2025-06-05 12:12:46,150 - INFO - Monitor thread terminated
+2025-06-05 12:12:46,150 - INFO - Thread Monitor terminated successfully
+2025-06-05 12:12:46,150 - INFO - Closing zero-disk vision...
+2025-06-05 12:12:46,150 - INFO - Closing video and cleaning up...
+2025-06-05 12:12:46,162 - INFO - Memory-only vision thread terminated
+2025-06-05 12:12:48,152 - INFO - FFmpeg process terminated
+2025-06-05 12:12:48,180 - WARNING - Error cleaning temporary directory: [WinError 32] Le processus ne peut pas accéder au fichier car ce fichier est utilisé par un autre processus: 'C:\\Users\\Baptiste\\AppData\\Local\\Temp\\bebop_temp_0v8o3g5t'
+2025-06-05 12:12:48,682 - INFO - Bebop video stream stopped
+2025-06-05 12:12:48,682 - INFO - Zero-disk vision closed successfully
+2025-06-05 12:12:48,683 - INFO - Disconnecting from Bebop...
+2025-06-05 12:12:49,186 - INFO - Bebop disconnected successfully
+2025-06-05 12:12:49,187 - INFO - OpenCV windows closed successfully
+2025-06-05 12:12:49,187 - INFO - ============================================================
+2025-06-05 12:12:49,188 - INFO - FINAL STATISTICS (ZERO DISK USAGE):
+2025-06-05 12:12:49,188 - INFO -   Total Runtime:          12.9s
+2025-06-05 12:12:49,189 - INFO -   Frames Processed:       47
+2025-06-05 12:12:49,189 - INFO -   Average Frame Rate:     3.6/s
+2025-06-05 12:12:49,190 - INFO -   Total Detections:       0
+2025-06-05 12:12:49,190 - INFO -   Detection Rate:         0.0%
+2025-06-05 12:12:49,190 - INFO -   Buffer Checks:          174
+2025-06-05 12:12:49,190 - INFO -   Buffer Hits:            47
+2025-06-05 12:12:49,190 - INFO -   Buffer Hit Rate:        27.0%
+2025-06-05 12:12:49,192 - INFO -   Temp Files Created:     182
+2025-06-05 12:12:49,192 - INFO -   Temp Files Cleaned:     182
+2025-06-05 12:12:49,192 - INFO -   Cleanup Efficiency:     100.0%
+2025-06-05 12:12:49,192 - INFO -   Processing Errors:      0
+2025-06-05 12:12:49,192 - INFO - ============================================================
+2025-06-05 12:12:49,192 - INFO - Zero Disk Usage system cleanup completed successfully
+2025-06-05 12:12:49,196 - INFO - Program exiting with code 1
