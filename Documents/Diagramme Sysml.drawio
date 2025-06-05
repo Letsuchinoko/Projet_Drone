@@ -198,7 +198,7 @@
         <mxCell id="2Wkc55DOOA-EuOzFVxMj-2" value="Diriger le drone avec des signes" style="shape=ellipse;html=1;strokeWidth=3;fontStyle=1;whiteSpace=wrap;align=center;perimeter=ellipsePerimeter;" vertex="1" parent="1">
           <mxGeometry x="220" y="140" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="2Wkc55DOOA-EuOzFVxMj-3" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="edgeStyle=none;html=1;endArrow=open;verticalAlign=bottom;dashed=1;labelBackgroundColor=none;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="2Wkc55DOOA-EuOzFVxMj-2" target="Ex8lp0-vGI4u2Ay012PU-12">
+        <mxCell id="2Wkc55DOOA-EuOzFVxMj-3" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="edgeStyle=none;html=1;endArrow=open;verticalAlign=bottom;dashed=1;labelBackgroundColor=none;rounded=0;exitX=1;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="2Wkc55DOOA-EuOzFVxMj-2" target="Ex8lp0-vGI4u2Ay012PU-12">
           <mxGeometry width="160" relative="1" as="geometry">
             <mxPoint x="370" y="220" as="sourcePoint" />
             <mxPoint x="530" y="220" as="targetPoint" />
