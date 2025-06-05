@@ -1,0 +1,7 @@
+2025-06-05 09:47:13,946 - INFO - Démarrage détection gant Bebop 2 en mode flux RAM (ffmpeg + OpenCV)
+2025-06-05 09:47:13,968 - INFO - Connexion au drone...
+2025-06-05 09:47:14,992 - INFO - Drone connecté !
+2025-06-05 09:47:14,992 - INFO - Contrôle du drone (pyparrot) démarré.
+2025-06-05 09:48:15,413 - INFO - Arrêt clavier demandé.
+2025-06-05 09:48:15,414 - INFO - Nettoyage et arrêt du flux video...
+2025-06-05 09:48:15,920 - INFO - Drone déconnecté et script terminé.
