@@ -362,8 +362,10 @@ class AdvancedGloveDetector:
             return frame
 
 def vision_callback(args):
-    """Callback optimisé pour la réception des frames"""
+    """Callback ultra-optimisé pour la réception des frames avec cache intelligent"""
     try:
+        current_time = time.time()
+        
         with image_dir_lock:
             pattern = os.path.join(IMAGES_DIR, "image_*.png")
             files = glob.glob(pattern)
@@ -371,51 +373,206 @@ def vision_callback(args):
             if not files:
                 return
                 
-            # Prendre le fichier le plus récent
-            latest_file = max(files, key=os.path.getmtime)
+            # Tri par temps de modification (plus efficace que max())
+            files.sort(key=os.path.getmtime, reverse=True)
             
-            # Vérifications de validité
-            if not os.path.exists(latest_file) or os.path.getsize(latest_file) < 2000:
+            # Traiter les 2-3 fichiers les plus récents pour éviter les images corrompues
+            processed = False
+            for i, latest_file in enumerate(files[:3]):
+                try:
+                    # Vérifications rapides de validité
+                    stat_info = os.stat(latest_file)
+                    file_size = stat_info.st_size
+                    file_mtime = stat_info.st_mtime
+                    
+                    # Éviter les fichiers trop petits ou en cours d'écriture
+                    if file_size < 3000:
+                        continue
+                        
+                    # Éviter les fichiers trop récents (potentiellement en cours d'écriture)
+                    if (current_time - file_mtime) < 0.02:  # 20ms de sécurité
+                        continue
+                    
+                    # Éviter de retraiter le même fichier
+                    with stats_lock:
+                        if frame_stats['last_processed_file'] == os.path.basename(latest_file):
+                            if i == 0:  # Si c'est le plus récent et déjà traité, pas de nouveau
+                                return
+                            continue
+                    
+                    # Lecture avec retry en cas d'échec
+                    frame = None
+                    for attempt in range(2):
+                        try:
+                            frame = cv2.imread(latest_file, cv2.IMREAD_COLOR)
+                            if frame is not None:
+                                break
+                            time.sleep(0.005)  # Petit délai avant retry
+                        except:
+                            if attempt == 0:
+                                time.sleep(0.01)
+                            continue
+                    
+                    if frame is None:
+                        continue
+                        
+                    # Vérifications de la frame
+                    h, w = frame.shape[:2]
+                    if h < 240 or w < 320:  # Résolution minimum
+                        continue
+                        
+                    # Test de corruption simple (pixels tous noirs ou tous blancs)
+                    if np.all(frame == 0) or np.all(frame == 255):
+                        continue
+                    
+                    # Test de variance pour éviter les images uniformes
+                    gray_test = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                    if np.var(gray_test) < 100:  # Image trop uniforme
+                        continue
+                    
+                    # Frame valide trouvée
+                    processed = True
+                    
+                    # Gestion intelligente de la queue
+                    queue_size = frame_queue.qsize()
+                    
+                    if queue_size >= MAX_QUEUE_SIZE:
+                        # Vider complètement la queue pour éviter le lag accumulé
+                        cleared = 0
+                        while not frame_queue.empty() and cleared < MAX_QUEUE_SIZE:
+                            try:
+                                frame_queue.get_nowait()
+                                cleared += 1
+                            except Empty:
+                                break
+                        logger.debug(f"Queue cleared: {cleared} frames")
+                    
+                    # Ajout de la nouvelle frame
+                    try:
+                        frame_queue.put_nowait(frame)
+                    except:
+                        # Dernier recours : forcer l'ajout
+                        try:
+                            frame_queue.get_nowait()
+                            frame_queue.put_nowait(frame)
+                        except:
+                            logger.debug("Failed to add frame to queue")
+                            continue
+                    
+                    # Mise à jour des statistiques
+                    with stats_lock:
+                        frame_stats['frame_count'] += 1
+                        frame_stats['last_frame_time'] = current_time
+                        frame_stats['last_processed_file'] = os.path.basename(latest_file)
+                    
+                    logger.debug(f"Frame captured: {os.path.basename(latest_file)} ({file_size} bytes)")
+                    break
+                    
+                except (OSError, IOError) as e:
+                    logger.debug(f"File access error for {latest_file}: {e}")
+                    continue
+                except Exception as e:
+                    logger.debug(f"Frame processing error for {latest_file}: {e}")
+                    continue
+            
+            if not processed:
+                logger.debug("No valid frames found in recent files")
+                
+    except Exception as e:
+        logger.debug(f"Vision callback critical error: {e}")
+
+def enhanced_vision_callback(args):
+    """Version alternative avec buffer circulaire pour ultra-haute performance"""
+    try:
+        current_time = time.time()
+        
+        # Cache des fichiers pour éviter les appels système répétés
+        if not hasattr(enhanced_vision_callback, 'file_cache'):
+            enhanced_vision_callback.file_cache = {}
+            enhanced_vision_callback.last_scan = 0
+        
+        # Rescan des fichiers seulement toutes les 100ms
+        if (current_time - enhanced_vision_callback.last_scan) > 0.1:
+            with image_dir_lock:
+                pattern = os.path.join(IMAGES_DIR, "image_*.png")
+                files = glob.glob(pattern)
+                
+                # Mise à jour du cache
+                new_cache = {}
+                for f in files:
+                    try:
+                        stat_info = os.stat(f)
+                        new_cache[f] = {
+                            'mtime': stat_info.st_mtime,
+                            'size': stat_info.st_size
+                        }
+                    except:
+                        continue
+                
+                enhanced_vision_callback.file_cache = new_cache
+                enhanced_vision_callback.last_scan = current_time
+        
+        # Trouver le fichier le plus récent depuis le cache
+        if not enhanced_vision_callback.file_cache:
+            return
+        
+        latest_file = max(enhanced_vision_callback.file_cache.items(), 
+                         key=lambda x: x[1]['mtime'])
+        
+        file_path, file_info = latest_file
+        
+        # Vérifications rapides
+        if file_info['size'] < 3000:
+            return
+        
+        if (current_time - file_info['mtime']) < 0.015:  # 15ms de sécurité
+            return
+        
+        # Éviter le retraitement
+        with stats_lock:
+            if frame_stats['last_processed_file'] == os.path.basename(file_path):
                 return
-            
-            # Petit délai pour s'assurer que le fichier est complètement écrit
-            time.sleep(0.005)
-            
-            frame = cv2.imread(latest_file)
+        
+        # Lecture optimisée
+        try:
+            frame = cv2.imread(file_path, cv2.IMREAD_COLOR)
             if frame is None:
                 return
-                
+            
             h, w = frame.shape[:2]
-            if h < 200 or w < 200:  # Taille minimum plus stricte
+            if h < 240 or w < 320:
                 return
             
-            # Nettoyage préventif de la queue si elle est pleine
+            # Test rapide de validité
+            if np.mean(frame) < 5 or np.mean(frame) > 250:  # Image trop sombre ou claire
+                return
+            
+            # Gestion ultra-rapide de la queue
             if frame_queue.full():
-                try:
-                    frame_queue.get_nowait()  # Retire la plus ancienne frame
-                except Empty:
-                    pass
+                # Vider d'un coup au lieu de un par un
+                temp_frames = []
+                while not frame_queue.empty():
+                    try:
+                        temp_frames.append(frame_queue.get_nowait())
+                    except Empty:
+                        break
+                # Ne garder que la dernière frame si nécessaire
+                if temp_frames:
+                    logger.debug(f"Queue flushed: {len(temp_frames)} frames")
             
-            try:
-                frame_queue.put_nowait(frame)
-            except:
-                # Si la queue est pleine, on remplace la dernière frame
-                try:
-                    frame_queue.get_nowait()
-                    frame_queue.put_nowait(frame)
-                except:
-                    pass
-        
-        # Mise à jour des statistiques
-        with stats_lock:
-            frame_stats['frame_count'] += 1
-            frame_stats['last_frame_time'] = time.time()
-            frame_stats['last_processed_file'] = os.path.basename(latest_file)
+            frame_queue.put_nowait(frame)
             
-        logger.debug(f"Frame processed: {os.path.basename(latest_file)}")
-        
+            # Stats
+            with stats_lock:
+                frame_stats['frame_count'] += 1
+                frame_stats['last_frame_time'] = current_time
+                frame_stats['last_processed_file'] = os.path.basename(file_path)
+            
+        except Exception as e:
+            logger.debug(f"Frame processing error: {e}")
+            
     except Exception as e:
-        logger.debug(f"Vision callback error: {e}")
+        logger.debug(f"Enhanced callback error: {e}")
 
 def cleanup_thread():
     """Thread de nettoyage optimisé"""
@@ -703,5 +860,5 @@ if __name__ == "__main__":
         logger.info(f"Program exiting with code {exit_code}")
         sys.exit(exit_code)
     except Exception as e:
-        logger.error(f"Unhandled exception: {e}")
+        logger.error(f"Unhandled exception in main: {e}")
         sys.exit(1)
