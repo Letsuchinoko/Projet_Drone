@@ -2,36 +2,29 @@ package com.example.APPLI
 
 import android.Manifest
 import android.app.Activity
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothManager
-import android.bluetooth.BluetoothSocket
+import android.bluetooth.*
 import android.content.*
 import android.content.pm.PackageManager
 import android.location.LocationManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.view.*
 import android.widget.*
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import java.io.IOException
+import java.io.InputStream
 import java.util.*
-import kotlin.concurrent.thread
 
 class Fragment1 : Fragment() {
     companion object {
         private const val TAG = "BluetoothDebug"
-        private const val UUID_STRING = "00001101-0000-1000-8000-00805F9B34FB" // UUID standard pour SPP
-        private const val REQUEST_ENABLE_LOCATION = 1001
+        private const val UUID_STRING = "00001101-0000-1000-8000-00805F9B34FB"
     }
 
-    // Variables d'interface
     private lateinit var textView: TextView
     private lateinit var btnPermissionsBT: Button
     private lateinit var btnActiverBT: Button
@@ -42,29 +35,19 @@ class Fragment1 : Fragment() {
     private val listeAppareils = mutableListOf<String>()
     private val appareilsMap = mutableMapOf<String, BluetoothDevice>()
 
-    // Variables Bluetooth
     private lateinit var bluetoothManager: BluetoothManager
     private lateinit var bluetoothAdapter: BluetoothAdapter
     private var bluetoothSocket: BluetoothSocket? = null
     private var deviceConnected: BluetoothDevice? = null
 
-    // Receiver pour les événements Bluetooth
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
                 BluetoothDevice.ACTION_FOUND -> {
-                    Log.d(TAG, "Appareil trouvé")
                     val device: BluetoothDevice? = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
-                    device?.let { 
-                        val name = it.name ?: "Inconnu"
-                        val address = it.address
-                        val rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE)
-                        Log.d(TAG, "Appareil trouvé: $name ($address) RSSI: $rssi")
-                        ajouterAppareil(it)
-                    }
+                    device?.let { ajouterAppareil(it) }
                 }
                 BluetoothAdapter.ACTION_DISCOVERY_FINISHED -> {
-                    Log.d(TAG, "Recherche terminée")
                     Toast.makeText(activity, "Recherche terminée", Toast.LENGTH_SHORT).show()
                 }
                 BluetoothAdapter.ACTION_DISCOVERY_STARTED -> {
@@ -74,13 +57,23 @@ class Fragment1 : Fragment() {
         }
     }
 
-    // Gestionnaire des permissions
+    private val bondReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (BluetoothDevice.ACTION_BOND_STATE_CHANGED == intent?.action) {
+                val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
+                val state = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, BluetoothDevice.ERROR)
+                if (state == BluetoothDevice.BOND_BONDED && device != null) {
+                    Toast.makeText(requireContext(), "Appairé à ${device.name}", Toast.LENGTH_SHORT).show()
+                    connecterAppareil(device)
+                }
+            }
+        }
+    }
+
     private val requetePermissions = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
-        val allGranted = permissions.entries.all { it.value }
-        Log.d(TAG, "Résultat des permissions: $permissions")
-        if (allGranted) {
+        if (permissions.entries.all { it.value }) {
             activerBoutons()
             Toast.makeText(activity, "Permissions accordées", Toast.LENGTH_SHORT).show()
         } else {
@@ -88,43 +81,34 @@ class Fragment1 : Fragment() {
         }
     }
 
-    // Gestionnaire d'activation Bluetooth
     private val requeteActivationBT = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            Log.d(TAG, "Bluetooth activé par l'utilisateur")
+    ) {
+        if (it.resultCode == Activity.RESULT_OK) {
             activerBoutons()
             Toast.makeText(activity, "Bluetooth activé", Toast.LENGTH_SHORT).show()
         } else {
-            Log.d(TAG, "Bluetooth refusé par l'utilisateur")
             Toast.makeText(activity, "Bluetooth refusé", Toast.LENGTH_SHORT).show()
         }
     }
 
-    // Gestionnaire d'activation de la localisation
     private val requeteActivationLocation = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            Log.d(TAG, "Localisation activée")
-            Toast.makeText(activity, "Localisation activée", Toast.LENGTH_SHORT).show()
+    ) {
+        if (it.resultCode == Activity.RESULT_OK) {
             rechercherAppareils()
         } else {
-            Log.d(TAG, "Localisation refusée")
-            Toast.makeText(activity, "La localisation est nécessaire pour la recherche Bluetooth", Toast.LENGTH_LONG).show()
+            Toast.makeText(activity, "La localisation est nécessaire", Toast.LENGTH_LONG).show()
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_1, container, false)
         initialiserVues(view)
         initialiserBluetooth()
         configurerBoutons()
+
+        requireContext().registerReceiver(bondReceiver, IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED))
         return view
     }
 
@@ -139,11 +123,9 @@ class Fragment1 : Fragment() {
         arrayAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, listeAppareils)
         listView.adapter = arrayAdapter
 
-        // Ajouter le listener pour les clics sur les éléments de la liste
         listView.setOnItemClickListener { _, _, position, _ ->
             val selectedItem = listeAppareils[position]
             val address = selectedItem.split("\n")[1]
-            Log.d(TAG, "Tentative de connexion à l'appareil: $address")
             appareilsMap[address]?.let { device ->
                 if (deviceConnected?.address == device.address) {
                     deconnecterAppareil()
@@ -158,23 +140,10 @@ class Fragment1 : Fragment() {
     }
 
     private fun initialiserBluetooth() {
-        try {
-            bluetoothManager = requireContext().getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-            bluetoothAdapter = bluetoothManager.adapter
-            if (bluetoothAdapter == null) {
-                Log.e(TAG, "Bluetooth non disponible sur cet appareil")
-                Toast.makeText(activity, "Bluetooth non disponible", Toast.LENGTH_SHORT).show()
-            } else {
-                Log.d(TAG, "Bluetooth disponible")
-                btnPermissionsBT.isEnabled = true
-                if (bluetoothAdapter.isEnabled) {
-                    activerBoutons()
-                }
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Erreur lors de l'initialisation du Bluetooth: ${e.message}")
-            Toast.makeText(activity, "Erreur Bluetooth: ${e.message}", Toast.LENGTH_SHORT).show()
-        }
+        bluetoothManager = requireContext().getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        bluetoothAdapter = bluetoothManager.adapter
+        if (bluetoothAdapter.isEnabled) activerBoutons()
+        else btnPermissionsBT.isEnabled = true
     }
 
     private fun configurerBoutons() {
@@ -186,243 +155,151 @@ class Fragment1 : Fragment() {
 
     private fun demanderPermissions() {
         val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            arrayOf(
-                Manifest.permission.BLUETOOTH_CONNECT,
-                Manifest.permission.BLUETOOTH_SCAN,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            )
+            arrayOf(Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.ACCESS_FINE_LOCATION)
         } else {
-            arrayOf(
-                Manifest.permission.BLUETOOTH_ADMIN,
-                Manifest.permission.BLUETOOTH,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            )
+            arrayOf(Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.ACCESS_FINE_LOCATION)
         }
-        Log.d(TAG, "Demande des permissions: ${permissions.joinToString()}")
         requetePermissions.launch(permissions)
     }
 
     private fun activerBluetooth() {
         if (!bluetoothAdapter.isEnabled) {
-            Log.d(TAG, "Demande d'activation du Bluetooth")
-            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            requeteActivationBT.launch(enableBtIntent)
+            val intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+            requeteActivationBT.launch(intent)
         } else {
-            Log.d(TAG, "Bluetooth déjà activé")
             Toast.makeText(activity, "Bluetooth déjà activé", Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun verifierPermissions(): Boolean {
         val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            arrayOf(
-                Manifest.permission.BLUETOOTH_CONNECT,
-                Manifest.permission.BLUETOOTH_SCAN,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            )
+            arrayOf(Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.ACCESS_FINE_LOCATION)
         } else {
-            arrayOf(
-                Manifest.permission.BLUETOOTH_ADMIN,
-                Manifest.permission.BLUETOOTH,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            )
+            arrayOf(Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.ACCESS_FINE_LOCATION)
         }
-
-        val permissionsManquantes = permissions.filter {
-            ContextCompat.checkSelfPermission(requireContext(), it) != PackageManager.PERMISSION_GRANTED
+        return permissions.all {
+            ContextCompat.checkSelfPermission(requireContext(), it) == PackageManager.PERMISSION_GRANTED
         }
-
-        if (permissionsManquantes.isNotEmpty()) {
-            Log.e(TAG, "Permissions manquantes: ${permissionsManquantes.joinToString()}")
-            Toast.makeText(activity, "Permissions manquantes", Toast.LENGTH_SHORT).show()
-            return false
-        }
-        return true
     }
 
     private fun activerLocalisation() {
-        try {
-            val locationManager = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-            if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                Log.d(TAG, "Demande d'activation de la localisation")
-                val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-                requeteActivationLocation.launch(intent)
-            } else {
-                Log.d(TAG, "Localisation déjà activée")
-                rechercherAppareils()
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Erreur lors de l'activation de la localisation: ${e.message}")
-            Toast.makeText(activity, "Erreur lors de l'activation de la localisation", Toast.LENGTH_SHORT).show()
+        val locationManager = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+            requeteActivationLocation.launch(intent)
+        } else {
+            rechercherAppareils()
         }
     }
 
     private fun rechercherAppareils() {
-        Log.d(TAG, "Début de la recherche d'appareils")
-        
-        if (!bluetoothAdapter.isEnabled) {
-            Log.e(TAG, "Bluetooth non activé")
-            Toast.makeText(activity, "Veuillez activer le Bluetooth", Toast.LENGTH_SHORT).show()
+        if (!bluetoothAdapter.isEnabled || !verifierPermissions()) {
+            Toast.makeText(activity, "Bluetooth ou permissions manquants", Toast.LENGTH_SHORT).show()
             return
         }
 
-        if (!verifierPermissions()) {
-            Log.e(TAG, "Permissions manquantes")
-            return
-        }
-
-        // Vérifier si la localisation est activée
         val locationManager = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            Log.d(TAG, "Localisation non activée, demande d'activation")
             activerLocalisation()
             return
         }
 
+        if (bluetoothAdapter.isDiscovering) bluetoothAdapter.cancelDiscovery()
+
+        listeAppareils.clear()
+        appareilsMap.clear()
+        arrayAdapter.notifyDataSetChanged()
+
         try {
-            if (bluetoothAdapter.isDiscovering) {
-                Log.d(TAG, "Annulation de la recherche en cours")
-                bluetoothAdapter.cancelDiscovery()
-            }
+            requireContext().unregisterReceiver(receiver)
+        } catch (_: Exception) {}
 
-            listeAppareils.clear()
-            appareilsMap.clear()
-            arrayAdapter.notifyDataSetChanged()
+        val filter = IntentFilter().apply {
+            addAction(BluetoothDevice.ACTION_FOUND)
+            addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED)
+            addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
+        }
+        requireContext().registerReceiver(receiver, filter)
 
-            try {
-                requireContext().unregisterReceiver(receiver)
-            } catch (e: Exception) {
-                Log.d(TAG, "Erreur lors du désenregistrement du receiver: ${e.message}")
-            }
-
-            val filter = IntentFilter().apply {
-                addAction(BluetoothDevice.ACTION_FOUND)
-                addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
-                addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED)
-            }
-            requireContext().registerReceiver(receiver, filter)
-
-            val started = bluetoothAdapter.startDiscovery()
-            Log.d(TAG, "Résultat de startDiscovery: $started")
-            
-            if (started) {
-                Toast.makeText(activity, "Recherche en cours...", Toast.LENGTH_SHORT).show()
-            } else {
-                Log.e(TAG, "Échec du démarrage de la recherche")
-                Toast.makeText(activity, "Impossible de lancer la recherche", Toast.LENGTH_SHORT).show()
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Erreur lors de la recherche: ${e.message}")
-            Toast.makeText(activity, "Erreur: ${e.message}", Toast.LENGTH_SHORT).show()
+        if (bluetoothAdapter.startDiscovery()) {
+            Toast.makeText(activity, "Recherche en cours...", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(activity, "Erreur lors de la recherche", Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun ajouterAppareil(device: BluetoothDevice) {
         val name = device.name ?: "Inconnu"
-        val address = device.address
-        val entry = "$name\n$address"
+        val entry = "$name\n${device.address}"
         if (!listeAppareils.contains(entry)) {
             listeAppareils.add(entry)
-            appareilsMap[address] = device
+            appareilsMap[device.address] = device
             arrayAdapter.notifyDataSetChanged()
         }
     }
 
     private inner class ConnectThread(private val device: BluetoothDevice) : Thread() {
-        private var mmSocket: BluetoothSocket? = null
-
-        init {
-            try {
-                // Essayer d'abord avec la méthode standard
-                mmSocket = device.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"))
-            } catch (e: Exception) {
-                try {
-                    // Si ça échoue, essayer avec la méthode alternative
-                    val method = device.javaClass.getMethod("createRfcommSocket", Int::class.java)
-                    mmSocket = method.invoke(device, 1) as BluetoothSocket
-                } catch (e2: Exception) {
-                    try {
-                        // Dernier essai avec un autre UUID
-                        mmSocket = device.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"))
-                    } catch (e3: Exception) {
-                        Log.e(TAG, "Toutes les méthodes de création de socket ont échoué")
-                    }
-                }
-            }
-        }
-
         override fun run() {
             bluetoothAdapter.cancelDiscovery()
-
             try {
-                if (mmSocket == null) {
-                    throw IOException("Socket non créé")
-                }
-
-                // Vérifier si l'appareil est déjà connecté
-                if (device.bondState == BluetoothDevice.BOND_BONDED) {
-                    Log.d(TAG, "Appareil déjà appairé")
-                }
-
-                mmSocket?.connect()
-                
-                activity?.runOnUiThread {
-                    deviceConnected = device
-                    textView.text = "Connecté à ${device.name}"
-                    Toast.makeText(activity, "Connecté", Toast.LENGTH_SHORT).show()
-                }
-                
-                bluetoothSocket = mmSocket
+                val socket = device.createInsecureRfcommSocketToServiceRecord(UUID.fromString(UUID_STRING))
+                bluetoothSocket = socket
+                socket.connect()
+                deviceConnected = device
+                textView.post { textView.text = "Connecté à ${device.name}" }
+                ConnectedThread(socket).start()
             } catch (e: IOException) {
-                Log.e(TAG, "Erreur connexion: ${e.message}")
-                activity?.runOnUiThread {
-                    Toast.makeText(activity, "Échec connexion", Toast.LENGTH_SHORT).show()
-                    textView.text = "Échec connexion"
-                }
-                cancel()
+                Log.e(TAG, "Erreur de connexion : ${e.message}")
+                bluetoothSocket?.close()
+                bluetoothSocket = null
+                textView.post { textView.text = "Échec de connexion" }
             }
         }
+    }
 
-        fun cancel() {
+    private inner class ConnectedThread(private val socket: BluetoothSocket) : Thread() {
+        private val inputStream: InputStream = socket.inputStream
+        private val buffer = ByteArray(1024)
+
+        override fun run() {
             try {
-                mmSocket?.close()
+                while (true) {
+                    val bytes = inputStream.read(buffer)
+                    val received = String(buffer, 0, bytes)
+                    Log.i(TAG, "Reçu: $received")
+                }
             } catch (e: IOException) {
-                Log.e(TAG, "Erreur fermeture socket: ${e.message}")
+                Log.d(TAG, "Connexion perdue", e)
             }
         }
     }
 
     private fun connecterAppareil(device: BluetoothDevice) {
-        if (!verifierPermissions()) {
-            return
-        }
-
+        if (!verifierPermissions()) return
         if (!bluetoothAdapter.isEnabled) {
             Toast.makeText(activity, "Bluetooth non activé", Toast.LENGTH_SHORT).show()
             return
         }
 
-        // Vérifier si l'appareil est déjà appairé
         if (device.bondState != BluetoothDevice.BOND_BONDED) {
-            Log.d(TAG, "Appareil non appairé, tentative d'appairage")
             device.createBond()
+            Toast.makeText(activity, "Appairage en cours...", Toast.LENGTH_SHORT).show()
+            return
         }
 
-        Log.d(TAG, "Connexion à ${device.name}")
         Toast.makeText(activity, "Connexion...", Toast.LENGTH_SHORT).show()
         ConnectThread(device).start()
     }
 
     private fun deconnecterAppareil() {
         try {
-            Log.d(TAG, "Déconnexion de l'appareil")
             bluetoothSocket?.close()
+            bluetoothSocket = null
             deviceConnected = null
             textView.text = "Déconnecté"
             Toast.makeText(activity, "Déconnecté", Toast.LENGTH_SHORT).show()
         } catch (e: IOException) {
-            Log.e(TAG, "Erreur lors de la déconnexion: ${e.message}")
-            Toast.makeText(activity, "Erreur lors de la déconnexion", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity, "Erreur déconnexion", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -448,6 +325,7 @@ class Fragment1 : Fragment() {
         try {
             bluetoothSocket?.close()
             requireContext().unregisterReceiver(receiver)
+            requireContext().unregisterReceiver(bondReceiver)
         } catch (_: Exception) {}
     }
 }
