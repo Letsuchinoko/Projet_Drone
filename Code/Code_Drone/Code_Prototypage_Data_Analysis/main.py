@@ -131,7 +131,7 @@ class NoDiskVision(DroneVision):
         # Démarrer immédiatement le buffering
         self._start_video_buffering()
 
-        # Vérification du succès comme dans PyParrot original
+        # Vérification du succès améliorée
         from pyparrot.utils.NonBlockingStreamReader import NonBlockingStreamReader
         
         stderr_reader = NonBlockingStreamReader(self.ffmpeg_process.stderr)
@@ -139,18 +139,22 @@ class NoDiskVision(DroneVision):
 
         success = False
         timeout_counter = 0
-        max_timeout = 50  # 5 secondes
+        max_timeout = 30  # 3 secondes max
+        found_stream = False
+        found_error = False
 
-        while not success and timeout_counter < max_timeout:
+        while not success and timeout_counter < max_timeout and not found_error:
             line = stderr_reader.readline()
             if line is not None:
                 line_str = line.decode("utf-8")
                 logger.debug(f"FFmpeg stderr: {line_str.strip()}")
                 if "Stream #0:0 -> #0:0 (h264 (native) -> png (native))" in line_str:
+                    found_stream = True
                     success = True
                     break
                 if "Output file #0 does not contain any stream" in line_str:
-                    logger.error("FFmpeg: No stream found")
+                    logger.error("FFmpeg: No stream found in stderr")
+                    found_error = True
                     break
 
             line = stdout_reader.readline()
@@ -158,9 +162,11 @@ class NoDiskVision(DroneVision):
                 line_str = line.decode("utf-8")
                 logger.debug(f"FFmpeg stdout: {line_str.strip()}")
                 if "Output file #0 does not contain any stream" in line_str:
-                    logger.error("FFmpeg: No stream found")
+                    logger.error("FFmpeg: No stream found in stdout")
+                    found_error = True
                     break
                 if "Stream #0:0 -> #0:0 (h264 (native) -> png (native))" in line_str:
+                    found_stream = True
                     success = True
                     break
 
@@ -170,6 +176,23 @@ class NoDiskVision(DroneVision):
         # Cleanup des readers
         stderr_reader.finish_reader()
         stdout_reader.finish_reader()
+
+        # Même si pas de confirmation explicite, si le processus fonctionne et on a des images, c'est OK
+        if not success and not found_error:
+            logger.warning("No explicit FFmpeg success message, but checking for images...")
+            # Attendre un peu et vérifier si des images arrivent
+            time.sleep(2)
+            
+            # Chercher des fichiers d'images
+            import glob
+            test_pattern = os.path.join(self.imagePath, "image_*.png")
+            test_files = glob.glob(test_pattern)
+            
+            if test_files:
+                success = True
+                logger.info(f"FFmpeg appears to be working - found {len(test_files)} image files")
+            else:
+                logger.warning("No image files found - FFmpeg may have issues")
 
         if success:
             logger.info("FFmpeg stream opened successfully")
@@ -289,12 +312,40 @@ class NoDiskVision(DroneVision):
             except Exception as e:
                 logger.warning(f"Error terminating FFmpeg: {e}")
 
-        # Nettoyer le dossier temporaire
+        # Nettoyer le dossier temporaire avec retry
         try:
-            shutil.rmtree(self.temp_dir)
-            logger.info(f"Temporary directory cleaned: {self.temp_dir}")
+            # Attendre un peu que tous les processus libèrent les fichiers
+            time.sleep(1)
+            
+            # Tenter de supprimer tous les fichiers d'abord
+            try:
+                import glob
+                temp_files = glob.glob(os.path.join(self.temp_dir, "*"))
+                for temp_file in temp_files:
+                    try:
+                        if os.path.isfile(temp_file):
+                            os.remove(temp_file)
+                    except:
+                        pass
+                time.sleep(0.5)
+            except:
+                pass
+            
+            # Essayer de supprimer le dossier
+            for attempt in range(3):
+                try:
+                    shutil.rmtree(self.temp_dir)
+                    logger.info(f"Temporary directory cleaned: {self.temp_dir}")
+                    break
+                except Exception as e:
+                    if attempt < 2:
+                        logger.debug(f"Cleanup attempt {attempt+1} failed, retrying...")
+                        time.sleep(1)
+                    else:
+                        logger.warning(f"Could not clean temporary directory after 3 attempts: {e}")
+                        logger.info(f"Temporary directory will be cleaned by system: {self.temp_dir}")
         except Exception as e:
-            logger.warning(f"Error cleaning temporary directory: {e}")
+            logger.warning(f"Error during temp cleanup: {e}")
 
         # Arrêter le stream (bebop seulement)
         if self.is_bebop:
