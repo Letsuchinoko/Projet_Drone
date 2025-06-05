@@ -12,13 +12,12 @@ import sys
 from collections import deque
 import glob
 
-# === CONFIGURATION ===
 DISPLAY_FPS = 20
 MAX_QUEUE_SIZE = 3
 IMAGES_DIR = "C:/Users/Baptiste/anaconda3/Lib/site-packages/pyparrot/images"
 CONNECTION_TIMEOUT = 15
-MAX_IMAGE_FILES = 30
-IMAGE_KEEP_COUNT = 12
+MAX_IMAGE_FILES = 80    # plus large pour ne pas effacer des images actives
+IMAGE_KEEP_COUNT = 40   # idem
 WATCHDOG_TIMEOUT = 8
 
 frame_queue = Queue(maxsize=MAX_QUEUE_SIZE)
@@ -74,12 +73,22 @@ class ImprovedGloveDetector:
             skin_upper = np.array([25, 130, 255])
             mask_skin = cv2.inRange(hsv, skin_lower, skin_upper)
 
-            # --- Masque orange vif du gant ---
-            glove_lower = np.array([10, 130, 140])
-            glove_upper = np.array([23, 255, 255])
-            mask_gant = cv2.inRange(hsv, glove_lower, glove_upper)
+            # --- Masque orange du gant ---
+            orange_lower = np.array([10, 120, 120])
+            orange_upper = np.array([23, 255, 255])
+            mask_orange = cv2.inRange(hsv, orange_lower, orange_upper)
 
-            # --- On retire la peau ---
+            # --- Masque rouge du gant (deux plages à cause du Hue circulaire) ---
+            red_lower1 = np.array([0, 140, 120])
+            red_upper1 = np.array([8, 255, 255])
+            mask_red1 = cv2.inRange(hsv, red_lower1, red_upper1)
+            red_lower2 = np.array([170, 140, 120])
+            red_upper2 = np.array([180, 255, 255])
+            mask_red2 = cv2.inRange(hsv, red_lower2, red_upper2)
+            mask_red = cv2.bitwise_or(mask_red1, mask_red2)
+
+            # --- Fusionne orange + rouge, puis enlève la peau ---
+            mask_gant = cv2.bitwise_or(mask_orange, mask_red)
             mask = cv2.bitwise_and(mask_gant, cv2.bitwise_not(mask_skin))
 
             # --- Nettoyage morpho ---
@@ -200,7 +209,8 @@ def vision_callback(args):
             h, w = frame.shape[:2]
             if h < 150 or w < 150:
                 return
-            if frame_queue.full():
+            # Si jamais on prend du retard, flush le buffer pour éviter le lag
+            while frame_queue.qsize() > 1:
                 try:
                     frame_queue.get_nowait()
                 except Empty:
@@ -233,10 +243,10 @@ def cleanup_thread():
                         logger.info(f"Cleaned up {removed_count} old image files")
         except Exception as e:
             logger.debug(f"Cleanup error: {e}")
-        for _ in range(25):
+        for _ in range(20):
             if not processing_active.is_set():
                 break
-            time.sleep(0.4)
+            time.sleep(0.5)
     logger.info("Cleanup thread terminated")
 
 def display_thread():
