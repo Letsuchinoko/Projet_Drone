@@ -1,0 +1,253 @@
+2025-06-05 11:20:02,296 - INFO - Starting Bebop 2 Active Polling Detection System
+2025-06-05 11:20:02,297 - INFO - Polling rate: 20Hz (50ms interval)
+2025-06-05 11:20:02,297 - INFO - Images directory verified: C:/Users/Baptiste/anaconda3/Lib/site-packages/pyparrot/images
+2025-06-05 11:20:02,333 - INFO - Initial cleanup: removed 120 old files
+2025-06-05 11:20:02,357 - INFO - Connecting to Bebop 2...
+2025-06-05 11:20:03,374 - INFO - Drone connected successfully
+2025-06-05 11:20:03,375 - INFO - Active polling thread started
+2025-06-05 11:20:03,475 - INFO - Thread 1/3 started: ActivePolling
+2025-06-05 11:20:03,486 - INFO - Display thread started
+2025-06-05 11:20:03,586 - INFO - Thread 2/3 started: Display
+2025-06-05 11:20:03,586 - INFO - Monitor thread started
+2025-06-05 11:20:03,687 - INFO - Thread 3/3 started: Monitor
+2025-06-05 11:20:03,687 - INFO - All threads started successfully
+2025-06-05 11:20:03,687 - INFO - Opening video stream for active polling...
+2025-06-05 11:20:08,611 - WARNING - No new frames - polling: 67 (+67), read success: 0.0%, last frame 6.3s ago
+2025-06-05 11:20:08,612 - WARNING -               Files: 0 found, Success reads: 0, Fails: 67
+2025-06-05 11:20:13,670 - WARNING - No new frames - polling: 129 (+62), read success: 0.0%, last frame 11.4s ago
+2025-06-05 11:20:13,685 - WARNING -               Files: 0 found, Success reads: 0, Fails: 129
+2025-06-05 11:20:18,724 - WARNING - No new frames - polling: 186 (+57), read success: 0.0%, last frame 16.4s ago
+2025-06-05 11:20:18,724 - WARNING -               Files: 0 found, Success reads: 0, Fails: 185
+2025-06-05 11:20:23,733 - WARNING - No new frames - polling: 241 (+55), read success: 0.0%, last frame 21.4s ago
+2025-06-05 11:20:23,733 - WARNING -               Files: 0 found, Success reads: 0, Fails: 241
+2025-06-05 11:20:28,763 - WARNING - No new frames - polling: 297 (+56), read success: 0.0%, last frame 26.5s ago
+2025-06-05 11:20:28,763 - WARNING -               Files: 0 found, Success reads: 0, Fails: 297
+2025-06-05 11:20:33,804 - WARNING - No new frames - polling: 359 (+62), read success: 0.0%, last frame 31.5s ago
+2025-06-05 11:20:33,820 - WARNING -               Files: 0 found, Success reads: 0, Fails: 359
+2025-06-05 11:20:38,834 - WARNING - No new frames - polling: 417 (+58), read success: 0.0%, last frame 36.5s ago
+2025-06-05 11:20:38,834 - WARNING -               Files: 0 found, Success reads: 0, Fails: 417
+2025-06-05 11:20:43,903 - WARNING - No new frames - polling: 476 (+59), read success: 0.0%, last frame 41.6s ago
+2025-06-05 11:20:43,904 - WARNING -               Files: 0 found, Success reads: 0, Fails: 475
+2025-06-05 11:20:46,578 - INFO - Video stream opened successfully (42.9s)
+2025-06-05 11:20:46,578 - INFO - Active Polling Detection System is now active
+2025-06-05 11:20:46,578 - INFO - ============================================================
+2025-06-05 11:20:46,578 - INFO - SYSTEM INFO:
+2025-06-05 11:20:46,578 - INFO -   Polling Rate: 20Hz
+2025-06-05 11:20:46,580 - INFO -   Display FPS:  25
+2025-06-05 11:20:46,580 - INFO -   Images Dir:   C:/Users/Baptiste/anaconda3/Lib/site-packages/pyparrot/images
+2025-06-05 11:20:46,580 - INFO - ============================================================
+2025-06-05 11:20:46,580 - INFO - CONTROLS:
+2025-06-05 11:20:46,580 - INFO -   'q' or ESC  = Quit
+2025-06-05 11:20:46,581 - INFO -   'r'         = Complete reset
+2025-06-05 11:20:46,581 - INFO -   's'         = Screenshot
+2025-06-05 11:20:46,581 - INFO -   'd'         = Debug stats
+2025-06-05 11:20:46,582 - INFO - ============================================================
+2025-06-05 11:20:47,871 - INFO - Display FPS: 0.7
+2025-06-05 11:20:48,919 - INFO - MONITOR - Frames: 37 (+37), FPS: 7.4, Det: 27.0%, Err: 0
+2025-06-05 11:20:48,919 - INFO -          Polling: 542 cycles (+66, 13.2/s), Success: 6.8% (37/542)
+2025-06-05 11:20:48,919 - INFO -          Files: 12 found | 159 cleaned | 0 duplicates skipped
+2025-06-05 11:20:49,270 - INFO - Display FPS: 21.5
+2025-06-05 11:20:50,673 - INFO - Display FPS: 21.4
+2025-06-05 11:20:52,065 - INFO - Display FPS: 21.5
+2025-06-05 11:20:53,463 - INFO - Display FPS: 21.5
+2025-06-05 11:20:53,920 - INFO - MONITOR - Frames: 122 (+85), FPS: 17.0, Det: 21.3%, Err: 0
+2025-06-05 11:20:53,920 - INFO -          Polling: 627 cycles (+85, 17.0/s), Success: 19.5% (122/627)
+2025-06-05 11:20:53,920 - INFO -          Files: 12 found | 310 cleaned | 0 duplicates skipped
+2025-06-05 11:20:54,861 - INFO - Display FPS: 21.5
+2025-06-05 11:20:56,260 - INFO - Display FPS: 21.4
+2025-06-05 11:20:56,599 - INFO - STATUS - Uptime: 10s | Avg Frame Rate: 16.7/s | Avg Polling: 67.1/s
+2025-06-05 11:20:56,600 - INFO -        - Total Frames: 167 | Detections: 26 | Files Cleaned: 389
+2025-06-05 11:20:57,664 - INFO - Display FPS: 21.4
+2025-06-05 11:20:58,921 - INFO - MONITOR - Frames: 207 (+85), FPS: 17.0, Det: 12.6%, Err: 0
+2025-06-05 11:20:58,921 - INFO -          Polling: 712 cycles (+85, 17.0/s), Success: 29.1% (207/712)
+2025-06-05 11:20:58,922 - INFO -          Files: 12 found | 460 cleaned | 1 duplicates skipped
+2025-06-05 11:20:59,061 - INFO - Display FPS: 21.5
+2025-06-05 11:21:00,453 - INFO - Display FPS: 21.6
+2025-06-05 11:21:01,874 - INFO - Display FPS: 21.1
+2025-06-05 11:21:03,267 - INFO - Display FPS: 21.5
+2025-06-05 11:21:03,922 - INFO - MONITOR - Frames: 290 (+83), FPS: 16.6, Det: 21.4%, Err: 0
+2025-06-05 11:21:03,922 - INFO -          Polling: 795 cycles (+83, 16.6/s), Success: 36.5% (290/795)
+2025-06-05 11:21:03,922 - INFO -          Files: 12 found | 610 cleaned | 1 duplicates skipped
+2025-06-05 11:21:04,669 - INFO - Display FPS: 21.4
+2025-06-05 11:21:06,072 - INFO - Display FPS: 21.4
+2025-06-05 11:21:06,615 - INFO - STATUS - Uptime: 20s | Avg Frame Rate: 16.7/s | Avg Polling: 41.9/s
+2025-06-05 11:21:06,615 - INFO -        - Total Frames: 335 | Detections: 64 | Files Cleaned: 690
+2025-06-05 11:21:07,477 - INFO - Display FPS: 21.4
+2025-06-05 11:21:08,878 - INFO - Display FPS: 21.4
+2025-06-05 11:21:08,923 - INFO - MONITOR - Frames: 374 (+84), FPS: 16.8, Det: 17.1%, Err: 0
+2025-06-05 11:21:08,923 - INFO -          Polling: 879 cycles (+84, 16.8/s), Success: 42.5% (374/879)
+2025-06-05 11:21:08,923 - INFO -          Files: 11 found | 760 cleaned | 1 duplicates skipped
+2025-06-05 11:21:10,281 - INFO - Display FPS: 21.4
+2025-06-05 11:21:11,686 - INFO - Display FPS: 21.4
+2025-06-05 11:21:13,071 - INFO - Display FPS: 21.6
+2025-06-05 11:21:13,924 - INFO - MONITOR - Frames: 458 (+84), FPS: 16.8, Det: 15.7%, Err: 0
+2025-06-05 11:21:13,924 - INFO -          Polling: 963 cycles (+84, 16.8/s), Success: 47.6% (458/963)
+2025-06-05 11:21:13,924 - INFO -          Files: 12 found | 911 cleaned | 1 duplicates skipped
+2025-06-05 11:21:14,476 - INFO - Display FPS: 21.4
+2025-06-05 11:21:15,876 - INFO - Display FPS: 21.4
+2025-06-05 11:21:16,635 - INFO - STATUS - Uptime: 30s | Avg Frame Rate: 16.7/s | Avg Polling: 33.6/s
+2025-06-05 11:21:16,635 - INFO -        - Total Frames: 503 | Detections: 72 | Files Cleaned: 990
+2025-06-05 11:21:17,259 - INFO - Display FPS: 21.7
+2025-06-05 11:21:18,663 - INFO - Display FPS: 21.4
+2025-06-05 11:21:18,926 - INFO - MONITOR - Frames: 543 (+85), FPS: 17.0, Det: 13.3%, Err: 0
+2025-06-05 11:21:18,926 - INFO -          Polling: 1048 cycles (+85, 17.0/s), Success: 51.8% (543/1048)
+2025-06-05 11:21:18,926 - INFO -          Files: 12 found | 1061 cleaned | 1 duplicates skipped
+2025-06-05 11:21:20,038 - INFO - Display FPS: 21.8
+2025-06-05 11:21:21,423 - INFO - Display FPS: 21.7
+2025-06-05 11:21:22,823 - INFO - Display FPS: 21.4
+2025-06-05 11:21:23,926 - INFO - MONITOR - Frames: 628 (+85), FPS: 17.0, Det: 11.5%, Err: 0
+2025-06-05 11:21:23,926 - INFO -          Polling: 1133 cycles (+85, 17.0/s), Success: 55.4% (628/1133)
+2025-06-05 11:21:23,926 - INFO -          Files: 12 found | 1210 cleaned | 1 duplicates skipped
+2025-06-05 11:21:24,225 - INFO - Display FPS: 21.5
+2025-06-05 11:21:25,625 - INFO - Display FPS: 21.4
+2025-06-05 11:21:26,658 - INFO - STATUS - Uptime: 40s | Avg Frame Rate: 16.8/s | Avg Polling: 29.4/s
+2025-06-05 11:21:26,658 - INFO -        - Total Frames: 675 | Detections: 72 | Files Cleaned: 1288
+2025-06-05 11:21:27,019 - INFO - Display FPS: 21.5
+2025-06-05 11:21:28,420 - INFO - Display FPS: 21.4
+2025-06-05 11:21:28,927 - INFO - MONITOR - Frames: 714 (+86), FPS: 17.2, Det: 10.2%, Err: 0
+2025-06-05 11:21:28,927 - INFO -          Polling: 1219 cycles (+86, 17.2/s), Success: 58.6% (714/1219)
+2025-06-05 11:21:28,927 - INFO -          Files: 11 found | 1358 cleaned | 1 duplicates skipped
+2025-06-05 11:21:29,823 - INFO - Display FPS: 21.4
+2025-06-05 11:21:31,228 - INFO - Display FPS: 21.4
+2025-06-05 11:21:32,626 - INFO - Display FPS: 21.4
+2025-06-05 11:21:33,929 - INFO - MONITOR - Frames: 799 (+85), FPS: 17.0, Det: 9.3%, Err: 0
+2025-06-05 11:21:33,929 - INFO -          Polling: 1304 cycles (+85, 17.0/s), Success: 61.3% (799/1304)
+2025-06-05 11:21:33,929 - INFO -          Files: 12 found | 1511 cleaned | 1 duplicates skipped
+2025-06-05 11:21:34,023 - INFO - Display FPS: 21.4
+2025-06-05 11:21:35,429 - INFO - Display FPS: 21.4
+2025-06-05 11:21:36,698 - INFO - STATUS - Uptime: 50s | Avg Frame Rate: 16.9/s | Avg Polling: 27.0/s
+2025-06-05 11:21:36,698 - INFO -        - Total Frames: 846 | Detections: 77 | Files Cleaned: 1594
+2025-06-05 11:21:36,828 - INFO - Display FPS: 21.4
+2025-06-05 11:21:38,231 - INFO - Display FPS: 21.4
+2025-06-05 11:21:38,930 - INFO - MONITOR - Frames: 884 (+85), FPS: 17.0, Det: 8.7%, Err: 0
+2025-06-05 11:21:38,930 - INFO -          Polling: 1389 cycles (+85, 17.0/s), Success: 63.6% (884/1389)
+2025-06-05 11:21:38,930 - INFO -          Files: 13 found | 1658 cleaned | 1 duplicates skipped
+2025-06-05 11:21:39,630 - INFO - Display FPS: 21.5
+2025-06-05 11:21:41,022 - INFO - Display FPS: 21.6
+2025-06-05 11:21:42,424 - INFO - Display FPS: 21.4
+2025-06-05 11:21:43,822 - INFO - Display FPS: 21.4
+2025-06-05 11:21:43,931 - INFO - MONITOR - Frames: 968 (+84), FPS: 16.8, Det: 11.7%, Err: 0
+2025-06-05 11:21:43,931 - INFO -          Polling: 1473 cycles (+84, 16.8/s), Success: 65.7% (968/1473)
+2025-06-05 11:21:43,931 - INFO -          Files: 11 found | 1809 cleaned | 1 duplicates skipped
+2025-06-05 11:21:45,227 - INFO - Display FPS: 21.4
+2025-06-05 11:21:46,633 - INFO - Display FPS: 21.4
+2025-06-05 11:21:46,735 - INFO - STATUS - Uptime: 60s | Avg Frame Rate: 16.9/s | Avg Polling: 25.3/s
+2025-06-05 11:21:46,735 - INFO -        - Total Frames: 1015 | Detections: 140 | Files Cleaned: 1893
+2025-06-05 11:21:48,035 - INFO - Display FPS: 21.4
+2025-06-05 11:21:48,932 - INFO - MONITOR - Frames: 1052 (+84), FPS: 16.8, Det: 13.4%, Err: 0
+2025-06-05 11:21:48,932 - INFO -          Polling: 1557 cycles (+84, 16.8/s), Success: 67.6% (1052/1557)
+2025-06-05 11:21:48,932 - INFO -          Files: 12 found | 1960 cleaned | 1 duplicates skipped
+2025-06-05 11:21:49,427 - INFO - Display FPS: 21.6
+2025-06-05 11:21:50,825 - INFO - Display FPS: 21.5
+2025-06-05 11:21:52,230 - INFO - Display FPS: 21.3
+2025-06-05 11:21:53,629 - INFO - Display FPS: 21.4
+2025-06-05 11:21:53,933 - INFO - MONITOR - Frames: 1137 (+85), FPS: 17.0, Det: 13.9%, Err: 0
+2025-06-05 11:21:53,933 - INFO -          Polling: 1642 cycles (+85, 17.0/s), Success: 69.2% (1137/1642)
+2025-06-05 11:21:53,933 - INFO -          Files: 11 found | 2111 cleaned | 1 duplicates skipped
+2025-06-05 11:21:55,039 - INFO - Display FPS: 21.3
+2025-06-05 11:21:56,425 - INFO - Display FPS: 21.6
+2025-06-05 11:21:56,754 - INFO - STATUS - Uptime: 70s | Avg Frame Rate: 16.9/s | Avg Polling: 24.1/s
+2025-06-05 11:21:56,754 - INFO -        - Total Frames: 1184 | Detections: 195 | Files Cleaned: 2195
+2025-06-05 11:21:57,831 - INFO - Display FPS: 21.4
+2025-06-05 11:21:58,934 - INFO - MONITOR - Frames: 1221 (+84), FPS: 16.8, Det: 17.6%, Err: 0
+2025-06-05 11:21:58,934 - INFO -          Polling: 1726 cycles (+84, 16.8/s), Success: 70.7% (1221/1726)
+2025-06-05 11:21:58,934 - INFO -          Files: 12 found | 2261 cleaned | 1 duplicates skipped
+2025-06-05 11:21:59,232 - INFO - Display FPS: 21.4
+2025-06-05 11:22:00,637 - INFO - Display FPS: 21.4
+2025-06-05 11:22:02,031 - INFO - Display FPS: 21.5
+2025-06-05 11:22:03,428 - INFO - Display FPS: 21.5
+2025-06-05 11:22:03,935 - INFO - MONITOR - Frames: 1305 (+84), FPS: 16.8, Det: 20.9%, Err: 0
+2025-06-05 11:22:03,935 - INFO -          Polling: 1810 cycles (+84, 16.8/s), Success: 72.1% (1305/1810)
+2025-06-05 11:22:03,935 - INFO -          Files: 12 found | 2411 cleaned | 1 duplicates skipped
+2025-06-05 11:22:04,801 - INFO - Display FPS: 21.8
+2025-06-05 11:22:06,202 - INFO - Display FPS: 21.4
+2025-06-05 11:22:06,774 - INFO - STATUS - Uptime: 80s | Avg Frame Rate: 16.9/s | Avg Polling: 23.2/s
+2025-06-05 11:22:06,774 - INFO -        - Total Frames: 1353 | Detections: 319 | Files Cleaned: 2481
+2025-06-05 11:22:07,605 - INFO - Display FPS: 21.4
+2025-06-05 11:22:08,936 - INFO - MONITOR - Frames: 1390 (+85), FPS: 17.0, Det: 25.7%, Err: 0
+2025-06-05 11:22:08,936 - INFO -          Polling: 1895 cycles (+85, 17.0/s), Success: 73.4% (1390/1895)
+2025-06-05 11:22:08,936 - INFO -          Files: 10 found | 2481 cleaned | 24 duplicates skipped
+2025-06-05 11:22:09,007 - INFO - Display FPS: 21.4
+2025-06-05 11:22:10,390 - INFO - Display FPS: 21.7
+2025-06-05 11:22:11,794 - INFO - Display FPS: 21.4
+2025-06-05 11:22:13,191 - INFO - Display FPS: 21.5
+2025-06-05 11:22:13,937 - INFO - MONITOR - Frames: 1476 (+86), FPS: 17.2, Det: 29.9%, Err: 0
+2025-06-05 11:22:13,937 - INFO -          Polling: 1981 cycles (+86, 17.2/s), Success: 74.5% (1476/1981)
+2025-06-05 11:22:13,937 - INFO -          Files: 10 found | 2481 cleaned | 67 duplicates skipped
+2025-06-05 11:22:14,586 - INFO - Display FPS: 21.5
+2025-06-05 11:22:15,983 - INFO - Display FPS: 21.5
+2025-06-05 11:22:16,795 - INFO - STATUS - Uptime: 90s | Avg Frame Rate: 16.9/s | Avg Polling: 22.5/s
+2025-06-05 11:22:16,795 - INFO -        - Total Frames: 1525 | Detections: 492 | Files Cleaned: 2481
+2025-06-05 11:22:17,382 - INFO - Display FPS: 21.4
+2025-06-05 11:22:18,784 - INFO - Display FPS: 21.5
+2025-06-05 11:22:18,938 - INFO - MONITOR - Frames: 1562 (+86), FPS: 17.2, Det: 33.9%, Err: 0
+2025-06-05 11:22:18,939 - INFO -          Polling: 2067 cycles (+86, 17.2/s), Success: 75.6% (1562/2067)
+2025-06-05 11:22:18,939 - INFO -          Files: 10 found | 2481 cleaned | 110 duplicates skipped
+2025-06-05 11:22:20,185 - INFO - Display FPS: 21.4
+2025-06-05 11:22:21,586 - INFO - Display FPS: 21.4
+2025-06-05 11:22:22,988 - INFO - Display FPS: 21.4
+2025-06-05 11:22:23,939 - INFO - MONITOR - Frames: 1648 (+86), FPS: 17.2, Det: 37.3%, Err: 0
+2025-06-05 11:22:23,940 - INFO -          Polling: 2154 cycles (+87, 17.4/s), Success: 76.5% (1648/2154)
+2025-06-05 11:22:23,940 - INFO -          Files: 10 found | 2481 cleaned | 153 duplicates skipped
+2025-06-05 11:22:24,376 - INFO - Display FPS: 21.6
+2025-06-05 11:22:25,770 - INFO - Display FPS: 21.5
+2025-06-05 11:22:26,813 - INFO - STATUS - Uptime: 100s | Avg Frame Rate: 16.9/s | Avg Polling: 22.0/s
+2025-06-05 11:22:26,813 - INFO -        - Total Frames: 1698 | Detections: 665 | Files Cleaned: 2481
+2025-06-05 11:22:27,174 - INFO - Display FPS: 21.4
+2025-06-05 11:22:28,569 - INFO - Display FPS: 21.5
+2025-06-05 11:22:28,941 - INFO - MONITOR - Frames: 1735 (+87), FPS: 17.4, Det: 40.4%, Err: 0
+2025-06-05 11:22:28,941 - INFO -          Polling: 2240 cycles (+86, 17.2/s), Success: 77.5% (1735/2240)
+2025-06-05 11:22:28,941 - INFO -          Files: 10 found | 2481 cleaned | 196 duplicates skipped
+2025-06-05 11:22:29,968 - INFO - Display FPS: 21.4
+2025-06-05 11:22:31,368 - INFO - Display FPS: 21.4
+2025-06-05 11:22:32,767 - INFO - Display FPS: 21.5
+2025-06-05 11:22:33,942 - INFO - MONITOR - Frames: 1821 (+86), FPS: 17.2, Det: 43.3%, Err: 0
+2025-06-05 11:22:33,942 - INFO -          Polling: 2326 cycles (+86, 17.2/s), Success: 78.3% (1821/2326)
+2025-06-05 11:22:33,942 - INFO -          Files: 10 found | 2481 cleaned | 239 duplicates skipped
+2025-06-05 11:22:34,161 - INFO - Display FPS: 21.5
+2025-06-05 11:22:35,557 - INFO - Display FPS: 21.5
+2025-06-05 11:22:36,825 - INFO - STATUS - Uptime: 110s | Avg Frame Rate: 17.0/s | Avg Polling: 21.6/s
+2025-06-05 11:22:36,825 - INFO -        - Total Frames: 1871 | Detections: 837 | Files Cleaned: 2481
+2025-06-05 11:22:36,942 - INFO - Display FPS: 21.7
+2025-06-05 11:22:38,345 - INFO - Display FPS: 21.4
+2025-06-05 11:22:38,943 - INFO - MONITOR - Frames: 1907 (+86), FPS: 17.2, Det: 45.8%, Err: 0
+2025-06-05 11:22:38,943 - INFO -          Polling: 2412 cycles (+86, 17.2/s), Success: 79.1% (1907/2412)
+2025-06-05 11:22:38,943 - INFO -          Files: 10 found | 2481 cleaned | 282 duplicates skipped
+2025-06-05 11:22:39,746 - INFO - Display FPS: 21.4
+2025-06-05 11:22:41,149 - INFO - Display FPS: 21.4
+2025-06-05 11:22:42,545 - INFO - Display FPS: 21.4
+2025-06-05 11:22:43,942 - INFO - Display FPS: 21.5
+2025-06-05 11:22:43,944 - INFO - MONITOR - Frames: 1993 (+86), FPS: 17.2, Det: 48.2%, Err: 0
+2025-06-05 11:22:43,944 - INFO -          Polling: 2499 cycles (+87, 17.4/s), Success: 79.8% (1993/2499)
+2025-06-05 11:22:43,944 - INFO -          Files: 10 found | 2481 cleaned | 326 duplicates skipped
+2025-06-05 11:22:44,370 - INFO - Signal 2 received - initiating shutdown
+2025-06-05 11:22:44,383 - INFO - Display thread terminated
+2025-06-05 11:22:44,400 - INFO - Active polling thread terminated
+2025-06-05 11:22:44,838 - INFO - Display window was closed
+2025-06-05 11:22:44,839 - INFO - Starting comprehensive cleanup...
+2025-06-05 11:22:44,839 - INFO - Thread ActivePolling terminated successfully
+2025-06-05 11:22:44,839 - INFO - Thread Display terminated successfully
+2025-06-05 11:22:48,945 - INFO - Monitor thread terminated
+2025-06-05 11:22:48,945 - INFO - Thread Monitor terminated successfully
+2025-06-05 11:22:55,449 - INFO - Video stream closed successfully
+2025-06-05 11:22:55,951 - INFO - Drone disconnected successfully
+2025-06-05 11:22:55,967 - INFO - Final cleanup: removed 10 remaining files
+2025-06-05 11:22:55,968 - INFO - OpenCV windows closed successfully
+2025-06-05 11:22:55,969 - INFO - ============================================================
+2025-06-05 11:22:55,969 - INFO - FINAL STATISTICS:
+2025-06-05 11:22:55,969 - INFO -   Total Runtime:        129.4s
+2025-06-05 11:22:55,970 - INFO -   Frames Processed:     2001
+2025-06-05 11:22:55,970 - INFO -   Average Frame Rate:   15.5/s
+2025-06-05 11:22:55,970 - INFO -   Total Detections:     968
+2025-06-05 11:22:55,970 - INFO -   Detection Rate:       48.4%
+2025-06-05 11:22:55,970 - INFO -   Polling Cycles:       2506
+2025-06-05 11:22:55,970 - INFO -   Average Polling Rate: 19.4/s
+2025-06-05 11:22:55,970 - INFO -   Successful Reads:     2001
+2025-06-05 11:22:55,971 - INFO -   Failed Reads:         505
+2025-06-05 11:22:55,971 - INFO -   Read Success Rate:    79.8%
+2025-06-05 11:22:55,971 - INFO -   Files Cleaned:        2481
+2025-06-05 11:22:55,971 - INFO -   Duplicate Skips:      329
+2025-06-05 11:22:55,971 - INFO -   Errors:               0
+2025-06-05 11:22:55,971 - INFO - ============================================================
+2025-06-05 11:22:55,971 - INFO - Comprehensive cleanup completed successfully
+2025-06-05 11:22:55,972 - INFO - Program exiting with code 0

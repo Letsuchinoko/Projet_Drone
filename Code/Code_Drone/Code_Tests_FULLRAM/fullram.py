@@ -11,7 +11,7 @@ from pyparrot.DroneVision import DroneVision
 
 # === PARAMÈTRES BEBOP 2 VIDEO ===
 BEBOP_IP = "192.168.42.1"
-BEBOP_PORT = 5004   # ou 5600 selon firmware
+BEBOP_PORT = 5600   # ou 5600 selon firmware
 WIDTH, HEIGHT = 856, 480   # Résolution standard Bebop 2
 
 logging.basicConfig(
