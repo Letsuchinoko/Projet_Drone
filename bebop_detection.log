@@ -1,66 +1,43 @@
-2025-06-05 08:49:51,155 - INFO - Starting Bebop 2 glove detection system
-2025-06-05 08:49:51,178 - INFO - Connecting to Bebop 2...
-2025-06-05 08:49:52,198 - INFO - Drone connected successfully
-2025-06-05 08:49:52,200 - INFO - Display thread started
-2025-06-05 08:49:52,201 - INFO - Cleanup thread started
-2025-06-05 08:49:52,201 - INFO - Connection monitor started
-2025-06-05 08:49:52,202 - INFO - All threads started (display, cleanup, monitor)
-2025-06-05 08:49:52,203 - INFO - Opening video stream...
-2025-06-05 08:49:52,220 - INFO - Cleaned up 46 old image files
-2025-06-05 08:49:54,242 - WARNING - No frames received for 2 seconds
-2025-06-05 08:49:56,207 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
-2025-06-05 08:49:56,268 - WARNING - No frames received for 2 seconds
-2025-06-05 08:49:58,290 - WARNING - No frames received for 2 seconds
-2025-06-05 08:50:00,289 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
-2025-06-05 08:50:00,305 - WARNING - No frames received for 2 seconds
-2025-06-05 08:50:02,333 - WARNING - No frames received for 2 seconds
-2025-06-05 08:50:04,334 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
-2025-06-05 08:50:04,366 - WARNING - No frames received for 2 seconds
-2025-06-05 08:50:06,374 - WARNING - No frames received for 2 seconds
-2025-06-05 08:50:08,389 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
-2025-06-05 08:50:08,404 - WARNING - No frames received for 2 seconds
-2025-06-05 08:50:10,433 - WARNING - No frames received for 2 seconds
-2025-06-05 08:50:12,403 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
-2025-06-05 08:50:12,449 - WARNING - No frames received for 2 seconds
-2025-06-05 08:50:14,494 - WARNING - No frames received for 2 seconds
-2025-06-05 08:50:16,441 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
-2025-06-05 08:50:16,519 - WARNING - No frames received for 2 seconds
-2025-06-05 08:50:18,547 - WARNING - No frames received for 2 seconds
-2025-06-05 08:50:20,516 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
-2025-06-05 08:50:20,547 - WARNING - No frames received for 2 seconds
-2025-06-05 08:50:22,569 - WARNING - No frames received for 2 seconds
-2025-06-05 08:50:24,550 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
-2025-06-05 08:50:24,597 - WARNING - No frames received for 2 seconds
-2025-06-05 08:50:26,598 - WARNING - No frames received for 2 seconds
-2025-06-05 08:50:28,607 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
-2025-06-05 08:50:28,623 - WARNING - No frames received for 2 seconds
-2025-06-05 08:50:30,097 - INFO - Video stream opened successfully
-2025-06-05 08:50:30,097 - INFO - Detection system active
-2025-06-05 08:50:30,097 - INFO - Controls: 'q'/ESC=Quit, 'r'=Reset stats, 's'=Screenshot
-2025-06-05 08:50:31,681 - INFO - FPS: 0.8
-2025-06-05 08:50:32,628 - INFO - STATS - Frames: 46, FPS: 11.5, Detections: 52.2%, Errors: 0
-2025-06-05 08:50:32,834 - INFO - Cleaned up 504 old image files
-2025-06-05 08:50:34,891 - WARNING - No frames received for 2 seconds
-2025-06-05 08:50:36,640 - INFO - STATS - Frames: 48, FPS: 0.5, Detections: 54.2%, Errors: 0
-2025-06-05 08:50:36,899 - WARNING - No frames received for 2 seconds
-2025-06-05 08:50:38,905 - WARNING - No frames received for 2 seconds
-2025-06-05 08:50:40,643 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
-2025-06-05 08:50:40,913 - WARNING - No frames received for 2 seconds
-2025-06-05 08:50:42,915 - WARNING - No frames received for 2 seconds
-2025-06-05 08:50:42,936 - INFO - Cleaned up 300 old image files
-2025-06-05 08:50:44,644 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
-2025-06-05 08:50:44,928 - WARNING - No frames received for 2 seconds
-2025-06-05 08:50:46,931 - WARNING - No frames received for 2 seconds
-2025-06-05 08:50:48,644 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
-2025-06-05 08:50:48,935 - WARNING - No frames received for 2 seconds
-2025-06-05 08:50:50,942 - WARNING - No frames received for 2 seconds
-2025-06-05 08:50:51,177 - INFO - Stop signal received
-2025-06-05 08:50:51,342 - INFO - Cleanup thread terminated
-2025-06-05 08:50:52,103 - INFO - Starting cleanup...
-2025-06-05 08:50:52,646 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
-2025-06-05 08:50:52,646 - INFO - Connection monitor terminated
-2025-06-05 08:50:52,955 - WARNING - No frames received for 2 seconds
-2025-06-05 08:50:52,962 - INFO - Display thread terminated
-2025-06-05 08:51:00,606 - INFO - Video stream closed
-2025-06-05 08:51:01,108 - INFO - Drone disconnected
-2025-06-05 08:51:01,109 - INFO - Cleanup completed
+2025-06-05 09:06:30,769 - INFO - Starting Bebop 2 glove detection system
+2025-06-05 09:06:30,791 - INFO - Connecting to Bebop 2...
+2025-06-05 09:06:31,810 - INFO - Drone connected successfully
+2025-06-05 09:06:31,811 - INFO - Display thread started
+2025-06-05 09:06:31,811 - INFO - Cleanup thread started
+2025-06-05 09:06:31,811 - INFO - Connection monitor started
+2025-06-05 09:06:31,811 - INFO - All threads started (display, cleanup, monitor)
+2025-06-05 09:06:31,812 - INFO - Opening video stream...
+2025-06-05 09:06:31,879 - INFO - Cleaned up 275 old image files
+2025-06-05 09:06:33,841 - WARNING - No frames received for 2 seconds
+2025-06-05 09:06:35,815 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
+2025-06-05 09:06:35,845 - WARNING - No frames received for 2 seconds
+2025-06-05 09:06:37,887 - WARNING - No frames received for 2 seconds
+2025-06-05 09:06:39,073 - INFO - Video stream opened successfully
+2025-06-05 09:06:39,074 - INFO - Detection system active
+2025-06-05 09:06:39,074 - INFO - Controls: 'q'/ESC=Quit, 'r'=Reset stats, 's'=Screenshot
+2025-06-05 09:06:39,818 - INFO - STATS - Frames: 17, FPS: 4.2, Detections: 94.1%, Errors: 0
+2025-06-05 09:06:40,416 - INFO - FPS: 3.5
+2025-06-05 09:06:41,808 - INFO - FPS: 21.6
+2025-06-05 09:06:42,165 - INFO - Cleaned up 147 old image files
+2025-06-05 09:06:43,819 - INFO - STATS - Frames: 68, FPS: 12.8, Detections: 98.5%, Errors: 0
+2025-06-05 09:06:44,136 - WARNING - No frames received for 2 seconds
+2025-06-05 09:06:46,142 - WARNING - No frames received for 2 seconds
+2025-06-05 09:06:47,820 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
+2025-06-05 09:06:48,147 - WARNING - No frames received for 2 seconds
+2025-06-05 09:06:50,160 - WARNING - No frames received for 2 seconds
+2025-06-05 09:06:51,822 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
+2025-06-05 09:06:52,174 - WARNING - No frames received for 2 seconds
+2025-06-05 09:06:52,258 - INFO - Cleaned up 300 old image files
+2025-06-05 09:06:54,186 - WARNING - No frames received for 2 seconds
+2025-06-05 09:06:55,823 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
+2025-06-05 09:06:56,199 - WARNING - No frames received for 2 seconds
+2025-06-05 09:06:58,212 - WARNING - No frames received for 2 seconds
+2025-06-05 09:06:59,203 - INFO - Stop signal received
+2025-06-05 09:06:59,264 - INFO - Cleanup thread terminated
+2025-06-05 09:06:59,825 - WARNING - No new frames received for monitoring (stream may be frozen). Manual restart required.
+2025-06-05 09:06:59,825 - INFO - Connection monitor terminated
+2025-06-05 09:07:00,081 - INFO - Starting cleanup...
+2025-06-05 09:07:00,218 - WARNING - No frames received for 2 seconds
+2025-06-05 09:07:00,223 - INFO - Display thread terminated
+2025-06-05 09:07:08,583 - INFO - Video stream closed
+2025-06-05 09:07:09,086 - INFO - Drone disconnected
+2025-06-05 09:07:09,087 - INFO - Cleanup completed
