@@ -10,12 +10,13 @@ import os
 import signal
 import sys
 from collections import deque
+import glob
 
 # Configuration optimisée
 DISPLAY_FPS = 25
-MAX_QUEUE_SIZE = 3
 CONNECTION_TIMEOUT = 20
 FRAME_TIMEOUT = 1.0
+IMAGES_DIR = "C:/Users/Baptiste/anaconda3/Lib/site-packages/pyparrot/images"
 
 # Variables globales pour la frame unique
 current_frame = None
@@ -29,7 +30,9 @@ frame_stats = {
     'error_count': 0,
     'last_frame_time': time.time(),
     'callback_calls': 0,
-    'frame_updates': 0
+    'successful_reads': 0,
+    'failed_reads': 0,
+    'last_file_processed': None
 }
 stats_lock = threading.Lock()
 
@@ -39,15 +42,14 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
         logging.StreamHandler(sys.stdout),
-        logging.FileHandler('bebop_callback_intercept.log', mode='w', encoding='utf-8')
+        logging.FileHandler('bebop_optimized_fallback.log', mode='w', encoding='utf-8')
     ]
 )
 logger = logging.getLogger(__name__)
 
-def intercepted_vision_callback(args):
+def smart_vision_callback(args):
     """
-    Callback intercepté qui récupère la frame directement depuis PyParrot
-    avant qu'elle soit écrite sur disque
+    Callback qui se contente de déclencher une lecture intelligente de fichier
     """
     global current_frame
     
@@ -55,192 +57,206 @@ def intercepted_vision_callback(args):
         with stats_lock:
             frame_stats['callback_calls'] += 1
         
-        # Le callback de PyParrot reçoit les arguments dans args
-        # On doit examiner la structure pour récupérer la frame
+        # Déclencher une lecture de fichier optimisée
+        frame = read_latest_image_smart()
         
-        # Méthode 1: Si args contient directement la frame
-        if hasattr(args, 'frame') and args.frame is not None:
-            frame = args.frame
-        # Méthode 2: Si args est un dictionnaire
-        elif isinstance(args, dict) and 'frame' in args:
-            frame = args['frame']
-        # Méthode 3: Si args contient les données d'image
-        elif hasattr(args, 'data') and args.data is not None:
-            # Convertir les données brutes en frame OpenCV
-            try:
-                # Supposons que data contient les données d'image
-                frame_data = args.data
-                if isinstance(frame_data, bytes):
-                    # Convertir bytes en array numpy puis en image
-                    nparr = np.frombuffer(frame_data, np.uint8)
-                    frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-                else:
-                    frame = None
-            except Exception as e:
-                logger.debug(f"Frame conversion error: {e}")
-                frame = None
+        if frame is not None:
+            with frame_lock:
+                current_frame = frame.copy()
+            
+            with stats_lock:
+                frame_stats['frame_count'] += 1
+                frame_stats['last_frame_time'] = time.time()
+                frame_stats['successful_reads'] += 1
         else:
-            # Fallback: lire depuis le fichier le plus récent (comme avant)
-            frame = read_latest_image_file()
-        
-        # Validation de la frame
-        if frame is not None and frame.size > 0:
-            try:
-                # Tests de validité
-                h, w = frame.shape[:2]
-                if h >= 240 and w >= 320:
-                    # Test de corruption simple
-                    mean_val = np.mean(frame)
-                    if 10 <= mean_val <= 245:
-                        # Frame valide - mise à jour
-                        with frame_lock:
-                            current_frame = frame.copy()
-                        
-                        with stats_lock:
-                            frame_stats['frame_count'] += 1
-                            frame_stats['frame_updates'] += 1
-                            frame_stats['last_frame_time'] = time.time()
-                        
-                        logger.debug(f"Frame updated: {w}x{h}")
-                    else:
-                        logger.debug(f"Frame rejected (mean: {mean_val:.1f})")
-                else:
-                    logger.debug(f"Frame rejected (size: {w}x{h})")
-            except Exception as e:
-                logger.debug(f"Frame validation error: {e}")
+            with stats_lock:
+                frame_stats['failed_reads'] += 1
                 
     except Exception as e:
         logger.debug(f"Callback error: {e}")
+        with stats_lock:
+            frame_stats['failed_reads'] += 1
 
-def read_latest_image_file():
+def read_latest_image_smart():
     """
-    Fallback: lecture du fichier image le plus récent
-    (utilisé si l'interception directe échoue)
+    Lecture intelligente et robuste du fichier image le plus récent
     """
     try:
-        import glob
-        images_dir = "C:/Users/Baptiste/anaconda3/Lib/site-packages/pyparrot/images"
-        
-        if not os.path.exists(images_dir):
+        if not os.path.exists(IMAGES_DIR):
             return None
         
-        pattern = os.path.join(images_dir, "image_*.png")
+        # Scanner les fichiers avec pattern optimisé
+        pattern = os.path.join(IMAGES_DIR, "image_*.png")
         files = glob.glob(pattern)
         
         if not files:
             return None
         
-        # Prendre le fichier le plus récent
-        latest_file = max(files, key=os.path.getmtime)
+        # Trier par temps de modification (plus récent en premier)
+        files.sort(key=lambda f: os.path.getmtime(f), reverse=True)
         
-        # Vérifications de sécurité
         current_time = time.time()
-        file_mtime = os.path.getmtime(latest_file)
-        file_size = os.path.getsize(latest_file)
         
-        # Éviter les fichiers trop récents (en cours d'écriture) ou trop petits
-        if (current_time - file_mtime) < 0.05 or file_size < 5000:
-            return None
-        
-        # Lecture avec retry
-        for attempt in range(2):
+        # Essayer les 3 fichiers les plus récents
+        for latest_file in files[:3]:
             try:
-                frame = cv2.imread(latest_file, cv2.IMREAD_COLOR)
-                if frame is not None:
-                    return frame
-                time.sleep(0.01)
-            except:
-                if attempt == 0:
-                    time.sleep(0.02)
+                # Informations sur le fichier
+                stat_info = os.stat(latest_file)
+                file_size = stat_info.st_size
+                file_mtime = stat_info.st_mtime
+                filename = os.path.basename(latest_file)
+                
+                # Filtres de sécurité
+                if file_size < 3000:  # Trop petit
+                    continue
+                    
+                if (current_time - file_mtime) < 0.02:  # Trop récent (en cours d'écriture)
+                    continue
+                
+                # Éviter de relire le même fichier
+                with stats_lock:
+                    if frame_stats['last_file_processed'] == filename:
+                        continue
+                
+                # Lecture avec plusieurs tentatives
+                frame = None
+                for attempt in range(3):
+                    try:
+                        frame = cv2.imread(latest_file, cv2.IMREAD_COLOR)
+                        if frame is not None and frame.size > 0:
+                            break
+                        time.sleep(0.005)  # Petite pause avant retry
+                    except Exception as e:
+                        logger.debug(f"Read attempt {attempt+1} failed: {e}")
+                        if attempt < 2:
+                            time.sleep(0.01)
+                        continue
+                
+                if frame is None:
+                    continue
+                
+                # Validations étendues
+                h, w = frame.shape[:2]
+                if h < 240 or w < 320:
+                    continue
+                
+                # Test de corruption
+                mean_val = np.mean(frame)
+                if mean_val < 10 or mean_val > 245:
+                    continue
+                
+                # Test de variance (éviter images uniformes)
+                gray_test = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                if np.var(gray_test) < 150:
+                    continue
+                
+                # Test de pixels non-nuls
+                if np.count_nonzero(frame) < (frame.size * 0.05):
+                    continue
+                
+                # Frame valide trouvée !
+                with stats_lock:
+                    frame_stats['last_file_processed'] = filename
+                
+                logger.debug(f"Frame loaded: {filename} ({w}x{h}, {file_size} bytes)")
+                return frame
+                
+            except (OSError, IOError) as e:
+                logger.debug(f"File access error for {latest_file}: {e}")
+                continue
+            except Exception as e:
+                logger.debug(f"File processing error for {latest_file}: {e}")
                 continue
         
+        # Aucun fichier valide trouvé
         return None
         
     except Exception as e:
-        logger.debug(f"File fallback error: {e}")
+        logger.debug(f"Smart read critical error: {e}")
         return None
 
-class OptimizedGloveDetector:
-    """Détecteur de gants optimisé pour une seule frame"""
+class FastGloveDetector:
+    """Détecteur de gants ultra-optimisé"""
     
     def __init__(self):
-        self.detection_history = deque(maxlen=10)
-        self.min_area = 600
-        self.max_area = 35000
+        self.detection_history = deque(maxlen=8)
+        self.min_area = 800
+        self.max_area = 40000
         
         # Kernels morphologiques
         self.kernel_open = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
-        self.kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
+        self.kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
         
         # Stabilisation
-        self.stable_detections = deque(maxlen=5)
-        self.confidence_threshold = 3
+        self.stable_detections = deque(maxlen=4)
+        self.confidence_threshold = 2
         
         # Cache pour éviter les recalculs
-        self.last_frame_id = None
-        self.last_result = None
+        self.last_frame_hash = None
+        self.last_detection_result = None
         
     def detect_glove(self, frame):
-        """Détection optimisée avec cache"""
+        """Détection ultra-rapide avec cache"""
         if frame is None:
             return frame, False
             
         try:
-            # ID unique pour cette frame (basé sur le contenu)
-            frame_id = hash(frame.tobytes())
+            # Hash de la frame pour détecter les changements
+            frame_hash = hash(frame.tobytes()[:10000])  # Hash partiel pour la vitesse
             
-            # Si c'est la même frame que la dernière fois, retourner le cache
-            if frame_id == self.last_frame_id and self.last_result is not None:
-                return self.last_result
+            # Si c'est la même frame, retourner le cache
+            if frame_hash == self.last_frame_hash and self.last_detection_result is not None:
+                return self.last_detection_result
             
             original_frame = frame.copy()
             h, w = frame.shape[:2]
             
-            # Redimensionnement pour performances
+            # Redimensionnement agressif pour les performances
             scale_factor = 1.0
-            if w > 640:
-                scale_factor = 640.0 / w
+            target_width = 480  # Encore plus petit
+            if w > target_width:
+                scale_factor = target_width / w
                 work_frame = cv2.resize(frame, (int(w * scale_factor), int(h * scale_factor)))
             else:
                 work_frame = frame.copy()
             
-            # Prétraitement
-            work_frame = cv2.GaussianBlur(work_frame, (5, 5), 0)
+            # Prétraitement minimal
+            work_frame = cv2.GaussianBlur(work_frame, (3, 3), 0)  # Blur plus léger
             hsv = cv2.cvtColor(work_frame, cv2.COLOR_BGR2HSV)
             
-            # Masque couleur
-            mask = self._create_color_mask(hsv)
+            # Masque couleur simplifié
+            mask = self._create_fast_mask(hsv)
             
-            # Morphologie
+            # Morphologie minimale
             mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, self.kernel_open)
             mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, self.kernel_close)
             
             # Contours
             contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            best_contour = self._select_best_contour(contours)
+            best_contour = self._select_contour_fast(contours)
             
-            # Validation
+            # Validation simple
             detected = best_contour is not None
             
-            # Historique
+            # Historique court
             self.stable_detections.append(detected)
             stable_detection = sum(self.stable_detections) >= self.confidence_threshold
             self.detection_history.append(stable_detection)
             
-            # Dessin
+            # Dessin si détection
             if stable_detection and best_contour is not None:
                 if scale_factor != 1.0:
                     best_contour = (best_contour / scale_factor).astype(np.int32)
-                self._draw_detection(original_frame, best_contour)
+                self._draw_simple(original_frame, best_contour)
                 with stats_lock:
                     frame_stats['detection_count'] += 1
             
-            # Overlay
-            result_frame = self._add_overlay(original_frame, stable_detection, mask)
+            # Overlay minimal
+            result_frame = self._add_simple_overlay(original_frame, stable_detection)
             
             # Cache du résultat
-            self.last_frame_id = frame_id
-            self.last_result = (result_frame, stable_detection)
+            self.last_frame_hash = frame_hash
+            self.last_detection_result = (result_frame, stable_detection)
             
             return result_frame, stable_detection
             
@@ -250,20 +266,20 @@ class OptimizedGloveDetector:
                 frame_stats['error_count'] += 1
             return original_frame, False
     
-    def _create_color_mask(self, hsv):
-        """Masque couleur pour gants orange/rouge"""
+    def _create_fast_mask(self, hsv):
+        """Masque couleur ultra-rapide"""
         try:
-            # Orange
-            orange_lower = np.array([10, 120, 120])
+            # Orange simplifié
+            orange_lower = np.array([8, 100, 100])
             orange_upper = np.array([25, 255, 255])
             mask_orange = cv2.inRange(hsv, orange_lower, orange_upper)
             
-            # Rouge
-            red_lower1 = np.array([0, 120, 120])
-            red_upper1 = np.array([10, 255, 255])
-            mask_red1 = cv2.inRange(hsv, red_lower1, red_upper1)
+            # Rouge simplifié (une seule plage)
+            red_lower = np.array([0, 100, 100])
+            red_upper = np.array([10, 255, 255])
+            mask_red1 = cv2.inRange(hsv, red_lower, red_upper)
             
-            red_lower2 = np.array([170, 120, 120])
+            red_lower2 = np.array([170, 100, 100])
             red_upper2 = np.array([180, 255, 255])
             mask_red2 = cv2.inRange(hsv, red_lower2, red_upper2)
             
@@ -272,28 +288,24 @@ class OptimizedGloveDetector:
             return cv2.bitwise_or(mask_orange, mask_red)
             
         except Exception as e:
-            logger.debug(f"Color mask error: {e}")
+            logger.debug(f"Mask error: {e}")
             return np.zeros(hsv.shape[:2], dtype=np.uint8)
     
-    def _select_best_contour(self, contours):
-        """Sélection du meilleur contour"""
+    def _select_contour_fast(self, contours):
+        """Sélection rapide du meilleur contour"""
         if not contours:
             return None
             
         try:
+            # Prendre simplement le contour avec la plus grande aire valide
             best_contour = None
-            best_score = 0
+            best_area = 0
             
             for contour in contours:
                 area = cv2.contourArea(contour)
-                
-                if self.min_area <= area <= self.max_area:
-                    # Score simple basé sur l'aire
-                    score = min(area / 3000.0, 1.0)
-                    
-                    if score > best_score:
-                        best_score = score
-                        best_contour = contour
+                if self.min_area <= area <= self.max_area and area > best_area:
+                    best_area = area
+                    best_contour = contour
             
             return best_contour
             
@@ -301,95 +313,64 @@ class OptimizedGloveDetector:
             logger.debug(f"Contour selection error: {e}")
             return None
     
-    def _draw_detection(self, frame, contour):
-        """Dessin de la détection"""
+    def _draw_simple(self, frame, contour):
+        """Dessin simple et rapide"""
         try:
-            # Contour
+            # Contour simple
             cv2.drawContours(frame, [contour], -1, (0, 255, 0), 2)
             
             # Rectangle
             x, y, w, h = cv2.boundingRect(contour)
             cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 100, 0), 2)
             
-            # Centre
-            M = cv2.moments(contour)
-            if M["m00"] != 0:
-                cx = int(M["m10"] / M["m00"])
-                cy = int(M["m01"] / M["m00"])
-                cv2.circle(frame, (cx, cy), 6, (0, 0, 255), -1)
-            
-            # Texte
+            # Texte simple
             area = cv2.contourArea(contour)
-            cv2.putText(frame, f"GANT (A:{int(area)})", (x, max(y - 10, 20)),
+            cv2.putText(frame, f"GANT ({int(area)})", (x, max(y - 10, 20)),
                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
                        
         except Exception as e:
             logger.debug(f"Drawing error: {e}")
     
-    def _add_overlay(self, frame, detected, mask=None):
-        """Overlay d'informations"""
+    def _add_simple_overlay(self, frame, detected):
+        """Overlay simplifié et rapide"""
         try:
             h, w = frame.shape[:2]
             
             # Status principal
-            status = "🟢 GANT DETECTE" if detected else "🔍 RECHERCHE..."
+            status = "🟢 DETECTE" if detected else "🔍 RECHERCHE"
             color = (0, 255, 0) if detected else (0, 255, 255)
             cv2.putText(frame, status, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
             
-            # Statistiques
+            # Statistiques essentielles
             with stats_lock:
                 frames = frame_stats['frame_count']
                 detections = frame_stats['detection_count']
-                errors = frame_stats['error_count']
                 callbacks = frame_stats['callback_calls']
-                updates = frame_stats['frame_updates']
+                success_reads = frame_stats['successful_reads']
+                failed_reads = frame_stats['failed_reads']
                 detection_rate = (detections / max(frames, 1)) * 100
-                update_rate = (updates / max(callbacks, 1)) * 100
+                read_success_rate = (success_reads / max(callbacks, 1)) * 100
             
-            stats_text = f"Frames: {frames} | Det: {detection_rate:.1f}% | Err: {errors}"
-            cv2.putText(frame, stats_text, (10, h - 80), 
+            # Ligne 1: Stats de base
+            stats_text = f"Frames: {frames} | Det: {detection_rate:.1f}%"
+            cv2.putText(frame, stats_text, (10, h - 60), 
                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
             
-            callback_text = f"Callbacks: {callbacks} | Updates: {updates} ({update_rate:.1f}%)"
-            cv2.putText(frame, callback_text, (10, h - 60), 
+            # Ligne 2: Stats de lecture
+            read_text = f"Callbacks: {callbacks} | Reads: {success_reads}/{success_reads + failed_reads} ({read_success_rate:.1f}%)"
+            cv2.putText(frame, read_text, (10, h - 40), 
                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, (100, 255, 100), 1)
             
-            # Historique
-            history_symbols = ["●" if d else "○" for d in list(self.detection_history)[-15:]]
-            history_text = "Hist: " + "".join(history_symbols)
-            cv2.putText(frame, history_text, (10, h - 40), 
+            # Ligne 3: Historique minimal
+            history = ["●" if d else "○" for d in list(self.detection_history)[-10:]]
+            history_text = "Hist: " + "".join(history)
+            cv2.putText(frame, history_text, (10, h - 20), 
                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, (200, 200, 200), 1)
-            
-            # Confiance
-            confidence = sum(self.stable_detections) / len(self.stable_detections) if self.stable_detections else 0
-            confidence_text = f"Confiance: {confidence:.1%}"
-            conf_color = (0, 255, 0) if confidence > 0.6 else (0, 165, 255)
-            cv2.putText(frame, confidence_text, (10, h - 20), 
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.4, conf_color, 1)
             
             # Timestamp
             timestamp = time.strftime("%H:%M:%S")
             cv2.putText(frame, timestamp, (w - 100, 25), 
                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-            
-            # Mode
-            cv2.putText(frame, "MODE: CALLBACK INTERCEPT", (w - 250, h - 20), 
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 255), 1)
-            
-            # Masque miniature
-            if mask is not None and mask.size > 0:
-                try:
-                    mask_small = cv2.resize(mask, (120, 90))
-                    mask_colored = cv2.applyColorMap(mask_small, cv2.COLORMAP_JET)
-                    
-                    mask_x, mask_y = w - 130, 45
-                    frame[mask_y:mask_y+90, mask_x:mask_x+120] = mask_colored
-                    
-                    cv2.rectangle(frame, (mask_x, mask_y), (mask_x+120, mask_y+90), (255, 255, 255), 1)
-                    cv2.putText(frame, "Masque", (mask_x, mask_y + 105), 
-                               cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 255, 255), 1)
-                except:
-                    pass
             
             return frame
             
@@ -398,16 +379,18 @@ class OptimizedGloveDetector:
             return frame
 
 def display_thread():
-    """Thread d'affichage utilisant la frame unique"""
-    detector = OptimizedGloveDetector()
+    """Thread d'affichage optimisé"""
+    detector = FastGloveDetector()
     logger.info("Display thread started")
     
-    window_name = "Bebop 2 - Callback Intercept Detection"
+    window_name = "Bebop 2 - Optimized Fallback Detection"
     cv2.namedWindow(window_name, cv2.WINDOW_AUTOSIZE)
     
     fps_counter = 0
     fps_start_time = time.time()
     last_display_time = time.time()
+    
+    no_frame_count = 0
     
     while processing_active.is_set():
         try:
@@ -415,7 +398,7 @@ def display_thread():
             
             # Limiter le FPS d'affichage
             if (current_time - last_display_time) < (1.0 / DISPLAY_FPS):
-                time.sleep(0.005)
+                time.sleep(0.01)
                 continue
             
             last_display_time = current_time
@@ -428,25 +411,37 @@ def display_thread():
                     frame = None
             
             if frame is None:
-                # Écran d'attente
+                no_frame_count += 1
+                
+                # Écran d'attente avec plus d'infos
                 blank_frame = np.zeros((480, 640, 3), dtype=np.uint8)
-                cv2.putText(blank_frame, "Attente des frames...", (200, 240),
+                cv2.putText(blank_frame, "Attente des frames...", (200, 200),
                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
                 
                 with stats_lock:
                     callbacks = frame_stats['callback_calls']
-                    updates = frame_stats['frame_updates']
+                    success_reads = frame_stats['successful_reads']
+                    failed_reads = frame_stats['failed_reads']
+                    total_reads = success_reads + failed_reads
+                    success_rate = (success_reads / max(total_reads, 1)) * 100
                 
-                cv2.putText(blank_frame, f"Callbacks: {callbacks} | Updates: {updates}", 
-                           (180, 280), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+                cv2.putText(blank_frame, f"Callbacks: {callbacks}", 
+                           (220, 240), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
+                cv2.putText(blank_frame, f"Lectures reussies: {success_reads}/{total_reads} ({success_rate:.1f}%)", 
+                           (160, 270), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
+                cv2.putText(blank_frame, f"Tentatives sans frame: {no_frame_count}", 
+                           (190, 300), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 100, 100), 1)
                 
                 cv2.imshow(window_name, blank_frame)
                 
-                key = cv2.waitKey(100) & 0xFF
+                key = cv2.waitKey(50) & 0xFF
                 if key == ord('q') or key == 27:
                     processing_active.clear()
                     break
                 continue
+            
+            # Reset du compteur si on a une frame
+            no_frame_count = 0
             
             # Traitement de la détection
             processed_frame, detected = detector.detect_glove(frame)
@@ -476,20 +471,19 @@ def display_thread():
                     frame_stats['detection_count'] = 0
                     frame_stats['error_count'] = 0
                     frame_stats['callback_calls'] = 0
-                    frame_stats['frame_updates'] = 0
+                    frame_stats['successful_reads'] = 0
+                    frame_stats['failed_reads'] = 0
+                    frame_stats['last_file_processed'] = None
                 detector.detection_history.clear()
                 detector.stable_detections.clear()
-                detector.last_frame_id = None
-                detector.last_result = None
-                logger.info("Statistics and cache reset")
+                detector.last_frame_hash = None
+                detector.last_detection_result = None
+                no_frame_count = 0
+                logger.info("Complete reset performed")
             elif key == ord('s'):
-                screenshot_name = f"screenshot_intercept_{int(time.time())}.png"
+                screenshot_name = f"screenshot_fallback_{int(time.time())}.png"
                 cv2.imwrite(screenshot_name, processed_frame)
                 logger.info(f"Screenshot saved: {screenshot_name}")
-            elif key == ord('c'):
-                with stats_lock:
-                    stats = frame_stats.copy()
-                logger.info(f"Current stats: {stats}")
                 
         except Exception as e:
             logger.error(f"Display thread error: {e}")
@@ -499,7 +493,7 @@ def display_thread():
     logger.info("Display thread terminated")
 
 def monitor_thread():
-    """Thread de monitoring simple"""
+    """Thread de monitoring optimisé"""
     logger.info("Monitor thread started")
     last_frame_count = 0
     last_callback_count = 0
@@ -515,7 +509,8 @@ def monitor_thread():
             detections = frame_stats['detection_count']
             errors = frame_stats['error_count']
             callbacks = frame_stats['callback_calls']
-            updates = frame_stats['frame_updates']
+            success_reads = frame_stats['successful_reads']
+            failed_reads = frame_stats['failed_reads']
             last_received_time = frame_stats['last_frame_time']
         
         frame_diff = current_frames - last_frame_count
@@ -524,22 +519,80 @@ def monitor_thread():
         last_callback_count = callbacks
         
         time_since_last_frame = time.time() - last_received_time
+        total_reads = success_reads + failed_reads
+        read_success_rate = (success_reads / max(total_reads, 1)) * 100
         
         if frame_diff > 0:
             avg_fps = frame_diff / 5
             detection_rate = (detections / max(current_frames, 1)) * 100
-            update_rate = (updates / max(callbacks, 1)) * 100
             callback_fps = callback_diff / 5
             
             logger.info(f"MONITOR - Frames: {current_frames} (+{frame_diff}), FPS: {avg_fps:.1f}, "
-                       f"Det: {detection_rate:.1f}%, Err: {errors}, "
-                       f"Callbacks: {callbacks} (+{callback_diff}, {callback_fps:.1f}/s), "
-                       f"Update rate: {update_rate:.1f}%")
+                       f"Det: {detection_rate:.1f}%, Err: {errors}")
+            logger.info(f"         Callbacks: {callbacks} (+{callback_diff}, {callback_fps:.1f}/s), "
+                       f"Read success: {read_success_rate:.1f}% ({success_reads}/{total_reads})")
         else:
             logger.warning(f"No new frames - callbacks: {callbacks} (+{callback_diff}), "
-                         f"last frame {time_since_last_frame:.1f}s ago")
+                         f"read success: {read_success_rate:.1f}%, last frame {time_since_last_frame:.1f}s ago")
     
     logger.info("Monitor thread terminated")
+
+def cleanup_files_gentle():
+    """Nettoyage très doux des fichiers anciens"""
+    try:
+        if not os.path.exists(IMAGES_DIR):
+            return
+        
+        files = glob.glob(os.path.join(IMAGES_DIR, "image_*.png"))
+        
+        if len(files) > 150:  # Seuil très élevé
+            current_time = time.time()
+            old_files = []
+            
+            for file_path in files:
+                try:
+                    file_mtime = os.path.getmtime(file_path)
+                    # Supprimer seulement les fichiers de plus de 3 minutes
+                    if (current_time - file_mtime) > 180:
+                        old_files.append(file_path)
+                except:
+                    continue
+            
+            # Supprimer seulement la moitié des anciens fichiers
+            files_to_remove = old_files[:len(old_files)//2]
+            removed_count = 0
+            
+            for file_path in files_to_remove:
+                try:
+                    os.remove(file_path)
+                    removed_count += 1
+                    time.sleep(0.001)  # Pause entre suppressions
+                except:
+                    continue
+            
+            if removed_count > 0:
+                logger.info(f"Gentle cleanup: removed {removed_count} very old files")
+                        
+    except Exception as e:
+        logger.debug(f"Cleanup error: {e}")
+
+def cleanup_thread():
+    """Thread de nettoyage ultra-conservateur"""
+    logger.info("Gentle cleanup thread started")
+    
+    while processing_active.is_set():
+        try:
+            cleanup_files_gentle()
+        except Exception as e:
+            logger.debug(f"Cleanup thread error: {e}")
+        
+        # Attente de 2 minutes entre nettoyages
+        for _ in range(120):
+            if not processing_active.is_set():
+                break
+            time.sleep(1)
+    
+    logger.info("Cleanup thread terminated")
 
 def signal_handler(sig, frame):
     """Gestionnaire de signaux"""
@@ -547,17 +600,22 @@ def signal_handler(sig, frame):
     processing_active.clear()
 
 def main():
-    """Fonction principale avec interception de callback"""
+    """Fonction principale avec fallback optimisé"""
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
     
-    logger.info("Starting Bebop 2 Callback Intercept Detection System")
+    logger.info("Starting Bebop 2 Optimized Fallback Detection System")
     
     bebop = None
     vision = None
     threads = []
     
     try:
+        # Vérification du répertoire d'images
+        if not os.path.exists(IMAGES_DIR):
+            logger.error(f"Images directory not found: {IMAGES_DIR}")
+            return False
+        
         # Connexion au drone
         bebop = Bebop()
         logger.info("Connecting to Bebop 2...")
@@ -569,15 +627,16 @@ def main():
         
         logger.info("Drone connected successfully")
         
-        # Configuration de la vision avec callback intercepté
+        # Configuration de la vision avec callback optimisé
         vision = DroneVision(bebop, is_bebop=True)
-        vision.set_user_callback_function(intercepted_vision_callback)
+        vision.set_user_callback_function(smart_vision_callback)
         
         # Démarrer les threads
         display_thread_obj = threading.Thread(target=display_thread, daemon=True, name="Display")
         monitor_thread_obj = threading.Thread(target=monitor_thread, daemon=True, name="Monitor")
+        cleanup_thread_obj = threading.Thread(target=cleanup_thread, daemon=True, name="Cleanup")
         
-        threads = [display_thread_obj, monitor_thread_obj]
+        threads = [display_thread_obj, monitor_thread_obj, cleanup_thread_obj]
         
         for thread in threads:
             thread.start()
@@ -586,14 +645,14 @@ def main():
         logger.info("All threads started successfully")
         
         # Ouverture du flux vidéo
-        logger.info("Opening video stream with intercepted callback...")
+        logger.info("Opening video stream with optimized fallback...")
         if not vision.open_video():
             logger.error("Failed to open video stream")
             return False
         
         logger.info("Video stream opened successfully")
-        logger.info("Callback intercept detection system is now active")
-        logger.info("Controls: 'q'/ESC=Quit, 'r'=Reset stats, 's'=Screenshot, 'c'=Show stats")
+        logger.info("Optimized fallback detection system is now active")
+        logger.info("Controls: 'q'/ESC=Quit, 'r'=Complete reset, 's'=Screenshot")
         
         # Boucle principale
         try:
@@ -602,7 +661,7 @@ def main():
                 
                 # Vérifier si la fenêtre est toujours ouverte
                 try:
-                    if cv2.getWindowProperty("Bebop 2 - Callback Intercept Detection", cv2.WND_PROP_VISIBLE) < 1:
+                    if cv2.getWindowProperty("Bebop 2 - Optimized Fallback Detection", cv2.WND_PROP_VISIBLE) < 1:
                         logger.info("Display window was closed")
                         break
                 except:
