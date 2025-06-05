@@ -1,0 +1,49 @@
+2025-06-05 09:52:07,719 - INFO - Starting Advanced Bebop 2 detection with auto-restart
+2025-06-05 09:52:07,741 - INFO - Connecting to Bebop 2...
+2025-06-05 09:52:08,760 - INFO - Drone connected successfully
+2025-06-05 09:52:08,761 - INFO - Display thread started
+2025-06-05 09:52:08,962 - INFO - Conservative cleanup thread started
+2025-06-05 09:52:09,163 - INFO - Enhanced connection monitor started
+2025-06-05 09:52:09,364 - INFO - Vision restart manager started
+2025-06-05 09:52:09,565 - INFO - All threads started successfully
+2025-06-05 09:52:09,565 - INFO - Opening initial video stream...
+2025-06-05 09:52:13,170 - WARNING - Stream issue detected (failure #1). Last frame: 5.5s ago
+2025-06-05 09:52:17,177 - WARNING - Stream issue detected (failure #2). Last frame: 9.5s ago
+2025-06-05 09:52:17,193 - WARNING - Triggering automatic restart
+2025-06-05 09:52:17,209 - WARNING - Attempting vision restart #1
+2025-06-05 09:52:21,215 - WARNING - Stream issue detected (failure #3). Last frame: 13.5s ago
+2025-06-05 09:52:25,218 - WARNING - Stream issue detected (failure #4). Last frame: 17.5s ago
+2025-06-05 09:52:25,886 - INFO - Video stream closed for restart
+2025-06-05 09:52:28,913 - ERROR - Critical restart manager error: 'Bebop' object has no attribute 'is_alive'
+2025-06-05 09:52:29,223 - WARNING - Stream issue detected (failure #5). Last frame: 21.5s ago
+2025-06-05 09:52:33,225 - WARNING - Stream issue detected (failure #6). Last frame: 25.5s ago
+2025-06-05 09:52:37,258 - WARNING - Stream issue detected (failure #7). Last frame: 29.5s ago
+2025-06-05 09:52:38,930 - WARNING - Attempting vision restart #2
+2025-06-05 09:52:41,331 - WARNING - Stream issue detected (failure #8). Last frame: 33.6s ago
+2025-06-05 09:52:45,369 - WARNING - Stream issue detected (failure #9). Last frame: 37.6s ago
+2025-06-05 09:52:47,597 - INFO - Video stream closed for restart
+2025-06-05 09:52:49,425 - WARNING - Stream issue detected (failure #10). Last frame: 41.7s ago
+2025-06-05 09:52:50,642 - ERROR - Critical restart manager error: 'Bebop' object has no attribute 'is_alive'
+2025-06-05 09:52:53,454 - WARNING - Stream issue detected (failure #11). Last frame: 45.7s ago
+2025-06-05 09:52:53,669 - INFO - Initial video stream opened successfully
+2025-06-05 09:52:53,669 - INFO - Auto-restart detection system is now active
+2025-06-05 09:52:53,669 - INFO - Controls: 'q'/ESC=Quit, 'r'=Reset all, 's'=Screenshot, 'c'=Cache stats, 'v'=Manual restart
+2025-06-05 09:52:57,486 - WARNING - Stream issue detected (failure #12). Last frame: 49.8s ago
+2025-06-05 09:53:00,689 - WARNING - Attempting vision restart #3
+2025-06-05 09:53:01,487 - WARNING - Stream issue detected (failure #13). Last frame: 53.8s ago
+2025-06-05 09:53:05,488 - WARNING - Stream issue detected (failure #14). Last frame: 57.8s ago
+2025-06-05 09:53:08,578 - INFO - Display thread terminated
+2025-06-05 09:53:08,675 - INFO - Starting comprehensive cleanup...
+2025-06-05 09:53:08,675 - INFO - Waiting for threads to terminate...
+2025-06-05 09:53:09,193 - INFO - Video stream closed for restart
+2025-06-05 09:53:09,411 - INFO - Cleanup thread terminated
+2025-06-05 09:53:09,489 - INFO - Enhanced connection monitor terminated
+2025-06-05 09:53:12,194 - ERROR - Critical restart manager error: 'Bebop' object has no attribute 'is_alive'
+2025-06-05 09:53:19,491 - INFO - Signal 2 received - initiating graceful shutdown
+2025-06-05 09:53:19,491 - INFO - Cache and queue cleared
+2025-06-05 09:53:22,194 - INFO - Vision restart manager terminated
+2025-06-05 09:53:25,993 - INFO - Video stream closed
+2025-06-05 09:53:26,496 - INFO - Drone disconnected
+2025-06-05 09:53:26,497 - INFO - OpenCV windows closed
+2025-06-05 09:53:26,497 - INFO - Comprehensive cleanup completed successfully
+2025-06-05 09:53:26,498 - INFO - Program exiting with code 0
