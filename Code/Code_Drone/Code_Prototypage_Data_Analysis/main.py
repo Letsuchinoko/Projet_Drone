@@ -97,120 +97,235 @@ class FastGloveDetector:
             return original_frame, False
 
     def _create_optimized_glove_mask(self, hsv):
-        """Masque couleur optimisé basé sur votre gant orange/rouge"""
+        """Masque couleur ultra-précis pour éliminer faux positifs"""
         try:
             h, w = hsv.shape[:2]
             
-            # Masques orange optimisés (basé sur votre image)
-            # Orange principal du gant
-            orange_main_lower = np.array([10, 140, 140])
-            orange_main_upper = np.array([22, 255, 255])
+            # === MASQUES ORANGE ULTRA-PRÉCIS ===
+            # Orange principal du gant (très saturé)
+            orange_main_lower = np.array([12, 160, 160])  # Saturation augmentée
+            orange_main_upper = np.array([20, 255, 255])
             mask_orange_main = cv2.inRange(hsv, orange_main_lower, orange_main_upper)
             
-            # Orange légèrement désaturé (ombres)
-            orange_shadow_lower = np.array([12, 100, 100])
-            orange_shadow_upper = np.array([20, 200, 200])
-            mask_orange_shadow = cv2.inRange(hsv, orange_shadow_lower, orange_shadow_upper)
-            
-            # Orange très vif (reflets)
-            orange_bright_lower = np.array([8, 150, 180])
+            # Orange vif (reflets du gant)
+            orange_bright_lower = np.array([10, 180, 180])  # Très saturé
             orange_bright_upper = np.array([18, 255, 255])
             mask_orange_bright = cv2.inRange(hsv, orange_bright_lower, orange_bright_upper)
             
-            # Masques rouge (parties rouges du gant)
-            # Rouge principal
-            red_main_lower1 = np.array([0, 140, 140])
-            red_main_upper1 = np.array([8, 255, 255])
+            # Orange moyennement saturé (zones d'ombre du gant)
+            orange_shadow_lower = np.array([14, 120, 140])  # Saturation minimale élevée
+            orange_shadow_upper = np.array([19, 200, 220])
+            mask_orange_shadow = cv2.inRange(hsv, orange_shadow_lower, orange_shadow_upper)
+            
+            # === MASQUES ROUGE ULTRA-PRÉCIS ===
+            # Rouge principal (très saturé)
+            red_main_lower1 = np.array([0, 160, 160])   # Saturation élevée
+            red_main_upper1 = np.array([6, 255, 255])
             mask_red_main1 = cv2.inRange(hsv, red_main_lower1, red_main_upper1)
             
-            red_main_lower2 = np.array([172, 140, 140])
+            red_main_lower2 = np.array([174, 160, 160])  # Saturation élevée
             red_main_upper2 = np.array([180, 255, 255])
             mask_red_main2 = cv2.inRange(hsv, red_main_lower2, red_main_upper2)
             
-            # Rouge désaturé
-            red_desat_lower1 = np.array([0, 80, 120])
-            red_desat_upper1 = np.array([10, 180, 220])
-            mask_red_desat1 = cv2.inRange(hsv, red_desat_lower1, red_desat_upper1)
+            # Rouge moyennement saturé
+            red_medium_lower1 = np.array([0, 120, 140])
+            red_medium_upper1 = np.array([8, 200, 240])
+            mask_red_medium1 = cv2.inRange(hsv, red_medium_lower1, red_medium_upper1)
             
-            red_desat_lower2 = np.array([170, 80, 120])
-            red_desat_upper2 = np.array([180, 180, 220])
-            mask_red_desat2 = cv2.inRange(hsv, red_desat_lower2, red_desat_upper2)
+            red_medium_lower2 = np.array([172, 120, 140])
+            red_medium_upper2 = np.array([180, 200, 240])
+            mask_red_medium2 = cv2.inRange(hsv, red_medium_lower2, red_medium_upper2)
             
-            # Combinaison des masques orange
-            mask_orange = cv2.bitwise_or(mask_orange_main, 
-                         cv2.bitwise_or(mask_orange_shadow, mask_orange_bright))
+            # === EXCLUSIONS STRICTES ===
             
-            # Combinaison des masques rouge
-            mask_red = cv2.bitwise_or(mask_red_main1, 
-                      cv2.bitwise_or(mask_red_main2, 
-                      cv2.bitwise_or(mask_red_desat1, mask_red_desat2)))
+            # 1. Exclusion herbe/végétation (vert-jaune)
+            grass_lower1 = np.array([25, 40, 40])   # Vert-jaune
+            grass_upper1 = np.array([80, 255, 255])
+            mask_grass = cv2.inRange(hsv, grass_lower1, grass_upper1)
             
-            # Masque final gant
-            mask_glove = cv2.bitwise_or(mask_orange, mask_red)
+            # 2. Exclusion murs/béton (faible saturation)
+            wall_lower = np.array([0, 0, 0])       # Très faible saturation
+            wall_upper = np.array([180, 60, 255])   # Seuil saturation strict
+            mask_wall = cv2.inRange(hsv, wall_lower, wall_upper)
             
-            # Exclusion peau très ciblée (pour éviter faux positifs main)
-            skin_lower = np.array([5, 50, 120])
-            skin_upper = np.array([15, 120, 200])
+            # 3. Exclusion jaune/doré (confusion possible)
+            yellow_lower = np.array([20, 100, 100])  # Jaune pur
+            yellow_upper = np.array([35, 255, 255])
+            mask_yellow = cv2.inRange(hsv, yellow_lower, yellow_upper)
+            
+            # 4. Exclusion peau stricte
+            skin_lower = np.array([5, 60, 120])     # Saturation min élevée
+            skin_upper = np.array([15, 140, 220])
             mask_skin = cv2.inRange(hsv, skin_lower, skin_upper)
             
-            # Érosion de la peau pour garder le gant
-            mask_skin_eroded = cv2.erode(mask_skin, self.kernel_small, iterations=1)
+            # 5. Exclusion bois/marron
+            wood_lower = np.array([8, 50, 50])
+            wood_upper = np.array([25, 150, 180])
+            mask_wood = cv2.inRange(hsv, wood_lower, wood_upper)
             
-            # Application de l'exclusion
-            mask_final = cv2.bitwise_and(mask_glove, cv2.bitwise_not(mask_skin_eroded))
+            # === COMBINAISONS ===
             
-            # Bordures réduites
+            # Masque orange final
+            mask_orange = cv2.bitwise_or(mask_orange_main, 
+                         cv2.bitwise_or(mask_orange_bright, mask_orange_shadow))
+            
+            # Masque rouge final
+            mask_red = cv2.bitwise_or(mask_red_main1, 
+                      cv2.bitwise_or(mask_red_main2, 
+                      cv2.bitwise_or(mask_red_medium1, mask_red_medium2)))
+            
+            # Masque gant complet
+            mask_glove = cv2.bitwise_or(mask_orange, mask_red)
+            
+            # Masque d'exclusions combiné
+            mask_exclusions = cv2.bitwise_or(mask_grass, 
+                             cv2.bitwise_or(mask_wall, 
+                             cv2.bitwise_or(mask_yellow, 
+                             cv2.bitwise_or(mask_skin, mask_wood))))
+            
+            # Application stricte des exclusions
+            mask_exclusions_dilated = cv2.dilate(mask_exclusions, self.kernel_medium, iterations=2)
+            mask_final = cv2.bitwise_and(mask_glove, cv2.bitwise_not(mask_exclusions_dilated))
+            
+            # === FILTRAGE SPATIAL ===
+            
+            # Bordures strictes
             border_mask = np.ones((h, w), dtype=np.uint8) * 255
-            border_size = 10
+            border_size = 15  # Bordure plus large
             border_mask[:border_size, :] = 0
             border_mask[-border_size:, :] = 0
             border_mask[:, :border_size] = 0
             border_mask[:, -border_size:] = 0
             
+            # Zone centrale privilégiée (gant plus probable au centre)
+            center_bonus = np.zeros((h, w), dtype=np.uint8)
+            center_h_start, center_h_end = h//4, 3*h//4
+            center_w_start, center_w_end = w//4, 3*w//4
+            center_bonus[center_h_start:center_h_end, center_w_start:center_w_end] = 255
+            
+            # Application des filtres spatiaux
             mask_final = cv2.bitwise_and(mask_final, border_mask)
             
-            # Nettoyage léger
-            mask_final = cv2.medianBlur(mask_final, 3)
+            # Bonus pour zone centrale (dilatation plus forte au centre)
+            mask_center = cv2.bitwise_and(mask_final, center_bonus)
+            mask_center_enhanced = cv2.dilate(mask_center, self.kernel_medium, iterations=1)
+            mask_final = cv2.bitwise_or(mask_final, mask_center_enhanced)
+            
+            # === POST-TRAITEMENT ===
+            
+            # Nettoyage morphologique strict
+            mask_final = cv2.morphologyEx(mask_final, cv2.MORPH_OPEN, self.kernel_small, iterations=2)
+            mask_final = cv2.morphologyEx(mask_final, cv2.MORPH_CLOSE, self.kernel_medium, iterations=1)
+            
+            # Suppression des petits artefacts
+            mask_final = cv2.medianBlur(mask_final, 5)
+            
+            # Sauvegarde pour debug
+            self._last_mask = mask_final
+            self._debug_masks = {
+                'orange': mask_orange,
+                'red': mask_red,
+                'exclusions': mask_exclusions,
+                'final': mask_final
+            }
             
             return mask_final
             
         except Exception as e:
-            logger.debug(f"Mask creation error: {e}")
+            logger.debug(f"Optimized mask creation error: {e}")
             return np.zeros(hsv.shape[:2], dtype=np.uint8)
 
     def _select_best_contour_fast(self, contours):
-        """Sélection ultra-rapide du meilleur contour"""
+        """Sélection ultra-stricte pour éliminer faux positifs"""
         if not contours:
             return None
             
         try:
+            h, w = HEIGHT, WIDTH
             best_contour = None
-            best_area = 0
+            best_score = 0
             
             for contour in contours:
                 area = cv2.contourArea(contour)
                 
-                # Filtres de base ultra-rapides
+                # Filtres de base stricts
                 if area < self.min_area or area > self.max_area:
                     continue
                 if len(contour) < self.min_contour_points:
                     continue
                 
-                # Sélection par aire (simple et rapide)
-                if area > best_area:
-                    # Validation forme basique
-                    x, y, w, h = cv2.boundingRect(contour)
-                    aspect_ratio = w / float(h)
-                    
-                    # Ratio acceptable pour une main/gant
-                    if 0.2 <= aspect_ratio <= 4.0:
-                        best_area = area
-                        best_contour = contour
+                # Analyse géométrique stricte
+                x, y, w_rect, h_rect = cv2.boundingRect(contour)
+                aspect_ratio = w_rect / float(h_rect)
+                
+                # Ratio d'aspect strict pour une main/gant
+                if not (0.3 <= aspect_ratio <= 2.5):
+                    continue
+                
+                # Position : éviter les bords et privilégier le centre
+                margin = 25
+                if (x < margin or y < margin or 
+                    (x + w_rect) > (w - margin) or 
+                    (y + h_rect) > (h - margin)):
+                    continue
+                
+                # Analyse de forme avancée
+                hull = cv2.convexHull(contour)
+                hull_area = cv2.contourArea(hull)
+                
+                if hull_area <= 0:
+                    continue
+                
+                solidity = area / hull_area
+                
+                # Solidité stricte (éliminer objets trop irréguliers)
+                if solidity < 0.4 or solidity > 0.95:  # Pas trop régulier non plus
+                    continue
+                
+                # Test de compacité (éliminer objets trop allongés/fins)
+                perimeter = cv2.arcLength(contour, True)
+                if perimeter > 0:
+                    compactness = (4 * np.pi * area) / (perimeter * perimeter)
+                    # Éviter objets trop allongés (comme herbe, branches)
+                    if compactness < 0.1:
+                        continue
+                
+                # Centre de masse (pour position)
+                M = cv2.moments(contour)
+                if M["m00"] == 0:
+                    continue
+                
+                cx = int(M["m10"] / M["m00"])
+                cy = int(M["m01"] / M["m00"])
+                
+                # Privilégier zone centrale de l'image
+                center_x_norm = cx / w
+                center_y_norm = cy / h
+                
+                # Bonus pour position centrale
+                position_bonus = 1.0
+                if 0.3 <= center_x_norm <= 0.7 and 0.2 <= center_y_norm <= 0.8:
+                    position_bonus = 1.5
+                
+                # Score basé sur l'aire avec bonus position
+                area_score = min(area / 3000.0, 1.0) * position_bonus
+                
+                # Bonus pour forme "main-like"
+                shape_bonus = 1.0
+                if 0.6 <= aspect_ratio <= 1.4 and 0.5 <= solidity <= 0.8:
+                    shape_bonus = 1.3
+                
+                # Score final
+                final_score = area_score * shape_bonus
+                
+                if final_score > best_score:
+                    best_score = final_score
+                    best_contour = contour
             
             return best_contour
             
         except Exception as e:
-            logger.debug(f"Fast contour selection error: {e}")
+            logger.debug(f"Strict contour selection error: {e}")
             return None
 
     def _draw_fast_detection(self, frame, contour):
@@ -465,11 +580,33 @@ def main():
                     detector.__init__()
                     logger.info("🔄 Reset détecteur")
                 elif key == ord('d'):
-                    # Debug masque
-                    if hasattr(detector, '_last_mask'):
-                        debug_name = f"debug_mask_{int(time.time())}.png"
-                        cv2.imwrite(debug_name, detector._last_mask)
-                        logger.info(f"🔍 Masque debug sauvé: {debug_name}")
+                    # Debug masques détaillé
+                    if hasattr(detector, '_debug_masks'):
+                        timestamp = int(time.time())
+                        
+                        # Sauvegarde masque final
+                        debug_final = f"debug_final_{timestamp}.png"
+                        cv2.imwrite(debug_final, detector._debug_masks['final'])
+                        
+                        # Sauvegarde masque orange
+                        debug_orange = f"debug_orange_{timestamp}.png"
+                        cv2.imwrite(debug_orange, detector._debug_masks['orange'])
+                        
+                        # Sauvegarde masque rouge
+                        debug_red = f"debug_red_{timestamp}.png"
+                        cv2.imwrite(debug_red, detector._debug_masks['red'])
+                        
+                        # Sauvegarde masque exclusions
+                        debug_exclusions = f"debug_exclusions_{timestamp}.png"
+                        cv2.imwrite(debug_exclusions, detector._debug_masks['exclusions'])
+                        
+                        logger.info(f"🔍 Masques debug sauvés:")
+                        logger.info(f"   Final: {debug_final}")
+                        logger.info(f"   Orange: {debug_orange}")
+                        logger.info(f"   Rouge: {debug_red}")
+                        logger.info(f"   Exclusions: {debug_exclusions}")
+                    else:
+                        logger.info("❌ Pas de données debug disponibles")
 
             except KeyboardInterrupt:
                 logger.info("⌨️ Interruption clavier")
