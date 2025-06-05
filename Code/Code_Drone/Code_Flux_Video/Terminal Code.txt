@@ -1,0 +1,4 @@
+[udp @ 0000023829861ec0] bind failed: Error number -10048 occurred
+[in#0 @ 000002382982e900] Error opening input: Invalid data found when processing input
+Error opening input file C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\utils\bebop.sdp.
+Error opening input files: Invalid data found when processing input
