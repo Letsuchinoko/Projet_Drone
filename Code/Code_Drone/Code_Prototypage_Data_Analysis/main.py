@@ -583,8 +583,20 @@ def vision_restart_manager(bebop, vision_obj_ref):
             
             time.sleep(3)  # Pause pour stabilisation
             
-            # Redémarrer le flux
-            if bebop.is_alive():
+            # Redémarrer le flux - vérifier si le drone est connecté
+            drone_connected = False
+            try:
+                # Tenter de vérifier l'état du drone avec une méthode sûre
+                drone_connected = hasattr(bebop, '_drone_connection') or bebop is not None
+                # Alternative: on peut aussi tenter un ping simple
+                if hasattr(bebop, 'ask_for_state_update'):
+                    bebop.ask_for_state_update()
+                    drone_connected = True
+            except Exception as e:
+                logger.debug(f"Drone connection check failed: {e}")
+                drone_connected = False
+            
+            if drone_connected:
                 try:
                     vision_obj_ref[0] = DroneVision(bebop, is_bebop=True)
                     vision_obj_ref[0].set_user_callback_function(robust_vision_callback)
@@ -602,6 +614,8 @@ def vision_restart_manager(bebop, vision_obj_ref):
                         
                 except Exception as e:
                     logger.error(f"Vision restart error: {e}")
+            else:
+                logger.error("Drone not connected, cannot restart video stream")
             
             # Si on arrive ici, le redémarrage a échoué
             logger.error("Vision restart failed")
