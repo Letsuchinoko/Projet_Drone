@@ -1,0 +1,67 @@
+2025-06-05 09:40:33,368 - INFO - Starting Advanced Bebop 2 glove detection system with RAM cache
+2025-06-05 09:40:33,389 - INFO - Connecting to Bebop 2...
+2025-06-05 09:40:34,428 - INFO - Drone connected successfully
+2025-06-05 09:40:34,429 - INFO - Display thread started
+2025-06-05 09:40:34,530 - INFO - Cleanup thread started
+2025-06-05 09:40:34,608 - INFO - Cleaned up 391 old image files
+2025-06-05 09:40:34,630 - INFO - Connection monitor started
+2025-06-05 09:40:34,731 - INFO - All threads started successfully
+2025-06-05 09:40:34,731 - INFO - Opening video stream...
+2025-06-05 09:40:37,641 - WARNING - Stream issue detected (failure #1). Last frame: 4.3s ago
+2025-06-05 09:40:40,662 - WARNING - Stream issue detected (failure #2). Last frame: 7.3s ago
+2025-06-05 09:40:41,357 - INFO - Video stream opened successfully
+2025-06-05 09:40:41,358 - INFO - Advanced detection system with RAM cache is now active
+2025-06-05 09:40:41,358 - INFO - Controls: 'q'/ESC=Quit, 'r'=Reset stats, 's'=Screenshot, 'c'=Cache stats
+2025-06-05 09:40:42,871 - INFO - Display FPS: 21.4
+2025-06-05 09:40:43,663 - INFO - Stream recovered
+2025-06-05 09:40:43,663 - INFO - MONITOR - Frames: 91, FPS: 30.3, Detections: 19.8%, Errors: 0, Cache: 10/10 (56.8% hits)
+2025-06-05 09:40:44,284 - INFO - Display FPS: 21.2
+2025-06-05 09:40:45,680 - INFO - Display FPS: 21.5
+2025-06-05 09:40:46,664 - INFO - MONITOR - Frames: 178, FPS: 29.0, Detections: 23.0%, Errors: 0, Cache: 10/10 (47.7% hits)
+2025-06-05 09:40:47,076 - INFO - Display FPS: 21.5
+2025-06-05 09:40:48,448 - INFO - Display FPS: 21.9
+2025-06-05 09:40:49,665 - INFO - MONITOR - Frames: 254, FPS: 25.3, Detections: 36.2%, Errors: 0, Cache: 10/10 (39.0% hits)
+2025-06-05 09:40:49,859 - INFO - Display FPS: 21.3
+2025-06-05 09:40:51,239 - INFO - Display FPS: 21.7
+2025-06-05 09:40:52,625 - INFO - Display FPS: 21.6
+2025-06-05 09:40:52,665 - INFO - MONITOR - Frames: 322, FPS: 22.7, Detections: 44.1%, Errors: 0, Cache: 10/10 (34.4% hits)
+2025-06-05 09:40:54,028 - INFO - Display FPS: 21.4
+2025-06-05 09:40:55,479 - INFO - Display FPS: 20.7
+2025-06-05 09:40:55,666 - INFO - MONITOR - Frames: 385, FPS: 21.0, Detections: 42.3%, Errors: 0, Cache: 10/10 (29.9% hits)
+2025-06-05 09:40:56,883 - INFO - Display FPS: 21.4
+2025-06-05 09:40:58,447 - INFO - Display FPS: 19.2
+2025-06-05 09:40:58,667 - INFO - MONITOR - Frames: 444, FPS: 19.7, Detections: 36.7%, Errors: 0, Cache: 10/10 (26.9% hits)
+2025-06-05 09:41:00,113 - INFO - Display FPS: 18.0
+2025-06-05 09:41:01,667 - INFO - MONITOR - Frames: 493, FPS: 16.3, Detections: 33.1%, Errors: 0, Cache: 10/10 (25.6% hits)
+2025-06-05 09:41:02,181 - INFO - Display FPS: 14.5
+2025-06-05 09:41:03,658 - INFO - Display FPS: 20.3
+2025-06-05 09:41:04,667 - INFO - MONITOR - Frames: 546, FPS: 17.7, Detections: 31.0%, Errors: 0, Cache: 10/10 (24.8% hits)
+2025-06-05 09:41:05,467 - INFO - Display FPS: 16.6
+2025-06-05 09:41:07,121 - INFO - Display FPS: 18.1
+2025-06-05 09:41:07,668 - INFO - MONITOR - Frames: 600, FPS: 18.0, Detections: 30.7%, Errors: 0, Cache: 10/10 (22.9% hits)
+2025-06-05 09:41:08,769 - INFO - Display FPS: 18.2
+2025-06-05 09:41:10,565 - INFO - Display FPS: 16.7
+2025-06-05 09:41:10,668 - INFO - MONITOR - Frames: 652, FPS: 17.3, Detections: 29.8%, Errors: 0, Cache: 10/10 (21.3% hits)
+2025-06-05 09:41:12,363 - INFO - Display FPS: 16.7
+2025-06-05 09:41:13,669 - INFO - MONITOR - Frames: 701, FPS: 16.3, Detections: 31.8%, Errors: 0, Cache: 10/10 (20.0% hits)
+2025-06-05 09:41:14,216 - INFO - Display FPS: 16.2
+2025-06-05 09:41:16,670 - INFO - MONITOR - Frames: 726, FPS: 8.3, Detections: 30.7%, Errors: 0, Cache: 10/10 (19.5% hits)
+2025-06-05 09:41:19,670 - WARNING - Stream issue detected (failure #1). Last frame: 4.5s ago
+2025-06-05 09:41:22,671 - WARNING - Stream issue detected (failure #2). Last frame: 7.5s ago
+2025-06-05 09:41:25,672 - WARNING - Stream issue detected (failure #3). Last frame: 10.5s ago
+2025-06-05 09:41:25,672 - ERROR - Multiple consecutive stream failures. Manual restart may be required.
+2025-06-05 09:41:28,672 - WARNING - Stream issue detected (failure #4). Last frame: 13.5s ago
+2025-06-05 09:41:28,672 - ERROR - Multiple consecutive stream failures. Manual restart may be required.
+2025-06-05 09:41:31,673 - WARNING - Stream issue detected (failure #5). Last frame: 16.5s ago
+2025-06-05 09:41:31,673 - ERROR - Multiple consecutive stream failures. Manual restart may be required.
+2025-06-05 09:41:32,789 - INFO - Signal 2 received - initiating shutdown
+2025-06-05 09:41:33,384 - INFO - Display thread terminated
+2025-06-05 09:41:33,399 - INFO - Display window was closed
+2025-06-05 09:41:33,399 - INFO - Starting comprehensive cleanup...
+2025-06-05 09:41:33,671 - INFO - Cleanup thread terminated
+2025-06-05 09:41:34,674 - INFO - Connection monitor terminated
+2025-06-05 09:41:35,400 - INFO - RAM cache cleared
+2025-06-05 09:41:41,904 - INFO - Video stream closed
+2025-06-05 09:41:42,406 - INFO - Drone disconnected
+2025-06-05 09:41:42,407 - INFO - Cleanup completed successfully
+2025-06-05 09:41:42,431 - INFO - Program exiting with code 0
