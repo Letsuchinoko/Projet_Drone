@@ -1,276 +1,480 @@
 import cv2
-import time
 import numpy as np
+import time
+import subprocess
 import threading
-from pyparrot.Bebop import Bebop
-from pyparrot.DroneVision import DroneVision
-from queue import Queue, Empty
+import sys
 import logging
 import os
-import signal
-import sys
+import pyparrot
+from pyparrot.Bebop import Bebop
 from collections import deque
-import glob
 
-# Configuration optimisée
-DISPLAY_FPS = 25
-MAX_QUEUE_SIZE = 2  # Réduit pour éviter le lag
-IMAGES_DIR = "C:/Users/Baptiste/anaconda3/Lib/site-packages/pyparrot/images"
-CONNECTION_TIMEOUT = 20
-MAX_IMAGE_FILES = 50    # Réduit pour un nettoyage plus fréquent
-IMAGE_KEEP_COUNT = 25   
-WATCHDOG_TIMEOUT = 5    # Réduit pour une détection plus rapide des problèmes
-FRAME_TIMEOUT = 1.0     # Timeout plus court pour les frames
+# === PARAMÈTRES OPTIMISÉS AVEC ZOOM ADAPTATIF ===
+BEBOP_IP = "192.168.42.1"
+WIDTH, HEIGHT = 856, 480
 
-# Variables globales
-frame_queue = Queue(maxsize=MAX_QUEUE_SIZE)
-processing_active = threading.Event()
-processing_active.set()
-frame_stats = {
-    'frame_count': 0,
-    'detection_count': 0,
-    'error_count': 0,
-    'last_frame_time': time.time(),
-    'last_processed_file': None,
-    'stream_restarts': 0
-}
-stats_lock = threading.Lock()
-image_dir_lock = threading.Lock()
-vision_restart_lock = threading.Lock()
-
-# Configuration du logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
         logging.StreamHandler(sys.stdout),
-        logging.FileHandler('bebop_detection.log', mode='w', encoding='utf-8')
+        logging.FileHandler('bebop_adaptive_zoom.log', mode='w', encoding='utf-8')
     ]
 )
 logger = logging.getLogger(__name__)
 
-class AdvancedGloveDetector:
+# === DÉTECTEUR GANT AVEC ZOOM ADAPTATIF ===
+class AdaptiveZoomGloveDetector:
     def __init__(self):
-        self.detection_history = deque(maxlen=20)
-        self.min_area = 800          # Augmenté pour éviter les petits éléments
-        self.max_area = 50000        # Réduit pour éviter les grands objets
-        self.min_contour_points = 15 # Augmenté pour des formes plus complexes
+        # Configuration de base
+        self.detection_history = deque(maxlen=10)
+        self.stable_detections = deque(maxlen=3)
+        self.confidence_threshold = 2
         
-        # Kernels morphologiques optimisés
-        self.kernel_open = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
-        self.kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (9, 9))
-        self.kernel_erode = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2, 2))
+        # Paramètres de détection
+        self.min_area = 150      # Plus petit pour distance
+        self.max_area = 100000   # Plus grand pour zoom
+        self.min_contour_points = 6
         
-        # Stabilisation des détections
-        self.stable_detections = deque(maxlen=7)
-        self.confidence_threshold = 4  # Sur 7 dernières détections
+        # Kernels morphologiques
+        self.kernel_small = np.ones((2, 2), np.uint8)
+        self.kernel_medium = np.ones((5, 5), np.uint8)
+        self.kernel_large = np.ones((8, 8), np.uint8)
         
-        # Filtrage temporel
-        self.last_detection_center = None
-        self.max_movement_threshold = 100  # pixels max entre deux détections
+        # === SYSTÈME DE ZOOM ADAPTATIF ===
+        self.zoom_factor = 1.0
+        self.target_zoom = 1.0
+        self.zoom_smooth_factor = 0.1  # Lissage du zoom
+        self.zoom_min = 1.0
+        self.zoom_max = 4.0
         
-    def detect_glove(self, frame):
+        # Calibrage distance/aire
+        self.area_reference = 3000    # Aire de référence à distance normale
+        self.area_history = deque(maxlen=10)
+        self.last_detection_area = None
+        
+        # Zone de recherche adaptative
+        self.search_zone = None
+        self.zone_expand_factor = 1.5
+        
+        # Stats
+        self.frame_count = 0
+        self.detection_count = 0
+        self.zoom_adjustments = 0
+        self.fps_start_time = time.time()
+        self.current_fps = 0
+
+    def detect_glove_with_zoom(self, frame):
+        """Détection avec zoom adaptatif intelligent"""
         if frame is None:
             return frame, False
             
         original_frame = frame.copy()
-        h, w = frame.shape[:2]
+        self.frame_count += 1
         
         try:
-            # Redimensionnement adaptatif
-            scale_factor = 1.0
-            if w > 800:
-                scale_factor = 800.0 / w
-                work_frame = cv2.resize(frame, (int(w * scale_factor), int(h * scale_factor)))
-            else:
-                work_frame = frame.copy()
+            # === PHASE 1: ANALYSE GLOBALE (ZOOM OUT) ===
+            # Recherche globale si pas de détection récente
+            if sum(self.stable_detections) == 0 or self.zoom_factor > 1.5:
+                global_result = self._global_detection_phase(frame)
+                if global_result:
+                    detected, contour, area = global_result
+                    if detected:
+                        # Ajustement du zoom basé sur l'aire détectée
+                        self._update_zoom_from_area(area)
+                        return self._finalize_detection(original_frame, detected, contour, area)
             
-            # Prétraitement amélioré
-            work_frame = cv2.bilateralFilter(work_frame, 9, 80, 80)  # Meilleur que GaussianBlur
-            hsv = cv2.cvtColor(work_frame, cv2.COLOR_BGR2HSV)
+            # === PHASE 2: DÉTECTION AVEC ZOOM ===
+            # Application du zoom adaptatif
+            zoomed_frame, zoom_info = self._apply_adaptive_zoom(frame)
             
-            # Masques couleur améliorés
-            mask = self._create_advanced_color_mask(hsv)
+            # Détection sur frame zoomée
+            hsv = cv2.cvtColor(zoomed_frame, cv2.COLOR_BGR2HSV)
+            mask = self._create_zoom_optimized_mask(hsv)
             
-            # Post-traitement morphologique amélioré
-            mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, self.kernel_open)
-            mask = cv2.erode(mask, self.kernel_erode, iterations=1)
-            mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, self.kernel_close)
+            # Morphologie adaptée au zoom
+            mask = self._adaptive_morphology_for_zoom(mask)
             
-            # Détection et sélection du meilleur contour
+            # Détection de contours
             contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            best_contour = self._select_best_contour_advanced(contours, work_frame.shape)
+            best_contour, area = self._select_best_contour_zoom(contours)
             
-            # Validation temporelle
-            detected = self._validate_detection_temporal(best_contour, scale_factor)
+            # Remapping des coordonnées vers frame originale
+            if best_contour is not None:
+                best_contour = self._remap_contour_to_original(best_contour, zoom_info)
+                # Recalculer l'aire dans l'espace original
+                area = cv2.contourArea(best_contour)
             
-            # Mise à jour de l'historique
+            # Validation et stabilisation
+            detected = best_contour is not None
             self.stable_detections.append(detected)
             stable_detection = sum(self.stable_detections) >= self.confidence_threshold
-            self.detection_history.append(stable_detection)
             
-            # Dessin des résultats
-            if stable_detection and best_contour is not None:
-                if scale_factor != 1.0:
-                    best_contour = (best_contour / scale_factor).astype(np.int32)
-                self._draw_advanced_detection(original_frame, best_contour)
-                with stats_lock:
-                    frame_stats['detection_count'] += 1
-                    
-            result_frame = self._add_advanced_overlay(original_frame, stable_detection, mask)
-            return result_frame, stable_detection
+            # Mise à jour du zoom
+            if stable_detection and area:
+                self._update_zoom_from_area(area)
+                self.area_history.append(area)
+                self.last_detection_area = area
+            else:
+                # Zoom out si pas de détection
+                self._zoom_out_gradually()
+            
+            return self._finalize_detection(original_frame, stable_detection, best_contour, area)
             
         except Exception as e:
-            logger.error(f"Detection error: {e}")
-            with stats_lock:
-                frame_stats['error_count'] += 1
+            logger.debug(f"Adaptive zoom detection error: {e}")
             return original_frame, False
-    
-    def _create_advanced_color_mask(self, hsv):
-        """Création d'un masque couleur avancé avec exclusion de la peau"""
-        h, w = hsv.shape[:2]
-        
-        # Masque peau amélioré (plusieurs teintes)
-        skin_masks = []
-        # Peau claire
-        skin_lower1 = np.array([0, 20, 70])
-        skin_upper1 = np.array([25, 120, 255])
-        skin_masks.append(cv2.inRange(hsv, skin_lower1, skin_upper1))
-        
-        # Peau foncée
-        skin_lower2 = np.array([0, 25, 50])
-        skin_upper2 = np.array([15, 100, 200])
-        skin_masks.append(cv2.inRange(hsv, skin_lower2, skin_upper2))
-        
-        mask_skin = cv2.bitwise_or(skin_masks[0], skin_masks[1])
-        
-        # Masque orange optimisé
-        orange_lower = np.array([8, 140, 140])   # Plus restrictif
-        orange_upper = np.array([20, 255, 255])
-        mask_orange = cv2.inRange(hsv, orange_lower, orange_upper)
-        
-        # Masque rouge optimisé (deux plages)
-        red_lower1 = np.array([0, 150, 140])    # Plus restrictif
-        red_upper1 = np.array([6, 255, 255])
-        mask_red1 = cv2.inRange(hsv, red_lower1, red_upper1)
-        
-        red_lower2 = np.array([174, 150, 140])  # Plus restrictif
-        red_upper2 = np.array([180, 255, 255])
-        mask_red2 = cv2.inRange(hsv, red_lower2, red_upper2)
-        
-        mask_red = cv2.bitwise_or(mask_red1, mask_red2)
-        
-        # Combinaison et exclusion de la peau
-        mask_gant = cv2.bitwise_or(mask_orange, mask_red)
-        mask_skin_dilated = cv2.dilate(mask_skin, self.kernel_close, iterations=1)
-        mask_final = cv2.bitwise_and(mask_gant, cv2.bitwise_not(mask_skin_dilated))
-        
-        return mask_final
-    
-    def _select_best_contour_advanced(self, contours, frame_shape):
-        """Sélection avancée du meilleur contour avec scoring multicritères"""
-        if not contours:
+
+    def _global_detection_phase(self, frame):
+        """Phase de détection globale (recherche large)"""
+        try:
+            # Détection rapide sur frame complète
+            hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+            mask = self._create_zoom_optimized_mask(hsv)
+            
+            # Morphologie légère pour recherche globale
+            mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, self.kernel_medium)
+            mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, self.kernel_small)
+            
+            contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            best_contour, area = self._select_best_contour_zoom(contours)
+            
+            if best_contour is not None and area > self.min_area:
+                return True, best_contour, area
+            
             return None
             
-        h, w = frame_shape[:2]
-        best_contour = None
-        best_score = 0
-        
-        for contour in contours:
-            area = cv2.contourArea(contour)
-            
-            # Filtres de base
-            if area < self.min_area or area > self.max_area:
-                continue
-            if len(contour) < self.min_contour_points:
-                continue
-                
-            # Rectangle englobant
-            x, y, w_rect, h_rect = cv2.boundingRect(contour)
-            
-            # Filtre aspect ratio plus strict
-            aspect_ratio = w_rect / float(h_rect)
-            if not (0.3 <= aspect_ratio <= 3.0):  # Plus restrictif
-                continue
-                
-            # Éviter les bords (plus strict)
-            margin = 10
-            if (x < margin or y < margin or 
-                (x + w_rect) > (w - margin) or 
-                (y + h_rect) > (h - margin)):
-                continue
-            
-            # Calcul de la solidité (convexité)
-            hull = cv2.convexHull(contour)
-            hull_area = cv2.contourArea(hull)
-            if hull_area > 0:
-                solidity = area / hull_area
-                if solidity < 0.45:  # Plus restrictif
-                    continue
-            else:
-                continue
-            
-            # Calcul du périmètre et circularité
-            perimeter = cv2.arcLength(contour, True)
-            if perimeter > 0:
-                circularity = 4 * np.pi * area / (perimeter * perimeter)
-                if circularity < 0.15:  # Éviter les formes trop allongées
-                    continue
-            
-            # Scoring multicritères
-            area_score = min(area / 5000.0, 1.0)
-            position_score = 1.0 if y > h * 0.15 else 0.6  # Préférer le centre-bas
-            solidity_score = min(solidity * 2, 1.0)
-            
-            # Bonus pour les formes plus carrées
-            aspect_bonus = 1.0 if 0.7 <= aspect_ratio <= 1.4 else 0.8
-            
-            score = area_score * position_score * solidity_score * aspect_bonus
-            
-            if score > best_score:
-                best_score = score
-                best_contour = contour
-                
-        return best_contour
-    
-    def _validate_detection_temporal(self, contour, scale_factor):
-        """Validation temporelle pour éviter les fausses détections"""
-        if contour is None:
-            self.last_detection_center = None
-            return False
-            
-        # Calcul du centre
-        M = cv2.moments(contour)
-        if M["m00"] == 0:
-            return False
-            
-        cx = int(M["m10"] / M["m00"])
-        cy = int(M["m01"] / M["m00"])
-        current_center = (cx, cy)
-        
-        # Si on a une détection précédente, vérifier la cohérence
-        if self.last_detection_center is not None:
-            distance = np.sqrt((cx - self.last_detection_center[0])**2 + 
-                             (cy - self.last_detection_center[1])**2)
-            
-            # Si le mouvement est trop important, c'est probablement une fausse détection
-            if distance > self.max_movement_threshold:
-                return False
-        
-        self.last_detection_center = current_center
-        return True
-    
-    def _draw_advanced_detection(self, frame, contour):
-        """Dessin avancé de la détection"""
+        except Exception as e:
+            logger.debug(f"Global detection error: {e}")
+            return None
+
+    def _apply_adaptive_zoom(self, frame):
+        """Application du zoom adaptatif intelligent"""
         try:
+            h, w = frame.shape[:2]
+            
+            # Lissage du zoom pour éviter les oscillations
+            self.zoom_factor += (self.target_zoom - self.zoom_factor) * self.zoom_smooth_factor
+            self.zoom_factor = np.clip(self.zoom_factor, self.zoom_min, self.zoom_max)
+            
+            if self.zoom_factor <= 1.05:  # Pas de zoom si facteur proche de 1
+                return frame, {'zoom': 1.0, 'offset_x': 0, 'offset_y': 0, 'crop_w': w, 'crop_h': h}
+            
+            # Zone de focus basée sur dernière détection
+            if self.search_zone is not None:
+                center_x, center_y, zone_w, zone_h = self.search_zone
+            else:
+                # Centre de l'image par défaut
+                center_x, center_y = w // 2, h // 2
+                zone_w, zone_h = w // 2, h // 2
+            
+            # Calcul de la zone de crop
+            crop_w = int(w / self.zoom_factor)
+            crop_h = int(h / self.zoom_factor)
+            
+            # Centrage sur la zone de recherche
+            offset_x = max(0, min(center_x - crop_w // 2, w - crop_w))
+            offset_y = max(0, min(center_y - crop_h // 2, h - crop_h))
+            
+            # Crop et redimensionnement
+            cropped = frame[offset_y:offset_y + crop_h, offset_x:offset_x + crop_w]
+            zoomed = cv2.resize(cropped, (w, h), interpolation=cv2.INTER_LINEAR)
+            
+            zoom_info = {
+                'zoom': self.zoom_factor,
+                'offset_x': offset_x,
+                'offset_y': offset_y,
+                'crop_w': crop_w,
+                'crop_h': crop_h
+            }
+            
+            return zoomed, zoom_info
+            
+        except Exception as e:
+            logger.debug(f"Adaptive zoom error: {e}")
+            return frame, {'zoom': 1.0, 'offset_x': 0, 'offset_y': 0, 'crop_w': w, 'crop_h': h}
+
+    def _create_zoom_optimized_mask(self, hsv):
+        """Masque optimisé pour détection zoomée"""
+        try:
+            h, w = hsv.shape[:2]
+            
+            # Ajustement des seuils selon le zoom
+            sat_boost = min(20, int(10 * self.zoom_factor))  # Plus de saturation pour zoom élevé
+            val_boost = min(15, int(8 * self.zoom_factor))
+            
+            # === MASQUES ORANGE OPTIMISÉS ===
+            orange_main_lower = np.array([12, 160 - sat_boost, 160 - val_boost])
+            orange_main_upper = np.array([20, 255, 255])
+            mask_orange_main = cv2.inRange(hsv, orange_main_lower, orange_main_upper)
+            
+            orange_bright_lower = np.array([10, 180 - sat_boost, 180 - val_boost])
+            orange_bright_upper = np.array([18, 255, 255])
+            mask_orange_bright = cv2.inRange(hsv, orange_bright_lower, orange_bright_upper)
+            
+            orange_shadow_lower = np.array([14, 120 - sat_boost//2, 140 - val_boost])
+            orange_shadow_upper = np.array([19, 200, 220])
+            mask_orange_shadow = cv2.inRange(hsv, orange_shadow_lower, orange_shadow_upper)
+            
+            # === MASQUES ROUGE OPTIMISÉS ===
+            red_main_lower1 = np.array([0, 160 - sat_boost, 160 - val_boost])
+            red_main_upper1 = np.array([6, 255, 255])
+            mask_red_main1 = cv2.inRange(hsv, red_main_lower1, red_main_upper1)
+            
+            red_main_lower2 = np.array([174, 160 - sat_boost, 160 - val_boost])
+            red_main_upper2 = np.array([180, 255, 255])
+            mask_red_main2 = cv2.inRange(hsv, red_main_lower2, red_main_upper2)
+            
+            # Combinaisons
+            mask_orange = cv2.bitwise_or(mask_orange_main, 
+                         cv2.bitwise_or(mask_orange_bright, mask_orange_shadow))
+            
+            mask_red = cv2.bitwise_or(mask_red_main1, mask_red_main2)
+            
+            mask_glove = cv2.bitwise_or(mask_orange, mask_red)
+            
+            # === EXCLUSIONS ADAPTATIVES ===
+            # Exclusions moins strictes en zoom élevé
+            exclusion_strictness = max(0.5, 1.0 - (self.zoom_factor - 1.0) * 0.3)
+            
+            # Peau (ajustée selon zoom)
+            skin_sat_max = int(120 * exclusion_strictness)
+            skin_lower = np.array([5, 60, 120])
+            skin_upper = np.array([15, skin_sat_max, 220])
+            mask_skin = cv2.inRange(hsv, skin_lower, skin_upper)
+            
+            # Application exclusions
+            mask_skin_eroded = cv2.erode(mask_skin, self.kernel_small, iterations=1)
+            mask_final = cv2.bitwise_and(mask_glove, cv2.bitwise_not(mask_skin_eroded))
+            
+            # Bordures adaptatives (plus petites en zoom)
+            border_size = max(5, int(15 / self.zoom_factor))
+            border_mask = np.ones((h, w), dtype=np.uint8) * 255
+            border_mask[:border_size, :] = 0
+            border_mask[-border_size:, :] = 0
+            border_mask[:, :border_size] = 0
+            border_mask[:, -border_size:] = 0
+            
+            mask_final = cv2.bitwise_and(mask_final, border_mask)
+            
+            # Nettoyage adaptatif
+            blur_size = max(3, int(5 / self.zoom_factor))
+            if blur_size % 2 == 0:
+                blur_size += 1
+            mask_final = cv2.medianBlur(mask_final, blur_size)
+            
+            return mask_final
+            
+        except Exception as e:
+            logger.debug(f"Zoom optimized mask error: {e}")
+            return np.zeros(hsv.shape[:2], dtype=np.uint8)
+
+    def _adaptive_morphology_for_zoom(self, mask):
+        """Morphologie adaptée au niveau de zoom"""
+        try:
+            # Kernels adaptatifs selon le zoom
+            if self.zoom_factor > 2.5:
+                # Zoom élevé: kernels plus grands
+                kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (8, 8))
+                kernel_open = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+                iterations = 2
+            elif self.zoom_factor > 1.5:
+                # Zoom moyen
+                kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (6, 6))
+                kernel_open = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2, 2))
+                iterations = 1
+            else:
+                # Zoom faible
+                kernel_close = self.kernel_medium
+                kernel_open = self.kernel_small
+                iterations = 1
+            
+            # Application morphologie
+            mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel_close, iterations=iterations)
+            mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel_open, iterations=1)
+            
+            return mask
+            
+        except Exception as e:
+            logger.debug(f"Adaptive morphology error: {e}")
+            return mask
+
+    def _select_best_contour_zoom(self, contours):
+        """Sélection contour optimisée pour zoom"""
+        if not contours:
+            return None, 0
+            
+        try:
+            best_contour = None
+            best_score = 0
+            best_area = 0
+            
+            # Ajustement des seuils selon le zoom
+            min_area_adjusted = self.min_area * (self.zoom_factor ** 1.5)
+            max_area_adjusted = self.max_area * (self.zoom_factor ** 1.5)
+            
+            for contour in contours:
+                area = cv2.contourArea(contour)
+                
+                if area < min_area_adjusted or area > max_area_adjusted:
+                    continue
+                if len(contour) < self.min_contour_points:
+                    continue
+                
+                # Analyse géométrique
+                x, y, w, h = cv2.boundingRect(contour)
+                aspect_ratio = w / float(h)
+                
+                if not (0.3 <= aspect_ratio <= 2.5):
+                    continue
+                
+                # Score basé sur l'aire et la forme
+                area_score = min(area / (self.area_reference * self.zoom_factor), 1.0)
+                
+                # Bonus pour position centrale (important en zoom)
+                center_x = x + w // 2
+                center_y = y + h // 2
+                frame_center_x = WIDTH // 2
+                frame_center_y = HEIGHT // 2
+                
+                dist_from_center = np.sqrt((center_x - frame_center_x)**2 + (center_y - frame_center_y)**2)
+                max_dist = np.sqrt(frame_center_x**2 + frame_center_y**2)
+                position_score = 1.0 - (dist_from_center / max_dist) * 0.5
+                
+                final_score = area_score * position_score
+                
+                if final_score > best_score:
+                    best_score = final_score
+                    best_contour = contour
+                    best_area = area
+            
+            return best_contour, best_area
+            
+        except Exception as e:
+            logger.debug(f"Zoom contour selection error: {e}")
+            return None, 0
+
+    def _remap_contour_to_original(self, contour, zoom_info):
+        """Remapping du contour vers les coordonnées originales"""
+        try:
+            if zoom_info['zoom'] <= 1.05:
+                return contour
+            
+            # Facteurs de conversion
+            scale_x = zoom_info['crop_w'] / WIDTH
+            scale_y = zoom_info['crop_h'] / HEIGHT
+            
+            # Remapping des points
+            remapped_contour = contour.copy()
+            remapped_contour[:, :, 0] = (contour[:, :, 0] * scale_x + zoom_info['offset_x']).astype(np.int32)
+            remapped_contour[:, :, 1] = (contour[:, :, 1] * scale_y + zoom_info['offset_y']).astype(np.int32)
+            
+            return remapped_contour
+            
+        except Exception as e:
+            logger.debug(f"Contour remapping error: {e}")
+            return contour
+
+    def _update_zoom_from_area(self, area):
+        """Mise à jour du zoom basée sur l'aire détectée"""
+        try:
+            if area <= 0:
+                return
+            
+            # Calcul du zoom optimal basé sur l'aire
+            # Plus l'aire est petite, plus on zoome
+            area_ratio = self.area_reference / area
+            
+            # Fonction de zoom adaptative
+            if area < 800:           # Très petit (loin)
+                self.target_zoom = min(self.zoom_max, 3.5)
+            elif area < 1500:        # Petit (moyennement loin)
+                self.target_zoom = min(self.zoom_max, 2.5)
+            elif area < 3000:        # Moyen (distance normale)
+                self.target_zoom = 1.8
+            elif area < 6000:        # Grand (proche)
+                self.target_zoom = 1.3
+            else:                    # Très grand (très proche)
+                self.target_zoom = 1.0
+            
+            # Mise à jour de la zone de recherche
+            self._update_search_zone_from_contour(area)
+            
+            self.zoom_adjustments += 1
+            
+        except Exception as e:
+            logger.debug(f"Zoom update error: {e}")
+
+    def _zoom_out_gradually(self):
+        """Zoom out graduel si pas de détection"""
+        try:
+            # Réduction progressive du zoom si pas de détection
+            if sum(self.stable_detections) == 0:
+                self.target_zoom = max(self.zoom_min, self.target_zoom * 0.95)
+                
+                # Reset de la zone de recherche si zoom faible
+                if self.target_zoom < 1.2:
+                    self.search_zone = None
+                    
+        except Exception as e:
+            logger.debug(f"Zoom out error: {e}")
+
+    def _update_search_zone_from_contour(self, area):
+        """Mise à jour de la zone de recherche"""
+        try:
+            # Zone de recherche basée sur la dernière détection
+            # Ici on pourrait utiliser la position du contour
+            # Pour l'instant, on garde le centre avec expansion
+            if self.search_zone is None:
+                self.search_zone = (WIDTH//2, HEIGHT//2, WIDTH//3, HEIGHT//3)
+                
+        except Exception as e:
+            logger.debug(f"Search zone update error: {e}")
+
+    def _finalize_detection(self, frame, detected, contour, area):
+        """Finalisation de la détection avec affichage"""
+        try:
+            # Historique
+            self.detection_history.append(detected)
+            if detected:
+                self.detection_count += 1
+            
+            # Dessin
+            if detected and contour is not None:
+                self._draw_zoom_detection(frame, contour, area)
+            
+            # Overlay avec informations de zoom
+            result_frame = self._add_zoom_overlay(frame, detected, area)
+            
+            return result_frame, detected
+            
+        except Exception as e:
+            logger.debug(f"Finalization error: {e}")
+            return frame, False
+
+    def _draw_zoom_detection(self, frame, contour, area):
+        """Dessin avec informations de zoom"""
+        try:
+            # Couleur selon la distance estimée
+            if area > 4000:
+                color = (0, 255, 0)      # Vert - proche
+                distance_text = "PROCHE"
+            elif area > 1500:
+                color = (0, 255, 255)    # Jaune - moyen
+                distance_text = "MOYEN"
+            else:
+                color = (0, 150, 255)    # Orange - loin
+                distance_text = "LOIN"
+            
             # Contour principal
-            cv2.drawContours(frame, [contour], -1, (0, 255, 0), 3)
+            cv2.drawContours(frame, [contour], -1, color, 3)
             
             # Rectangle englobant
             x, y, w, h = cv2.boundingRect(contour)
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 100, 0), 2)
+            cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
             
-            # Centre de masse
+            # Centre
             M = cv2.moments(contour)
             if M["m00"] != 0:
                 cx = int(M["m10"] / M["m00"])
@@ -278,421 +482,373 @@ class AdvancedGloveDetector:
                 cv2.circle(frame, (cx, cy), 8, (0, 0, 255), -1)
                 cv2.circle(frame, (cx, cy), 12, (255, 255, 255), 2)
             
-            # Informations détaillées
-            area = cv2.contourArea(contour)
-            hull = cv2.convexHull(contour)
-            hull_area = cv2.contourArea(hull)
-            solidity = area / hull_area if hull_area > 0 else 0
-            
-            # Texte d'information
-            info_y = max(y - 15, 30)
-            cv2.putText(frame, f"GANT DETECTE", (x, info_y),
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
-            cv2.putText(frame, f"Aire: {int(area)} | Sol: {solidity:.2f}", 
-                       (x, info_y - 25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+            # Texte avec distance et aire
+            cv2.putText(frame, f"GANT {distance_text}", (x, max(y - 15, 25)),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2)
+            cv2.putText(frame, f"Aire: {int(area)} | Zoom: {self.zoom_factor:.1f}x", 
+                       (x, max(y - 40, 50)),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
                        
         except Exception as e:
-            logger.debug(f"Drawing error: {e}")
-    
-    def _add_advanced_overlay(self, frame, detected, mask=None):
-        """Overlay avancé avec plus d'informations"""
+            logger.debug(f"Zoom drawing error: {e}")
+
+    def _add_zoom_overlay(self, frame, detected, area):
+        """Overlay avec informations de zoom"""
         try:
             h, w = frame.shape[:2]
             
             # Status principal
-            status = "🟢 GANT DETECTE" if detected else "🔍 RECHERCHE..."
-            color = (0, 255, 0) if detected else (0, 255, 255)
-            cv2.putText(frame, status, (10, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2)
+            if detected:
+                if self.zoom_factor > 2.0:
+                    status = f"🎯 GANT DETECTE (ZOOM {self.zoom_factor:.1f}x)"
+                else:
+                    status = "🎯 GANT DETECTE"
+                color = (0, 255, 0)
+            else:
+                status = f"🔍 RECHERCHE (ZOOM {self.zoom_factor:.1f}x)"
+                color = (0, 255, 255)
             
-            # Statistiques détaillées
-            with stats_lock:
-                detection_rate = (frame_stats['detection_count'] / max(frame_stats['frame_count'], 1)) * 100
-                stats_text = (f"Frames: {frame_stats['frame_count']} | "
-                            f"Detections: {frame_stats['detection_count']} ({detection_rate:.1f}%) | "
-                            f"Erreurs: {frame_stats['error_count']}")
+            cv2.putText(frame, status, (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2)
             
-            cv2.putText(frame, stats_text, (10, h - 80), 
+            # Barre de zoom visuelle
+            zoom_bar_width = 200
+            zoom_bar_height = 15
+            zoom_x, zoom_y = 10, 70
+            
+            # Barre de fond
+            cv2.rectangle(frame, (zoom_x, zoom_y), 
+                         (zoom_x + zoom_bar_width, zoom_y + zoom_bar_height), 
+                         (50, 50, 50), -1)
+            
+            # Barre de zoom actuel
+            zoom_width = int(zoom_bar_width * (self.zoom_factor - 1.0) / (self.zoom_max - 1.0))
+            zoom_color = (0, 255, 255) if self.zoom_factor > 1.5 else (100, 255, 100)
+            cv2.rectangle(frame, (zoom_x, zoom_y), 
+                         (zoom_x + zoom_width, zoom_y + zoom_bar_height), 
+                         zoom_color, -1)
+            
+            cv2.putText(frame, f"Zoom: {self.zoom_factor:.1f}x", 
+                       (zoom_x + zoom_bar_width + 10, zoom_y + 12),
                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
             
-            # Historique visuel amélioré
-            history_symbols = []
-            for detection in list(self.detection_history)[-20:]:
-                if detection:
-                    history_symbols.append("●")
-                else:
-                    history_symbols.append("○")
+            # Stats de performance
+            detection_rate = (self.detection_count / max(self.frame_count, 1)) * 100
+            stats_text = f"Frames: {self.frame_count} | Det: {detection_rate:.1f}% | Ajust. zoom: {self.zoom_adjustments}"
+            cv2.putText(frame, stats_text, (10, h - 80), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
             
-            history_text = "Historique: " + "".join(history_symbols)
-            cv2.putText(frame, history_text, (10, h - 50), 
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, (200, 200, 200), 1)
+            # Information aire courante
+            if area and area > 0:
+                area_text = f"Aire actuelle: {int(area)} | Target zoom: {self.target_zoom:.1f}x"
+                cv2.putText(frame, area_text, (10, h - 55), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (200, 255, 200), 1)
             
-            # Niveau de confiance
-            confidence = sum(self.stable_detections) / len(self.stable_detections) if self.stable_detections else 0
-            confidence_text = f"Confiance: {confidence:.1%}"
-            conf_color = (0, 255, 0) if confidence > 0.6 else (0, 165, 255)
-            cv2.putText(frame, confidence_text, (10, h - 20), 
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, conf_color, 1)
+            # FPS
+            if self.frame_count % 30 == 0:
+                now = time.time()
+                elapsed = now - self.fps_start_time
+                self.current_fps = 30 / elapsed if elapsed > 0 else 0
+                self.fps_start_time = now
             
-            # Timestamp
-            timestamp = time.strftime("%H:%M:%S")
-            cv2.putText(frame, timestamp, (w - 120, 30), 
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+            cv2.putText(frame, f"FPS: {self.current_fps:.1f}", (w - 150, 30), 
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.7, (100, 255, 100), 2)
             
-            # Masque miniature amélioré
-            if mask is not None and mask.size > 0:
-                try:
-                    mask_small = cv2.resize(mask, (180, 135))
-                    mask_colored = cv2.applyColorMap(mask_small, cv2.COLORMAP_JET)
-                    
-                    # Position du masque
-                    mask_x, mask_y = w - 190, 50
-                    frame[mask_y:mask_y+135, mask_x:mask_x+180] = mask_colored
-                    
-                    # Bordure du masque
-                    cv2.rectangle(frame, (mask_x, mask_y), (mask_x+180, mask_y+135), (255, 255, 255), 2)
-                    cv2.putText(frame, "Masque Couleur", (mask_x, mask_y + 150), 
-                               cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
-                except:
-                    pass
+            # Historique
+            history = "".join(["●" if x else "○" for x in list(self.detection_history)[-10:]])
+            cv2.putText(frame, f"Hist: {history}", (10, h - 30), 
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
+            
+            # Zone de zoom (si active)
+            if self.zoom_factor > 1.2 and self.search_zone:
+                zone_x, zone_y, zone_w, zone_h = self.search_zone
+                cv2.rectangle(frame, 
+                             (zone_x - zone_w//2, zone_y - zone_h//2), 
+                             (zone_x + zone_w//2, zone_y + zone_h//2), 
+                             (100, 100, 255), 2)
+                cv2.putText(frame, "ZONE ZOOM", (zone_x - 40, zone_y - zone_h//2 - 10),
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.4, (100, 100, 255), 1)
             
             return frame
             
         except Exception as e:
-            logger.debug(f"Overlay error: {e}")
+            logger.debug(f"Zoom overlay error: {e}")
             return frame
 
-def vision_callback(args):
-    """Callback optimisé pour la réception des frames"""
-    try:
-        with image_dir_lock:
-            pattern = os.path.join(IMAGES_DIR, "image_*.png")
-            files = glob.glob(pattern)
-            
-            if not files:
-                return
-                
-            # Prendre le fichier le plus récent
-            latest_file = max(files, key=os.path.getmtime)
-            
-            # Vérifications de validité
-            if not os.path.exists(latest_file) or os.path.getsize(latest_file) < 2000:
-                return
-            
-            # Petit délai pour s'assurer que le fichier est complètement écrit
-            time.sleep(0.005)
-            
-            frame = cv2.imread(latest_file)
-            if frame is None:
-                return
-                
-            h, w = frame.shape[:2]
-            if h < 200 or w < 200:  # Taille minimum plus stricte
-                return
-            
-            # Nettoyage préventif de la queue si elle est pleine
-            if frame_queue.full():
-                try:
-                    frame_queue.get_nowait()  # Retire la plus ancienne frame
-                except Empty:
-                    pass
-            
-            try:
-                frame_queue.put_nowait(frame)
-            except:
-                # Si la queue est pleine, on remplace la dernière frame
-                try:
-                    frame_queue.get_nowait()
-                    frame_queue.put_nowait(frame)
-                except:
-                    pass
-        
-        # Mise à jour des statistiques
-        with stats_lock:
-            frame_stats['frame_count'] += 1
-            frame_stats['last_frame_time'] = time.time()
-            frame_stats['last_processed_file'] = os.path.basename(latest_file)
-            
-        logger.debug(f"Frame processed: {os.path.basename(latest_file)}")
-        
-    except Exception as e:
-        logger.debug(f"Vision callback error: {e}")
-
-def cleanup_thread():
-    """Thread de nettoyage optimisé"""
-    logger.info("Cleanup thread started")
-    cleanup_interval = 15  # Nettoyage plus fréquent
+# === CONTRÔLE DRONE SIMPLE ===
+def simple_drone_control(bebop):
+    logger.info("Contrôle drone démarré.")
+    print("\n[Commandes drone]\n"
+          "  t = décoller | l = atterrir | e = quitter\n"
+          "  f/b/g/d = mouvements | h/m = haut/bas | a/c = rotations\n")
     
-    while processing_active.is_set():
+    while True:
         try:
-            with image_dir_lock:
-                files = glob.glob(os.path.join(IMAGES_DIR, "image_*.png"))
-                
-                if len(files) > MAX_IMAGE_FILES:
-                    # Trier par date de modification
-                    files_sorted = sorted(files, key=os.path.getmtime, reverse=True)
-                    files_to_remove = files_sorted[IMAGE_KEEP_COUNT:]
-                    
-                    removed_count = 0
-                    for file_path in files_to_remove:
-                        try:
-                            os.remove(file_path)
-                            removed_count += 1
-                        except OSError as e:
-                            logger.debug(f"Could not remove {file_path}: {e}")
-                    
-                    if removed_count > 0:
-                        logger.info(f"Cleaned up {removed_count} old image files")
-                        
-        except Exception as e:
-            logger.debug(f"Cleanup error: {e}")
-        
-        # Attente interruptible
-        for _ in range(cleanup_interval):
-            if not processing_active.is_set():
-                break
-            time.sleep(1)
-    
-    logger.info("Cleanup thread terminated")
-
-def display_thread():
-    """Thread d'affichage optimisé"""
-    detector = AdvancedGloveDetector()
-    logger.info("Display thread started")
-    
-    window_name = "Bebop 2 - Detection Gant Avancee"
-    cv2.namedWindow(window_name, cv2.WINDOW_AUTOSIZE)
-    
-    # Compteurs pour les statistiques
-    fps_counter = 0
-    fps_start_time = time.time()
-    last_fps_log = time.time()
-    
-    while processing_active.is_set():
-        try:
-            # Récupération de frame avec timeout
-            try:
-                frame = frame_queue.get(timeout=FRAME_TIMEOUT)
-            except Empty:
-                logger.debug("No frame received within timeout")
-                continue
-            
-            if frame is None:
-                continue
-            
-            # Traitement de la détection
-            processed_frame, detected = detector.detect_glove(frame)
-            
-            # Calcul FPS
-            fps_counter += 1
-            current_time = time.time()
-            
-            # Log FPS toutes les 30 frames ou toutes les 5 secondes
-            if fps_counter % 30 == 0 or (current_time - last_fps_log) > 5:
-                fps_elapsed = current_time - fps_start_time
-                current_fps = fps_counter / fps_elapsed if fps_elapsed > 0 else 0
-                
-                if fps_counter % 30 == 0:
-                    logger.info(f"Display FPS: {current_fps:.1f}")
-                
-                last_fps_log = current_time
-                fps_start_time = current_time
-                fps_counter = 0
-            
-            # Affichage
-            cv2.imshow(window_name, processed_frame)
-            
-            # Gestion des touches
-            key = cv2.waitKey(1) & 0xFF
-            if key == ord('q') or key == 27:  # 'q' ou Escape
-                logger.info("User requested quit")
-                processing_active.clear()
-                break
-            elif key == ord('r'):  # Reset statistiques
-                with stats_lock:
-                    frame_stats['frame_count'] = 0
-                    frame_stats['detection_count'] = 0
-                    frame_stats['error_count'] = 0
-                detector.detection_history.clear()
-                detector.stable_detections.clear()
-                logger.info("Statistics and detection history reset")
-            elif key == ord('s'):  # Screenshot
-                screenshot_name = f"screenshot_{int(time.time())}.png"
-                cv2.imwrite(screenshot_name, processed_frame)
-                logger.info(f"Screenshot saved: {screenshot_name}")
-            elif key == ord('d'):  # Toggle debug
-                logger.info("Debug info toggled")
-                
-        except Exception as e:
-            logger.error(f"Display thread error: {e}")
-            time.sleep(0.1)
-    
-    cv2.destroyAllWindows()
-    logger.info("Display thread terminated")
-
-def connection_monitor_thread():
-    """Thread de monitoring optimisé avec redémarrage automatique"""
-    logger.info("Connection monitor started")
-    last_frame_count = 0
-    check_interval = 3  # Vérification plus fréquente
-    consecutive_failures = 0
-    
-    while processing_active.is_set():
-        time.sleep(check_interval)
-        
-        if not processing_active.is_set():
+            key = input("> ").strip().lower()
+        except EOFError:
             break
-        
-        with stats_lock:
-            current_frames = frame_stats['frame_count']
-            errors = frame_stats['error_count']
-            detections = frame_stats['detection_count']
-            last_received_time = frame_stats['last_frame_time']
-        
-        frame_diff = current_frames - last_frame_count
-        last_frame_count = current_frames
-        time_since_last_frame = time.time() - last_received_time
-        
-        # Vérification de l'état du flux
-        if frame_diff == 0 or time_since_last_frame > WATCHDOG_TIMEOUT:
-            consecutive_failures += 1
-            logger.warning(f"Stream issue detected (failure #{consecutive_failures}). "
-                         f"Last frame: {time_since_last_frame:.1f}s ago")
             
-            if consecutive_failures >= 3:
-                logger.error("Multiple consecutive stream failures. Manual restart may be required.")
-                # On pourrait implémenter un redémarrage automatique ici
-                
-        else:
-            if consecutive_failures > 0:
-                logger.info("Stream recovered")
-            consecutive_failures = 0
-            
-            # Statistiques normales
-            avg_fps = frame_diff / check_interval
-            detection_rate = (detections / max(current_frames, 1)) * 100
-            
-            logger.info(f"MONITOR - Frames: {current_frames}, FPS: {avg_fps:.1f}, "
-                       f"Detections: {detection_rate:.1f}%, Errors: {errors}")
-    
-    logger.info("Connection monitor terminated")
-
-def signal_handler(sig, frame):
-    """Gestionnaire de signaux amélioré"""
-    logger.info(f"Signal {sig} received - initiating shutdown")
-    processing_active.clear()
+        if key == 't':
+            bebop.safe_takeoff(10)
+            print("✈️ Décollage")
+        elif key == 'l':
+            bebop.safe_land(10)
+            print("🛬 Atterrissage")
+        elif key == 'e':
+            bebop.safe_land(10)
+            bebop.disconnect()
+            print("🔚 Arrêt")
+            break
+        elif key == 'f':
+            bebop.fly_direct(roll=0, pitch=25, yaw=0, vertical_movement=0, duration=0.3)
+        elif key == 'b':
+            bebop.fly_direct(roll=0, pitch=-25, yaw=0, vertical_movement=0, duration=0.3)
+        elif key == 'g':
+            bebop.fly_direct(roll=-25, pitch=0, yaw=0, vertical_movement=0, duration=0.3)
+        elif key == 'd':
+            bebop.fly_direct(roll=25, pitch=0, yaw=0, vertical_movement=0, duration=0.3)
+        elif key == 'h':
+            bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=20, duration=0.3)
+        elif key == 'm':
+            bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=-20, duration=0.3)
+        elif key == 'a':
+            bebop.fly_direct(roll=0, pitch=0, yaw=-35, vertical_movement=0, duration=0.3)
+        elif key == 'c':
+            bebop.fly_direct(roll=0, pitch=0, yaw=35, vertical_movement=0, duration=0.3)
 
 def main():
-    """Fonction principale optimisée"""
-    # Configuration des signaux
-    signal.signal(signal.SIGINT, signal_handler)
-    signal.signal(signal.SIGTERM, signal_handler)
-    
-    logger.info("Starting Advanced Bebop 2 glove detection system")
-    
-    # Vérification du répertoire d'images
-    if not os.path.exists(IMAGES_DIR):
-        logger.error(f"Images directory not found: {IMAGES_DIR}")
-        return False
+    """Fonction principale avec zoom adaptatif"""
+    logger.info("=== BEBOP 2 ADAPTIVE ZOOM DETECTION ===")
+    logger.info("🔍 Système de zoom adaptatif pour détection longue distance")
     
     bebop = None
-    vision = None
-    threads = []
+    pipe = None
+    detector = None
+    start_time = time.time()
     
     try:
-        # Connexion au drone
+        # === CONNEXION DRONE ===
+        logger.info("📡 Connexion au drone...")
         bebop = Bebop()
-        logger.info("Connecting to Bebop 2...")
-        
-        success = bebop.connect(CONNECTION_TIMEOUT)
-        if not success:
-            logger.error("Failed to connect to drone")
+        if not bebop.connect(10):
+            logger.error("❌ Échec connexion drone")
             return False
+
+        logger.info("✅ Drone connecté!")
         
-        logger.info("Drone connected successfully")
-        
-        # Configuration de la vision
-        vision = DroneVision(bebop, is_bebop=True)
-        vision.set_user_callback_function(vision_callback)
-        
-        # Démarrage des threads
-        display_thread_obj = threading.Thread(target=display_thread, daemon=True)
-        cleanup_thread_obj = threading.Thread(target=cleanup_thread, daemon=True)
-        monitor_thread_obj = threading.Thread(target=connection_monitor_thread, daemon=True)
-        
-        threads = [display_thread_obj, cleanup_thread_obj, monitor_thread_obj]
-        
-        for thread in threads:
-            thread.start()
-            time.sleep(0.1)  # Petit délai entre les démarrages
-        
-        logger.info("All threads started successfully")
-        
-        # Ouverture du flux vidéo
-        logger.info("Opening video stream...")
-        if not vision.open_video():
-            logger.error("Failed to open video stream")
-            return False
-        
-        logger.info("Video stream opened successfully")
-        logger.info("Advanced detection system is now active")
-        logger.info("Controls: 'q'/ESC=Quit, 'r'=Reset stats, 's'=Screenshot, 'd'=Debug")
-        
-        # Boucle principale
-        try:
-            while processing_active.is_set():
-                time.sleep(1)
-                
-                # Vérifier si la fenêtre est toujours ouverte
-                try:
-                    if cv2.getWindowProperty("Bebop 2 - Detection Gant Avancee", cv2.WND_PROP_VISIBLE) < 1:
-                        logger.info("Display window was closed")
-                        break
-                except:
-                    pass
-                    
-        except KeyboardInterrupt:
-            logger.info("Keyboard interrupt received")
-    
-    except Exception as e:
-        logger.error(f"Critical error in main: {e}")
-        return False
-    
-    finally:
-        # Nettoyage complet
-        logger.info("Starting comprehensive cleanup...")
-        processing_active.clear()
-        
-        # Attendre un peu pour que les threads se terminent proprement
+        # === FLUX VIDÉO ===
+        logger.info("📹 Démarrage flux vidéo...")
+        bebop.start_video_stream()
         time.sleep(2)
         
-        # Fermeture du flux vidéo
-        if vision:
-            try:
-                vision.close_video()
-                logger.info("Video stream closed")
-            except Exception as e:
-                logger.debug(f"Error closing video: {e}")
+        # === CONTRÔLE DRONE ===
+        ctrl_thread = threading.Thread(target=simple_drone_control, args=(bebop,), daemon=True)
+        ctrl_thread.start()
         
-        # Déconnexion du drone
+        # === PIPELINE FFMPEG ===
+        sdp_path = os.path.join(os.path.dirname(pyparrot.__file__), "utils", "bebop.sdp")
+        if not os.path.exists(sdp_path):
+            logger.error(f"❌ SDP introuvable: {sdp_path}")
+            return False
+        
+        # FFmpeg optimisé pour zoom adaptatif
+        ffmpeg_cmd = [
+            'ffmpeg',
+            '-protocol_whitelist', 'file,rtp,udp',
+            '-fflags', 'nobuffer',
+            '-flags', 'low_delay',
+            '-avioflags', 'direct',
+            '-analyzeduration', '800000',    # Légèrement plus pour qualité zoom
+            '-probesize', '800000',
+            '-i', sdp_path,
+            '-f', 'rawvideo',
+            '-pix_fmt', 'bgr24',
+            '-'
+        ]
+        
+        logger.info(f"🚀 FFmpeg avec support zoom: {' '.join(ffmpeg_cmd)}")
+        
+        try:
+            pipe = subprocess.Popen(ffmpeg_cmd, stdout=subprocess.PIPE, bufsize=1024*1024)
+            logger.info("✅ Pipeline zoom initialisé")
+        except FileNotFoundError:
+            logger.error("❌ FFmpeg non trouvé!")
+            return False
+
+        # === DÉTECTEUR ZOOM ADAPTATIF ===
+        detector = AdaptiveZoomGloveDetector()
+        
+        # === INTERFACE ===
+        window_name = "Bebop 2 - Zoom Adaptatif (3m+ optimisé)"
+        cv2.namedWindow(window_name, cv2.WINDOW_AUTOSIZE)
+        
+        logger.info("=" * 60)
+        logger.info("🎮 COMMANDES:")
+        logger.info("  'q' = Quitter | 's' = Screenshot | 'r' = Reset")
+        logger.info("  'z' = Reset zoom | '+' = Zoom manuel + | '-' = Zoom manuel -")
+        logger.info("=" * 60)
+        logger.info("🔍 ZOOM ADAPTATIF:")
+        logger.info("  Auto-zoom selon distance gant")
+        logger.info("  Plage: 1.0x à 4.0x")
+        logger.info("  Optimisé pour 3m+ de distance")
+        logger.info("=" * 60)
+        
+        # === BOUCLE PRINCIPALE ZOOM ADAPTATIF ===
+        logger.info("🎬 Démarrage détection avec zoom adaptatif...")
+        
+        screenshot_count = 0
+        last_fps_log = time.time()
+        fps_counter = 0
+        skip_counter = 0
+        
+        while True:
+            try:
+                # Lecture frame
+                raw_frame = pipe.stdout.read(WIDTH * HEIGHT * 3)
+                
+                if len(raw_frame) != WIDTH * HEIGHT * 3:
+                    logger.error("❌ Erreur lecture frame")
+                    break
+                
+                frame = np.frombuffer(raw_frame, np.uint8).reshape((HEIGHT, WIDTH, 3))
+                
+                # Skip frames léger pour performance
+                skip_counter += 1
+                if skip_counter % 2 != 0:
+                    continue
+                
+                # Détection avec zoom adaptatif
+                processed_frame, detected = detector.detect_glove_with_zoom(frame)
+                
+                # Affichage
+                cv2.imshow(window_name, processed_frame)
+                
+                # Stats FPS
+                fps_counter += 1
+                if fps_counter % 60 == 0:
+                    current_time = time.time()
+                    elapsed = current_time - last_fps_log
+                    display_fps = 60 / elapsed if elapsed > 0 else 0
+                    
+                    # Log avec informations de zoom
+                    zoom_info = f"Zoom: {detector.zoom_factor:.1f}x (target: {detector.target_zoom:.1f}x)"
+                    area_info = f"Aire moy: {np.mean(detector.area_history) if detector.area_history else 0:.0f}"
+                    
+                    logger.info(f"📊 FPS: {display_fps:.1f} | "
+                               f"Détections: {detector.detection_count}/{detector.frame_count} "
+                               f"({(detector.detection_count/max(detector.frame_count,1))*100:.1f}%) | "
+                               f"{zoom_info} | {area_info}")
+                    last_fps_log = current_time
+                
+                # Gestion touches
+                key = cv2.waitKey(1) & 0xFF
+                
+                if key == ord('q') or key == 27:
+                    logger.info("🛑 Arrêt demandé")
+                    break
+                    
+                elif key == ord('s'):
+                    timestamp = int(time.time())
+                    screenshot_name = f"zoom_capture_{timestamp}_{screenshot_count:03d}.png"
+                    
+                    # Ajout informations zoom dans le screenshot
+                    info_frame = processed_frame.copy()
+                    info_text = f"Zoom: {detector.zoom_factor:.1f}x | Frame: {detector.frame_count}"
+                    cv2.putText(info_frame, info_text, (10, HEIGHT - 10),
+                               cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+                    
+                    cv2.imwrite(screenshot_name, info_frame)
+                    logger.info(f"📸 Screenshot avec zoom: {screenshot_name}")
+                    screenshot_count += 1
+                    
+                elif key == ord('r'):
+                    # Reset complet
+                    old_count = detector.detection_count
+                    detector.__init__()
+                    logger.info(f"🔄 Détecteur reset (détections: {old_count})")
+                    
+                elif key == ord('z'):
+                    # Reset zoom seulement
+                    detector.zoom_factor = 1.0
+                    detector.target_zoom = 1.0
+                    detector.search_zone = None
+                    logger.info("🔍 Zoom reset à 1.0x")
+                    
+                elif key == ord('+') or key == ord('='):
+                    # Zoom manuel +
+                    detector.target_zoom = min(detector.zoom_max, detector.target_zoom + 0.5)
+                    logger.info(f"🔍 Zoom manuel: {detector.target_zoom:.1f}x")
+                    
+                elif key == ord('-'):
+                    # Zoom manuel -
+                    detector.target_zoom = max(detector.zoom_min, detector.target_zoom - 0.5)
+                    logger.info(f"🔍 Zoom manuel: {detector.target_zoom:.1f}x")
+                    
+                elif key == ord('d'):
+                    # Debug informations détaillées
+                    logger.info("🔍 INFOS DEBUG ZOOM:")
+                    logger.info(f"   Zoom actuel: {detector.zoom_factor:.2f}x")
+                    logger.info(f"   Zoom cible: {detector.target_zoom:.2f}x")
+                    logger.info(f"   Ajustements zoom: {detector.zoom_adjustments}")
+                    logger.info(f"   Aire de référence: {detector.area_reference}")
+                    if detector.area_history:
+                        logger.info(f"   Aires récentes: {list(detector.area_history)}")
+                    if detector.search_zone:
+                        logger.info(f"   Zone recherche: {detector.search_zone}")
+
+            except KeyboardInterrupt:
+                logger.info("⌨️ Interruption clavier")
+                break
+            except Exception as e:
+                logger.error(f"❌ Erreur boucle principale: {e}")
+                continue
+
+    except Exception as e:
+        logger.error(f"❌ Erreur critique: {e}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return False
+        
+    finally:
+        # === NETTOYAGE ===
+        logger.info("🧹 Nettoyage...")
+        
+        if detector:
+            total_runtime = time.time() - start_time
+            detection_rate = (detector.detection_count / max(detector.frame_count, 1)) * 100
+            avg_zoom = detector.zoom_factor
+            
+            logger.info("=" * 60)
+            logger.info("📊 STATS FINALES ZOOM ADAPTATIF:")
+            logger.info(f"  ⏱️ Durée: {total_runtime:.1f}s")
+            logger.info(f"  🎞️ Frames: {detector.frame_count}")
+            logger.info(f"  ⚡ FPS: {detector.frame_count/max(total_runtime,1):.1f}")
+            logger.info(f"  🎯 Détections: {detector.detection_count} ({detection_rate:.1f}%)")
+            logger.info(f"  🔍 Zoom final: {detector.zoom_factor:.1f}x")
+            logger.info(f"  📈 Ajustements zoom: {detector.zoom_adjustments}")
+            logger.info(f"  📸 Screenshots: {screenshot_count}")
+            if detector.area_history:
+                logger.info(f"  📏 Aire moyenne: {np.mean(detector.area_history):.0f}")
+            logger.info("=" * 60)
+        
+        if pipe:
+            try:
+                pipe.terminate()
+                logger.info("✅ Pipeline fermé")
+            except:
+                pass
+        
+        try:
+            cv2.destroyAllWindows()
+            logger.info("✅ Interface fermée")
+        except:
+            pass
+        
         if bebop:
             try:
                 bebop.disconnect()
-                logger.info("Drone disconnected")
-            except Exception as e:
-                logger.debug(f"Error disconnecting drone: {e}")
+                logger.info("✅ Drone déconnecté")
+            except:
+                pass
         
-        # Fermeture des fenêtres OpenCV
-        cv2.destroyAllWindows()
-        
-        # Attendre que tous les threads se terminent
-        for thread in threads:
-            try:
-                thread.join(timeout=5)
-                logger.debug(f"Thread {thread.name} terminated")
-            except Exception as e:
-                logger.debug(f"Error joining thread: {e}")
-        
-        logger.info("Cleanup completed successfully")
+        logger.info("🎉 Session zoom adaptatif terminée!")
     
     return True
 
@@ -700,8 +856,10 @@ if __name__ == "__main__":
     try:
         success = main()
         exit_code = 0 if success else 1
-        logger.info(f"Program exiting with code {exit_code}")
+        print(f"\n🏁 Code de sortie: {exit_code}")
         sys.exit(exit_code)
     except Exception as e:
-        logger.error(f"Unhandled exception: {e}")
+        logger.error(f"💥 Exception: {e}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
         sys.exit(1)

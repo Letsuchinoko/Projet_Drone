@@ -1,41 +1,4 @@
-[h264 @ 000001d4790f6a80] non-existing PPS 0 referenced
-
-[h264 @ 000001d4790f6a80] decode_slice_header error
-
-[h264 @ 000001d4790f6a80] no frame!
-
-Input #0, sdp, from 'C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\utils/bebop.sdp':
-
-  Duration: N/A, start: 1.267944, bitrate: N/A
-
-  Stream #0:0: Video: h264 (Constrained Baseline), yuv420p(progressive), 856x480 [SAR 1:1 DAR 107:60], 29.97 fps, 29.97 tbr, 90k tbn
-
-Stream mapping:
-
-  Stream #0:0 -> #0:0 (h264 (native) -> png (native))
-
-2025-06-03 10:47:58,904 - INFO - [OK] Video stream opened successfully
-2025-06-03 10:47:58,904 - INFO - [DETECT] Detection system active
-2025-06-03 10:47:58,904 - INFO - Controls: 'q'/ESC=Quit, 'r'=Reset stats, 's'=Screenshot, Ctrl+C=Emergency stop
-2025-06-03 10:48:05,262 - INFO - [STATS] Frames: 93, FPS: 9.3, Detections: 98.9%, Errors: 0
-2025-06-03 10:48:15,263 - INFO - [STATS] Frames: 245, FPS: 15.2, Detections: 99.6%, Errors: 0
-2025-06-03 10:48:19,766 - WARNING - [WARNING] No frames received for several seconds
-2025-06-03 10:48:24,794 - WARNING - [WARNING] No frames received for several seconds
-2025-06-03 10:48:25,263 - INFO - [STATS] Frames: 265, FPS: 2.0, Detections: 99.6%, Errors: 0
-2025-06-03 10:48:29,824 - WARNING - [WARNING] No frames received for several seconds
-2025-06-03 10:48:34,862 - WARNING - [WARNING] No frames received for several seconds
-2025-06-03 10:48:35,264 - WARNING - [MONITOR] No new frames received
-2025-06-03 10:48:39,910 - WARNING - [WARNING] No frames received for several seconds
-2025-06-03 10:48:44,047 - INFO - [STOP] Stop signal received
-2025-06-03 10:48:44,119 - INFO - [CLEANUP] Thread terminated
-2025-06-03 10:48:44,935 - INFO - [REFRESH] Starting cleanup process...
-2025-06-03 10:48:44,957 - WARNING - [WARNING] No frames received for several seconds
-2025-06-03 10:48:44,974 - INFO - [DISPLAY] Thread terminated
-2025-06-03 10:48:45,265 - WARNING - [MONITOR] No new frames received
-2025-06-03 10:48:45,265 - INFO - [MONITOR] Connection monitoring terminated
-Killing the ffmpeg subprocess
-Sending a second kill call to the ffmpeg process
-2025-06-03 10:48:52,438 - INFO - [VIDEO] Video stream closed
- disconnecting 
-2025-06-03 10:48:52,941 - INFO - [CONNECT] Drone disconnected
-2025-06-03 10:48:52,942 - INFO - [OK] Cleanup completed - Program terminated properly
+[udp @ 0000023829861ec0] bind failed: Error number -10048 occurred
+[in#0 @ 000002382982e900] Error opening input: Invalid data found when processing input
+Error opening input file C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\utils\bebop.sdp.
+Error opening input files: Invalid data found when processing input
