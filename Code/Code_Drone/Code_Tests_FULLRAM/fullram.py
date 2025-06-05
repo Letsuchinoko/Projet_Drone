@@ -6,22 +6,17 @@ import threading
 import sys
 import logging
 from collections import deque
-
 from pyparrot.Bebop import Bebop
+from pyparrot.DroneVision import DroneVision
 
 # === PARAMÈTRES BEBOP 2 VIDEO ===
 BEBOP_IP = "192.168.42.1"
-BEBOP_PORT = 5600
-WIDTH, HEIGHT = 856, 480   # Résolution standard Bebop 2 (tu peux ajuster)
+BEBOP_PORT = 5004   # ou 5600 selon firmware
+WIDTH, HEIGHT = 856, 480   # Résolution standard Bebop 2
 
-# === LOGGING CONFIG ===
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(sys.stdout),
-        logging.FileHandler('bebop_detection_ffmpeg.log', mode='w', encoding='utf-8')
-    ]
+    format='%(asctime)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
@@ -196,7 +191,6 @@ def drone_control_thread(bebop):
         except EOFError:
             print("Arrêt du thread contrôle drone (entrée clavier coupée).")
             break
-        key = input("> ").strip().lower()
         if key == 't':
             bebop.safe_takeoff(10)
             print("Décollage")
@@ -229,14 +223,19 @@ def drone_control_thread(bebop):
 
 def main():
     logger.info("Démarrage détection gant Bebop 2 en mode flux RAM (ffmpeg + OpenCV)")
-
-    # -- Démarre le contrôle drone en thread séparé --
     bebop = Bebop()
     logger.info("Connexion au drone...")
     if not bebop.connect(10):
         logger.error("Echec connexion drone")
         return
     logger.info("Drone connecté !")
+
+    # --- OBLIGATOIRE : démarre le flux vidéo sur le drone (sinon, PAS DE FLUX) ---
+    vision = DroneVision(bebop, is_bebop=True)
+    vision.open_video()
+    logger.info("Flux vidéo demandé au drone (open_video).")
+
+    # -- Contrôle drone (optionnel, peut être commenté) --
     ctrl_thread = threading.Thread(target=drone_control_thread, args=(bebop,), daemon=True)
     ctrl_thread.start()
 
@@ -269,7 +268,6 @@ def main():
             detector.frame_count += 1
             processed_frame, detected = detector.detect_glove(frame)
 
-            # Affichage
             cv2.imshow(window_name, processed_frame)
             key = cv2.waitKey(1) & 0xFF
             if key == ord('q') or key == 27:
@@ -286,7 +284,6 @@ def main():
                 logger.info(f"Screenshot sauvegardé : {screenshot_name}")
                 screenshot_count += 1
 
-            # FPS Log
             if detector.frame_count % 30 == 0:
                 now = time.time()
                 elapsed = now - detector.fps_start_time
