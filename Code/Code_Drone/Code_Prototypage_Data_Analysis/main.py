@@ -66,7 +66,7 @@ class AdaptiveZoomGloveDetector:
         self.current_fps = 0
 
     def detect_glove_with_zoom(self, frame):
-        """Détection avec zoom adaptatif intelligent"""
+        """Détection avec zoom adaptatif intelligent et fallback global"""
         if frame is None:
             return frame, False
             
@@ -74,57 +74,500 @@ class AdaptiveZoomGloveDetector:
         self.frame_count += 1
         
         try:
-            # === PHASE 1: ANALYSE GLOBALE (ZOOM OUT) ===
-            # Recherche globale si pas de détection récente
-            if sum(self.stable_detections) == 0 or self.zoom_factor > 1.5:
-                global_result = self._global_detection_phase(frame)
-                if global_result:
-                    detected, contour, area = global_result
-                    if detected:
-                        # Ajustement du zoom basé sur l'aire détectée
-                        self._update_zoom_from_area(area)
-                        return self._finalize_detection(original_frame, detected, contour, area)
+            h, w = frame.shape[:2]
             
-            # === PHASE 2: DÉTECTION AVEC ZOOM ===
-            # Application du zoom adaptatif
-            zoomed_frame, zoom_info = self._apply_adaptive_zoom(frame)
+            # === STRATÉGIE DOUBLE : ZOOM + GLOBAL ===
             
-            # Détection sur frame zoomée
-            hsv = cv2.cvtColor(zoomed_frame, cv2.COLOR_BGR2HSV)
-            mask = self._create_zoom_optimized_mask(hsv)
+            # 1. Essayer détection avec zoom si zoom actif
+            zoom_detected = False
+            zoom_contour = None
+            zoom_area = 0
             
-            # Morphologie adaptée au zoom
-            mask = self._adaptive_morphology_for_zoom(mask)
+            if self.zoom_factor > 1.1:  # Si zoom significatif
+                zoomed_frame = self._apply_full_frame_zoom(frame)
+                zoom_detected, zoom_contour, zoom_area = self._detect_on_frame(zoomed_frame, self.zoom_factor)
+                
+                # Remapping des coordonnées si détection en zoom
+                if zoom_detected and zoom_contour is not None:
+                    zoom_contour = self._remap_contour_from_zoom(zoom_contour, self.zoom_factor)
+                    zoom_area = cv2.contourArea(zoom_contour)
             
-            # Détection de contours
-            contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            best_contour, area = self._select_best_contour_zoom(contours)
+            # 2. Détection globale (toujours faire en parallèle)
+            global_detected, global_contour, global_area = self._detect_on_frame(frame, 1.0)
             
-            # Remapping des coordonnées vers frame originale
-            if best_contour is not None:
-                best_contour = self._remap_contour_to_original(best_contour, zoom_info)
-                # Recalculer l'aire dans l'espace original
-                area = cv2.contourArea(best_contour)
+            # === SÉLECTION DU MEILLEUR RÉSULTAT ===
+            final_detected = False
+            final_contour = None
+            final_area = 0
+            detection_source = "none"
             
-            # Validation et stabilisation
-            detected = best_contour is not None
-            self.stable_detections.append(detected)
+            # Priorité : zoom si bon résultat, sinon global
+            if zoom_detected and zoom_area > self.min_area:
+                final_detected = True
+                final_contour = zoom_contour
+                final_area = zoom_area
+                detection_source = "zoom"
+            elif global_detected and global_area > self.min_area:
+                final_detected = True
+                final_contour = global_contour
+                final_area = global_area
+                detection_source = "global"
+            
+            # === STABILISATION ===
+            self.stable_detections.append(final_detected)
             stable_detection = sum(self.stable_detections) >= self.confidence_threshold
             
-            # Mise à jour du zoom
-            if stable_detection and area:
-                self._update_zoom_from_area(area)
-                self.area_history.append(area)
-                self.last_detection_area = area
+            # === MISE À JOUR ZOOM ===
+            if stable_detection and final_area > 0:
+                self._update_zoom_from_area(final_area)
+                self.area_history.append(final_area)
+                self.last_detection_area = final_area
+                
+                # Mise à jour zone de recherche avec position actuelle
+                if final_contour is not None:
+                    self._update_search_zone_from_contour_position(final_contour)
             else:
                 # Zoom out si pas de détection
                 self._zoom_out_gradually()
             
-            return self._finalize_detection(original_frame, stable_detection, best_contour, area)
+            # === AFFICHAGE ===
+            result_frame = self._finalize_detection_with_source(
+                original_frame, stable_detection, final_contour, final_area, detection_source
+            )
+            
+            return result_frame, stable_detection
             
         except Exception as e:
             logger.debug(f"Adaptive zoom detection error: {e}")
             return original_frame, False
+
+    def _apply_full_frame_zoom(self, frame):
+        """Application du zoom sur toute l'image (pas juste une zone)"""
+        try:
+            h, w = frame.shape[:2]
+            
+            if self.zoom_factor <= 1.05:
+                return frame
+            
+            # Zone de focus basée sur dernière détection ou centre
+            if self.search_zone is not None:
+                center_x, center_y = self.search_zone[0], self.search_zone[1]
+            else:
+                center_x, center_y = w // 2, h // 2
+            
+            # Calcul de la zone de crop
+            crop_w = int(w / self.zoom_factor)
+            crop_h = int(h / self.zoom_factor)
+            
+            # Centrage sur la zone de recherche avec contraintes
+            offset_x = max(0, min(center_x - crop_w // 2, w - crop_w))
+            offset_y = max(0, min(center_y - crop_h // 2, h - crop_h))
+            
+            # Crop et redimensionnement vers taille originale
+            cropped = frame[offset_y:offset_y + crop_h, offset_x:offset_x + crop_w]
+            zoomed = cv2.resize(cropped, (w, h), interpolation=cv2.INTER_LINEAR)
+            
+            # Stocker les infos de transformation pour remapping
+            self._zoom_transform = {
+                'zoom': self.zoom_factor,
+                'offset_x': offset_x,
+                'offset_y': offset_y,
+                'crop_w': crop_w,
+                'crop_h': crop_h
+            }
+            
+            return zoomed
+            
+        except Exception as e:
+            logger.debug(f"Full frame zoom error: {e}")
+            return frame
+
+    def _detect_on_frame(self, frame, zoom_level):
+        """Détection sur une frame donnée"""
+        try:
+            # Conversion HSV
+            hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+            
+            # Création masque adapté au zoom
+            mask = self._create_zoom_optimized_mask(hsv, zoom_level)
+            
+            # Morphologie adaptée
+            mask = self._adaptive_morphology_for_zoom(mask, zoom_level)
+            
+            # Détection contours
+            contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            best_contour, area = self._select_best_contour_zoom(contours, zoom_level)
+            
+            detected = best_contour is not None and area > self.min_area
+            
+            return detected, best_contour, area
+            
+        except Exception as e:
+            logger.debug(f"Frame detection error: {e}")
+            return False, None, 0
+
+    def _remap_contour_from_zoom(self, contour, zoom_factor):
+        """Remapping du contour depuis image zoomée vers originale"""
+        try:
+            if zoom_factor <= 1.05 or not hasattr(self, '_zoom_transform'):
+                return contour
+            
+            transform = self._zoom_transform
+            
+            # Facteurs de conversion
+            scale_x = transform['crop_w'] / WIDTH
+            scale_y = transform['crop_h'] / HEIGHT
+            
+            # Remapping des points
+            remapped_contour = contour.copy()
+            remapped_contour[:, :, 0] = (contour[:, :, 0] * scale_x + transform['offset_x']).astype(np.int32)
+            remapped_contour[:, :, 1] = (contour[:, :, 1] * scale_y + transform['offset_y']).astype(np.int32)
+            
+            return remapped_contour
+            
+        except Exception as e:
+            logger.debug(f"Contour remapping error: {e}")
+            return contour
+
+    def _create_zoom_optimized_mask(self, hsv, zoom_level=1.0):
+        """Masque optimisé selon le niveau de zoom"""
+        try:
+            h, w = hsv.shape[:2]
+            
+            # Ajustement des seuils selon le zoom
+            sat_boost = min(15, int(8 * zoom_level))
+            val_boost = min(10, int(5 * zoom_level))
+            
+            # === MASQUES ORANGE OPTIMISÉS ===
+            orange_main_lower = np.array([12, max(120, 160 - sat_boost), max(120, 160 - val_boost)])
+            orange_main_upper = np.array([20, 255, 255])
+            mask_orange_main = cv2.inRange(hsv, orange_main_lower, orange_main_upper)
+            
+            orange_bright_lower = np.array([10, max(140, 180 - sat_boost), max(140, 180 - val_boost)])
+            orange_bright_upper = np.array([18, 255, 255])
+            mask_orange_bright = cv2.inRange(hsv, orange_bright_lower, orange_bright_upper)
+            
+            orange_shadow_lower = np.array([14, max(100, 120 - sat_boost//2), max(100, 140 - val_boost)])
+            orange_shadow_upper = np.array([19, 200, 220])
+            mask_orange_shadow = cv2.inRange(hsv, orange_shadow_lower, orange_shadow_upper)
+            
+            # === MASQUES ROUGE OPTIMISÉS ===
+            red_main_lower1 = np.array([0, max(120, 160 - sat_boost), max(120, 160 - val_boost)])
+            red_main_upper1 = np.array([6, 255, 255])
+            mask_red_main1 = cv2.inRange(hsv, red_main_lower1, red_main_upper1)
+            
+            red_main_lower2 = np.array([174, max(120, 160 - sat_boost), max(120, 160 - val_boost)])
+            red_main_upper2 = np.array([180, 255, 255])
+            mask_red_main2 = cv2.inRange(hsv, red_main_lower2, red_main_upper2)
+            
+            # Combinaisons
+            mask_orange = cv2.bitwise_or(mask_orange_main, 
+                         cv2.bitwise_or(mask_orange_bright, mask_orange_shadow))
+            
+            mask_red = cv2.bitwise_or(mask_red_main1, mask_red_main2)
+            mask_glove = cv2.bitwise_or(mask_orange, mask_red)
+            
+            # === EXCLUSIONS ADAPTATIVES ===
+            # Peau (moins stricte en zoom élevé)
+            skin_sat_max = max(80, int(120 - 20 * (zoom_level - 1.0)))
+            skin_lower = np.array([5, 60, 120])
+            skin_upper = np.array([15, skin_sat_max, 220])
+            mask_skin = cv2.inRange(hsv, skin_lower, skin_upper)
+            
+            # Application exclusions
+            mask_skin_eroded = cv2.erode(mask_skin, self.kernel_small, iterations=1)
+            mask_final = cv2.bitwise_and(mask_glove, cv2.bitwise_not(mask_skin_eroded))
+            
+            # Bordures adaptatives (plus petites en zoom élevé)
+            border_size = max(3, int(12 / zoom_level))
+            border_mask = np.ones((h, w), dtype=np.uint8) * 255
+            border_mask[:border_size, :] = 0
+            border_mask[-border_size:, :] = 0
+            border_mask[:, :border_size] = 0
+            border_mask[:, -border_size:] = 0
+            
+            mask_final = cv2.bitwise_and(mask_final, border_mask)
+            
+            # Nettoyage adaptatif
+            blur_size = max(3, int(5 / zoom_level))
+            if blur_size % 2 == 0:
+                blur_size += 1
+            mask_final = cv2.medianBlur(mask_final, blur_size)
+            
+            return mask_final
+            
+        except Exception as e:
+            logger.debug(f"Zoom optimized mask error: {e}")
+            return np.zeros(hsv.shape[:2], dtype=np.uint8)
+
+    def _adaptive_morphology_for_zoom(self, mask, zoom_level=1.0):
+        """Morphologie adaptée au niveau de zoom"""
+        try:
+            # Kernels adaptatifs selon le zoom
+            if zoom_level > 2.5:
+                # Zoom élevé: kernels plus grands
+                kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
+                kernel_open = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+                iterations = 1
+            elif zoom_level > 1.5:
+                # Zoom moyen
+                kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+                kernel_open = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2, 2))
+                iterations = 1
+            else:
+                # Zoom faible/normal
+                kernel_close = self.kernel_medium
+                kernel_open = self.kernel_small
+                iterations = 1
+            
+            # Application morphologie
+            mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel_close, iterations=iterations)
+            mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel_open, iterations=1)
+            
+            return mask
+            
+        except Exception as e:
+            logger.debug(f"Adaptive morphology error: {e}")
+            return mask
+
+    def _select_best_contour_zoom(self, contours, zoom_level=1.0):
+        """Sélection contour optimisée pour zoom"""
+        if not contours:
+            return None, 0
+            
+        try:
+            best_contour = None
+            best_score = 0
+            best_area = 0
+            
+            # Ajustement des seuils selon le zoom
+            min_area_adjusted = max(self.min_area, self.min_area * (zoom_level ** 0.5))
+            max_area_adjusted = self.max_area * (zoom_level ** 1.2)
+            
+            for contour in contours:
+                area = cv2.contourArea(contour)
+                
+                if area < min_area_adjusted or area > max_area_adjusted:
+                    continue
+                if len(contour) < self.min_contour_points:
+                    continue
+                
+                # Analyse géométrique
+                x, y, w, h = cv2.boundingRect(contour)
+                aspect_ratio = w / float(h)
+                
+                if not (0.2 <= aspect_ratio <= 3.0):
+                    continue
+                
+                # Score basé sur l'aire
+                ideal_area = self.area_reference * max(0.5, zoom_level * 0.8)
+                area_score = min(area / ideal_area, 1.0) if ideal_area > 0 else 0.5
+                
+                # Bonus pour position (moins important en zoom élevé)
+                position_bonus = 1.0
+                if zoom_level < 2.0:
+                    center_x = x + w // 2
+                    center_y = y + h // 2
+                    frame_center_x = WIDTH // 2
+                    frame_center_y = HEIGHT // 2
+                    
+                    dist_from_center = np.sqrt((center_x - frame_center_x)**2 + (center_y - frame_center_y)**2)
+                    max_dist = np.sqrt(frame_center_x**2 + frame_center_y**2)
+                    position_bonus = 1.0 - (dist_from_center / max_dist) * 0.3
+                
+                final_score = area_score * position_bonus
+                
+                if final_score > best_score:
+                    best_score = final_score
+                    best_contour = contour
+                    best_area = area
+            
+            return best_contour, best_area
+            
+        except Exception as e:
+            logger.debug(f"Zoom contour selection error: {e}")
+            return None, 0
+
+    def _update_search_zone_from_contour_position(self, contour):
+        """Mise à jour de la zone de recherche basée sur position du contour"""
+        try:
+            if contour is None:
+                return
+            
+            # Calculer le centre du contour
+            M = cv2.moments(contour)
+            if M["m00"] != 0:
+                cx = int(M["m10"] / M["m00"])
+                cy = int(M["m01"] / M["m00"])
+                
+                # Mise à jour de la zone avec une certaine inertie
+                if self.search_zone is None:
+                    self.search_zone = [cx, cy, WIDTH//3, HEIGHT//3]
+                else:
+                    # Lissage de la position
+                    self.search_zone[0] = int(0.7 * self.search_zone[0] + 0.3 * cx)
+                    self.search_zone[1] = int(0.7 * self.search_zone[1] + 0.3 * cy)
+                    
+        except Exception as e:
+            logger.debug(f"Search zone update error: {e}")
+
+    def _finalize_detection_with_source(self, frame, detected, contour, area, source):
+        """Finalisation avec indication de la source de détection"""
+        try:
+            # Historique
+            self.detection_history.append(detected)
+            if detected:
+                self.detection_count += 1
+            
+            # Dessin avec indication de source
+            if detected and contour is not None:
+                self._draw_detection_with_source(frame, contour, area, source)
+            
+            # Overlay avec informations étendues
+            result_frame = self._add_enhanced_zoom_overlay(frame, detected, area, source)
+            
+            return result_frame
+            
+        except Exception as e:
+            logger.debug(f"Finalization error: {e}")
+            return frame
+
+    def _draw_detection_with_source(self, frame, contour, area, source):
+        """Dessin avec indication de la source (zoom/global)"""
+        try:
+            # Couleur selon la source et distance
+            if source == "zoom":
+                if area > 4000:
+                    color = (0, 255, 0)      # Vert - zoom proche
+                    distance_text = "ZOOM PROCHE"
+                elif area > 1500:
+                    color = (0, 255, 255)    # Jaune - zoom moyen
+                    distance_text = "ZOOM MOYEN"
+                else:
+                    color = (0, 150, 255)    # Orange - zoom loin
+                    distance_text = "ZOOM LOIN"
+            else:  # global
+                color = (255, 0, 255)        # Magenta - détection globale
+                distance_text = "GLOBAL"
+            
+            # Contour principal
+            thickness = 4 if source == "zoom" else 2
+            cv2.drawContours(frame, [contour], -1, color, thickness)
+            
+            # Rectangle englobant
+            x, y, w, h = cv2.boundingRect(contour)
+            cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
+            
+            # Centre
+            M = cv2.moments(contour)
+            if M["m00"] != 0:
+                cx = int(M["m10"] / M["m00"])
+                cy = int(M["m01"] / M["m00"])
+                cv2.circle(frame, (cx, cy), 8, (0, 0, 255), -1)
+                cv2.circle(frame, (cx, cy), 12, (255, 255, 255), 2)
+            
+            # Texte avec source et distance
+            cv2.putText(frame, f"GANT {distance_text}", (x, max(y - 15, 25)),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
+            cv2.putText(frame, f"Aire: {int(area)} | {source.upper()}", 
+                       (x, max(y - 40, 50)),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+                       
+        except Exception as e:
+            logger.debug(f"Enhanced drawing error: {e}")
+
+    def _add_enhanced_zoom_overlay(self, frame, detected, area, source):
+        """Overlay enrichi avec informations de zoom et source"""
+        try:
+            h, w = frame.shape[:2]
+            
+            # Status principal avec source
+            if detected:
+                if source == "zoom":
+                    status = f"🎯 GANT DETECTE ZOOM {self.zoom_factor:.1f}x"
+                    color = (0, 255, 0)
+                else:
+                    status = f"🎯 GANT DETECTE (GLOBAL)"
+                    color = (255, 0, 255)
+            else:
+                status = f"🔍 RECHERCHE (Z:{self.zoom_factor:.1f}x)"
+                color = (0, 255, 255)
+            
+            cv2.putText(frame, status, (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
+            
+            # Indicateur de stratégie active
+            strategy_text = f"Stratégie: {'ZOOM+GLOBAL' if self.zoom_factor > 1.1 else 'GLOBAL SEUL'}"
+            cv2.putText(frame, strategy_text, (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (200, 200, 255), 1)
+            
+            # Barre de zoom visuelle améliorée
+            zoom_bar_width = 200
+            zoom_bar_height = 15
+            zoom_x, zoom_y = 10, 90
+            
+            # Barre de fond
+            cv2.rectangle(frame, (zoom_x, zoom_y), 
+                         (zoom_x + zoom_bar_width, zoom_y + zoom_bar_height), 
+                         (50, 50, 50), -1)
+            
+            # Barre de zoom actuel
+            zoom_width = int(zoom_bar_width * (self.zoom_factor - 1.0) / (self.zoom_max - 1.0))
+            zoom_color = (0, 255, 255) if self.zoom_factor > 2.0 else (100, 255, 100)
+            cv2.rectangle(frame, (zoom_x, zoom_y), 
+                         (zoom_x + zoom_width, zoom_y + zoom_bar_height), 
+                         zoom_color, -1)
+            
+            # Indication target zoom
+            target_width = int(zoom_bar_width * (self.target_zoom - 1.0) / (self.zoom_max - 1.0))
+            cv2.line(frame, (zoom_x + target_width, zoom_y - 2), 
+                    (zoom_x + target_width, zoom_y + zoom_bar_height + 2), (255, 255, 255), 2)
+            
+            cv2.putText(frame, f"Zoom: {self.zoom_factor:.1f}x → {self.target_zoom:.1f}x", 
+                       (zoom_x + zoom_bar_width + 10, zoom_y + 12),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+            
+            # Stats de performance
+            detection_rate = (self.detection_count / max(self.frame_count, 1)) * 100
+            stats_text = f"Frames: {self.frame_count} | Det: {detection_rate:.1f}%"
+            cv2.putText(frame, stats_text, (10, h - 80), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
+            
+            # Information source et aire
+            if area and area > 0:
+                source_color = (0, 255, 0) if source == "zoom" else (255, 0, 255)
+                area_text = f"Source: {source.upper()} | Aire: {int(area)}"
+                cv2.putText(frame, area_text, (10, h - 55), cv2.FONT_HERSHEY_SIMPLEX, 0.5, source_color, 1)
+            
+            # FPS
+            if self.frame_count % 30 == 0:
+                now = time.time()
+                elapsed = now - self.fps_start_time
+                self.current_fps = 30 / elapsed if elapsed > 0 else 0
+                self.fps_start_time = now
+            
+            cv2.putText(frame, f"FPS: {self.current_fps:.1f}", (w - 150, 30), 
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.7, (100, 255, 100), 2)
+            
+            # Zone de recherche zoom (si active)
+            if self.zoom_factor > 1.2 and self.search_zone:
+                zone_x, zone_y = self.search_zone[0], self.search_zone[1]
+                zone_w, zone_h = self.search_zone[2], self.search_zone[3]
+                
+                # Calcul de la zone de crop actuelle
+                crop_w = int(w / self.zoom_factor)
+                crop_h = int(h / self.zoom_factor)
+                offset_x = max(0, min(zone_x - crop_w // 2, w - crop_w))
+                offset_y = max(0, min(zone_y - crop_h // 2, h - crop_h))
+                
+                cv2.rectangle(frame, (offset_x, offset_y), (offset_x + crop_w, offset_y + crop_h), 
+                             (0, 255, 255), 2)
+                cv2.putText(frame, f"ZONE ZOOM {self.zoom_factor:.1f}x", 
+                           (offset_x, max(offset_y - 10, 20)),
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 255), 1)
+            
+            return frame
+            
+        except Exception as e:
+            logger.debug(f"Enhanced zoom overlay error: {e}")
+            return frame
 
     def _global_detection_phase(self, frame):
         """Phase de détection globale (recherche large)"""
