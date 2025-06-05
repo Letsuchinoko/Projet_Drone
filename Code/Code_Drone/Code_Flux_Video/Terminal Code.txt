@@ -1,41 +1,55 @@
-[h264 @ 000001d4790f6a80] non-existing PPS 0 referenced
+C:\Users\Baptiste\Documents\GitHub\Projet_Drone> & C:/Users/Baptiste/anaconda3/python.exe c:/Users/Baptiste/Documents/GitHub/Projet_Drone/Code/Code_Drone/Code_Tests_FULLRAM/fullram.py
+2025-06-05 09:47:13,946 - INFO - Démarrage détection gant Bebop 2 en mode flux RAM (ffmpeg + OpenCV)
+2025-06-05 09:47:13,968 - INFO - Connexion au drone...
+Setting up mDNS listener since this is not a Mambo
+Making a browser for _arsdk-090c._udp.local.
+Service Bebop2-070980._arsdk-090c._udp.local. added, service info: ServiceInfo(type='_arsdk-090c._udp.local.', name='Bebop2-070980._arsdk-090c._udp.local.', addresses=[b'\xc0\xa8*\x01'], port=44444, weight=0, priority=0, server='Bebop2-070980.local.', properties={b'{"device_id":"PI040384AG6L070980"}': None})
+{"d2c_port": 43210, "controller_type": "computer", "controller_name": "pyparrot", "arstream2_client_stream_port": 55004, "arstream2_client_control_port": 55005}
+{'status': 0, 'c2d_port': 54321, 'c2d_update_port': 51, 'c2d_user_port': 21, 'qos_mode': 0, 'arstream2_server_stream_port': 5004, 'arstream2_server_control_port': 5005}
+c2d_port is 54321
+starting listening at
+ Success in setting up the wifi network to the drone!
+2025-06-05 09:47:14,992 - INFO - Drone connecté !
+2025-06-05 09:47:14,992 - INFO - Contrôle du drone (pyparrot) démarré.
 
-[h264 @ 000001d4790f6a80] decode_slice_header error
+[Commandes clavier]
+  t = décoller
+  l = atterrir
+  e = quitter
+  f = avancer
+  b = reculer
+  g = gauche
+  d = droite
+  h = haut
+  m = bas
+  a = rotation gauche
+  c = rotation droite
 
-[h264 @ 000001d4790f6a80] no frame!
-
-Input #0, sdp, from 'C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\utils/bebop.sdp':
-
-  Duration: N/A, start: 1.267944, bitrate: N/A
-
-  Stream #0:0: Video: h264 (Constrained Baseline), yuv420p(progressive), 856x480 [SAR 1:1 DAR 107:60], 29.97 fps, 29.97 tbr, 90k tbn
-
-Stream mapping:
-
-  Stream #0:0 -> #0:0 (h264 (native) -> png (native))
-
-2025-06-03 10:47:58,904 - INFO - [OK] Video stream opened successfully
-2025-06-03 10:47:58,904 - INFO - [DETECT] Detection system active
-2025-06-03 10:47:58,904 - INFO - Controls: 'q'/ESC=Quit, 'r'=Reset stats, 's'=Screenshot, Ctrl+C=Emergency stop
-2025-06-03 10:48:05,262 - INFO - [STATS] Frames: 93, FPS: 9.3, Detections: 98.9%, Errors: 0
-2025-06-03 10:48:15,263 - INFO - [STATS] Frames: 245, FPS: 15.2, Detections: 99.6%, Errors: 0
-2025-06-03 10:48:19,766 - WARNING - [WARNING] No frames received for several seconds
-2025-06-03 10:48:24,794 - WARNING - [WARNING] No frames received for several seconds
-2025-06-03 10:48:25,263 - INFO - [STATS] Frames: 265, FPS: 2.0, Detections: 99.6%, Errors: 0
-2025-06-03 10:48:29,824 - WARNING - [WARNING] No frames received for several seconds
-2025-06-03 10:48:34,862 - WARNING - [WARNING] No frames received for several seconds
-2025-06-03 10:48:35,264 - WARNING - [MONITOR] No new frames received
-2025-06-03 10:48:39,910 - WARNING - [WARNING] No frames received for several seconds
-2025-06-03 10:48:44,047 - INFO - [STOP] Stop signal received
-2025-06-03 10:48:44,119 - INFO - [CLEANUP] Thread terminated
-2025-06-03 10:48:44,935 - INFO - [REFRESH] Starting cleanup process...
-2025-06-03 10:48:44,957 - WARNING - [WARNING] No frames received for several seconds
-2025-06-03 10:48:44,974 - INFO - [DISPLAY] Thread terminated
-2025-06-03 10:48:45,265 - WARNING - [MONITOR] No new frames received
-2025-06-03 10:48:45,265 - INFO - [MONITOR] Connection monitoring terminated
-Killing the ffmpeg subprocess
-Sending a second kill call to the ffmpeg process
-2025-06-03 10:48:52,438 - INFO - [VIDEO] Video stream closed
+> ffmpeg version 7.1.1-full_build-www.gyan.dev Copyright (c) 2000-2025 the FFmpeg developers
+  built with gcc 14.2.0 (Rev1, Built by MSYS2 project)
+  configuration: --enable-gpl --enable-version3 --enable-static --disable-w32threads --disable-autodetect --enable-fontconfig --enable-iconv --enable-gnutls --enable-lcms2 --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-libsnappy --enable-zlib --enable-librist --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-libbluray --enable-libcaca --enable-libdvdnav --enable-libdvdread --enable-sdl2 --enable-libaribb24 --enable-libaribcaption --enable-libdav1d --enable-libdavs2 --enable-libopenjpeg --enable-libquirc --enable-libuavs3d --enable-libxevd --enable-libzvbi --enable-libqrencode --enable-librav1e --enable-libsvtav1 --enable-libvvenc --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs2 --enable-libxeve --enable-libxvid --enable-libaom --enable-libjxl --enable-libvpx --enable-mediafoundation --enable-libass --enable-frei0r --enable-libfreetype --enable-libfribidi --enable-libharfbuzz --enable-liblensfun --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-dxva2 --enable-d3d11va --enable-d3d12va --enable-ffnvcodec --enable-libvpl --enable-nvdec --enable-nvenc --enable-vaapi --enable-libshaderc --enable-vulkan --enable-libplacebo --enable-opencl --enable-libcdio --enable-libgme --enable-libmodplug --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libshine --enable-libtheora --enable-libtwolame --enable-libvo-amrwbenc --enable-libcodec2 --enable-libilbc --enable-libgsm --enable-liblc3 --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-ladspa --enable-libbs2b --enable-libflite --enable-libmysofa --enable-librubberband --enable-libsoxr --enable-chromaprint
+  libavutil      59. 39.100 / 59. 39.100
+  libavcodec     61. 19.101 / 61. 19.101
+  libavformat    61.  7.100 / 61.  7.100
+  libavdevice    61.  3.100 / 61.  3.100
+  libavfilter    10.  4.100 / 10.  4.100
+  libswscale      8.  3.100 /  8.  3.100
+  libswresample   5.  3.100 /  5.  3.100
+  libpostproc    58.  3.100 / 58.  3.100
+Exception in thread Thread-2 (drone_control_thread):
+Traceback (most recent call last):
+  File "C:\Users\Baptiste\anaconda3\Lib\threading.py", line 1073, in _bootstrap_inner
+    self.run()
+  File "C:\Users\Baptiste\anaconda3\Lib\threading.py", line 1010, in run
+    self._target(*self._args, **self._kwargs)
+  File "c:\Users\Baptiste\Documents\GitHub\Projet_Drone\Code\Code_Drone\Code_Tests_FULLRAM\fullram.py", line 194, in drone_control_thread
+    key = input("> ").strip().lower()
+          ^^^^^^^^^^^
+EOFError
+[in#0 @ 000001b7f8fa0880] Error opening input: Immediate exit requested
+Error opening input file udp://@192.168.42.1:5600.
+Exiting normally, received signal 2.
+2025-06-05 09:48:15,413 - INFO - Arrêt clavier demandé.
+2025-06-05 09:48:15,414 - INFO - Nettoyage et arrêt du flux video...
  disconnecting 
-2025-06-03 10:48:52,941 - INFO - [CONNECT] Drone disconnected
-2025-06-03 10:48:52,942 - INFO - [OK] Cleanup completed - Program terminated properly
+2025-06-05 09:48:15,920 - INFO - Drone déconnecté et script terminé.
