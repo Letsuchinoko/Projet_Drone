@@ -5,10 +5,10 @@ import subprocess
 import sys
 import logging
 import os
+import pyparrot
 from pyparrot.Bebop import Bebop
 from pyparrot.DroneVision import DroneVision
 
-# === PARAMÈTRES BEBOP 2 VIDEO ===
 BEBOP_IP = "192.168.42.1"
 WIDTH, HEIGHT = 856, 480
 
@@ -31,10 +31,10 @@ def main():
     vision = DroneVision(bebop, is_bebop=True)
     vision.open_video()
     logger.info("Flux vidéo demandé au drone (open_video).")
-    time.sleep(2)  # Laisse le temps au flux de démarrer (important!)
+    time.sleep(2)  # Laisse le temps au flux de démarrer
 
-    # Chemin vers le SDP utilisé par pyparrot
-    sdp_path = os.path.join(os.path.dirname(__file__), "utils", "bebop.sdp")
+    # Chemin vers le SDP utilisé par pyparrot (chemin dans site-packages)
+    sdp_path = os.path.join(os.path.dirname(pyparrot.__file__), "utils", "bebop.sdp")
     if not os.path.exists(sdp_path):
         logger.error(f"Fichier SDP introuvable: {sdp_path}")
         return

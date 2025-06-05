@@ -84,9 +84,7 @@ class NoDiskVision(DroneVision):
                                                    args=(user_callback_function, user_callback_args))
 
     def open_video(self):
-        """
-        Ouvre le flux vidéo avec redirection vers dossier temporaire
-        """
+        """Ouvre le flux vidéo avec redirection vers dossier temporaire"""
         # Démarrer le stream sur le bebop
         if self.is_bebop:
             self.drone_object.start_video_stream()
@@ -198,9 +196,7 @@ class NoDiskVision(DroneVision):
             time.sleep(1.0 / (3.0 * self.fps))
 
     def _memory_only_vision(self, buffer_size):
-        """
-        Version modifiée qui lit depuis temp et nettoie immédiatement
-        """
+        """Version modifiée qui lit depuis temp et nettoie immédiatement"""
         logger.info("Memory-only vision thread started")
         
         self.new_frame = False
@@ -338,394 +334,7 @@ def direct_buffer_thread(vision_object):
                             frame_stats['buffer_hits'] += 1
                             frame_stats['last_frame_time'] = time.time()
                         
-                        last_display_time = current_time
-            
-            # Récupération frame
-            with frame_lock:
-                if current_frame is not None:
-                    frame = current_frame.copy()
-                else:
-                    frame = None
-            
-            if frame is None:
-                no_frame_count += 1
-                
-                # Écran d'attente
-                blank_frame = np.zeros((480, 640, 3), dtype=np.uint8)
-                cv2.putText(blank_frame, "Zero Disk System Active...", (150, 200),
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
-                
-                with stats_lock:
-                    checks = frame_stats['buffer_checks']
-                    hits = frame_stats['buffer_hits']
-                    temp_created = frame_stats['temp_files_created']
-                    temp_cleaned = frame_stats['temp_files_cleaned']
-                    hit_rate = (hits / max(checks, 1)) * 100
-                    cleanup_rate = (temp_cleaned / max(temp_created, 1)) * 100
-                
-                cv2.putText(blank_frame, f"Buffer: {checks} checks | {hit_rate:.1f}% hits", 
-                           (140, 240), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
-                cv2.putText(blank_frame, f"Temp files: {temp_created} created | {cleanup_rate:.1f}% cleaned", 
-                           (100, 270), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (100, 255, 100), 1)
-                cv2.putText(blank_frame, f"Display cycles sans frame: {no_frame_count}", 
-                           (140, 300), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 100, 100), 1)
-                
-                cv2.imshow(window_name, blank_frame)
-                
-                key = cv2.waitKey(50) & 0xFF
-                if key == ord('q') or key == 27:
-                    processing_active.clear()
-                    break
-                continue
-            
-            no_frame_count = 0
-            
-            # Traitement détection
-            processed_frame, detected = detector.detect_glove(frame)
-            
-            # FPS
-            fps_counter += 1
-            if fps_counter % 30 == 0:
-                fps_elapsed = current_time - fps_start_time
-                current_fps = fps_counter / fps_elapsed if fps_elapsed > 0 else 0
-                logger.info(f"Display FPS: {current_fps:.1f}")
-                fps_start_time = current_time
-                fps_counter = 0
-            
-            # Affichage
-            cv2.imshow(window_name, processed_frame)
-            
-            # Touches
-            key = cv2.waitKey(1) & 0xFF
-            if key == ord('q') or key == 27:
-                logger.info("User requested quit")
-                processing_active.clear()
-                break
-            elif key == ord('r'):
-                # Reset complet
-                with stats_lock:
-                    frame_stats['frame_count'] = 0
-                    frame_stats['detection_count'] = 0
-                    frame_stats['error_count'] = 0
-                    frame_stats['buffer_checks'] = 0
-                    frame_stats['buffer_hits'] = 0
-                    frame_stats['buffer_misses'] = 0
-                    frame_stats['temp_files_created'] = 0
-                    frame_stats['temp_files_cleaned'] = 0
-                
-                detector.detection_history.clear()
-                detector.stable_detections.clear()
-                detector.last_frame_id = None
-                detector.last_detection_result = None
-                detector.last_detection_center = None
-                detector.detection_cooldown = 0
-                
-                no_frame_count = 0
-                logger.info("Complete reset performed")
-                
-            elif key == ord('s'):
-                screenshot_name = f"screenshot_zerodisk_{int(time.time())}.png"
-                cv2.imwrite(screenshot_name, processed_frame)
-                logger.info(f"Screenshot saved: {screenshot_name}")
-                
-            elif key == ord('d'):
-                # Debug détaillé
-                with stats_lock:
-                    debug_stats = frame_stats.copy()
-                logger.info(f"Debug stats: {debug_stats}")
-                
-        except Exception as e:
-            logger.error(f"Display thread error: {e}")
-            time.sleep(0.1)
-    
-    cv2.destroyAllWindows()
-    logger.info("Display thread terminated")
-
-def monitor_thread():
-    """Thread de monitoring"""
-    logger.info("Monitor thread started")
-    last_frame_count = 0
-    last_buffer_checks = 0
-    last_temp_created = 0
-    
-    while processing_active.is_set():
-        time.sleep(5)
-        
-        if not processing_active.is_set():
-            break
-        
-        with stats_lock:
-            current_frames = frame_stats['frame_count']
-            detections = frame_stats['detection_count']
-            errors = frame_stats['error_count']
-            buffer_checks = frame_stats['buffer_checks']
-            buffer_hits = frame_stats['buffer_hits']
-            buffer_misses = frame_stats['buffer_misses']
-            temp_created = frame_stats['temp_files_created']
-            temp_cleaned = frame_stats['temp_files_cleaned']
-            last_received_time = frame_stats['last_frame_time']
-        
-        frame_diff = current_frames - last_frame_count
-        checks_diff = buffer_checks - last_buffer_checks
-        temp_diff = temp_created - last_temp_created
-        
-        last_frame_count = current_frames
-        last_buffer_checks = buffer_checks
-        last_temp_created = temp_created
-        
-        time_since_last_frame = time.time() - last_received_time
-        buffer_hit_rate = (buffer_hits / max(buffer_checks, 1)) * 100
-        cleanup_efficiency = (temp_cleaned / max(temp_created, 1)) * 100
-        
-        if frame_diff > 0:
-            avg_fps = frame_diff / 5
-            detection_rate = (detections / max(current_frames, 1)) * 100
-            check_rate = checks_diff / 5
-            temp_rate = temp_diff / 5
-            
-            logger.info(f"MONITOR - Frames: {current_frames} (+{frame_diff}), FPS: {avg_fps:.1f}, "
-                       f"Det: {detection_rate:.1f}%, Err: {errors}")
-            logger.info(f"         Buffer: {buffer_checks} checks (+{checks_diff}, {check_rate:.1f}/s), "
-                       f"Hit rate: {buffer_hit_rate:.1f}%")
-            logger.info(f"         Temp files: {temp_created} created (+{temp_diff}, {temp_rate:.1f}/s), "
-                       f"Cleanup: {cleanup_efficiency:.1f}% ({temp_cleaned}/{temp_created})")
-        else:
-            logger.warning(f"No new frames - buffer checks: {buffer_checks} (+{checks_diff}), "
-                         f"hit rate: {buffer_hit_rate:.1f}%, last frame {time_since_last_frame:.1f}s ago")
-            logger.warning(f"              Temp files: {temp_created} created, {temp_cleaned} cleaned, "
-                         f"cleanup efficiency: {cleanup_efficiency:.1f}%")
-    
-    logger.info("Monitor thread terminated")
-
-def signal_handler(sig, frame):
-    """Gestionnaire de signaux"""
-    logger.info(f"Signal {sig} received - initiating shutdown")
-    processing_active.clear()
-
-def main():
-    """Fonction principale avec zéro usage disque"""
-    signal.signal(signal.SIGINT, signal_handler)
-    signal.signal(signal.SIGTERM, signal_handler)
-    
-    logger.info("Starting Bebop 2 Zero Disk Usage Detection System")
-    logger.info("Features: Temporary directory + Immediate cleanup + Buffer access")
-    
-    bebop = None
-    vision = None
-    threads = []
-    
-    try:
-        # Connexion au drone
-        bebop = Bebop()
-        logger.info("Connecting to Bebop 2...")
-        
-        success = bebop.connect(CONNECTION_TIMEOUT)
-        if not success:
-            logger.error("Failed to connect to drone")
-            return False
-        
-        logger.info("Drone connected successfully")
-        
-        # Configuration de la vision sans disque
-        vision = NoDiskVision(bebop, is_bebop=True, buffer_size=50)
-        
-        # Démarrage des threads
-        buffer_thread_obj = threading.Thread(target=direct_buffer_thread, args=(vision,), daemon=True, name="DirectBuffer")
-        display_thread_obj = threading.Thread(target=display_thread, daemon=True, name="Display")
-        monitor_thread_obj = threading.Thread(target=monitor_thread, daemon=True, name="Monitor")
-        
-        threads = [buffer_thread_obj, display_thread_obj, monitor_thread_obj]
-        
-        for i, thread in enumerate(threads):
-            thread.start()
-            time.sleep(0.1)
-            logger.info(f"Thread {i+1}/{len(threads)} started: {thread.name}")
-        
-        logger.info("All threads started successfully")
-        
-        # Ouverture du flux vidéo
-        logger.info("Opening video stream with zero disk usage...")
-        start_time = time.time()
-        
-        if not vision.open_video():
-            logger.error("Failed to open video stream")
-            return False
-        
-        open_time = time.time() - start_time
-        logger.info(f"Video stream opened successfully ({open_time:.1f}s)")
-        logger.info("Zero Disk Usage Detection System is now active")
-        logger.info("=" * 60)
-        logger.info("SYSTEM INFO:")
-        logger.info(f"  Mode:             Zero Disk Usage")
-        logger.info(f"  Temp Directory:   {vision.temp_dir}")
-        logger.info(f"  Buffer Size:      {vision.buffer_size} frames")
-        logger.info(f"  Immediate Cleanup: Enabled")
-        logger.info("=" * 60)
-        logger.info("CONTROLS:")
-        logger.info("  'q' or ESC  = Quit")
-        logger.info("  'r'         = Complete reset")
-        logger.info("  's'         = Screenshot")
-        logger.info("  'd'         = Debug stats")
-        logger.info("=" * 60)
-        
-        # Boucle principale avec monitoring
-        start_time = time.time()
-        last_status_time = time.time()
-        status_interval = 20  # Status toutes les 20 secondes
-        
-        try:
-            while processing_active.is_set():
-                time.sleep(1)
-                
-                current_time = time.time()
-                
-                # Vérifier fenêtre OpenCV
-                try:
-                    if cv2.getWindowProperty("Bebop 2 - Zero Disk Usage", cv2.WND_PROP_VISIBLE) < 1:
-                        logger.info("Display window was closed")
-                        break
-                except:
-                    pass
-                
-                # Status périodique ultra-détaillé
-                if (current_time - last_status_time) >= status_interval:
-                    with stats_lock:
-                        status_stats = frame_stats.copy()
-                    
-                    uptime = current_time - start_time
-                    avg_frame_rate = status_stats['frame_count'] / max(uptime, 1)
-                    avg_check_rate = status_stats['buffer_checks'] / max(uptime, 1)
-                    buffer_efficiency = (status_stats['buffer_hits'] / max(status_stats['buffer_checks'], 1)) * 100
-                    cleanup_efficiency = (status_stats['temp_files_cleaned'] / max(status_stats['temp_files_created'], 1)) * 100
-                    
-                    logger.info(f"STATUS - Uptime: {uptime:.0f}s")
-                    logger.info(f"       - Frame Rate: {avg_frame_rate:.1f}/s (Total: {status_stats['frame_count']})")
-                    logger.info(f"       - Buffer Efficiency: {buffer_efficiency:.1f}% ({status_stats['buffer_hits']}/{status_stats['buffer_checks']})")
-                    logger.info(f"       - Temp Files: {status_stats['temp_files_created']} created, {status_stats['temp_files_cleaned']} cleaned")
-                    logger.info(f"       - Cleanup Efficiency: {cleanup_efficiency:.1f}%")
-                    logger.info(f"       - Detections: {status_stats['detection_count']} | Errors: {status_stats['error_count']}")
-                    
-                    # Vérification du dossier temporaire
-                    try:
-                        if hasattr(vision, 'temp_dir') and os.path.exists(vision.temp_dir):
-                            temp_files = len([f for f in os.listdir(vision.temp_dir) if f.endswith('.png')])
-                            logger.info(f"       - Temp directory status: {temp_files} files remaining")
-                            
-                            if temp_files > 10:
-                                logger.warning(f"       - WARNING: {temp_files} temp files not cleaned!")
-                        else:
-                            logger.warning("       - Temp directory not accessible")
-                    except Exception as e:
-                        logger.warning(f"       - Temp directory check error: {e}")
-                    
-                    last_status_time = current_time
-                
-                # Vérification de santé critique
-                with stats_lock:
-                    time_since_last_frame = current_time - frame_stats['last_frame_time']
-                    temp_created = frame_stats['temp_files_created']
-                    temp_cleaned = frame_stats['temp_files_cleaned']
-                
-                # Alerte si problème détecté
-                if time_since_last_frame > 15 and temp_created > 50:
-                    cleanup_rate = (temp_cleaned / max(temp_created, 1)) * 100
-                    logger.warning(f"HEALTH ALERT - No frames for {time_since_last_frame:.1f}s")
-                    logger.warning(f"             - Temp files: {temp_created} created, {temp_cleaned} cleaned ({cleanup_rate:.1f}%)")
-                    
-                    # Vérification PyParrot
-                    try:
-                        if hasattr(vision, 'vision_running'):
-                            logger.warning(f"             - Vision running: {vision.vision_running}")
-                        if hasattr(vision, 'ffmpeg_process') and vision.ffmpeg_process:
-                            process_alive = vision.ffmpeg_process.poll() is None
-                            logger.warning(f"             - FFmpeg alive: {process_alive}")
-                    except Exception as e:
-                        logger.warning(f"             - Health check error: {e}")
-                    
-        except KeyboardInterrupt:
-            logger.info("Keyboard interrupt received")
-    
-    except Exception as e:
-        logger.error(f"Critical error in main: {e}")
-        import traceback
-        logger.error(f"Traceback: {traceback.format_exc()}")
-        return False
-    
-    finally:
-        # Nettoyage ultra-complet
-        logger.info("Starting comprehensive cleanup...")
-        processing_active.clear()
-        
-        # Attendre les threads
-        for thread in threads:
-            try:
-                thread.join(timeout=8)
-                logger.info(f"Thread {thread.name} terminated successfully")
-            except Exception as e:
-                logger.warning(f"Error joining thread {thread.name}: {e}")
-        
-        # Fermeture de la vision (inclut nettoyage temp)
-        if vision:
-            try:
-                logger.info("Closing zero-disk vision...")
-                vision.close_video()
-                logger.info("Zero-disk vision closed successfully")
-            except Exception as e:
-                logger.warning(f"Error closing vision: {e}")
-        
-        # Déconnexion du drone
-        if bebop:
-            try:
-                logger.info("Disconnecting from Bebop...")
-                bebop.disconnect()
-                logger.info("Bebop disconnected successfully")
-            except Exception as e:
-                logger.warning(f"Error disconnecting Bebop: {e}")
-        
-        # Fermeture OpenCV
-        try:
-            cv2.destroyAllWindows()
-            logger.info("OpenCV windows closed successfully")
-        except Exception as e:
-            logger.warning(f"Error closing OpenCV windows: {e}")
-        
-        # Statistiques finales ultra-détaillées
-        with stats_lock:
-            final_stats = frame_stats.copy()
-        
-        total_time = time.time() - start_time if 'start_time' in locals() else 0
-        
-        logger.info("=" * 60)
-        logger.info("FINAL STATISTICS (ZERO DISK USAGE):")
-        logger.info(f"  Total Runtime:          {total_time:.1f}s")
-        logger.info(f"  Frames Processed:       {final_stats['frame_count']}")
-        logger.info(f"  Average Frame Rate:     {final_stats['frame_count']/max(total_time,1):.1f}/s")
-        logger.info(f"  Total Detections:       {final_stats['detection_count']}")
-        logger.info(f"  Detection Rate:         {(final_stats['detection_count']/max(final_stats['frame_count'],1))*100:.1f}%")
-        logger.info(f"  Buffer Checks:          {final_stats['buffer_checks']}")
-        logger.info(f"  Buffer Hits:            {final_stats['buffer_hits']}")
-        logger.info(f"  Buffer Hit Rate:        {(final_stats['buffer_hits']/max(final_stats['buffer_checks'],1))*100:.1f}%")
-        logger.info(f"  Temp Files Created:     {final_stats['temp_files_created']}")
-        logger.info(f"  Temp Files Cleaned:     {final_stats['temp_files_cleaned']}")
-        logger.info(f"  Cleanup Efficiency:     {(final_stats['temp_files_cleaned']/max(final_stats['temp_files_created'],1))*100:.1f}%")
-        logger.info(f"  Processing Errors:      {final_stats['error_count']}")
-        logger.info("=" * 60)
-        
-        logger.info("Zero Disk Usage system cleanup completed successfully")
-    
-    return True
-
-if __name__ == "__main__":
-    try:
-        success = main()
-        exit_code = 0 if success else 1
-        logger.info(f"Program exiting with code {exit_code}")
-        sys.exit(exit_code)
-    except Exception as e:
-        logger.error(f"Unhandled exception in main: {e}")
-        import traceback
-        logger.error(f"Full traceback: {traceback.format_exc()}")
-        sys.exit(1)buffer_index = current_buffer_index
+                        last_buffer_index = current_buffer_index
                         logger.debug(f"New frame from buffer index {current_buffer_index}")
                     else:
                         with stats_lock:
@@ -1131,4 +740,368 @@ def display_thread():
                 time.sleep(0.01)
                 continue
             
-            last_
+            last_display_time = current_time
+            
+            # Récupération frame
+            with frame_lock:
+                if current_frame is not None:
+                    frame = current_frame.copy()
+                else:
+                    frame = None
+            
+            if frame is None:
+                no_frame_count += 1
+                
+                # Écran d'attente
+                blank_frame = np.zeros((480, 640, 3), dtype=np.uint8)
+                cv2.putText(blank_frame, "Zero Disk System Active...", (150, 200),
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
+                
+                with stats_lock:
+                    checks = frame_stats['buffer_checks']
+                    hits = frame_stats['buffer_hits']
+                    temp_created = frame_stats['temp_files_created']
+                    temp_cleaned = frame_stats['temp_files_cleaned']
+                    hit_rate = (hits / max(checks, 1)) * 100
+                    cleanup_rate = (temp_cleaned / max(temp_created, 1)) * 100
+                
+                cv2.putText(blank_frame, f"Buffer: {checks} checks | {hit_rate:.1f}% hits", 
+                           (140, 240), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
+                cv2.putText(blank_frame, f"Temp files: {temp_created} created | {cleanup_rate:.1f}% cleaned", 
+                           (100, 270), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (100, 255, 100), 1)
+                cv2.putText(blank_frame, f"Display cycles sans frame: {no_frame_count}", 
+                           (140, 300), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 100, 100), 1)
+                
+                cv2.imshow(window_name, blank_frame)
+                
+                key = cv2.waitKey(50) & 0xFF
+                if key == ord('q') or key == 27:
+                    processing_active.clear()
+                    break
+                continue
+            
+            no_frame_count = 0
+            
+            # Traitement détection
+            processed_frame, detected = detector.detect_glove(frame)
+            
+            # FPS
+            fps_counter += 1
+            if fps_counter % 30 == 0:
+                fps_elapsed = current_time - fps_start_time
+                current_fps = fps_counter / fps_elapsed if fps_elapsed > 0 else 0
+                logger.info(f"Display FPS: {current_fps:.1f}")
+                fps_start_time = current_time
+                fps_counter = 0
+            
+            # Affichage
+            cv2.imshow(window_name, processed_frame)
+            
+            # Touches
+            key = cv2.waitKey(1) & 0xFF
+            if key == ord('q') or key == 27:
+                logger.info("User requested quit")
+                processing_active.clear()
+                break
+            elif key == ord('r'):
+                # Reset complet
+                with stats_lock:
+                    frame_stats['frame_count'] = 0
+                    frame_stats['detection_count'] = 0
+                    frame_stats['error_count'] = 0
+                    frame_stats['buffer_checks'] = 0
+                    frame_stats['buffer_hits'] = 0
+                    frame_stats['buffer_misses'] = 0
+                    frame_stats['temp_files_created'] = 0
+                    frame_stats['temp_files_cleaned'] = 0
+                
+                detector.detection_history.clear()
+                detector.stable_detections.clear()
+                detector.last_frame_id = None
+                detector.last_detection_result = None
+                detector.last_detection_center = None
+                detector.detection_cooldown = 0
+                
+                no_frame_count = 0
+                logger.info("Complete reset performed")
+                
+            elif key == ord('s'):
+                screenshot_name = f"screenshot_zerodisk_{int(time.time())}.png"
+                cv2.imwrite(screenshot_name, processed_frame)
+                logger.info(f"Screenshot saved: {screenshot_name}")
+                
+            elif key == ord('d'):
+                # Debug détaillé
+                with stats_lock:
+                    debug_stats = frame_stats.copy()
+                logger.info(f"Debug stats: {debug_stats}")
+                
+        except Exception as e:
+            logger.error(f"Display thread error: {e}")
+            time.sleep(0.1)
+    
+    cv2.destroyAllWindows()
+    logger.info("Display thread terminated")
+
+def monitor_thread():
+    """Thread de monitoring"""
+    logger.info("Monitor thread started")
+    last_frame_count = 0
+    last_buffer_checks = 0
+    last_temp_created = 0
+    
+    while processing_active.is_set():
+        time.sleep(5)
+        
+        if not processing_active.is_set():
+            break
+        
+        with stats_lock:
+            current_frames = frame_stats['frame_count']
+            detections = frame_stats['detection_count']
+            errors = frame_stats['error_count']
+            buffer_checks = frame_stats['buffer_checks']
+            buffer_hits = frame_stats['buffer_hits']
+            buffer_misses = frame_stats['buffer_misses']
+            temp_created = frame_stats['temp_files_created']
+            temp_cleaned = frame_stats['temp_files_cleaned']
+            last_received_time = frame_stats['last_frame_time']
+        
+        frame_diff = current_frames - last_frame_count
+        checks_diff = buffer_checks - last_buffer_checks
+        temp_diff = temp_created - last_temp_created
+        
+        last_frame_count = current_frames
+        last_buffer_checks = buffer_checks
+        last_temp_created = temp_created
+        
+        time_since_last_frame = time.time() - last_received_time
+        buffer_hit_rate = (buffer_hits / max(buffer_checks, 1)) * 100
+        cleanup_efficiency = (temp_cleaned / max(temp_created, 1)) * 100
+        
+        if frame_diff > 0:
+            avg_fps = frame_diff / 5
+            detection_rate = (detections / max(current_frames, 1)) * 100
+            check_rate = checks_diff / 5
+            temp_rate = temp_diff / 5
+            
+            logger.info(f"MONITOR - Frames: {current_frames} (+{frame_diff}), FPS: {avg_fps:.1f}, "
+                       f"Det: {detection_rate:.1f}%, Err: {errors}")
+            logger.info(f"         Buffer: {buffer_checks} checks (+{checks_diff}, {check_rate:.1f}/s), "
+                       f"Hit rate: {buffer_hit_rate:.1f}%")
+            logger.info(f"         Temp files: {temp_created} created (+{temp_diff}, {temp_rate:.1f}/s), "
+                       f"Cleanup: {cleanup_efficiency:.1f}% ({temp_cleaned}/{temp_created})")
+        else:
+            logger.warning(f"No new frames - buffer checks: {buffer_checks} (+{checks_diff}), "
+                         f"hit rate: {buffer_hit_rate:.1f}%, last frame {time_since_last_frame:.1f}s ago")
+            logger.warning(f"              Temp files: {temp_created} created, {temp_cleaned} cleaned, "
+                         f"cleanup efficiency: {cleanup_efficiency:.1f}%")
+    
+    logger.info("Monitor thread terminated")
+
+def signal_handler(sig, frame):
+    """Gestionnaire de signaux"""
+    logger.info(f"Signal {sig} received - initiating shutdown")
+    processing_active.clear()
+
+def main():
+    """Fonction principale avec zéro usage disque"""
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+    
+    logger.info("Starting Bebop 2 Zero Disk Usage Detection System")
+    logger.info("Features: Temporary directory + Immediate cleanup + Buffer access")
+    
+    bebop = None
+    vision = None
+    threads = []
+    
+    try:
+        # Connexion au drone
+        bebop = Bebop()
+        logger.info("Connecting to Bebop 2...")
+        
+        success = bebop.connect(CONNECTION_TIMEOUT)
+        if not success:
+            logger.error("Failed to connect to drone")
+            return False
+        
+        logger.info("Drone connected successfully")
+        
+        # Configuration de la vision sans disque
+        vision = NoDiskVision(bebop, is_bebop=True, buffer_size=50)
+        
+        # Démarrage des threads
+        buffer_thread_obj = threading.Thread(target=direct_buffer_thread, args=(vision,), daemon=True, name="DirectBuffer")
+        display_thread_obj = threading.Thread(target=display_thread, daemon=True, name="Display")
+        monitor_thread_obj = threading.Thread(target=monitor_thread, daemon=True, name="Monitor")
+        
+        threads = [buffer_thread_obj, display_thread_obj, monitor_thread_obj]
+        
+        for i, thread in enumerate(threads):
+            thread.start()
+            time.sleep(0.1)
+            logger.info(f"Thread {i+1}/{len(threads)} started: {thread.name}")
+        
+        logger.info("All threads started successfully")
+        
+        # Ouverture du flux vidéo
+        logger.info("Opening video stream with zero disk usage...")
+        start_time = time.time()
+        
+        if not vision.open_video():
+            logger.error("Failed to open video stream")
+            return False
+        
+        open_time = time.time() - start_time
+        logger.info(f"Video stream opened successfully ({open_time:.1f}s)")
+        logger.info("Zero Disk Usage Detection System is now active")
+        logger.info("=" * 60)
+        logger.info("SYSTEM INFO:")
+        logger.info(f"  Mode:             Zero Disk Usage")
+        logger.info(f"  Temp Directory:   {vision.temp_dir}")
+        logger.info(f"  Buffer Size:      {vision.buffer_size} frames")
+        logger.info(f"  Immediate Cleanup: Enabled")
+        logger.info("=" * 60)
+        logger.info("CONTROLS:")
+        logger.info("  'q' or ESC  = Quit")
+        logger.info("  'r'         = Complete reset")
+        logger.info("  's'         = Screenshot")
+        logger.info("  'd'         = Debug stats")
+        logger.info("=" * 60)
+        
+        # Boucle principale avec monitoring
+        start_time = time.time()
+        last_status_time = time.time()
+        status_interval = 20  # Status toutes les 20 secondes
+        
+        try:
+            while processing_active.is_set():
+                time.sleep(1)
+                
+                current_time = time.time()
+                
+                # Vérifier fenêtre OpenCV
+                try:
+                    if cv2.getWindowProperty("Bebop 2 - Zero Disk Usage", cv2.WND_PROP_VISIBLE) < 1:
+                        logger.info("Display window was closed")
+                        break
+                except:
+                    pass
+                
+                # Status périodique
+                if (current_time - last_status_time) >= status_interval:
+                    with stats_lock:
+                        status_stats = frame_stats.copy()
+                    
+                    uptime = current_time - start_time
+                    avg_frame_rate = status_stats['frame_count'] / max(uptime, 1)
+                    buffer_efficiency = (status_stats['buffer_hits'] / max(status_stats['buffer_checks'], 1)) * 100
+                    cleanup_efficiency = (status_stats['temp_files_cleaned'] / max(status_stats['temp_files_created'], 1)) * 100
+                    
+                    logger.info(f"STATUS - Uptime: {uptime:.0f}s")
+                    logger.info(f"       - Frame Rate: {avg_frame_rate:.1f}/s (Total: {status_stats['frame_count']})")
+                    logger.info(f"       - Buffer Efficiency: {buffer_efficiency:.1f}%")
+                    logger.info(f"       - Temp Files: {status_stats['temp_files_created']} created, {status_stats['temp_files_cleaned']} cleaned")
+                    logger.info(f"       - Cleanup Efficiency: {cleanup_efficiency:.1f}%")
+                    logger.info(f"       - Detections: {status_stats['detection_count']} | Errors: {status_stats['error_count']}")
+                    
+                    # Vérification du dossier temporaire
+                    try:
+                        if hasattr(vision, 'temp_dir') and os.path.exists(vision.temp_dir):
+                            temp_files = len([f for f in os.listdir(vision.temp_dir) if f.endswith('.png')])
+                            logger.info(f"       - Temp directory status: {temp_files} files remaining")
+                            
+                            if temp_files > 10:
+                                logger.warning(f"       - WARNING: {temp_files} temp files not cleaned!")
+                        else:
+                            logger.warning("       - Temp directory not accessible")
+                    except Exception as e:
+                        logger.warning(f"       - Temp directory check error: {e}")
+                    
+                    last_status_time = current_time
+                    
+        except KeyboardInterrupt:
+            logger.info("Keyboard interrupt received")
+    
+    except Exception as e:
+        logger.error(f"Critical error in main: {e}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return False
+    
+    finally:
+        # Nettoyage complet
+        logger.info("Starting comprehensive cleanup...")
+        processing_active.clear()
+        
+        # Attendre les threads
+        for thread in threads:
+            try:
+                thread.join(timeout=8)
+                logger.info(f"Thread {thread.name} terminated successfully")
+            except Exception as e:
+                logger.warning(f"Error joining thread {thread.name}: {e}")
+        
+        # Fermeture de la vision (inclut nettoyage temp)
+        if vision:
+            try:
+                logger.info("Closing zero-disk vision...")
+                vision.close_video()
+                logger.info("Zero-disk vision closed successfully")
+            except Exception as e:
+                logger.warning(f"Error closing vision: {e}")
+        
+        # Déconnexion du drone
+        if bebop:
+            try:
+                logger.info("Disconnecting from Bebop...")
+                bebop.disconnect()
+                logger.info("Bebop disconnected successfully")
+            except Exception as e:
+                logger.warning(f"Error disconnecting Bebop: {e}")
+        
+        # Fermeture OpenCV
+        try:
+            cv2.destroyAllWindows()
+            logger.info("OpenCV windows closed successfully")
+        except Exception as e:
+            logger.warning(f"Error closing OpenCV windows: {e}")
+        
+        # Statistiques finales
+        with stats_lock:
+            final_stats = frame_stats.copy()
+        
+        total_time = time.time() - start_time if 'start_time' in locals() else 0
+        
+        logger.info("=" * 60)
+        logger.info("FINAL STATISTICS (ZERO DISK USAGE):")
+        logger.info(f"  Total Runtime:          {total_time:.1f}s")
+        logger.info(f"  Frames Processed:       {final_stats['frame_count']}")
+        logger.info(f"  Average Frame Rate:     {final_stats['frame_count']/max(total_time,1):.1f}/s")
+        logger.info(f"  Total Detections:       {final_stats['detection_count']}")
+        logger.info(f"  Detection Rate:         {(final_stats['detection_count']/max(final_stats['frame_count'],1))*100:.1f}%")
+        logger.info(f"  Buffer Checks:          {final_stats['buffer_checks']}")
+        logger.info(f"  Buffer Hits:            {final_stats['buffer_hits']}")
+        logger.info(f"  Buffer Hit Rate:        {(final_stats['buffer_hits']/max(final_stats['buffer_checks'],1))*100:.1f}%")
+        logger.info(f"  Temp Files Created:     {final_stats['temp_files_created']}")
+        logger.info(f"  Temp Files Cleaned:     {final_stats['temp_files_cleaned']}")
+        logger.info(f"  Cleanup Efficiency:     {(final_stats['temp_files_cleaned']/max(final_stats['temp_files_created'],1))*100:.1f}%")
+        logger.info(f"  Processing Errors:      {final_stats['error_count']}")
+        logger.info("=" * 60)
+        
+        logger.info("Zero Disk Usage system cleanup completed successfully")
+    
+    return True
+
+if __name__ == "__main__":
+    try:
+        success = main()
+        exit_code = 0 if success else 1
+        logger.info(f"Program exiting with code {exit_code}")
+        sys.exit(exit_code)
+    except Exception as e:
+        logger.error(f"Unhandled exception in main: {e}")
+        import traceback
+        logger.error(f"Full traceback: {traceback.format_exc()}")
+        sys.exit(1)
