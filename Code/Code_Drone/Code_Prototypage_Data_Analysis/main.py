@@ -5,19 +5,16 @@ import threading
 from pyparrot.Bebop import Bebop
 from pyparrot.DroneVision import DroneVision
 import logging
-import os
 import signal
 import sys
 from collections import deque
-import glob
 
 # Configuration
 DISPLAY_FPS = 25
 CONNECTION_TIMEOUT = 20
-IMAGES_DIR = "C:/Users/Baptiste/anaconda3/Lib/site-packages/pyparrot/images"
-POLLING_RATE = 0.05  # 50ms entre chaque vérification = 20Hz max
+BUFFER_CHECK_RATE = 0.033  # 30Hz - Check buffer 30 times per second
 
-# Variables globales pour la frame unique
+# Variables globales
 current_frame = None
 frame_lock = threading.RLock()
 processing_active = threading.Event()
@@ -28,13 +25,10 @@ frame_stats = {
     'detection_count': 0,
     'error_count': 0,
     'last_frame_time': time.time(),
-    'polling_cycles': 0,
-    'successful_reads': 0,
-    'failed_reads': 0,
-    'files_found': 0,
-    'files_cleaned': 0,
-    'last_file_processed': '',
-    'duplicate_skips': 0
+    'buffer_checks': 0,
+    'buffer_hits': 0,
+    'buffer_misses': 0,
+    'same_frame_skips': 0
 }
 stats_lock = threading.Lock()
 
@@ -44,146 +38,95 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
         logging.StreamHandler(sys.stdout),
-        logging.FileHandler('bebop_active_polling.log', mode='w', encoding='utf-8')
+        logging.FileHandler('bebop_direct_buffer.log', mode='w', encoding='utf-8')
     ]
 )
 logger = logging.getLogger(__name__)
 
-def active_polling_thread():
+def direct_buffer_thread(vision_object):
     """
-    Thread qui surveille activement le dossier d'images
+    Thread qui accède directement au buffer interne de PyParrot
     """
     global current_frame
     
-    logger.info("Active polling thread started")
+    logger.info("Direct buffer thread started")
+    
+    last_buffer_index = -1
     
     while processing_active.is_set():
         try:
             with stats_lock:
-                frame_stats['polling_cycles'] += 1
+                frame_stats['buffer_checks'] += 1
             
-            # Lecture active du fichier le plus récent
-            frame = read_latest_with_polling()
-            
-            if frame is not None:
-                with frame_lock:
-                    current_frame = frame.copy()
+            # Accès direct au buffer PyParrot
+            if hasattr(vision_object, 'buffer') and hasattr(vision_object, 'buffer_index'):
+                current_buffer_index = vision_object.buffer_index
                 
-                with stats_lock:
-                    frame_stats['frame_count'] += 1
-                    frame_stats['successful_reads'] += 1
-                    frame_stats['last_frame_time'] = time.time()
+                # Vérifier si on a un nouveau frame
+                if current_buffer_index != last_buffer_index:
+                    # Récupérer la frame du buffer PyParrot
+                    frame = vision_object.buffer[current_buffer_index]
+                    
+                    if frame is not None:
+                        # Validation rapide
+                        if validate_frame(frame):
+                            with frame_lock:
+                                current_frame = frame.copy()
+                            
+                            with stats_lock:
+                                frame_stats['frame_count'] += 1
+                                frame_stats['buffer_hits'] += 1
+                                frame_stats['last_frame_time'] = time.time()
+                            
+                            last_buffer_index = current_buffer_index
+                            logger.debug(f"New frame from buffer index {current_buffer_index}")
+                        else:
+                            with stats_lock:
+                                frame_stats['buffer_misses'] += 1
+                    else:
+                        with stats_lock:
+                            frame_stats['buffer_misses'] += 1
+                else:
+                    # Même index = même frame
+                    with stats_lock:
+                        frame_stats['same_frame_skips'] += 1
             else:
                 with stats_lock:
-                    frame_stats['failed_reads'] += 1
+                    frame_stats['buffer_misses'] += 1
             
-            # Attendre avant le prochain cycle
-            time.sleep(POLLING_RATE)
+            # Attendre avant la prochaine vérification
+            time.sleep(BUFFER_CHECK_RATE)
             
         except Exception as e:
-            logger.debug(f"Polling thread error: {e}")
+            logger.debug(f"Buffer thread error: {e}")
             with stats_lock:
-                frame_stats['failed_reads'] += 1
-            time.sleep(POLLING_RATE)
+                frame_stats['buffer_misses'] += 1
+            time.sleep(BUFFER_CHECK_RATE)
     
-    logger.info("Active polling thread terminated")
+    logger.info("Direct buffer thread terminated")
 
-def read_latest_with_polling():
-    """
-    Lecture active avec nettoyage intelligent
-    """
+def validate_frame(frame):
+    """Validation rapide d'une frame"""
     try:
-        if not os.path.exists(IMAGES_DIR):
-            return None
+        if frame is None or frame.size == 0:
+            return False
         
-        # Scanner tous les fichiers image
-        pattern = os.path.join(IMAGES_DIR, "image_*.png")
-        files = glob.glob(pattern)
+        h, w = frame.shape[:2]
+        if h < 240 or w < 320:
+            return False
         
-        with stats_lock:
-            frame_stats['files_found'] = len(files)
+        # Test basique de corruption
+        mean_val = np.mean(frame)
+        if mean_val < 10 or mean_val > 245:
+            return False
         
-        if not files:
-            return None
+        return True
         
-        # Trier par date de modification (plus récent en premier)
-        files.sort(key=os.path.getmtime, reverse=True)
-        
-        current_time = time.time()
-        frame = None
-        
-        # Essayer les 3 fichiers les plus récents
-        for i, latest_file in enumerate(files[:3]):
-            try:
-                stat_info = os.stat(latest_file)
-                file_size = stat_info.st_size
-                file_mtime = stat_info.st_mtime
-                filename = os.path.basename(latest_file)
-                
-                # Filtres de sécurité
-                if file_size < 3000:
-                    continue
-                    
-                # Éviter fichiers trop récents (en cours d'écriture)
-                if (current_time - file_mtime) < 0.02:
-                    continue
-                
-                # Éviter de relire le même fichier
-                with stats_lock:
-                    if frame_stats['last_file_processed'] == filename:
-                        frame_stats['duplicate_skips'] += 1
-                        if i == 0:  # Si c'est le plus récent, pas de nouveau contenu
-                            continue
-                
-                # Lecture rapide avec validation
-                try:
-                    frame = cv2.imread(latest_file, cv2.IMREAD_COLOR)
-                    if frame is not None and frame.size > 0:
-                        h, w = frame.shape[:2]
-                        if h >= 240 and w >= 320:
-                            mean_val = np.mean(frame)
-                            if 10 <= mean_val <= 245:
-                                # Frame valide !
-                                with stats_lock:
-                                    frame_stats['last_file_processed'] = filename
-                                
-                                logger.debug(f"Frame loaded: {filename} ({w}x{h}, {file_size} bytes)")
-                                break
-                    frame = None
-                except Exception as e:
-                    logger.debug(f"Read error {latest_file}: {e}")
-                    frame = None
-                    continue
-                    
-            except Exception as e:
-                logger.debug(f"File stat error {latest_file}: {e}")
-                continue
-        
-        # Nettoyage intelligent : garder seulement les 10 plus récents
-        if len(files) > 10:
-            files_to_remove = files[10:]
-            removed_count = 0
-            
-            for file_path in files_to_remove:
-                try:
-                    os.remove(file_path)
-                    removed_count += 1
-                except:
-                    continue
-            
-            if removed_count > 0:
-                with stats_lock:
-                    frame_stats['files_cleaned'] += removed_count
-                logger.debug(f"Cleaned {removed_count} old files")
-        
-        return frame
-        
-    except Exception as e:
-        logger.debug(f"Polling read error: {e}")
-        return None
+    except:
+        return False
 
-class SmartGloveDetector:
-    """Détecteur de gants intelligent optimisé"""
+class OptimizedGloveDetector:
+    """Détecteur optimisé pour accès direct au buffer"""
     
     def __init__(self):
         self.detection_history = deque(maxlen=8)
@@ -205,20 +148,20 @@ class SmartGloveDetector:
         self.max_movement = 70
         self.detection_cooldown = 0
         
-        # Cache
-        self.last_frame_hash = None
+        # Cache optimisé
+        self.last_frame_id = None
         self.last_detection_result = None
         
     def detect_glove(self, frame):
-        """Détection intelligente avec cache"""
+        """Détection avec cache frame ID"""
         if frame is None:
             return frame, False
             
         try:
-            # Cache simple
-            frame_hash = hash(frame.tobytes()[::1000])
+            # ID unique de frame (plus fiable que hash)
+            frame_id = id(frame)
             
-            if frame_hash == self.last_frame_hash and self.last_detection_result is not None:
+            if frame_id == self.last_frame_id and self.last_detection_result is not None:
                 return self.last_detection_result
             
             original_frame = frame.copy()
@@ -273,7 +216,7 @@ class SmartGloveDetector:
             result_frame = self._add_overlay(original_frame, stable_detection, mask)
             
             # Cache
-            self.last_frame_hash = frame_hash
+            self.last_frame_id = frame_id
             self.last_detection_result = (result_frame, stable_detection)
             
             return result_frame, stable_detection
@@ -285,7 +228,7 @@ class SmartGloveDetector:
             return original_frame, False
     
     def _create_smart_mask(self, hsv):
-        """Masque couleur intelligent"""
+        """Masque couleur intelligent avec exclusions"""
         try:
             h, w = hsv.shape[:2]
             
@@ -299,7 +242,7 @@ class SmartGloveDetector:
             orange_upper = np.array([22, 240, 240])
             mask_orange = cv2.inRange(hsv, orange_lower, orange_upper)
             
-            # Rouge gants (pas trop saturé)
+            # Rouge gants (modéré)
             red_lower1 = np.array([0, 120, 120])
             red_upper1 = np.array([8, 200, 220])
             mask_red1 = cv2.inRange(hsv, red_lower1, red_upper1)
@@ -310,10 +253,10 @@ class SmartGloveDetector:
             
             mask_red = cv2.bitwise_or(mask_red1, mask_red2)
             
-            # Combinaison
+            # Combinaison gants
             mask_gants = cv2.bitwise_or(mask_orange, mask_red)
             
-            # Exclusion peau
+            # Exclusion peau élargie
             mask_skin_dilated = cv2.dilate(mask_skin, self.kernel_close, iterations=1)
             mask_final = cv2.bitwise_and(mask_gants, cv2.bitwise_not(mask_skin_dilated))
             
@@ -334,7 +277,7 @@ class SmartGloveDetector:
             return np.zeros(hsv.shape[:2], dtype=np.uint8)
     
     def _select_best_contour(self, contours, frame_shape):
-        """Sélection du meilleur contour"""
+        """Sélection intelligente du meilleur contour"""
         if not contours:
             return None
             
@@ -374,11 +317,19 @@ class SmartGloveDetector:
                 else:
                     continue
                 
-                # Score simple
+                # Circularité
+                perimeter = cv2.arcLength(contour, True)
+                if perimeter > 0:
+                    circularity = 4 * np.pi * area / (perimeter * perimeter)
+                    if circularity < 0.2:
+                        continue
+                
+                # Score composite
                 area_score = min(area / 3000.0, 1.0)
                 solidity_score = min(solidity * 2, 1.0)
+                circularity_score = min(circularity * 5, 1.0)
                 
-                score = area_score * solidity_score
+                score = area_score * solidity_score * circularity_score
                 
                 if score > best_score:
                     best_score = score
@@ -423,11 +374,14 @@ class SmartGloveDetector:
     def _draw_detection(self, frame, contour):
         """Dessin de détection"""
         try:
+            # Contour principal
             cv2.drawContours(frame, [contour], -1, (0, 255, 0), 3)
             
+            # Rectangle
             x, y, w, h = cv2.boundingRect(contour)
             cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 100, 0), 2)
             
+            # Centre
             M = cv2.moments(contour)
             if M["m00"] != 0:
                 cx = int(M["m10"] / M["m00"])
@@ -435,15 +389,22 @@ class SmartGloveDetector:
                 cv2.circle(frame, (cx, cy), 8, (0, 0, 255), -1)
                 cv2.circle(frame, (cx, cy), 12, (255, 255, 255), 2)
             
+            # Texte
             area = cv2.contourArea(contour)
-            cv2.putText(frame, f"GANT DETECTE (A:{int(area)})", (x, max(y - 10, 20)),
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+            hull = cv2.convexHull(contour)
+            hull_area = cv2.contourArea(hull)
+            solidity = area / hull_area if hull_area > 0 else 0
+            
+            cv2.putText(frame, f"GANT DETECTE", (x, max(y - 15, 25)),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
+            cv2.putText(frame, f"A:{int(area)} S:{solidity:.2f}", (x, max(y - 35, 5)),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
                        
         except Exception as e:
             logger.debug(f"Drawing error: {e}")
     
     def _add_overlay(self, frame, detected, mask=None):
-        """Overlay d'informations"""
+        """Overlay informatif"""
         try:
             h, w = frame.shape[:2]
             
@@ -457,54 +418,53 @@ class SmartGloveDetector:
                 frames = frame_stats['frame_count']
                 detections = frame_stats['detection_count']
                 errors = frame_stats['error_count']
-                polling_cycles = frame_stats['polling_cycles']
-                success_reads = frame_stats['successful_reads']
-                failed_reads = frame_stats['failed_reads']
-                files_found = frame_stats['files_found']
-                cleaned = frame_stats['files_cleaned']
-                duplicates = frame_stats['duplicate_skips']
+                buffer_checks = frame_stats['buffer_checks']
+                buffer_hits = frame_stats['buffer_hits']
+                buffer_misses = frame_stats['buffer_misses']
+                same_frames = frame_stats['same_frame_skips']
                 
                 detection_rate = (detections / max(frames, 1)) * 100
-                read_success_rate = (success_reads / max(polling_cycles, 1)) * 100
+                buffer_hit_rate = (buffer_hits / max(buffer_checks, 1)) * 100
             
             # Performance
             perf_text = f"Frames: {frames} | Det: {detection_rate:.1f}% | Err: {errors}"
             cv2.putText(frame, perf_text, (10, h - 120), 
                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
             
-            # Polling
-            polling_text = f"Polling: {polling_cycles} cycles | {read_success_rate:.1f}% success | Files: {files_found}"
-            cv2.putText(frame, polling_text, (10, h - 100), 
+            # Buffer stats
+            buffer_text = f"Buffer: {buffer_checks} checks | {buffer_hit_rate:.1f}% hits | {same_frames} same"
+            cv2.putText(frame, buffer_text, (10, h - 100), 
                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (100, 255, 100), 1)
-            
-            # I/O
-            io_text = f"I/O: {success_reads} reads | {failed_reads} fails | {duplicates} skips | {cleaned} cleaned"
-            cv2.putText(frame, io_text, (10, h - 80), 
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 200, 100), 1)
             
             # Détecteur
             confidence = sum(self.stable_detections) / len(self.stable_detections) if self.stable_detections else 0
             detector_text = f"Confiance: {confidence:.1%} | Cooldown: {self.detection_cooldown}"
-            cv2.putText(frame, detector_text, (10, h - 60), 
+            cv2.putText(frame, detector_text, (10, h - 80), 
                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 165, 255), 1)
             
             # Historique
-            history = ["●" if d else "○" for d in list(self.detection_history)[-15:]]
+            history = ["●" if d else "○" for d in list(self.detection_history)[-12:]]
             history_text = "Hist: " + "".join(history)
-            cv2.putText(frame, history_text, (10, h - 40), 
+            cv2.putText(frame, history_text, (10, h - 60), 
                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (200, 200, 200), 1)
             
+            # Stabilité
+            stable_symbols = ["●" if d else "○" for d in list(self.stable_detections)]
+            stable_text = f"Stabilite ({self.confidence_threshold}/{len(self.stable_detections)}): " + "".join(stable_symbols)
+            cv2.putText(frame, stable_text, (10, h - 40), 
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 200, 0), 1)
+            
             # Mode
-            cv2.putText(frame, "MODE: ACTIVE POLLING (No Callback Dependency)", (10, h - 20), 
+            cv2.putText(frame, "MODE: DIRECT BUFFER ACCESS (PyParrot Internal)", (10, h - 20), 
                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 255), 1)
             
-            # Timestamp et FPS
+            # Timestamp et rate
             timestamp = time.strftime("%H:%M:%S")
             cv2.putText(frame, timestamp, (w - 120, 30), 
                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
             
-            polling_rate_text = f"Poll: {1/POLLING_RATE:.0f}Hz"
-            cv2.putText(frame, polling_rate_text, (w - 120, h - 20), 
+            check_rate_text = f"Check: {1/BUFFER_CHECK_RATE:.0f}Hz"
+            cv2.putText(frame, check_rate_text, (w - 120, h - 20), 
                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 0), 1)
             
             # Masque miniature
@@ -529,11 +489,11 @@ class SmartGloveDetector:
             return frame
 
 def display_thread():
-    """Thread d'affichage"""
-    detector = SmartGloveDetector()
+    """Thread d'affichage optimisé"""
+    detector = OptimizedGloveDetector()
     logger.info("Display thread started")
     
-    window_name = "Bebop 2 - Active Polling Detection"
+    window_name = "Bebop 2 - Direct Buffer Access"
     cv2.namedWindow(window_name, cv2.WINDOW_AUTOSIZE)
     
     fps_counter = 0
@@ -565,22 +525,22 @@ def display_thread():
                 
                 # Écran d'attente
                 blank_frame = np.zeros((480, 640, 3), dtype=np.uint8)
-                cv2.putText(blank_frame, "Polling actif en cours...", (160, 200),
+                cv2.putText(blank_frame, "Acces direct au buffer...", (150, 200),
                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
                 
                 with stats_lock:
-                    cycles = frame_stats['polling_cycles']
-                    reads = frame_stats['successful_reads']
-                    fails = frame_stats['failed_reads']
-                    files = frame_stats['files_found']
-                    success_rate = (reads / max(cycles, 1)) * 100
+                    checks = frame_stats['buffer_checks']
+                    hits = frame_stats['buffer_hits']
+                    misses = frame_stats['buffer_misses']
+                    same = frame_stats['same_frame_skips']
+                    hit_rate = (hits / max(checks, 1)) * 100
                 
-                cv2.putText(blank_frame, f"Cycles: {cycles} | Reads: {reads} | Success: {success_rate:.1f}%", 
-                           (120, 240), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
-                cv2.putText(blank_frame, f"Files found: {files} | Fails: {fails}", 
-                           (180, 270), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (100, 255, 100), 1)
-                cv2.putText(blank_frame, f"No frame cycles: {no_frame_count}", 
-                           (190, 300), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 100, 100), 1)
+                cv2.putText(blank_frame, f"Buffer checks: {checks} | Hits: {hits} ({hit_rate:.1f}%)", 
+                           (100, 240), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
+                cv2.putText(blank_frame, f"Misses: {misses} | Same frames: {same}", 
+                           (160, 270), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (100, 255, 100), 1)
+                cv2.putText(blank_frame, f"Display cycles sans frame: {no_frame_count}", 
+                           (140, 300), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 100, 100), 1)
                 
                 cv2.imshow(window_name, blank_frame)
                 
@@ -619,17 +579,14 @@ def display_thread():
                     frame_stats['frame_count'] = 0
                     frame_stats['detection_count'] = 0
                     frame_stats['error_count'] = 0
-                    frame_stats['polling_cycles'] = 0
-                    frame_stats['successful_reads'] = 0
-                    frame_stats['failed_reads'] = 0
-                    frame_stats['files_found'] = 0
-                    frame_stats['files_cleaned'] = 0
-                    frame_stats['last_file_processed'] = ''
-                    frame_stats['duplicate_skips'] = 0
+                    frame_stats['buffer_checks'] = 0
+                    frame_stats['buffer_hits'] = 0
+                    frame_stats['buffer_misses'] = 0
+                    frame_stats['same_frame_skips'] = 0
                 
                 detector.detection_history.clear()
                 detector.stable_detections.clear()
-                detector.last_frame_hash = None
+                detector.last_frame_id = None
                 detector.last_detection_result = None
                 detector.last_detection_center = None
                 detector.detection_cooldown = 0
@@ -638,12 +595,12 @@ def display_thread():
                 logger.info("Complete reset performed")
                 
             elif key == ord('s'):
-                screenshot_name = f"screenshot_polling_{int(time.time())}.png"
+                screenshot_name = f"screenshot_buffer_{int(time.time())}.png"
                 cv2.imwrite(screenshot_name, processed_frame)
                 logger.info(f"Screenshot saved: {screenshot_name}")
                 
             elif key == ord('d'):
-                # Debug
+                # Debug détaillé
                 with stats_lock:
                     debug_stats = frame_stats.copy()
                 logger.info(f"Debug stats: {debug_stats}")
@@ -659,7 +616,7 @@ def monitor_thread():
     """Thread de monitoring"""
     logger.info("Monitor thread started")
     last_frame_count = 0
-    last_polling_count = 0
+    last_buffer_checks = 0
     
     while processing_active.is_set():
         time.sleep(5)
@@ -671,36 +628,33 @@ def monitor_thread():
             current_frames = frame_stats['frame_count']
             detections = frame_stats['detection_count']
             errors = frame_stats['error_count']
-            polling_cycles = frame_stats['polling_cycles']
-            success_reads = frame_stats['successful_reads']
-            failed_reads = frame_stats['failed_reads']
-            files_found = frame_stats['files_found']
-            cleaned = frame_stats['files_cleaned']
-            duplicates = frame_stats['duplicate_skips']
+            buffer_checks = frame_stats['buffer_checks']
+            buffer_hits = frame_stats['buffer_hits']
+            buffer_misses = frame_stats['buffer_misses']
+            same_frames = frame_stats['same_frame_skips']
             last_received_time = frame_stats['last_frame_time']
         
         frame_diff = current_frames - last_frame_count
-        polling_diff = polling_cycles - last_polling_count
+        checks_diff = buffer_checks - last_buffer_checks
         last_frame_count = current_frames
-        last_polling_count = polling_cycles
+        last_buffer_checks = buffer_checks
         
         time_since_last_frame = time.time() - last_received_time
-        read_success_rate = (success_reads / max(polling_cycles, 1)) * 100
+        buffer_hit_rate = (buffer_hits / max(buffer_checks, 1)) * 100
         
         if frame_diff > 0:
             avg_fps = frame_diff / 5
             detection_rate = (detections / max(current_frames, 1)) * 100
-            polling_rate = polling_diff / 5
+            check_rate = checks_diff / 5
             
             logger.info(f"MONITOR - Frames: {current_frames} (+{frame_diff}), FPS: {avg_fps:.1f}, "
                        f"Det: {detection_rate:.1f}%, Err: {errors}")
-            logger.info(f"         Polling: {polling_cycles} cycles (+{polling_diff}, {polling_rate:.1f}/s), "
-                       f"Success: {read_success_rate:.1f}% ({success_reads}/{polling_cycles})")
-            logger.info(f"         Files: {files_found} found | {cleaned} cleaned | {duplicates} duplicates skipped")
+            logger.info(f"         Buffer: {buffer_checks} checks (+{checks_diff}, {check_rate:.1f}/s), "
+                       f"Hit rate: {buffer_hit_rate:.1f}% ({buffer_hits}/{buffer_checks})")
+            logger.info(f"         Same frames skipped: {same_frames}, Misses: {buffer_misses}")
         else:
-            logger.warning(f"No new frames - polling: {polling_cycles} (+{polling_diff}), "
-                         f"read success: {read_success_rate:.1f}%, last frame {time_since_last_frame:.1f}s ago")
-            logger.warning(f"              Files: {files_found} found, Success reads: {success_reads}, Fails: {failed_reads}")
+            logger.warning(f"No new frames - buffer checks: {buffer_checks} (+{checks_diff}), "
+                         f"hit rate: {buffer_hit_rate:.1f}%, last frame {time_since_last_frame:.1f}s ago")
     
     logger.info("Monitor thread terminated")
 
@@ -710,38 +664,18 @@ def signal_handler(sig, frame):
     processing_active.clear()
 
 def main():
-    """Fonction principale avec polling actif"""
+    """Fonction principale avec accès direct au buffer"""
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
     
-    logger.info("Starting Bebop 2 Active Polling Detection System")
-    logger.info(f"Polling rate: {1/POLLING_RATE:.0f}Hz ({POLLING_RATE*1000:.0f}ms interval)")
+    logger.info("Starting Bebop 2 Direct Buffer Access Detection System")
+    logger.info(f"Buffer check rate: {1/BUFFER_CHECK_RATE:.0f}Hz")
     
     bebop = None
     vision = None
     threads = []
     
     try:
-        # Vérification du répertoire
-        if not os.path.exists(IMAGES_DIR):
-            logger.error(f"Images directory not found: {IMAGES_DIR}")
-            return False
-        
-        logger.info(f"Images directory verified: {IMAGES_DIR}")
-        
-        # Nettoyage initial complet
-        try:
-            initial_files = glob.glob(os.path.join(IMAGES_DIR, "image_*.png"))
-            if initial_files:
-                for file_path in initial_files:
-                    try:
-                        os.remove(file_path)
-                    except:
-                        continue
-                logger.info(f"Initial cleanup: removed {len(initial_files)} old files")
-        except Exception as e:
-            logger.warning(f"Initial cleanup failed: {e}")
-        
         # Connexion au drone
         bebop = Bebop()
         logger.info("Connecting to Bebop 2...")
@@ -753,16 +687,16 @@ def main():
         
         logger.info("Drone connected successfully")
         
-        # Configuration de la vision (même avec callback minimal)
-        vision = DroneVision(bebop, is_bebop=True)
-        # Pas de callback - on va utiliser le polling actif
+        # Configuration de la vision PyParrot (avec buffer interne)
+        vision = DroneVision(bebop, is_bebop=True, buffer_size=50, cleanup_old_images=True)
+        # Pas de callback utilisateur - on accède directement au buffer
         
         # Démarrage des threads
-        polling_thread_obj = threading.Thread(target=active_polling_thread, daemon=True, name="ActivePolling")
+        buffer_thread_obj = threading.Thread(target=direct_buffer_thread, args=(vision,), daemon=True, name="DirectBuffer")
         display_thread_obj = threading.Thread(target=display_thread, daemon=True, name="Display")
         monitor_thread_obj = threading.Thread(target=monitor_thread, daemon=True, name="Monitor")
         
-        threads = [polling_thread_obj, display_thread_obj, monitor_thread_obj]
+        threads = [buffer_thread_obj, display_thread_obj, monitor_thread_obj]
         
         for i, thread in enumerate(threads):
             thread.start()
@@ -772,7 +706,7 @@ def main():
         logger.info("All threads started successfully")
         
         # Ouverture du flux vidéo
-        logger.info("Opening video stream for active polling...")
+        logger.info("Opening video stream for direct buffer access...")
         start_time = time.time()
         
         if not vision.open_video():
@@ -781,12 +715,12 @@ def main():
         
         open_time = time.time() - start_time
         logger.info(f"Video stream opened successfully ({open_time:.1f}s)")
-        logger.info("Active Polling Detection System is now active")
+        logger.info("Direct Buffer Access Detection System is now active")
         logger.info("=" * 60)
         logger.info("SYSTEM INFO:")
-        logger.info(f"  Polling Rate: {1/POLLING_RATE:.0f}Hz")
-        logger.info(f"  Display FPS:  {DISPLAY_FPS}")
-        logger.info(f"  Images Dir:   {IMAGES_DIR}")
+        logger.info(f"  Buffer Check Rate: {1/BUFFER_CHECK_RATE:.0f}Hz")
+        logger.info(f"  Display FPS:       {DISPLAY_FPS}")
+        logger.info(f"  PyParrot Buffer:   {vision.buffer_size} frames")
         logger.info("=" * 60)
         logger.info("CONTROLS:")
         logger.info("  'q' or ESC  = Quit")
@@ -795,10 +729,10 @@ def main():
         logger.info("  'd'         = Debug stats")
         logger.info("=" * 60)
         
-        # Boucle principale avec monitoring avancé
+        # Boucle principale avec monitoring
         start_time = time.time()
         last_status_time = time.time()
-        status_interval = 10  # Status toutes les 10 secondes
+        status_interval = 15  # Status toutes les 15 secondes
         
         try:
             while processing_active.is_set():
@@ -808,52 +742,64 @@ def main():
                 
                 # Vérifier fenêtre OpenCV
                 try:
-                    if cv2.getWindowProperty("Bebop 2 - Active Polling Detection", cv2.WND_PROP_VISIBLE) < 1:
+                    if cv2.getWindowProperty("Bebop 2 - Direct Buffer Access", cv2.WND_PROP_VISIBLE) < 1:
                         logger.info("Display window was closed")
                         break
                 except:
                     pass
                 
-                # Status périodique
+                # Status périodique détaillé
                 if (current_time - last_status_time) >= status_interval:
                     with stats_lock:
                         status_stats = frame_stats.copy()
                     
                     uptime = current_time - start_time
                     avg_frame_rate = status_stats['frame_count'] / max(uptime, 1)
-                    avg_polling_rate = status_stats['polling_cycles'] / max(uptime, 1)
+                    avg_check_rate = status_stats['buffer_checks'] / max(uptime, 1)
+                    buffer_efficiency = (status_stats['buffer_hits'] / max(status_stats['buffer_checks'], 1)) * 100
                     
-                    logger.info(f"STATUS - Uptime: {uptime:.0f}s | Avg Frame Rate: {avg_frame_rate:.1f}/s | "
-                               f"Avg Polling: {avg_polling_rate:.1f}/s")
-                    logger.info(f"       - Total Frames: {status_stats['frame_count']} | "
-                               f"Detections: {status_stats['detection_count']} | "
-                               f"Files Cleaned: {status_stats['files_cleaned']}")
+                    logger.info(f"STATUS - Uptime: {uptime:.0f}s")
+                    logger.info(f"       - Frame Rate: {avg_frame_rate:.1f}/s (Total: {status_stats['frame_count']})")
+                    logger.info(f"       - Buffer Check Rate: {avg_check_rate:.1f}/s (Efficiency: {buffer_efficiency:.1f}%)")
+                    logger.info(f"       - Detections: {status_stats['detection_count']} | Errors: {status_stats['error_count']}")
+                    
+                    # Vérification de santé du buffer PyParrot
+                    try:
+                        if hasattr(vision, 'buffer') and hasattr(vision, 'buffer_index'):
+                            buffer_status = f"PyParrot buffer index: {vision.buffer_index}"
+                            if hasattr(vision, 'vision_running'):
+                                buffer_status += f" | Vision running: {vision.vision_running}"
+                            logger.info(f"       - {buffer_status}")
+                        else:
+                            logger.warning("       - PyParrot buffer not accessible!")
+                    except Exception as e:
+                        logger.warning(f"       - Buffer check error: {e}")
                     
                     last_status_time = current_time
                 
-                # Vérification de santé du système
+                # Vérification de santé critique
                 with stats_lock:
                     time_since_last_frame = current_time - frame_stats['last_frame_time']
-                    polling_cycles = frame_stats['polling_cycles']
-                    successful_reads = frame_stats['successful_reads']
+                    buffer_checks = frame_stats['buffer_checks']
+                    buffer_hits = frame_stats['buffer_hits']
                 
-                # Alerte si pas de frames depuis longtemps
-                if time_since_last_frame > 15 and polling_cycles > 100:  # Plus tolérant
-                    read_rate = (successful_reads / max(polling_cycles, 1)) * 100
-                    logger.warning(f"HEALTH CHECK - No frames for {time_since_last_frame:.1f}s | "
-                                 f"Read success rate: {read_rate:.1f}%")
+                # Alerte si problème détecté
+                if time_since_last_frame > 20 and buffer_checks > 200:  # 20s sans frame
+                    hit_rate = (buffer_hits / max(buffer_checks, 1)) * 100
+                    logger.warning(f"HEALTH ALERT - No frames for {time_since_last_frame:.1f}s")
+                    logger.warning(f"             - Buffer hit rate: {hit_rate:.1f}%")
                     
-                    # Diagnostic des fichiers
+                    # Diagnostic PyParrot
                     try:
-                        files_count = len(glob.glob(os.path.join(IMAGES_DIR, "image_*.png")))
-                        logger.warning(f"             - Files in directory: {files_count}")
-                        
-                        if files_count == 0:
-                            logger.warning("             - No files found - drone may not be streaming")
-                        elif read_rate < 50:
-                            logger.warning("             - Low read success rate - possible file corruption")
+                        if hasattr(vision, 'vision_running'):
+                            logger.warning(f"             - PyParrot vision_running: {vision.vision_running}")
+                        if hasattr(vision, 'ffmpeg_process'):
+                            process_alive = vision.ffmpeg_process.poll() is None
+                            logger.warning(f"             - FFmpeg process alive: {process_alive}")
+                        if hasattr(vision, 'new_frame'):
+                            logger.warning(f"             - PyParrot new_frame flag: {vision.new_frame}")
                     except Exception as e:
-                        logger.warning(f"             - File check error: {e}")
+                        logger.warning(f"             - Diagnostic error: {e}")
                     
         except KeyboardInterrupt:
             logger.info("Keyboard interrupt received")
@@ -865,48 +811,36 @@ def main():
         return False
     
     finally:
-        # Nettoyage complet
+        # Nettoyage complet et ordonné
         logger.info("Starting comprehensive cleanup...")
         processing_active.clear()
         
-        # Attendre les threads
-        for thread in threads:
+        # Attendre les threads avec timeout progressif
+        for i, thread in enumerate(threads):
             try:
-                thread.join(timeout=8)
+                timeout = 5 + i * 2  # Timeout progressif
+                thread.join(timeout=timeout)
                 logger.info(f"Thread {thread.name} terminated successfully")
             except Exception as e:
                 logger.warning(f"Error joining thread {thread.name}: {e}")
         
-        # Fermeture flux vidéo
+        # Fermeture du flux vidéo PyParrot
         if vision:
             try:
+                logger.info("Closing PyParrot vision...")
                 vision.close_video()
-                logger.info("Video stream closed successfully")
+                logger.info("PyParrot vision closed successfully")
             except Exception as e:
-                logger.warning(f"Error closing video: {e}")
+                logger.warning(f"Error closing PyParrot vision: {e}")
         
-        # Déconnexion drone
+        # Déconnexion du drone
         if bebop:
             try:
+                logger.info("Disconnecting from Bebop...")
                 bebop.disconnect()
-                logger.info("Drone disconnected successfully")
+                logger.info("Bebop disconnected successfully")
             except Exception as e:
-                logger.warning(f"Error disconnecting drone: {e}")
-        
-        # Nettoyage final des fichiers
-        try:
-            final_files = glob.glob(os.path.join(IMAGES_DIR, "image_*.png"))
-            removed_count = 0
-            for file_path in final_files:
-                try:
-                    os.remove(file_path)
-                    removed_count += 1
-                except:
-                    continue
-            if removed_count > 0:
-                logger.info(f"Final cleanup: removed {removed_count} remaining files")
-        except Exception as e:
-            logger.warning(f"Final cleanup failed: {e}")
+                logger.warning(f"Error disconnecting Bebop: {e}")
         
         # Fermeture OpenCV
         try:
@@ -915,7 +849,7 @@ def main():
         except Exception as e:
             logger.warning(f"Error closing OpenCV windows: {e}")
         
-        # Statistiques finales détaillées
+        # Statistiques finales ultra-détaillées
         with stats_lock:
             final_stats = frame_stats.copy()
         
@@ -923,21 +857,30 @@ def main():
         
         logger.info("=" * 60)
         logger.info("FINAL STATISTICS:")
-        logger.info(f"  Total Runtime:        {total_time:.1f}s")
-        logger.info(f"  Frames Processed:     {final_stats['frame_count']}")
-        logger.info(f"  Average Frame Rate:   {final_stats['frame_count']/max(total_time,1):.1f}/s")
-        logger.info(f"  Total Detections:     {final_stats['detection_count']}")
-        logger.info(f"  Detection Rate:       {(final_stats['detection_count']/max(final_stats['frame_count'],1))*100:.1f}%")
-        logger.info(f"  Polling Cycles:       {final_stats['polling_cycles']}")
-        logger.info(f"  Average Polling Rate: {final_stats['polling_cycles']/max(total_time,1):.1f}/s")
-        logger.info(f"  Successful Reads:     {final_stats['successful_reads']}")
-        logger.info(f"  Failed Reads:         {final_stats['failed_reads']}")
-        logger.info(f"  Read Success Rate:    {(final_stats['successful_reads']/max(final_stats['polling_cycles'],1))*100:.1f}%")
-        logger.info(f"  Files Cleaned:        {final_stats['files_cleaned']}")
-        logger.info(f"  Duplicate Skips:      {final_stats['duplicate_skips']}")
-        logger.info(f"  Errors:               {final_stats['error_count']}")
-        logger.info("=" * 60)
+        logger.info(f"  Total Runtime:          {total_time:.1f}s")
+        logger.info(f"  Frames Processed:       {final_stats['frame_count']}")
+        logger.info(f"  Average Frame Rate:     {final_stats['frame_count']/max(total_time,1):.1f}/s")
+        logger.info(f"  Total Detections:       {final_stats['detection_count']}")
+        logger.info(f"  Detection Rate:         {(final_stats['detection_count']/max(final_stats['frame_count'],1))*100:.1f}%")
+        logger.info(f"  Buffer Checks:          {final_stats['buffer_checks']}")
+        logger.info(f"  Average Check Rate:     {final_stats['buffer_checks']/max(total_time,1):.1f}/s")
+        logger.info(f"  Buffer Hits:            {final_stats['buffer_hits']}")
+        logger.info(f"  Buffer Hit Rate:        {(final_stats['buffer_hits']/max(final_stats['buffer_checks'],1))*100:.1f}%")
+        logger.info(f"  Buffer Misses:          {final_stats['buffer_misses']}")
+        logger.info(f"  Same Frame Skips:       {final_stats['same_frame_skips']}")
+        logger.info(f"  Processing Errors:      {final_stats['error_count']}")
         
+        # Efficacité du système
+        if final_stats['buffer_checks'] > 0:
+            efficiency = (final_stats['buffer_hits'] / final_stats['buffer_checks']) * 100
+            logger.info(f"  System Efficiency:      {efficiency:.1f}%")
+        
+        # Ratio detection
+        if final_stats['frame_count'] > 0:
+            detection_ratio = final_stats['detection_count'] / final_stats['frame_count']
+            logger.info(f"  Detection Ratio:        {detection_ratio:.3f}")
+        
+        logger.info("=" * 60)
         logger.info("Comprehensive cleanup completed successfully")
     
     return True
