@@ -1,36 +1,45 @@
-2025-06-05 09:22:39,982 - INFO - Starting Advanced Bebop 2 glove detection system
-2025-06-05 09:22:40,005 - INFO - Connecting to Bebop 2...
-2025-06-05 09:22:43,030 - INFO - Drone connected successfully
-2025-06-05 09:22:43,031 - INFO - Display thread started
-2025-06-05 09:22:43,132 - INFO - Cleanup thread started
-2025-06-05 09:22:43,174 - INFO - Cleaned up 195 old image files
-2025-06-05 09:22:43,233 - INFO - Connection monitor started
-2025-06-05 09:22:43,334 - INFO - All threads started successfully
-2025-06-05 09:22:43,334 - INFO - Opening video stream...
-2025-06-05 09:22:46,277 - WARNING - Stream issue detected (failure #1). Last frame: 6.3s ago
-2025-06-05 09:22:49,287 - WARNING - Stream issue detected (failure #2). Last frame: 9.3s ago
-2025-06-05 09:22:52,322 - WARNING - Stream issue detected (failure #3). Last frame: 12.3s ago
-2025-06-05 09:22:52,322 - ERROR - Multiple consecutive stream failures. Manual restart may be required.
-2025-06-05 09:22:54,135 - INFO - Video stream opened successfully
-2025-06-05 09:22:54,135 - INFO - Advanced detection system is now active
-2025-06-05 09:22:54,136 - INFO - Controls: 'q'/ESC=Quit, 'r'=Reset stats, 's'=Screenshot, 'd'=Debug
-2025-06-05 09:22:55,338 - INFO - Stream recovered
-2025-06-05 09:22:55,339 - INFO - MONITOR - Frames: 43, FPS: 14.3, Detections: 0.0%, Errors: 0
-2025-06-05 09:22:55,420 - INFO - Display FPS: 20.5
-2025-06-05 09:22:56,806 - INFO - Display FPS: 21.6
-2025-06-05 09:22:58,200 - INFO - Display FPS: 21.5
-2025-06-05 09:22:58,296 - INFO - Cleaned up 195 old image files
-2025-06-05 09:22:58,339 - INFO - MONITOR - Frames: 123, FPS: 26.7, Detections: 21.1%, Errors: 0
-2025-06-05 09:23:01,339 - WARNING - Stream issue detected (failure #1). Last frame: 3.0s ago
-2025-06-05 09:23:04,340 - WARNING - Stream issue detected (failure #2). Last frame: 6.0s ago
-2025-06-05 09:23:07,340 - WARNING - Stream issue detected (failure #3). Last frame: 9.0s ago
-2025-06-05 09:23:07,340 - ERROR - Multiple consecutive stream failures. Manual restart may be required.
-2025-06-05 09:23:09,542 - INFO - Signal 2 received - initiating shutdown
-2025-06-05 09:23:10,142 - INFO - Starting comprehensive cleanup...
-2025-06-05 09:23:10,301 - INFO - Cleanup thread terminated
-2025-06-05 09:23:10,341 - INFO - Connection monitor terminated
-2025-06-05 09:23:10,552 - INFO - Display thread terminated
-2025-06-05 09:23:18,646 - INFO - Video stream closed
-2025-06-05 09:23:19,148 - INFO - Drone disconnected
-2025-06-05 09:23:19,148 - INFO - Cleanup completed successfully
-2025-06-05 09:23:19,172 - INFO - Program exiting with code 0
+2025-06-05 09:28:42,165 - INFO - Starting Advanced Bebop 2 glove detection system
+2025-06-05 09:28:42,189 - INFO - Connecting to Bebop 2...
+2025-06-05 09:28:43,213 - INFO - Drone connected successfully
+2025-06-05 09:28:43,213 - INFO - Display thread started
+2025-06-05 09:28:43,314 - INFO - Cleanup thread started
+2025-06-05 09:28:43,392 - INFO - Cleaned up 368 old image files
+2025-06-05 09:28:43,415 - INFO - Connection monitor started
+2025-06-05 09:28:43,515 - INFO - All threads started successfully
+2025-06-05 09:28:43,515 - INFO - Opening video stream...
+2025-06-05 09:28:46,437 - WARNING - Stream issue detected (failure #1). Last frame: 4.3s ago
+2025-06-05 09:28:49,450 - WARNING - Stream issue detected (failure #2). Last frame: 7.3s ago
+2025-06-05 09:28:52,476 - WARNING - Stream issue detected (failure #3). Last frame: 10.3s ago
+2025-06-05 09:28:52,476 - ERROR - Multiple consecutive stream failures. Manual restart may be required.
+2025-06-05 09:28:55,496 - WARNING - Stream issue detected (failure #4). Last frame: 13.3s ago
+2025-06-05 09:28:55,511 - ERROR - Multiple consecutive stream failures. Manual restart may be required.
+2025-06-05 09:28:58,514 - WARNING - Stream issue detected (failure #5). Last frame: 16.3s ago
+2025-06-05 09:28:58,530 - ERROR - Multiple consecutive stream failures. Manual restart may be required.
+2025-06-05 09:29:01,543 - WARNING - Stream issue detected (failure #6). Last frame: 19.4s ago
+2025-06-05 09:29:01,544 - ERROR - Multiple consecutive stream failures. Manual restart may be required.
+2025-06-05 09:29:04,571 - WARNING - Stream issue detected (failure #7). Last frame: 22.4s ago
+2025-06-05 09:29:04,587 - ERROR - Multiple consecutive stream failures. Manual restart may be required.
+2025-06-05 09:29:07,606 - WARNING - Stream issue detected (failure #8). Last frame: 25.4s ago
+2025-06-05 09:29:07,607 - ERROR - Multiple consecutive stream failures. Manual restart may be required.
+2025-06-05 09:29:09,743 - INFO - Video stream opened successfully
+2025-06-05 09:29:09,745 - INFO - Advanced detection system is now active
+2025-06-05 09:29:09,760 - INFO - Controls: 'q'/ESC=Quit, 'r'=Reset stats, 's'=Screenshot, 'd'=Debug
+2025-06-05 09:29:10,654 - INFO - Stream recovered
+2025-06-05 09:29:10,658 - INFO - MONITOR - Frames: 8, FPS: 2.7, Detections: 0.0%, Errors: 0
+2025-06-05 09:29:12,898 - INFO - Display FPS: 10.2
+2025-06-05 09:29:13,660 - INFO - MONITOR - Frames: 48, FPS: 13.3, Detections: 0.0%, Errors: 0
+2025-06-05 09:29:13,799 - INFO - Cleaned up 720 old image files
+2025-06-05 09:29:16,661 - WARNING - Stream issue detected (failure #1). Last frame: 3.1s ago
+2025-06-05 09:29:19,661 - WARNING - Stream issue detected (failure #2). Last frame: 6.1s ago
+2025-06-05 09:29:22,662 - WARNING - Stream issue detected (failure #3). Last frame: 9.1s ago
+2025-06-05 09:29:22,662 - ERROR - Multiple consecutive stream failures. Manual restart may be required.
+2025-06-05 09:29:24,861 - INFO - Signal 2 received - initiating shutdown
+2025-06-05 09:29:24,883 - INFO - Display thread terminated
+2025-06-05 09:29:25,662 - INFO - Connection monitor terminated
+2025-06-05 09:29:25,774 - INFO - Display window was closed
+2025-06-05 09:29:25,774 - INFO - Starting comprehensive cleanup...
+2025-06-05 09:29:25,802 - INFO - Cleanup thread terminated
+2025-06-05 09:29:34,277 - INFO - Video stream closed
+2025-06-05 09:29:34,780 - INFO - Drone disconnected
+2025-06-05 09:29:34,780 - INFO - Cleanup completed successfully
+2025-06-05 09:29:34,803 - INFO - Program exiting with code 0
