@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?><project name="Projet Drone" company="" webLink="http://" view-date="2025-05-10" view-index="0" gantt-divider-location="564" resource-divider-location="300" version="3.3.3311" locale="fr_FR">
+<?xml version="1.0" encoding="UTF-8"?><project name="Projet Drone" company="" webLink="http://" view-date="2025-05-10" view-index="0" gantt-divider-location="564" resource-divider-location="300" version="3.3.3312" locale="fr_FR">
     <description/>
     <view zooming-state="default:0" id="gantt-chart">
-        <field id="tpd3" name="Nom" width="313" order="0"/>
-        <field id="tpd4" name="Date de début" width="116" order="1"/>
-        <field id="tpd5" name="Date de fin" width="119" order="2"/>
+        <field id="tpd3" name="Nom" width="322" order="0"/>
+        <field id="tpd4" name="Date de début" width="119" order="1"/>
+        <field id="tpd5" name="Date de fin" width="122" order="2"/>
         <field id="tpd15" name="Notes" width="20" order="3"/>
         <option id="filter.completedTasks" value="false"/>
         <option id="filter.dueTodayTasks" value="false"/>
