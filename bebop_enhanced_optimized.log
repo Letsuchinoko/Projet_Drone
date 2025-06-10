@@ -1,0 +1,308 @@
+2025-06-10 10:22:44,081 - INFO - 💻 INFORMATIONS SYSTÈME:
+2025-06-10 10:22:44,082 - INFO -    OS: Windows 11
+2025-06-10 10:22:44,082 - INFO -    Python: 3.12.4
+2025-06-10 10:22:44,082 - INFO -    RAM: Unknown GB
+2025-06-10 10:22:44,082 - INFO -    CPU: 12 cores
+2025-06-10 10:22:44,082 - INFO -    Architecture: 64bit
+2025-06-10 10:22:44,082 - INFO -    OpenCV: 4.11.0
+2025-06-10 10:22:44,082 - INFO -    Fonctionnalités: Complètes optimisées avec modes adaptatifs
+2025-06-10 10:22:44,082 - INFO - 🔍 Vérification prérequis système...
+2025-06-10 10:22:44,082 - INFO - ✅ OpenCV 4.11.0 OK
+2025-06-10 10:22:44,083 - INFO - ✅ NumPy 1.26.4 OK
+2025-06-10 10:22:44,083 - INFO - ✅ pyparrot Unknown OK
+2025-06-10 10:22:44,145 - INFO - 🧪 Test connexion caméra...
+2025-06-10 10:22:46,856 - INFO - ✅ Caméra locale détectée (pour tests)
+2025-06-10 10:22:47,170 - INFO -    Performance test: 31.9 FPS
+2025-06-10 10:22:47,462 - INFO - ================================================================================
+2025-06-10 10:22:47,462 - INFO - 🚀 BEBOP 2 - DÉTECTION COMPLÈTE OPTIMISÉE
+2025-06-10 10:22:47,462 - INFO - 🎯 Toutes fonctionnalités + Performance maximale
+2025-06-10 10:22:47,462 - INFO - ================================================================================
+2025-06-10 10:22:47,462 - INFO - 📡 Connexion au drone...
+2025-06-10 10:22:48,532 - INFO - ✅ Drone connecté!
+2025-06-10 10:22:48,532 - INFO - 📹 Démarrage flux vidéo...
+2025-06-10 10:22:51,035 - INFO - 🎮 Contrôle drone optimisé démarré
+2025-06-10 10:22:51,036 - INFO - 🚀 FFmpeg optimisé qualité/vitesse configuré
+2025-06-10 10:22:51,042 - INFO - ✅ Pipeline optimisé initialisé
+2025-06-10 10:22:51,043 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:22:51,080 - INFO - ================================================================================
+2025-06-10 10:22:51,080 - INFO - 🎮 COMMANDES COMPLÈTES:
+2025-06-10 10:22:51,080 - INFO -   'q'/'ESC' = Quitter | 's' = Screenshot | 'r' = Reset
+2025-06-10 10:22:51,081 - INFO -   'z' = Reset zoom | '+'/'-' = Zoom | 'c' = Calibration
+2025-06-10 10:22:51,081 - INFO -   'f' = Mode Fast | 'b' = Mode Balanced | 'Q' = Mode Quality
+2025-06-10 10:22:51,081 - INFO -   'd' = Debug | 'p' = Stats | 'h' = Aide
+2025-06-10 10:22:51,081 - INFO - ================================================================================
+2025-06-10 10:22:51,081 - INFO - ⚡ FONCTIONNALITÉS OPTIMISÉES:
+2025-06-10 10:22:51,081 - INFO -   ✓ Stabilisation adaptative
+2025-06-10 10:22:51,082 - INFO -   ✓ Adaptation lumière rapide
+2025-06-10 10:22:51,082 - INFO -   ✓ Multi-échelle dynamique
+2025-06-10 10:22:51,082 - INFO -   ✓ Tracking Kalman conditionnel
+2025-06-10 10:22:51,083 - INFO -   ✓ Validation cascade adaptative
+2025-06-10 10:22:51,083 - INFO -   ✓ Auto-calibration optimisée
+2025-06-10 10:22:51,083 - INFO -   ✓ Zones confiance intelligentes
+2025-06-10 10:22:51,083 - INFO -   ✓ Zoom adaptatif 5x
+2025-06-10 10:22:51,083 - INFO -   ✓ Ajustement performance automatique
+2025-06-10 10:22:51,083 - INFO - ================================================================================
+2025-06-10 10:22:51,083 - INFO - 🎬 Démarrage détection complète optimisée...
+2025-06-10 10:22:52,967 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:22:54,687 - INFO - 📊 FPS: 16.7 | Det: 28/60 (46.7%) | Q: 0.73 | Mode: quality | Zoom: 1.5x→1.6x | FP: 20
+2025-06-10 10:22:56,819 - INFO - 📊 FPS: 28.1 | Det: 29/120 (24.2%) | Q: 0.75 | Mode: quality | Zoom: 1.0x→1.0x | FP: 39
+2025-06-10 10:22:57,782 - INFO - 🔍 PERFORMANCE:
+2025-06-10 10:22:57,782 - INFO -    Proc: 25.6ms | Track: 0 | Samples: 30 | Skip: 1
+2025-06-10 10:22:58,735 - INFO - 📊 FPS: 31.3 | Det: 41/180 (22.8%) | Q: 0.81 | Mode: quality | Zoom: 1.9x→1.7x | FP: 80
+2025-06-10 10:23:00,650 - INFO - 📊 FPS: 31.3 | Det: 66/240 (27.5%) | Q: 0.82 | Mode: quality | Zoom: 2.4x→2.9x | FP: 114
+2025-06-10 10:23:02,656 - INFO - 📊 FPS: 29.9 | Det: 95/300 (31.7%) | Q: 0.82 | Mode: quality | Zoom: 2.2x→2.0x | FP: 144
+2025-06-10 10:23:02,656 - INFO - 🔍 PERFORMANCE:
+2025-06-10 10:23:02,656 - INFO -    Proc: 16.6ms | Track: 7 | Samples: 50 | Skip: 1
+2025-06-10 10:23:04,652 - INFO - 📊 FPS: 30.1 | Det: 122/360 (33.9%) | Q: 0.75 | Mode: quality | Zoom: 1.8x→1.5x | FP: 177
+2025-06-10 10:23:06,016 - INFO - 🎨 Recalibration: 4 orange, 4 rouge
+2025-06-10 10:23:06,667 - INFO - 📊 FPS: 29.8 | Det: 148/420 (35.2%) | Q: 0.84 | Mode: quality | Zoom: 2.2x→2.0x | FP: 209
+2025-06-10 10:23:07,672 - INFO - 🔍 PERFORMANCE:
+2025-06-10 10:23:07,673 - INFO -    Proc: 20.9ms | Track: 13 | Samples: 50 | Skip: 1
+2025-06-10 10:23:08,662 - INFO - 📊 FPS: 30.1 | Det: 193/480 (40.2%) | Q: 0.74 | Mode: quality | Zoom: 2.5x→1.8x | FP: 224
+2025-06-10 10:23:10,661 - INFO - 📊 FPS: 30.0 | Det: 230/540 (42.6%) | Q: 0.82 | Mode: quality | Zoom: 1.6x→1.5x | FP: 247
+2025-06-10 10:23:12,827 - INFO - 🎨 Recalibration: 5 orange, 5 rouge
+2025-06-10 10:23:12,829 - INFO - 📊 FPS: 27.7 | Det: 256/600 (42.7%) | Q: 0.78 | Mode: quality | Zoom: 2.2x→1.6x | FP: 281
+2025-06-10 10:23:12,829 - INFO - 🔍 PERFORMANCE:
+2025-06-10 10:23:12,829 - INFO -    Proc: 19.7ms | Track: 8 | Samples: 50 | Skip: 1
+2025-06-10 10:23:14,730 - INFO - 📊 FPS: 31.6 | Det: 302/660 (45.8%) | Q: 0.79 | Mode: quality | Zoom: 2.7x→3.6x | FP: 295
+2025-06-10 10:23:16,782 - INFO - 📊 FPS: 29.2 | Det: 335/720 (46.5%) | Q: 0.80 | Mode: quality | Zoom: 2.7x→3.0x | FP: 322
+2025-06-10 10:23:17,717 - INFO - 🔍 PERFORMANCE:
+2025-06-10 10:23:17,718 - INFO -    Proc: 20.1ms | Track: 13 | Samples: 50 | Skip: 1
+2025-06-10 10:23:18,660 - INFO - 📊 FPS: 31.9 | Det: 372/780 (47.7%) | Q: 0.82 | Mode: quality | Zoom: 2.3x→2.2x | FP: 345
+2025-06-10 10:23:20,671 - INFO - 📊 FPS: 29.8 | Det: 411/840 (48.9%) | Q: 0.80 | Mode: quality | Zoom: 2.4x→2.0x | FP: 366
+2025-06-10 10:23:22,808 - INFO - 📊 FPS: 28.1 | Det: 438/900 (48.7%) | Q: 0.78 | Mode: quality | Zoom: 2.5x→2.6x | FP: 399
+2025-06-10 10:23:22,808 - INFO - 🔍 PERFORMANCE:
+2025-06-10 10:23:22,808 - INFO -    Proc: 21.6ms | Track: 6 | Samples: 50 | Skip: 1
+2025-06-10 10:23:23,230 - INFO - 🔍 Zoom reset
+2025-06-10 10:23:25,072 - INFO - 📊 FPS: 26.5 | Det: 465/960 (48.4%) | Q: 0.82 | Mode: quality | Zoom: 2.2x→3.4x | FP: 432
+2025-06-10 10:23:26,354 - INFO - 🎨 Recalibration: 5 orange, 5 rouge
+2025-06-10 10:23:27,104 - INFO - 📊 FPS: 29.5 | Det: 495/1020 (48.5%) | Q: 0.84 | Mode: quality | Zoom: 2.2x→2.3x | FP: 462
+2025-06-10 10:23:28,251 - INFO - 🔍 PERFORMANCE:
+2025-06-10 10:23:28,252 - INFO -    Proc: 29.4ms | Track: 3 | Samples: 50 | Skip: 1
+2025-06-10 10:23:29,565 - INFO - 📊 FPS: 24.4 | Det: 505/1080 (46.8%) | Q: 0.75 | Mode: quality | Zoom: 1.8x→1.4x | FP: 512
+2025-06-10 10:23:30,155 - INFO - 🔍 Zoom reset
+2025-06-10 10:23:32,262 - INFO - 📊 FPS: 22.2 | Det: 507/1140 (44.5%) | Q: 0.73 | Mode: quality | Zoom: 1.0x→1.0x | FP: 570
+2025-06-10 10:23:34,374 - INFO - 📊 FPS: 28.4 | Det: 538/1200 (44.8%) | Q: 0.78 | Mode: quality | Zoom: 2.0x→2.4x | FP: 599
+2025-06-10 10:23:34,374 - INFO - 🔍 PERFORMANCE:
+2025-06-10 10:23:34,374 - INFO -    Proc: 23.4ms | Track: 7 | Samples: 50 | Skip: 1
+2025-06-10 10:23:36,554 - INFO - 📊 FPS: 27.5 | Det: 563/1260 (44.7%) | Q: 0.74 | Mode: quality | Zoom: 2.0x→1.4x | FP: 634
+2025-06-10 10:23:38,571 - INFO - 📊 FPS: 29.7 | Det: 595/1320 (45.1%) | Q: 0.78 | Mode: quality | Zoom: 1.5x→1.8x | FP: 662
+2025-06-10 10:23:39,716 - INFO - 🔍 PERFORMANCE:
+2025-06-10 10:23:39,716 - INFO -    Proc: 28.7ms | Track: 11 | Samples: 50 | Skip: 1
+2025-06-10 10:23:40,871 - INFO - 📊 FPS: 26.1 | Det: 623/1380 (45.1%) | Q: 0.82 | Mode: quality | Zoom: 2.0x→1.3x | FP: 694
+2025-06-10 10:23:43,130 - INFO - 📊 FPS: 26.6 | Det: 649/1440 (45.1%) | Q: 0.79 | Mode: quality | Zoom: 1.9x→1.8x | FP: 728
+2025-06-10 10:23:45,211 - INFO - 📊 FPS: 28.8 | Det: 685/1500 (45.7%) | Q: 0.81 | Mode: quality | Zoom: 2.0x→1.6x | FP: 752
+2025-06-10 10:23:45,211 - INFO - 🔍 PERFORMANCE:
+2025-06-10 10:23:45,211 - INFO -    Proc: 24.0ms | Track: 9 | Samples: 50 | Skip: 1
+2025-06-10 10:23:47,146 - INFO - 📊 FPS: 31.0 | Det: 715/1560 (45.8%) | Q: 0.77 | Mode: quality | Zoom: 2.0x→2.2x | FP: 782
+2025-06-10 10:23:49,170 - INFO - 📊 FPS: 29.7 | Det: 741/1620 (45.7%) | Q: 0.69 | Mode: quality | Zoom: 3.9x→3.9x | FP: 816
+2025-06-10 10:23:50,224 - INFO - 🔍 PERFORMANCE:
+2025-06-10 10:23:50,224 - INFO -    Proc: 26.2ms | Track: 5 | Samples: 50 | Skip: 1
+2025-06-10 10:23:51,418 - INFO - 📊 FPS: 26.7 | Det: 761/1680 (45.3%) | Q: 0.67 | Mode: quality | Zoom: 3.9x→4.0x | FP: 856
+2025-06-10 10:23:53,502 - INFO - 📊 FPS: 28.8 | Det: 796/1740 (45.7%) | Q: 0.67 | Mode: quality | Zoom: 3.8x→4.0x | FP: 881
+2025-06-10 10:23:54,583 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:23:54,586 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:23:54,586 - INFO - 🔄 Reset (det: 46.8%)
+2025-06-10 10:23:54,733 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:23:55,466 - INFO - 📊 FPS: 30.5 | Det: 14/25 (56.0%) | Q: 0.75 | Mode: quality | Zoom: 2.1x→1.9x | FP: 11
+2025-06-10 10:23:55,466 - INFO - 🔍 PERFORMANCE:
+2025-06-10 10:23:55,467 - INFO -    Proc: 24.2ms | Track: 5 | Samples: 10 | Skip: 1
+2025-06-10 10:23:55,517 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:23:55,518 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:23:55,518 - INFO - 🔄 Reset (det: 55.6%)
+2025-06-10 10:23:55,678 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:23:55,924 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:23:55,925 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:23:55,925 - INFO - 🔄 Reset (det: 75.0%)
+2025-06-10 10:23:56,099 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:23:56,297 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:23:56,298 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:23:56,298 - INFO - 🔄 Reset (det: 50.0%)
+2025-06-10 10:23:56,432 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:23:56,559 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:23:56,559 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:23:56,559 - INFO - 🔄 Reset (det: 50.0%)
+2025-06-10 10:23:56,659 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:23:56,804 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:23:56,805 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:23:56,806 - INFO - 🔄 Reset (det: 44.4%)
+2025-06-10 10:23:57,016 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:23:57,016 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:23:57,017 - INFO - 🔄 Reset (det: 57.1%)
+2025-06-10 10:23:57,157 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:23:57,212 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:23:57,212 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:23:57,213 - INFO - 🔄 Reset (det: 85.7%)
+2025-06-10 10:23:57,296 - INFO - 📊 FPS: 32.8 | Det: 2/3 (66.7%) | Q: 0.69 | Mode: balanced | Zoom: 1.7x→3.9x | FP: 1
+2025-06-10 10:23:57,344 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:23:57,379 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:23:57,380 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:23:57,380 - INFO - 🔄 Reset (det: 50.0%)
+2025-06-10 10:23:57,529 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:23:57,683 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:23:57,684 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:23:57,684 - INFO - 🔄 Reset (det: 50.0%)
+2025-06-10 10:23:57,837 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:23:58,052 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:23:58,053 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:23:58,053 - INFO - 🔄 Reset (det: 45.5%)
+2025-06-10 10:23:58,189 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:23:58,250 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:23:58,252 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:23:58,252 - INFO - 🔄 Reset (det: 42.9%)
+2025-06-10 10:23:58,478 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:23:58,479 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:23:58,480 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:23:58,480 - INFO - 🔄 Reset (det: 57.1%)
+2025-06-10 10:23:58,623 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:23:58,624 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:23:58,634 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:23:58,634 - INFO - 🔄 Reset (det: 80.0%)
+2025-06-10 10:23:58,788 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:23:58,816 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:23:58,817 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:23:58,817 - INFO - 🔄 Reset (det: 50.0%)
+2025-06-10 10:23:58,950 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:23:59,142 - INFO - 📊 FPS: 32.5 | Det: 7/11 (63.6%) | Q: 0.68 | Mode: quality | Zoom: 2.8x→4.0x | FP: 4
+2025-06-10 10:23:59,234 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:23:59,236 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:23:59,236 - INFO - 🔄 Reset (det: 71.4%)
+2025-06-10 10:23:59,443 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:23:59,451 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:23:59,452 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:23:59,452 - INFO - 🔄 Reset (det: 42.9%)
+2025-06-10 10:23:59,678 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:23:59,717 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:23:59,718 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:23:59,719 - INFO - 🔄 Reset (det: 50.0%)
+2025-06-10 10:23:59,893 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:23:59,894 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:23:59,894 - INFO - 🔄 Reset (det: 50.0%)
+2025-06-10 10:24:00,056 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:24:00,079 - INFO - 🔍 PERFORMANCE:
+2025-06-10 10:24:00,079 - INFO -    Proc: 18.4ms | Track: 3 | Samples: 0 | Skip: 1
+2025-06-10 10:24:00,153 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:24:00,154 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:24:00,154 - INFO - 🔄 Reset (det: 62.5%)
+2025-06-10 10:24:00,303 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:24:00,316 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:24:00,317 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:24:00,317 - INFO - 🔄 Reset (det: 50.0%)
+2025-06-10 10:24:00,453 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:24:00,538 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:24:00,538 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:24:00,539 - INFO - 🔄 Reset (det: 100.0%)
+2025-06-10 10:24:00,686 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:24:00,954 - INFO - 📊 FPS: 33.1 | Det: 14/14 (100.0%) | Q: 0.69 | Mode: quality | Zoom: 3.0x→3.4x | FP: 0
+2025-06-10 10:24:00,955 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:24:00,955 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:24:00,956 - INFO - 🔄 Reset (det: 100.0%)
+2025-06-10 10:24:01,126 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:24:01,162 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:24:01,163 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:24:01,163 - INFO - 🔄 Reset (det: 57.1%)
+2025-06-10 10:24:01,307 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:24:01,357 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:24:01,358 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:24:01,358 - INFO - 🔄 Reset (det: 100.0%)
+2025-06-10 10:24:01,508 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:24:01,557 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:24:01,558 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:24:01,558 - INFO - 🔄 Reset (det: 50.0%)
+2025-06-10 10:24:01,880 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:24:01,979 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:24:01,980 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:24:01,981 - INFO - 🔄 Reset (det: 57.1%)
+2025-06-10 10:24:02,125 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:24:02,166 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:24:02,167 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:24:02,167 - INFO - 🔄 Reset (det: 83.3%)
+2025-06-10 10:24:02,328 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:24:02,344 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:24:02,345 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:24:02,345 - INFO - 🔄 Reset (det: 100.0%)
+2025-06-10 10:24:02,534 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:24:02,534 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:24:02,534 - INFO - 🔄 Reset (det: 50.0%)
+2025-06-10 10:24:02,690 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:24:02,691 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:24:02,691 - INFO - 🔄 Reset (det: 20.0%)
+2025-06-10 10:24:02,862 - INFO - 📊 FPS: 31.5 | Det: 2/5 (40.0%) | Q: 0.71 | Mode: balanced | Zoom: 1.4x→2.9x | FP: 3
+2025-06-10 10:24:02,863 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:24:02,863 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:24:02,864 - INFO - 🔄 Reset (det: 40.0%)
+2025-06-10 10:24:03,015 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:24:03,016 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:24:03,017 - INFO - 🔄 Reset (det: 20.0%)
+2025-06-10 10:24:03,178 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:24:03,179 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:24:03,179 - INFO - 🔄 Reset (det: 33.3%)
+2025-06-10 10:24:03,336 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:24:03,337 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:24:03,337 - INFO - 🔄 Reset (det: 20.0%)
+2025-06-10 10:24:03,484 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:24:03,484 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:24:03,484 - INFO - 🔄 Reset (det: 60.0%)
+2025-06-10 10:24:03,645 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:24:03,646 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:24:03,646 - INFO - 🔄 Reset (det: 40.0%)
+2025-06-10 10:24:03,813 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:24:03,814 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:24:03,816 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:24:03,816 - INFO - 🔄 Reset (det: 50.0%)
+2025-06-10 10:24:03,986 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:24:03,986 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:24:03,987 - INFO - 🔄 Reset (det: 33.3%)
+2025-06-10 10:24:04,141 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:24:04,155 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:24:04,156 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:24:04,156 - INFO - 🔄 Reset (det: 40.0%)
+2025-06-10 10:24:04,325 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:24:04,326 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:24:04,326 - INFO - 🔄 Reset (det: 33.3%)
+2025-06-10 10:24:04,447 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:24:04,485 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:24:04,486 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:24:04,486 - INFO - 🔄 Reset (det: 33.3%)
+2025-06-10 10:24:04,619 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:24:04,620 - INFO - 📊 FPS: 34.1 | Det: 2/5 (40.0%) | Q: 0.68 | Mode: quality | Zoom: 2.0x→3.8x | FP: 3
+2025-06-10 10:24:04,620 - INFO - 🔍 PERFORMANCE:
+2025-06-10 10:24:04,621 - INFO -    Proc: 17.6ms | Track: 2 | Samples: 0 | Skip: 1
+2025-06-10 10:24:04,657 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:24:04,658 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:24:04,658 - INFO - 🔄 Reset (det: 33.3%)
+2025-06-10 10:24:04,820 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:24:04,823 - INFO - 🔄 Reset détecteur optimisé
+2025-06-10 10:24:04,823 - INFO - 🚀 Détecteur Enhanced Optimisé initialisé - Toutes fonctionnalités + Performance
+2025-06-10 10:24:04,824 - INFO - 🔄 Reset (det: 33.3%)
+2025-06-10 10:24:04,960 - INFO - 🎯 Mode QUALITY activé (performance excellente)
+2025-06-10 10:24:06,989 - INFO - 📊 FPS: 25.3 | Det: 3/53 (5.7%) | Q: 0.68 | Mode: quality | Zoom: 2.3x→1.8x | FP: 50
+2025-06-10 10:24:09,212 - INFO - 📊 FPS: 27.0 | Det: 25/113 (22.1%) | Q: 0.77 | Mode: quality | Zoom: 2.9x→3.9x | FP: 88
+2025-06-10 10:24:09,577 - INFO - ⌨️ Interruption clavier
+2025-06-10 10:24:09,577 - INFO - 🧹 Nettoyage complet...
+2025-06-10 10:24:09,577 - INFO - ================================================================================
+2025-06-10 10:24:09,577 - INFO - 📊 STATISTIQUES FINALES COMPLÈTES OPTIMISÉES
+2025-06-10 10:24:09,577 - INFO - ================================================================================
+2025-06-10 10:24:09,578 - INFO -   ⏱️ Durée totale: 82.1s
+2025-06-10 10:24:09,578 - INFO -   🎞️ Frames traitées: 123
+2025-06-10 10:24:09,578 - INFO -   ⚡ FPS moyen: 1.5
+2025-06-10 10:24:09,578 - INFO -   🎯 Détections: 28 (22.8%)
+2025-06-10 10:24:09,578 - INFO -   📈 Qualité moyenne: 0.762
+2025-06-10 10:24:09,578 - INFO -   🔍 Zoom final: 3.4x
+2025-06-10 10:24:09,578 - INFO -   🚫 Faux positifs rejetés: 94
+2025-06-10 10:24:09,579 - INFO -   📸 Screenshots: 0
+2025-06-10 10:24:09,579 - INFO -   🎨 Échantillons couleur: 30
+2025-06-10 10:24:09,579 - INFO -   📍 Points tracking: 5
+2025-06-10 10:24:09,579 - INFO -   ⚙️ Temps traitement moy: 25.4ms
+2025-06-10 10:24:09,580 - INFO -   🎭 Mode final: quality
+2025-06-10 10:24:09,580 - INFO -   ⏭️ Skip frames: 1
+2025-06-10 10:24:09,580 - INFO -   📊 FPS final: 24.7
+2025-06-10 10:24:09,580 - INFO -   🔧 Stabilisation: OUI
+2025-06-10 10:24:09,580 - INFO -   📐 Multi-échelle: OUI
+2025-06-10 10:24:09,580 - INFO - ================================================================================
+2025-06-10 10:24:09,580 - INFO - 💡 RECOMMANDATION: Vérifier éclairage ou recalibrer couleurs
+2025-06-10 10:24:09,581 - INFO - 📁 Statistiques complètes sauvées: complete_detection_stats_1749543849.json
+2025-06-10 10:24:09,602 - INFO - ✅ Pipeline FFmpeg fermé
+2025-06-10 10:24:09,608 - INFO - ✅ Interface fermée
+2025-06-10 10:24:20,649 - INFO - ✅ Drone atterri et déconnecté
+2025-06-10 10:24:20,650 - INFO - 🎉 Session détection complète optimisée terminée!
