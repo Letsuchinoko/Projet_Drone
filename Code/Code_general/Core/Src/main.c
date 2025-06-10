@@ -47,15 +47,16 @@ UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-#define GPS_BUFFER_SIZE 256
-
+#define GPS_BUFFER_SIZE 100
+#define COMBINED_BUFFER_SIZE 128
 uint8_t gps_rx_buffer[GPS_BUFFER_SIZE]; // Re-enabled for full sentence reception
 uint16_t gps_rx_index = 0; // Re-enabled for full sentence reception
 uint8_t c; // Buffer for single character reception
 uint32_t adc_value;
 float voltage;
 float db;
-
+volatile uint8_t uart2_busy = 0;
+char combined_buffer[COMBINED_BUFFER_SIZE];
 char msg[32];
 char msgtest[35];
 
@@ -68,34 +69,11 @@ static void MX_USART1_UART_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_ADC1_Init(void);
 /* USER CODE BEGIN PFP */
-
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-  if (huart->Instance == huart1.Instance) // Check if the interrupt is from UART1 (GPS)
-  {
-    if (gps_rx_index < GPS_BUFFER_SIZE - 1) { // Prevent buffer overflow
-        gps_rx_buffer[gps_rx_index++] = c;
-    } else {
-        // Buffer overflow, reset index
-        gps_rx_index = 0; // Reset for next sentence
-    }
 
-    if (gps_rx_index >= 2 &&
-        gps_rx_buffer[gps_rx_index - 2] == '\r' &&
-        gps_rx_buffer[gps_rx_index - 1] == '\n')
-    {
-        gps_rx_buffer[gps_rx_index] = '\0'; // Null-terminate the received GPS sentence
-        HAL_UART_Transmit(&huart2, gps_rx_buffer, gps_rx_index, HAL_MAX_DELAY); // Transmit to Bluetooth
-        gps_rx_index = 0; // Reset for next sentence
-    }
-    // Restart reception for the next character
-    HAL_UART_Receive_IT(&huart1, &c, 1);
-  }
-}
 /* USER CODE END 0 */
 
 /**
@@ -133,38 +111,38 @@ int main(void)
   /* USER CODE BEGIN 2 */
   //sprintf(msgtest,"TEST MODULE BLUETOOTH DRONE\r\n");
   //HAL_UART_Transmit(&huart2, (uint8_t*)msgtest, strlen(msgtest), HAL_MAX_DELAY);
-
-  // Start UART1 reception in interrupt mode for GPS data
-  HAL_UART_Receive_IT(&huart1, &c, 1);
-
-  uint32_t last_sound_sensor_read_time = HAL_GetTick();
   //uint32_t last_test_transmit_time = HAL_GetTick(); // For test transmission
 
   while (1)
   {
-    // Sound Sensor reading (periodic)
-    if (HAL_GetTick() - last_sound_sensor_read_time > 200) // Read every 200ms
-    {
-        HAL_ADC_Start(&hadc1);
-        if (HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK) { // 100ms timeout for conversion
-            adc_value = HAL_ADC_GetValue(&hadc1);
-            voltage = (adc_value / 4095.0f) * 3.3f;
-            db = 20.0f * log10f(voltage / 0.01f);
 
-            sprintf(msg, "Son: %.1f dB\r\n", db);
-            HAL_UART_Transmit(&huart2, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY); // Transmit to Bluetooth
-        }
-        last_sound_sensor_read_time = HAL_GetTick(); // Update last read time
-    }
+  // Sound Sensor reading (periodic)
 
-    // === TEMPORARY TEST TRANSMISSION ===
-    //if (HAL_GetTick() - last_test_transmit_time > 1000) // Transmit "Hello" every 1 second
-    //{
-    //    char test_msg[] = "Hello Tera Term!\r\n";
-    //    HAL_UART_Transmit(&huart2, (uint8_t*)test_msg, strlen(test_msg), HAL_MAX_DELAY);
-    //    last_test_transmit_time = HAL_GetTick();
-    //}
-    // ===================================
+	    // Lecture audio
+	    HAL_ADC_Start(&hadc1);
+	    if (HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK) {
+	        adc_value = HAL_ADC_GetValue(&hadc1);
+	        voltage = (adc_value / 4095.0f) * 3.3f;
+	        db = 20.0f * log10f(voltage / 0.01f);
+	        sprintf(msg, "Son: %.1f dB\r\n", db);
+	    }
+
+	    // Lecture GPS
+	    if (HAL_UART_Receive(&huart1, &c, 1, 10) == HAL_OK) {
+	        gps_rx_buffer[gps_rx_index++] = c;
+	        // Vérifie la fin de la phrase NMEA (\r\n)
+	        if (c == '\n' && gps_rx_index > 1 && gps_rx_buffer[gps_rx_index-2] == '\r') {
+	            // Concatène GPS et audio
+	            int gps_len = snprintf(combined_buffer, COMBINED_BUFFER_SIZE, "%.*s", gps_rx_index, gps_rx_buffer);
+	            int sound_len = snprintf(combined_buffer + gps_len, COMBINED_BUFFER_SIZE - gps_len, "%s", msg);
+	            // Transmission unique
+	            HAL_UART_Transmit(&huart2, (uint8_t*)combined_buffer, gps_len + sound_len, HAL_MAX_DELAY);
+	            gps_rx_index = 0; // Réinitialise le buffer pour la prochaine phrase
+	        }
+	        else if (gps_rx_index >= GPS_BUFFER_SIZE) {
+	            gps_rx_index = 0; // Évite le débordement du buffer
+	        }
+	    }
   }
   /* USER CODE END 2 */
 
