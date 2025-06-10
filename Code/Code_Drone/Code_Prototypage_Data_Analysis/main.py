@@ -9,21 +9,101 @@ import os
 import pyparrot
 from pyparrot.Bebop import Bebop
 from collections import deque
+import platform
+import json
 
-# Imports optionnels avec fallback
-try:
-    from sklearn.cluster import KMeans
-    SKLEARN_AVAILABLE = True
-except ImportError:
-    SKLEARN_AVAILABLE = False
-    print("⚠️ scikit-learn non disponible - clustering d'arrière-plan désactivé")
+# === PARAMÈTRES OPTIMISÉS AVEC AMÉLIORATIONS COMPLÈTES ===
+BEBOP_IP = "192.168.42.1"
+WIDTH, HEIGHT = 856, 480
 
-try:
-    import psutil
-    PSUTIL_AVAILABLE = True
-except ImportError:
-    PSUTIL_AVAILABLE = False
-    print("⚠️ psutil non disponible - infos système limitées")
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler('bebop_enhanced_detection.log', mode='w', encoding='utf-8')
+    ]
+)
+logger = logging.getLogger(__name__)
+
+# === UTILITAIRES DE CLUSTERING SIMPLE (REMPLACEMENT SCIKIT-LEARN) ===
+class SimpleKMeans:
+    """Implémentation simple de K-means pour éviter la dépendance scikit-learn"""
+    
+    def __init__(self, n_clusters=2, max_iters=100):
+        self.n_clusters = n_clusters
+        self.max_iters = max_iters
+        self.cluster_centers_ = None
+        self.labels_ = None
+    
+    def fit(self, data):
+        """Ajustement du modèle K-means"""
+        try:
+            data = np.array(data)
+            n_samples, n_features = data.shape
+            
+            # Initialisation aléatoire des centres
+            np.random.seed(42)
+            self.cluster_centers_ = data[np.random.choice(n_samples, self.n_clusters, replace=False)]
+            
+            for _ in range(self.max_iters):
+                # Attribution des points aux clusters
+                distances = np.sqrt(((data - self.cluster_centers_[:, np.newaxis])**2).sum(axis=2))
+                self.labels_ = np.argmin(distances, axis=0)
+                
+                # Mise à jour des centres
+                new_centers = np.array([data[self.labels_ == i].mean(axis=0) for i in range(self.n_clusters)])
+                
+                # Vérification de convergence
+                if np.allclose(self.cluster_centers_, new_centers):
+                    break
+                    
+                self.cluster_centers_ = new_centers
+            
+            return self
+            
+        except Exception as e:
+            logger.debug(f"Simple K-means error: {e}")
+            # Fallback: retourner des centres par défaut
+            self.cluster_centers_ = np.array([[10, 180, 180], [0, 200, 200]])  # Orange et rouge typiques
+            self.labels_ = np.zeros(len(data), dtype=int)
+            return self
+
+# === UTILITAIRES SYSTÈME SANS PSUTIL ===
+def get_system_info():
+    """Informations système sans dépendance psutil"""
+    info = {
+        'os': f"{platform.system()} {platform.release()}",
+        'python': platform.python_version(),
+        'processor': platform.processor() or 'Unknown',
+        'architecture': platform.architecture()[0]
+    }
+    
+    # Tentative d'obtenir des infos mémoire sur Linux/Mac
+    try:
+        if platform.system() == 'Linux':
+            with open('/proc/meminfo', 'r') as f:
+                for line in f:
+                    if 'MemTotal' in line:
+                        mem_kb = int(line.split()[1])
+                        info['ram_gb'] = round(mem_kb / 1024 / 1024, 1)
+                        break
+        elif platform.system() == 'Darwin':  # macOS
+            import subprocess
+            result = subprocess.run(['sysctl', 'hw.memsize'], capture_output=True, text=True)
+            if result.returncode == 0:
+                mem_bytes = int(result.stdout.split()[-1])
+                info['ram_gb'] = round(mem_bytes / 1024 / 1024 / 1024, 1)
+    except:
+        info['ram_gb'] = 'Unknown'
+    
+    # Nombre de CPU
+    try:
+        info['cpu_cores'] = os.cpu_count() or 'Unknown'
+    except:
+        info['cpu_cores'] = 'Unknown'
+    
+    return info
 
 # === PARAMÈTRES OPTIMISÉS AVEC AMÉLIORATIONS COMPLÈTES ===
 BEBOP_IP = "192.168.42.1"
@@ -1329,73 +1409,47 @@ class CompleteEnhancedGloveDetector:
             
             samples = np.array(list(self.color_samples))
             
-            if SKLEARN_AVAILABLE:
-                # Clustering pour séparer orange et rouge
-                kmeans = KMeans(n_clusters=2, random_state=42, n_init=10)
-                clusters = kmeans.fit(samples)
+            # Clustering simple pour séparer orange et rouge
+            kmeans = SimpleKMeans(n_clusters=2)
+            clusters = kmeans.fit(samples)
+            
+            # Identification des clusters
+            centers = clusters.cluster_centers_
+            labels = clusters.labels_
+            
+            # Mise à jour des plages (adaptation conservative)
+            for i, center in enumerate(centers):
+                cluster_samples = samples[labels == i]
                 
-                # Identification des clusters
-                centers = clusters.cluster_centers_
-                labels = clusters.labels_
+                if len(cluster_samples) < 5:
+                    continue
                 
-                # Mise à jour des plages (adaptation conservative)
-                for i, center in enumerate(centers):
-                    cluster_samples = samples[labels == i]
-                    
-                    # Calcul des plages
-                    h_mean, s_mean, v_mean = center
-                    h_std = np.std(cluster_samples[:, 0])
-                    s_std = np.std(cluster_samples[:, 1])
-                    v_std = np.std(cluster_samples[:, 2])
-                    
-                    # Extension conservative des plages
-                    margin_h = max(5, h_std * 1.5)
-                    margin_s = max(20, s_std * 1.5)
-                    margin_v = max(20, v_std * 1.5)
-                    
-                    new_range = (
-                        [max(0, h_mean - margin_h), max(0, s_mean - margin_s), max(0, v_mean - margin_v)],
-                        [min(180, h_mean + margin_h), min(255, s_mean + margin_s), min(255, v_mean + margin_v)]
-                    )
-                    
-                    # Classification orange vs rouge
-                    if h_mean < 25:  # Orange/Rouge
-                        if h_mean < 15:
-                            # Ajout prudent aux plages orange
+                # Calcul des plages
+                h_mean, s_mean, v_mean = center
+                h_std = np.std(cluster_samples[:, 0])
+                s_std = np.std(cluster_samples[:, 1])
+                v_std = np.std(cluster_samples[:, 2])
+                
+                # Extension conservative des plages
+                margin_h = max(5, h_std * 1.5)
+                margin_s = max(20, s_std * 1.5)
+                margin_v = max(20, v_std * 1.5)
+                
+                new_range = (
+                    [max(0, h_mean - margin_h), max(0, s_mean - margin_s), max(0, v_mean - margin_v)],
+                    [min(180, h_mean + margin_h), min(255, s_mean + margin_s), min(255, v_mean + margin_v)]
+                )
+                
+                # Classification orange vs rouge
+                if h_mean < 25:  # Orange/Rouge
+                    if h_mean < 15:
+                        # Ajout prudent aux plages orange
+                        if len(self.color_calibration['orange_ranges']) < 6:  # Limite
                             self.color_calibration['orange_ranges'].append(new_range)
-                        else:
-                            # Ajout aux plages rouge
+                    else:
+                        # Ajout aux plages rouge
+                        if len(self.color_calibration['red_ranges']) < 6:  # Limite
                             self.color_calibration['red_ranges'].append(new_range)
-            else:
-                # Fallback sans clustering - analyse statistique simple
-                h_values = samples[:, 0]
-                
-                # Séparation basique orange/rouge par seuil de teinte
-                orange_samples = samples[h_values < 20]
-                red_samples = samples[(h_values < 10) | (h_values > 170)]
-                
-                # Mise à jour conservative des plages existantes
-                if len(orange_samples) > 5:
-                    h_mean = np.mean(orange_samples[:, 0])
-                    s_mean = np.mean(orange_samples[:, 1])
-                    v_mean = np.mean(orange_samples[:, 2])
-                    
-                    new_orange_range = (
-                        [max(0, h_mean - 5), max(0, s_mean - 30), max(0, v_mean - 30)],
-                        [min(180, h_mean + 5), min(255, s_mean + 30), min(255, v_mean + 30)]
-                    )
-                    self.color_calibration['orange_ranges'].append(new_orange_range)
-                
-                if len(red_samples) > 5:
-                    h_mean = np.mean(red_samples[:, 0])
-                    s_mean = np.mean(red_samples[:, 1])
-                    v_mean = np.mean(red_samples[:, 2])
-                    
-                    new_red_range = (
-                        [max(0, h_mean - 5), max(0, s_mean - 30), max(0, v_mean - 30)],
-                        [min(180, h_mean + 5), min(255, s_mean + 30), min(255, v_mean + 30)]
-                    )
-                    self.color_calibration['red_ranges'].append(new_red_range)
             
             logger.info(f"🎨 Recalibration couleurs: {len(self.color_calibration['orange_ranges'])} orange, {len(self.color_calibration['red_ranges'])} rouge")
             
@@ -2175,7 +2229,6 @@ def main():
             
             # Sauvegarde des statistiques finales
             try:
-                import json
                 stats_filename = f"detection_stats_{int(time.time())}.json"
                 with open(stats_filename, 'w') as f:
                     json.dump({
@@ -2183,7 +2236,8 @@ def main():
                         'total_frames': detector.frame_count,
                         'total_detections': detector.detection_count,
                         'performance_stats': final_stats,
-                        'screenshots_taken': screenshot_count
+                        'screenshots_taken': screenshot_count,
+                        'system_info': get_system_info()
                     }, f, indent=2)
                 logger.info(f"📁 Statistiques sauvées: {stats_filename}")
             except Exception as e:
@@ -2228,13 +2282,7 @@ def check_dependencies():
         'pyparrot': 'pyparrot'
     }
     
-    optional_packages = {
-        'sklearn': 'scikit-learn',
-        'psutil': 'psutil'
-    }
-    
     missing_required = []
-    missing_optional = []
     
     # Vérification des packages requis
     for module, package in required_packages.items():
@@ -2243,25 +2291,13 @@ def check_dependencies():
         except ImportError:
             missing_required.append(package)
     
-    # Vérification des packages optionnels
-    for module, package in optional_packages.items():
-        try:
-            __import__(module)
-        except ImportError:
-            missing_optional.append(package)
-    
     if missing_required:
         logger.error(f"❌ Packages requis manquants: {missing_required}")
         logger.info("📦 Installation requise:")
         logger.info(f"   pip install {' '.join(missing_required)}")
         return False
     
-    if missing_optional:
-        logger.warning(f"⚠️ Packages optionnels manquants: {missing_optional}")
-        logger.info("📦 Pour fonctionnalités complètes:")
-        logger.info(f"   pip install {' '.join(missing_optional)}")
-        logger.info("   (Le programme fonctionnera avec des fonctionnalités réduites)")
-    
+    logger.info("✅ Toutes les dépendances requises sont disponibles")
     return True
 
 def test_camera_connection():
@@ -2283,20 +2319,22 @@ def test_camera_connection():
 
 def print_system_info():
     """Affichage des informations système"""
-    import platform
-    import psutil
+    system_info = get_system_info()
     
     logger.info("💻 INFORMATIONS SYSTÈME:")
-    logger.info(f"   OS: {platform.system()} {platform.release()}")
-    logger.info(f"   Python: {platform.python_version()}")
-    logger.info(f"   RAM: {psutil.virtual_memory().total // (1024**3)} GB")
-    logger.info(f"   CPU: {psutil.cpu_count()} cores")
+    logger.info(f"   OS: {system_info['os']}")
+    logger.info(f"   Python: {system_info['python']}")
+    logger.info(f"   RAM: {system_info['ram_gb']} GB")
+    logger.info(f"   CPU: {system_info['cpu_cores']} cores")
+    logger.info(f"   Architecture: {system_info['architecture']}")
     
     try:
         import cv2
         logger.info(f"   OpenCV: {cv2.__version__}")
     except:
         logger.warning("   OpenCV: Non détecté")
+    
+    logger.info("   Fonctionnalités: Clustering intégré + Toutes optimisations")
 
 if __name__ == "__main__":
     try:
