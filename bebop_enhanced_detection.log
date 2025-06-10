@@ -1,0 +1,71 @@
+2025-06-10 09:29:20,448 - INFO - 💻 INFORMATIONS SYSTÈME:
+2025-06-10 09:29:20,449 - INFO -    OS: Windows 11
+2025-06-10 09:29:20,449 - INFO -    Python: 3.12.4
+2025-06-10 09:29:20,449 - INFO -    RAM: 15 GB
+2025-06-10 09:29:20,450 - INFO -    CPU: 12 cores
+2025-06-10 09:29:20,450 - INFO -    OpenCV: 4.11.0
+2025-06-10 09:29:20,450 - INFO - 🧪 Test connexion caméra...
+2025-06-10 09:29:26,155 - INFO - ✅ Caméra locale détectée (pour tests)
+2025-06-10 09:29:26,492 - INFO - ================================================================================
+2025-06-10 09:29:26,493 - INFO - 🚀 BEBOP 2 - DÉTECTION GANT COMPLÈTE AMÉLIORÉE
+2025-06-10 09:29:26,493 - INFO - 🎯 Multi-échelle + Tracking + Zoom adaptatif + Validation cascade
+2025-06-10 09:29:26,493 - INFO - ================================================================================
+2025-06-10 09:29:26,494 - INFO - 📡 Connexion au drone...
+2025-06-10 09:29:27,620 - INFO - ✅ Drone connecté!
+2025-06-10 09:29:27,620 - INFO - 📹 Démarrage flux vidéo...
+2025-06-10 09:29:31,124 - INFO - 🎮 Contrôle drone amélioré démarré
+2025-06-10 09:29:31,124 - INFO - 🚀 FFmpeg optimisé: ffmpeg -protocol_whitelist file,rtp,udp -fflags nobuffer+fastseek -flags low_delay -avioflags direct -analyzeduration 1000000 -probesize 1000000 -max_delay 0 -i C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\utils\bebop.sdp -f rawvideo -pix_fmt bgr24 -threads 0 -
+2025-06-10 09:29:33,220 - INFO - ✅ Pipeline optimisé initialisé
+2025-06-10 09:29:33,224 - INFO - 🚀 Détecteur Enhanced Glove initialisé avec toutes les améliorations
+2025-06-10 09:29:33,270 - INFO - ================================================================================
+2025-06-10 09:29:33,270 - INFO - 🎮 COMMANDES AVANCÉES:
+2025-06-10 09:29:33,271 - INFO -   'q'/'ESC' = Quitter | 's' = Screenshot | 'r' = Reset complet
+2025-06-10 09:29:33,271 - INFO -   'z' = Reset zoom | '+'/'-' = Zoom manuel | 'c' = Calibration couleurs
+2025-06-10 09:29:33,271 - INFO -   'd' = Debug détaillé | 'p' = Stats performance | 'h' = Aide
+2025-06-10 09:29:33,272 - INFO - ================================================================================
+2025-06-10 09:29:33,272 - INFO - 🔍 FONCTIONNALITÉS:
+2025-06-10 09:29:33,272 - INFO -   ✓ Stabilisation d'image avec flux optique
+2025-06-10 09:29:33,272 - INFO -   ✓ Adaptation automatique de la lumière
+2025-06-10 09:29:33,273 - INFO -   ✓ Détection multi-échelle (4 niveaux)
+2025-06-10 09:29:33,273 - INFO -   ✓ Tracking prédictif avec Kalman
+2025-06-10 09:29:33,273 - INFO -   ✓ Validation en cascade
+2025-06-10 09:29:33,274 - INFO -   ✓ Auto-calibration des couleurs
+2025-06-10 09:29:33,274 - INFO -   ✓ Zones de confiance adaptatives
+2025-06-10 09:29:33,274 - INFO -   ✓ Zoom intelligent jusqu'à 6x
+2025-06-10 09:29:33,274 - INFO - ================================================================================
+2025-06-10 09:29:33,275 - INFO - 🎬 Démarrage détection complète améliorée...
+2025-06-10 09:29:42,190 - INFO - 📊 FPS: 6.7 | Détections: 0/60 (0.0%) | Qualité: 0.00 | Zoom: 1.0x→1.0x | Rejets FP: 9
+2025-06-10 09:29:46,001 - INFO - 🔍 STATS DÉTAILLÉES:
+2025-06-10 09:29:46,002 - INFO -    Temps traitement moy: 87.9ms
+2025-06-10 09:29:46,002 - INFO -    Historique tracking: 0 points
+2025-06-10 09:29:46,003 - INFO -    Échantillons couleur: 0
+2025-06-10 09:29:46,003 - INFO -    Stabilité zoom: 0
+2025-06-10 09:29:47,818 - INFO - 📊 FPS: 10.7 | Détections: 0/120 (0.0%) | Qualité: 0.00 | Zoom: 1.0x→1.0x | Rejets FP: 9
+2025-06-10 09:29:53,343 - INFO - 📊 FPS: 10.9 | Détections: 0/180 (0.0%) | Qualité: 0.00 | Zoom: 1.0x→1.0x | Rejets FP: 9
+2025-06-10 09:29:55,165 - INFO - 🔍 STATS DÉTAILLÉES:
+2025-06-10 09:29:55,165 - INFO -    Temps traitement moy: 82.9ms
+2025-06-10 09:29:55,166 - INFO -    Historique tracking: 0 points
+2025-06-10 09:29:55,166 - INFO -    Échantillons couleur: 0
+2025-06-10 09:29:55,166 - INFO -    Stabilité zoom: 0
+2025-06-10 09:29:58,843 - INFO - 📊 FPS: 10.9 | Détections: 0/240 (0.0%) | Qualité: 0.00 | Zoom: 1.0x→1.0x | Rejets FP: 9
+2025-06-10 09:30:03,904 - INFO - 📊 FPS: 11.9 | Détections: 1/300 (0.3%) | Qualité: 0.87 | Zoom: 1.0x→2.0x | Rejets FP: 21
+2025-06-10 09:30:03,905 - INFO - 🔍 STATS DÉTAILLÉES:
+2025-06-10 09:30:03,905 - INFO -    Temps traitement moy: 78.1ms
+2025-06-10 09:30:03,905 - INFO -    Historique tracking: 0 points
+2025-06-10 09:30:03,906 - INFO -    Échantillons couleur: 20
+2025-06-10 09:30:03,906 - INFO -    Stabilité zoom: 0
+2025-06-10 09:30:08,957 - INFO - 📊 FPS: 11.9 | Détections: 1/360 (0.3%) | Qualité: 0.87 | Zoom: 1.0x→1.0x | Rejets FP: 22
+2025-06-10 09:30:11,517 - INFO - 📸 Screenshot amélioré: enhanced_capture_1749540611_000.png
+2025-06-10 09:30:12,409 - INFO - 🔍 STATS DÉTAILLÉES:
+2025-06-10 09:30:12,410 - INFO -    Temps traitement moy: 78.2ms
+2025-06-10 09:30:12,410 - INFO -    Historique tracking: 0 points
+2025-06-10 09:30:12,411 - INFO -    Échantillons couleur: 20
+2025-06-10 09:30:12,411 - INFO -    Stabilité zoom: 0
+2025-06-10 09:30:14,136 - INFO - 📊 FPS: 11.6 | Détections: 3/420 (0.7%) | Qualité: 0.82 | Zoom: 1.0x→3.8x | Rejets FP: 37
+2025-06-10 09:30:19,098 - INFO - 📊 FPS: 12.1 | Détections: 3/480 (0.6%) | Qualité: 0.82 | Zoom: 1.0x→1.1x | Rejets FP: 49
+2025-06-10 09:30:20,652 - INFO - 🔍 STATS DÉTAILLÉES:
+2025-06-10 09:30:20,652 - INFO -    Temps traitement moy: 70.2ms
+2025-06-10 09:30:20,653 - INFO -    Historique tracking: 15 points
+2025-06-10 09:30:20,653 - INFO -    Échantillons couleur: 100
+2025-06-10 09:30:20,654 - INFO -    Stabilité zoom: 0
+2025-06-10 09:30:23,907 - INFO - 📊 FPS: 12.5 | Détections: 36/540 (6.7%) | Qualité: 0.68 | Zoom: 1.0x→3.7x | Rejets FP: 56

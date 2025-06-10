@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?><project name="Projet Drone" company="" webLink="http://" view-date="2025-05-10" view-index="0" gantt-divider-location="549" resource-divider-location="300" version="3.3.3311" locale="fr_FR">
+<?xml version="1.0" encoding="UTF-8"?><project name="Projet Drone" company="" webLink="http://" view-date="2025-05-14" view-index="0" gantt-divider-location="534" resource-divider-location="300" version="3.3.3311" locale="fr_FR">
     <description/>
     <view zooming-state="default:0" id="gantt-chart">
-        <field id="tpd3" name="Nom" width="304" order="0"/>
-        <field id="tpd4" name="Date de début" width="113" order="1"/>
-        <field id="tpd5" name="Date de fin" width="116" order="2"/>
+        <field id="tpd3" name="Nom" width="295" order="0"/>
+        <field id="tpd4" name="Date de début" width="110" order="1"/>
+        <field id="tpd5" name="Date de fin" width="113" order="2"/>
         <field id="tpd15" name="Notes" width="20" order="3"/>
         <option id="filter.completedTasks" value="false"/>
         <option id="filter.dueTodayTasks" value="false"/>
@@ -41,7 +41,7 @@
         </taskproperties>
         <task id="28" uid="d7d4aae5f8004815b351b0fa62d69dee" name="Début" color="#ff9900" meeting="true" start="2025-05-12" duration="0" complete="0" expand="true"/>
         <task id="26" uid="219ddf34fbd845eabdb16173e9b34e49" name="Sprint 1 (30h)" color="#ff9900" meeting="true" start="2025-05-22" duration="0" complete="0" expand="true"/>
-        <task id="30" uid="90b48f129deb47fa85ebab9921831c3c" name="Sprint 2 (60h)" color="#ff9900" meeting="true" start="2025-06-04" duration="0" complete="0" expand="true"/>
+        <task id="30" uid="90b48f129deb47fa85ebab9921831c3c" name="Sprint 2 (60h)" color="#ff9900" meeting="true" start="2025-06-10" duration="0" complete="0" expand="true"/>
         <task id="29" uid="ab8c50f9960c4032a536c7fd3a64c234" name="Sprint 3 FINAL (90h)" color="#ff9900" meeting="true" start="2025-06-17" duration="0" complete="0" expand="true"/>
         <task id="0" uid="a9989d0f87ff4957a02c91cbdd683745" name="Etudiant 1 - Instrumentation Parrot Beebop 2" color="#990099" meeting="false" start="2025-05-12" duration="20" complete="0" expand="true">
             <depend id="29" type="2" difference="0" hardness="Strong"/>
@@ -58,15 +58,15 @@
             <task id="1" uid="f072ba2733a64704b6a63d3434c2c261" name="Visualisation des données (Oscilloscope)" color="#990099" meeting="false" start="2025-05-30" duration="4" complete="0" expand="true"/>
             <task id="6" uid="3430fbc4c6f1458e98d1043ef84e156a" name="Transmission des données du drone à la tablette avec Bluetooth" color="#990099" meeting="false" start="2025-05-30" duration="6" complete="0" expand="true"/>
         </task>
-        <task id="2" uid="bfe911919dae4acbb3cc26dd5440ff29" name="Etudiant 2 - Gestion du Drone" color="#af375c" meeting="false" start="2025-05-12" duration="10" complete="0" expand="true">
+        <task id="2" uid="bfe911919dae4acbb3cc26dd5440ff29" name="Etudiant 2 - Gestion du Drone" color="#af375c" meeting="false" start="2025-05-12" duration="14" complete="0" expand="true">
             <depend id="29" type="2" difference="0" hardness="Strong"/>
-            <task id="3" uid="c504baed2b9f4672819e8e1a668c64de" name="Création de la carte électronique (KiCad)" color="#af375c" meeting="false" start="2025-05-12" duration="6" complete="0" expand="true">
+            <task id="3" uid="c504baed2b9f4672819e8e1a668c64de" name="Création de la carte électronique (KiCad)" color="#af375c" meeting="false" start="2025-05-12" duration="10" complete="0" expand="true">
                 <depend id="4" type="2" difference="0" hardness="Strong"/>
             </task>
-            <task id="4" uid="f2e8f532198c4c509e244fe75cf210c8" name="Souder les composants et lier les capteurs à la carte" color="#af375c" meeting="false" start="2025-05-20" duration="2" complete="0" expand="true">
+            <task id="4" uid="f2e8f532198c4c509e244fe75cf210c8" name="Souder les composants et lier les capteurs à la carte" color="#af375c" meeting="false" start="2025-05-26" duration="2" complete="0" expand="true">
                 <depend id="5" type="2" difference="0" hardness="Strong"/>
             </task>
-            <task id="5" uid="756579b9f33147848b6ba9a418332bd4" name="Tester les pistes de continuité de la carte" color="#af375c" meeting="false" start="2025-05-22" duration="2" complete="0" expand="true"/>
+            <task id="5" uid="756579b9f33147848b6ba9a418332bd4" name="Tester les pistes de continuité de la carte" color="#af375c" meeting="false" start="2025-05-28" duration="2" complete="0" expand="true"/>
         </task>
         <task id="7" uid="e4eb3f45535c43ccb47f50fc96991032" name="Etudiant 3 - Développement API Android Studio" color="#339900" meeting="false" start="2025-05-12" duration="21" complete="0" expand="true">
             <depend id="29" type="2" difference="0" hardness="Strong"/>
