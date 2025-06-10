@@ -1,58 +1,182 @@
-2025-06-05 17:13:32,110 - INFO - === BEBOP 2 ADAPTIVE ZOOM DETECTION ===
-2025-06-05 17:13:32,110 - INFO - 🔍 Système de zoom adaptatif pour détection longue distance
-2025-06-05 17:13:32,110 - INFO - 📡 Connexion au drone...
-2025-06-05 17:13:33,169 - INFO - ✅ Drone connecté!
-2025-06-05 17:13:33,169 - INFO - 📹 Démarrage flux vidéo...
-2025-06-05 17:13:35,672 - INFO - Contrôle drone démarré.
-2025-06-05 17:13:35,673 - INFO - 🚀 FFmpeg avec support zoom: ffmpeg -protocol_whitelist file,rtp,udp -fflags nobuffer -flags low_delay -avioflags direct -analyzeduration 800000 -probesize 800000 -i C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\utils\bebop.sdp -f rawvideo -pix_fmt bgr24 -
-2025-06-05 17:13:35,679 - INFO - ✅ Pipeline zoom initialisé
-2025-06-05 17:13:35,707 - INFO - ============================================================
-2025-06-05 17:13:35,708 - INFO - 🎮 COMMANDES:
-2025-06-05 17:13:35,708 - INFO -   'q' = Quitter | 's' = Screenshot | 'r' = Reset
-2025-06-05 17:13:35,708 - INFO -   'z' = Reset zoom | '+' = Zoom manuel + | '-' = Zoom manuel -
-2025-06-05 17:13:35,708 - INFO - ============================================================
-2025-06-05 17:13:35,709 - INFO - 🔍 ZOOM ADAPTATIF:
-2025-06-05 17:13:35,709 - INFO -   Auto-zoom selon distance gant
-2025-06-05 17:13:35,709 - INFO -   Plage: 1.0x à 4.0x
-2025-06-05 17:13:35,709 - INFO -   Optimisé pour 3m+ de distance
-2025-06-05 17:13:35,709 - INFO - ============================================================
-2025-06-05 17:13:35,709 - INFO - 🎬 Démarrage détection avec zoom adaptatif...
-2025-06-05 17:13:41,632 - INFO - 📊 FPS: 10.1 | Détections: 0/60 (0.0%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 0
-2025-06-05 17:13:45,680 - INFO - 📊 FPS: 14.8 | Détections: 0/120 (0.0%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 0
-2025-06-05 17:13:49,640 - INFO - 📊 FPS: 15.2 | Détections: 0/180 (0.0%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 0
-2025-06-05 17:13:53,647 - INFO - 📊 FPS: 15.0 | Détections: 0/240 (0.0%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 0
-2025-06-05 17:13:57,660 - INFO - 📊 FPS: 15.0 | Détections: 0/300 (0.0%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 0
-2025-06-05 17:14:01,824 - INFO - 📊 FPS: 14.4 | Détections: 0/360 (0.0%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 0
-2025-06-05 17:14:05,703 - INFO - 📊 FPS: 15.5 | Détections: 0/420 (0.0%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 0
-2025-06-05 17:14:09,710 - INFO - 📊 FPS: 15.0 | Détections: 0/480 (0.0%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 0
-2025-06-05 17:14:13,720 - INFO - 📊 FPS: 15.0 | Détections: 0/540 (0.0%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 0
-2025-06-05 17:14:17,724 - INFO - 📊 FPS: 15.0 | Détections: 0/600 (0.0%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 0
-2025-06-05 17:14:21,729 - INFO - 📊 FPS: 15.0 | Détections: 0/660 (0.0%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 0
-2025-06-05 17:14:25,734 - INFO - 📊 FPS: 15.0 | Détections: 0/720 (0.0%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 0
-2025-06-05 17:14:29,732 - INFO - 📊 FPS: 15.0 | Détections: 0/780 (0.0%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 0
-2025-06-05 17:14:33,830 - INFO - 📊 FPS: 14.6 | Détections: 0/840 (0.0%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 0
-2025-06-05 17:14:37,750 - INFO - 📊 FPS: 15.3 | Détections: 0/900 (0.0%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 0
-2025-06-05 17:14:41,767 - INFO - 📊 FPS: 14.9 | Détections: 0/960 (0.0%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 0
-2025-06-05 17:14:45,748 - INFO - 📊 FPS: 15.1 | Détections: 0/1020 (0.0%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 0
-2025-06-05 17:14:49,727 - INFO - 📊 FPS: 15.1 | Détections: 0/1080 (0.0%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 0
-2025-06-05 17:14:53,740 - INFO - 📊 FPS: 15.0 | Détections: 0/1140 (0.0%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 0
-2025-06-05 17:14:57,750 - INFO - 📊 FPS: 15.0 | Détections: 0/1200 (0.0%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 0
-2025-06-05 17:15:01,752 - INFO - 📊 FPS: 15.0 | Détections: 0/1260 (0.0%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 0
-2025-06-05 17:15:05,782 - INFO - 📊 FPS: 14.9 | Détections: 0/1320 (0.0%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 0
-2025-06-05 17:15:09,778 - INFO - 📊 FPS: 15.0 | Détections: 0/1380 (0.0%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 0
-2025-06-05 17:15:11,946 - INFO - ⌨️ Interruption clavier
-2025-06-05 17:15:11,946 - INFO - 🧹 Nettoyage...
-2025-06-05 17:15:11,947 - INFO - ============================================================
-2025-06-05 17:15:11,947 - INFO - 📊 STATS FINALES ZOOM ADAPTATIF:
-2025-06-05 17:15:11,947 - INFO -   ⏱️ Durée: 99.8s
-2025-06-05 17:15:11,947 - INFO -   🎞️ Frames: 1412
-2025-06-05 17:15:11,947 - INFO -   ⚡ FPS: 14.1
-2025-06-05 17:15:11,947 - INFO -   🎯 Détections: 0 (0.0%)
-2025-06-05 17:15:11,947 - INFO -   🔍 Zoom final: 1.0x
-2025-06-05 17:15:11,947 - INFO -   📈 Ajustements zoom: 0
-2025-06-05 17:15:11,947 - INFO -   📸 Screenshots: 0
-2025-06-05 17:15:11,947 - INFO - ============================================================
-2025-06-05 17:15:11,948 - INFO - ✅ Pipeline fermé
-2025-06-05 17:15:11,951 - INFO - ✅ Interface fermée
-2025-06-05 17:15:12,454 - INFO - ✅ Drone déconnecté
-2025-06-05 17:15:12,455 - INFO - 🎉 Session zoom adaptatif terminée!
+2025-06-10 08:48:28,642 - INFO - === BEBOP 2 ADAPTIVE ZOOM DETECTION ===
+2025-06-10 08:48:28,643 - INFO - 🔍 Système de zoom adaptatif pour détection longue distance
+2025-06-10 08:48:28,643 - INFO - 📡 Connexion au drone...
+2025-06-10 08:48:29,778 - INFO - ✅ Drone connecté!
+2025-06-10 08:48:29,778 - INFO - 📹 Démarrage flux vidéo...
+2025-06-10 08:48:32,282 - INFO - Contrôle drone démarré.
+2025-06-10 08:48:32,283 - INFO - 🚀 FFmpeg avec support zoom: ffmpeg -protocol_whitelist file,rtp,udp -fflags nobuffer -flags low_delay -avioflags direct -analyzeduration 800000 -probesize 800000 -i C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\utils\bebop.sdp -f rawvideo -pix_fmt bgr24 -
+2025-06-10 08:48:34,257 - INFO - ✅ Pipeline zoom initialisé
+2025-06-10 08:48:34,332 - INFO - ============================================================
+2025-06-10 08:48:34,333 - INFO - 🎮 COMMANDES:
+2025-06-10 08:48:34,333 - INFO -   'q' = Quitter | 's' = Screenshot | 'r' = Reset
+2025-06-10 08:48:34,333 - INFO -   'z' = Reset zoom | '+' = Zoom manuel + | '-' = Zoom manuel -
+2025-06-10 08:48:34,333 - INFO - ============================================================
+2025-06-10 08:48:34,333 - INFO - 🔍 ZOOM ADAPTATIF:
+2025-06-10 08:48:34,334 - INFO -   Auto-zoom selon distance gant
+2025-06-10 08:48:34,334 - INFO -   Plage: 1.0x à 4.0x
+2025-06-10 08:48:34,334 - INFO -   Optimisé pour 3m+ de distance
+2025-06-10 08:48:34,334 - INFO - ============================================================
+2025-06-10 08:48:34,335 - INFO - 🎬 Démarrage détection avec zoom adaptatif...
+2025-06-10 08:48:39,503 - INFO - 📊 FPS: 11.6 | Détections: 2/60 (3.3%) | Zoom: 1.1x (target: 1.0x) | Aire moy: 0
+2025-06-10 08:48:43,504 - INFO - 📊 FPS: 15.0 | Détections: 31/120 (25.8%) | Zoom: 1.0x (target: 1.8x) | Aire moy: 0
+2025-06-10 08:48:47,501 - INFO - 📊 FPS: 15.0 | Détections: 90/180 (50.0%) | Zoom: 1.7x (target: 3.5x) | Aire moy: 710
+2025-06-10 08:48:51,521 - INFO - 📊 FPS: 14.9 | Détections: 147/240 (61.3%) | Zoom: 2.9x (target: 3.5x) | Aire moy: 420
+2025-06-10 08:48:55,506 - INFO - 📊 FPS: 15.1 | Détections: 197/300 (65.7%) | Zoom: 2.9x (target: 1.0x) | Aire moy: 420
+2025-06-10 08:48:59,508 - INFO - 📊 FPS: 15.0 | Détections: 256/360 (71.1%) | Zoom: 2.5x (target: 1.0x) | Aire moy: 2707
+2025-06-10 08:49:03,517 - INFO - 📊 FPS: 15.0 | Détections: 308/420 (73.3%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2667
+2025-06-10 08:49:07,523 - INFO - 📊 FPS: 15.0 | Détections: 350/480 (72.9%) | Zoom: 2.0x (target: 1.3x) | Aire moy: 2667
+2025-06-10 08:49:11,518 - INFO - 📊 FPS: 15.0 | Détections: 405/540 (75.0%) | Zoom: 1.7x (target: 1.3x) | Aire moy: 6122
+2025-06-10 08:49:15,541 - INFO - 📊 FPS: 14.9 | Détections: 465/600 (77.5%) | Zoom: 2.4x (target: 3.5x) | Aire moy: 550
+2025-06-10 08:49:19,535 - INFO - 📊 FPS: 15.0 | Détections: 523/660 (79.2%) | Zoom: 2.5x (target: 1.3x) | Aire moy: 565
+2025-06-10 08:49:23,533 - INFO - 📊 FPS: 15.0 | Détections: 583/720 (81.0%) | Zoom: 2.5x (target: 1.0x) | Aire moy: 565
+2025-06-10 08:49:27,540 - INFO - 📊 FPS: 15.0 | Détections: 643/780 (82.4%) | Zoom: 2.5x (target: 1.0x) | Aire moy: 565
+2025-06-10 08:49:31,528 - INFO - 📊 FPS: 15.0 | Détections: 703/840 (83.7%) | Zoom: 2.1x (target: 1.0x) | Aire moy: 2358
+2025-06-10 08:49:35,529 - INFO - 📊 FPS: 15.0 | Détections: 757/900 (84.1%) | Zoom: 1.9x (target: 2.5x) | Aire moy: 2358
+2025-06-10 08:49:39,545 - INFO - 📊 FPS: 14.9 | Détections: 813/960 (84.7%) | Zoom: 1.8x (target: 1.8x) | Aire moy: 2358
+2025-06-10 08:49:43,540 - INFO - 📊 FPS: 15.0 | Détections: 873/1020 (85.6%) | Zoom: 1.8x (target: 1.0x) | Aire moy: 2358
+2025-06-10 08:49:47,556 - INFO - 📊 FPS: 14.9 | Détections: 933/1080 (86.4%) | Zoom: 1.8x (target: 1.0x) | Aire moy: 2358
+2025-06-10 08:49:48,424 - INFO - 🔍 Zoom manuel: 1.5x
+2025-06-10 08:49:49,018 - INFO - 🔍 Zoom manuel: 1.5x
+2025-06-10 08:49:51,158 - INFO - 🔍 Zoom manuel: 1.0x
+2025-06-10 08:49:51,559 - INFO - 📊 FPS: 15.0 | Détections: 993/1140 (87.1%) | Zoom: 1.8x (target: 1.0x) | Aire moy: 2358
+2025-06-10 08:49:55,561 - INFO - 📊 FPS: 15.0 | Détections: 1052/1200 (87.7%) | Zoom: 1.7x (target: 1.0x) | Aire moy: 2358
+2025-06-10 08:49:59,570 - INFO - 📊 FPS: 15.0 | Détections: 1111/1260 (88.2%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:50:03,567 - INFO - 📊 FPS: 15.0 | Détections: 1171/1320 (88.7%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:50:07,578 - INFO - 📊 FPS: 15.0 | Détections: 1231/1380 (89.2%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:50:11,575 - INFO - 📊 FPS: 15.0 | Détections: 1291/1440 (89.7%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:50:15,571 - INFO - 📊 FPS: 15.0 | Détections: 1351/1500 (90.1%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:50:19,590 - INFO - 📊 FPS: 14.9 | Détections: 1411/1560 (90.4%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:50:23,591 - INFO - 📊 FPS: 15.0 | Détections: 1471/1620 (90.8%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:50:27,637 - INFO - 📊 FPS: 14.8 | Détections: 1531/1680 (91.1%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:50:31,630 - INFO - 📊 FPS: 15.0 | Détections: 1591/1740 (91.4%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:50:35,635 - INFO - 📊 FPS: 15.0 | Détections: 1651/1800 (91.7%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:50:39,641 - INFO - 📊 FPS: 15.0 | Détections: 1711/1860 (92.0%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:50:43,652 - INFO - 📊 FPS: 15.0 | Détections: 1771/1920 (92.2%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:50:47,660 - INFO - 📊 FPS: 15.0 | Détections: 1831/1980 (92.5%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:50:51,658 - INFO - 📊 FPS: 15.0 | Détections: 1891/2040 (92.7%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:50:55,659 - INFO - 📊 FPS: 15.0 | Détections: 1951/2100 (92.9%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:50:59,662 - INFO - 📊 FPS: 15.0 | Détections: 2011/2160 (93.1%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:51:03,667 - INFO - 📊 FPS: 15.0 | Détections: 2071/2220 (93.3%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:51:07,671 - INFO - 📊 FPS: 15.0 | Détections: 2131/2280 (93.5%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:51:11,669 - INFO - 📊 FPS: 15.0 | Détections: 2191/2340 (93.6%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:51:15,681 - INFO - 📊 FPS: 15.0 | Détections: 2251/2400 (93.8%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:51:19,680 - INFO - 📊 FPS: 15.0 | Détections: 2311/2460 (93.9%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:51:23,691 - INFO - 📊 FPS: 15.0 | Détections: 2371/2520 (94.1%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:51:27,693 - INFO - 📊 FPS: 15.0 | Détections: 2431/2580 (94.2%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:51:31,695 - INFO - 📊 FPS: 15.0 | Détections: 2491/2640 (94.4%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:51:35,698 - INFO - 📊 FPS: 15.0 | Détections: 2551/2700 (94.5%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:51:39,702 - INFO - 📊 FPS: 15.0 | Détections: 2611/2760 (94.6%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:51:43,709 - INFO - 📊 FPS: 15.0 | Détections: 2671/2820 (94.7%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:51:47,712 - INFO - 📊 FPS: 15.0 | Détections: 2731/2880 (94.8%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:51:51,720 - INFO - 📊 FPS: 15.0 | Détections: 2791/2940 (94.9%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:51:55,721 - INFO - 📊 FPS: 15.0 | Détections: 2851/3000 (95.0%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:51:59,725 - INFO - 📊 FPS: 15.0 | Détections: 2911/3060 (95.1%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:52:03,756 - INFO - 📊 FPS: 14.9 | Détections: 2971/3120 (95.2%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:52:07,725 - INFO - 📊 FPS: 15.1 | Détections: 3031/3180 (95.3%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:52:11,732 - INFO - 📊 FPS: 15.0 | Détections: 3091/3240 (95.4%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:52:12,955 - INFO - 🔍 Zoom manuel: 1.0x
+2025-06-10 08:52:13,467 - INFO - 🔍 Zoom manuel: 1.0x
+2025-06-10 08:52:14,141 - INFO - 🔍 Zoom manuel: 1.0x
+2025-06-10 08:52:15,742 - INFO - 📊 FPS: 15.0 | Détections: 3151/3300 (95.5%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:52:15,874 - INFO - 🔍 Zoom manuel: 1.0x
+2025-06-10 08:52:16,756 - INFO - 🔍 Zoom manuel: 1.5x
+2025-06-10 08:52:17,481 - INFO - 🔍 Zoom manuel: 1.5x
+2025-06-10 08:52:18,539 - INFO - 🔍 Zoom manuel: 1.5x
+2025-06-10 08:52:19,081 - INFO - 🔍 Zoom manuel: 1.0x
+2025-06-10 08:52:19,676 - INFO - 🔍 Zoom manuel: 1.5x
+2025-06-10 08:52:19,744 - INFO - 📊 FPS: 15.0 | Détections: 3211/3360 (95.6%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:52:20,008 - INFO - 🔍 Zoom manuel: 1.0x
+2025-06-10 08:52:20,416 - INFO - 🔍 Zoom manuel: 1.5x
+2025-06-10 08:52:20,753 - INFO - 🔍 Zoom manuel: 1.0x
+2025-06-10 08:52:21,147 - INFO - 🔍 Zoom manuel: 1.5x
+2025-06-10 08:52:23,487 - INFO - 🔍 Zoom manuel: 1.0x
+2025-06-10 08:52:23,749 - INFO - 📊 FPS: 15.0 | Détections: 3271/3420 (95.6%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 2056
+2025-06-10 08:52:24,416 - INFO - 🔍 Zoom manuel: 1.0x
+2025-06-10 08:52:25,415 - INFO - 🔍 Zoom manuel: 1.5x
+2025-06-10 08:52:27,519 - INFO - 🔍 Zoom manuel: 1.5x
+2025-06-10 08:52:27,763 - INFO - 📊 FPS: 14.9 | Détections: 3331/3480 (95.7%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 8386
+2025-06-10 08:52:30,611 - INFO - 🔍 Zoom manuel: 1.5x
+2025-06-10 08:52:31,754 - INFO - 📊 FPS: 15.0 | Détections: 3391/3540 (95.8%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 8827
+2025-06-10 08:52:31,822 - INFO - 🔍 Zoom manuel: 1.5x
+2025-06-10 08:52:32,487 - INFO - 🔍 Zoom manuel: 1.0x
+2025-06-10 08:52:35,757 - INFO - 📊 FPS: 15.0 | Détections: 3451/3600 (95.9%) | Zoom: 1.9x (target: 1.0x) | Aire moy: 8827
+2025-06-10 08:52:36,426 - INFO - 🔍 Zoom reset à 1.0x
+2025-06-10 08:52:39,766 - INFO - 📊 FPS: 15.0 | Détections: 3511/3660 (95.9%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 6144
+2025-06-10 08:52:43,765 - INFO - 📊 FPS: 15.0 | Détections: 3571/3720 (96.0%) | Zoom: 1.0x (target: 1.3x) | Aire moy: 11741
+2025-06-10 08:52:47,784 - INFO - 📊 FPS: 14.9 | Détections: 3631/3780 (96.1%) | Zoom: 1.3x (target: 1.3x) | Aire moy: 4319
+2025-06-10 08:52:51,778 - INFO - 📊 FPS: 15.0 | Détections: 3685/3840 (96.0%) | Zoom: 1.2x (target: 1.0x) | Aire moy: 5481
+2025-06-10 08:52:52,390 - INFO - 🔍 Zoom reset à 1.0x
+2025-06-10 08:52:55,781 - INFO - 📊 FPS: 15.0 | Détections: 3730/3900 (95.6%) | Zoom: 1.0x (target: 1.3x) | Aire moy: 5481
+2025-06-10 08:52:57,054 - INFO - 🔍 Zoom manuel: 1.8x
+2025-06-10 08:52:59,800 - INFO - 📊 FPS: 14.9 | Détections: 3788/3960 (95.7%) | Zoom: 3.3x (target: 3.5x) | Aire moy: 244
+2025-06-10 08:53:03,136 - INFO - 🔍 Zoom manuel: 3.0x
+2025-06-10 08:53:03,800 - INFO - 📊 FPS: 15.0 | Détections: 3827/4020 (95.2%) | Zoom: 3.4x (target: 3.5x) | Aire moy: 532
+2025-06-10 08:53:06,527 - INFO - 🔍 Zoom manuel: 3.0x
+2025-06-10 08:53:07,785 - INFO - 📊 FPS: 15.1 | Détections: 3876/4080 (95.0%) | Zoom: 3.1x (target: 1.8x) | Aire moy: 278
+2025-06-10 08:53:07,987 - INFO - 🔍 Zoom manuel: 1.3x
+2025-06-10 08:53:09,587 - INFO - 🔍 Zoom manuel: 1.3x
+2025-06-10 08:53:10,660 - INFO - 🔍 Zoom manuel: 1.3x
+2025-06-10 08:53:11,189 - INFO - 🔍 Zoom manuel: 1.0x
+2025-06-10 08:53:11,255 - INFO - 🔍 Zoom manuel: 1.0x
+2025-06-10 08:53:11,323 - INFO - 🔍 Zoom manuel: 1.3x
+2025-06-10 08:53:11,411 - INFO - 🔍 Zoom manuel: 1.0x
+2025-06-10 08:53:11,455 - INFO - 🔍 Zoom manuel: 1.0x
+2025-06-10 08:53:11,526 - INFO - 🔍 Zoom manuel: 1.0x
+2025-06-10 08:53:11,579 - INFO - 🔍 Zoom manuel: 1.0x
+2025-06-10 08:53:11,661 - INFO - 🔍 Zoom manuel: 1.0x
+2025-06-10 08:53:11,801 - INFO - 📊 FPS: 14.9 | Détections: 3929/4140 (94.9%) | Zoom: 2.0x (target: 1.0x) | Aire moy: 278
+2025-06-10 08:53:15,805 - INFO - 📊 FPS: 15.0 | Détections: 3978/4200 (94.7%) | Zoom: 2.8x (target: 3.3x) | Aire moy: 564
+2025-06-10 08:53:16,588 - INFO - 🔍 Zoom reset à 1.0x
+2025-06-10 08:53:19,789 - INFO - 📊 FPS: 15.1 | Détections: 4021/4260 (94.4%) | Zoom: 1.8x (target: 1.3x) | Aire moy: 3232
+2025-06-10 08:53:21,799 - INFO - 🔍 Zoom reset à 1.0x
+2025-06-10 08:53:23,798 - INFO - 📊 FPS: 15.0 | Détections: 4081/4320 (94.5%) | Zoom: 1.0x (target: 3.5x) | Aire moy: 3232
+2025-06-10 08:53:27,796 - INFO - 📊 FPS: 15.0 | Détections: 4140/4380 (94.5%) | Zoom: 2.2x (target: 3.5x) | Aire moy: 3289
+2025-06-10 08:53:31,804 - INFO - 📊 FPS: 15.0 | Détections: 4191/4440 (94.4%) | Zoom: 3.2x (target: 2.5x) | Aire moy: 519
+2025-06-10 08:53:35,806 - INFO - 📊 FPS: 15.0 | Détections: 4248/4500 (94.4%) | Zoom: 3.1x (target: 1.0x) | Aire moy: 421
+2025-06-10 08:53:36,484 - INFO - 🔍 Zoom reset à 1.0x
+2025-06-10 08:53:39,837 - INFO - 📊 FPS: 14.9 | Détections: 4308/4560 (94.5%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 13162
+2025-06-10 08:53:43,815 - INFO - 📊 FPS: 15.1 | Détections: 4368/4620 (94.5%) | Zoom: 1.1x (target: 1.0x) | Aire moy: 6362
+2025-06-10 08:53:47,824 - INFO - 📊 FPS: 15.0 | Détections: 4428/4680 (94.6%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 13317
+2025-06-10 08:53:51,830 - INFO - 📊 FPS: 15.0 | Détections: 4488/4740 (94.7%) | Zoom: 1.4x (target: 1.8x) | Aire moy: 4576
+2025-06-10 08:53:55,859 - INFO - 📊 FPS: 14.9 | Détections: 4548/4800 (94.8%) | Zoom: 1.1x (target: 1.0x) | Aire moy: 6403
+2025-06-10 08:53:59,831 - INFO - 📊 FPS: 15.1 | Détections: 4608/4860 (94.8%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 6397
+2025-06-10 08:54:03,840 - INFO - 📊 FPS: 15.0 | Détections: 4668/4920 (94.9%) | Zoom: 1.1x (target: 1.0x) | Aire moy: 6444
+2025-06-10 08:54:07,851 - INFO - 📊 FPS: 15.0 | Détections: 4728/4980 (94.9%) | Zoom: 1.2x (target: 1.0x) | Aire moy: 5619
+2025-06-10 08:54:11,854 - INFO - 📊 FPS: 15.0 | Détections: 4788/5040 (95.0%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 9154
+2025-06-10 08:54:15,838 - INFO - 📊 FPS: 15.1 | Détections: 4848/5100 (95.1%) | Zoom: 1.1x (target: 1.0x) | Aire moy: 5735
+2025-06-10 08:54:19,845 - INFO - 📊 FPS: 15.0 | Détections: 4908/5160 (95.1%) | Zoom: 2.8x (target: 3.5x) | Aire moy: 446
+2025-06-10 08:54:23,837 - INFO - 📊 FPS: 15.0 | Détections: 4968/5220 (95.2%) | Zoom: 3.2x (target: 1.0x) | Aire moy: 652
+2025-06-10 08:54:26,304 - INFO - 🔍 Zoom reset à 1.0x
+2025-06-10 08:54:27,858 - INFO - 📊 FPS: 14.9 | Détections: 5028/5280 (95.2%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 6729
+2025-06-10 08:54:31,847 - INFO - 📊 FPS: 15.0 | Détections: 5088/5340 (95.3%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 9527
+2025-06-10 08:54:35,886 - INFO - 📊 FPS: 14.9 | Détections: 5148/5400 (95.3%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 8208
+2025-06-10 08:54:38,651 - INFO - 📸 Screenshot avec zoom: zoom_capture_1749538478_000.png
+2025-06-10 08:54:39,849 - INFO - 📊 FPS: 15.1 | Détections: 5208/5460 (95.4%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 8272
+2025-06-10 08:54:43,859 - INFO - 📊 FPS: 15.0 | Détections: 5268/5520 (95.4%) | Zoom: 1.7x (target: 1.0x) | Aire moy: 4896
+2025-06-10 08:54:47,878 - INFO - 📊 FPS: 14.9 | Détections: 5328/5580 (95.5%) | Zoom: 1.7x (target: 1.0x) | Aire moy: 4896
+2025-06-10 08:54:51,878 - INFO - 📊 FPS: 15.0 | Détections: 5388/5640 (95.5%) | Zoom: 1.7x (target: 1.0x) | Aire moy: 4896
+2025-06-10 08:54:53,743 - INFO - 🔄 Détecteur reset (détections: 5416)
+2025-06-10 08:54:55,884 - INFO - 📊 FPS: 15.0 | Détections: 32/32 (100.0%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 0
+2025-06-10 08:54:59,891 - INFO - 📊 FPS: 15.0 | Détections: 92/92 (100.0%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 0
+2025-06-10 08:55:03,898 - INFO - 📊 FPS: 15.0 | Détections: 152/152 (100.0%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 0
+2025-06-10 08:55:07,891 - INFO - 📊 FPS: 15.0 | Détections: 212/212 (100.0%) | Zoom: 1.0x (target: 1.0x) | Aire moy: 0
+2025-06-10 08:55:11,888 - INFO - 📊 FPS: 15.0 | Détections: 272/272 (100.0%) | Zoom: 1.0x (target: 3.5x) | Aire moy: 0
+2025-06-10 08:55:15,874 - INFO - 📊 FPS: 15.1 | Détections: 314/332 (94.6%) | Zoom: 1.8x (target: 1.0x) | Aire moy: 0
+2025-06-10 08:55:19,881 - INFO - 📊 FPS: 15.0 | Détections: 374/392 (95.4%) | Zoom: 1.8x (target: 1.0x) | Aire moy: 0
+2025-06-10 08:55:23,878 - INFO - 📊 FPS: 15.0 | Détections: 434/452 (96.0%) | Zoom: 1.8x (target: 3.5x) | Aire moy: 0
+2025-06-10 08:55:24,211 - INFO - ⌨️ Interruption clavier
+2025-06-10 08:55:24,212 - INFO - 🧹 Nettoyage...
+2025-06-10 08:55:24,213 - INFO - ============================================================
+2025-06-10 08:55:24,213 - INFO - 📊 STATS FINALES ZOOM ADAPTATIF:
+2025-06-10 08:55:24,214 - INFO -   ⏱️ Durée: 415.6s
+2025-06-10 08:55:24,214 - INFO -   🎞️ Frames: 456
+2025-06-10 08:55:24,215 - INFO -   ⚡ FPS: 1.1
+2025-06-10 08:55:24,215 - INFO -   🎯 Détections: 437 (95.8%)
+2025-06-10 08:55:24,215 - INFO -   🔍 Zoom final: 1.8x
+2025-06-10 08:55:24,216 - INFO -   📈 Ajustements zoom: 437
+2025-06-10 08:55:24,216 - INFO -   📸 Screenshots: 1
+2025-06-10 08:55:24,216 - INFO - ============================================================
+2025-06-10 08:55:24,217 - INFO - ✅ Pipeline fermé
+2025-06-10 08:55:24,231 - INFO - ✅ Interface fermée
+2025-06-10 08:55:24,733 - INFO - ✅ Drone déconnecté
+2025-06-10 08:55:24,733 - INFO - 🎉 Session zoom adaptatif terminée!
