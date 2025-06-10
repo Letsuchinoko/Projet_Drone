@@ -10,6 +10,21 @@ import pyparrot
 from pyparrot.Bebop import Bebop
 from collections import deque
 
+# Imports optionnels avec fallback
+try:
+    from sklearn.cluster import KMeans
+    SKLEARN_AVAILABLE = True
+except ImportError:
+    SKLEARN_AVAILABLE = False
+    print("⚠️ scikit-learn non disponible - clustering d'arrière-plan désactivé")
+
+try:
+    import psutil
+    PSUTIL_AVAILABLE = True
+except ImportError:
+    PSUTIL_AVAILABLE = False
+    print("⚠️ psutil non disponible - infos système limitées")
+
 # === PARAMÈTRES OPTIMISÉS AVEC AMÉLIORATIONS COMPLÈTES ===
 BEBOP_IP = "192.168.42.1"
 WIDTH, HEIGHT = 856, 480
@@ -1314,43 +1329,73 @@ class CompleteEnhancedGloveDetector:
             
             samples = np.array(list(self.color_samples))
             
-            # Clustering pour séparer orange et rouge
-            from sklearn.cluster import KMeans
-            kmeans = KMeans(n_clusters=2, random_state=42)
-            clusters = kmeans.fit(samples)
-            
-            # Identification des clusters
-            centers = clusters.cluster_centers_
-            labels = clusters.labels_
-            
-            # Mise à jour des plages (adaptation conservative)
-            for i, center in enumerate(centers):
-                cluster_samples = samples[labels == i]
+            if SKLEARN_AVAILABLE:
+                # Clustering pour séparer orange et rouge
+                kmeans = KMeans(n_clusters=2, random_state=42, n_init=10)
+                clusters = kmeans.fit(samples)
                 
-                # Calcul des plages
-                h_mean, s_mean, v_mean = center
-                h_std = np.std(cluster_samples[:, 0])
-                s_std = np.std(cluster_samples[:, 1])
-                v_std = np.std(cluster_samples[:, 2])
+                # Identification des clusters
+                centers = clusters.cluster_centers_
+                labels = clusters.labels_
                 
-                # Extension conservative des plages
-                margin_h = max(5, h_std * 1.5)
-                margin_s = max(20, s_std * 1.5)
-                margin_v = max(20, v_std * 1.5)
+                # Mise à jour des plages (adaptation conservative)
+                for i, center in enumerate(centers):
+                    cluster_samples = samples[labels == i]
+                    
+                    # Calcul des plages
+                    h_mean, s_mean, v_mean = center
+                    h_std = np.std(cluster_samples[:, 0])
+                    s_std = np.std(cluster_samples[:, 1])
+                    v_std = np.std(cluster_samples[:, 2])
+                    
+                    # Extension conservative des plages
+                    margin_h = max(5, h_std * 1.5)
+                    margin_s = max(20, s_std * 1.5)
+                    margin_v = max(20, v_std * 1.5)
+                    
+                    new_range = (
+                        [max(0, h_mean - margin_h), max(0, s_mean - margin_s), max(0, v_mean - margin_v)],
+                        [min(180, h_mean + margin_h), min(255, s_mean + margin_s), min(255, v_mean + margin_v)]
+                    )
+                    
+                    # Classification orange vs rouge
+                    if h_mean < 25:  # Orange/Rouge
+                        if h_mean < 15:
+                            # Ajout prudent aux plages orange
+                            self.color_calibration['orange_ranges'].append(new_range)
+                        else:
+                            # Ajout aux plages rouge
+                            self.color_calibration['red_ranges'].append(new_range)
+            else:
+                # Fallback sans clustering - analyse statistique simple
+                h_values = samples[:, 0]
                 
-                new_range = (
-                    [max(0, h_mean - margin_h), max(0, s_mean - margin_s), max(0, v_mean - margin_v)],
-                    [min(180, h_mean + margin_h), min(255, s_mean + margin_s), min(255, v_mean + margin_v)]
-                )
+                # Séparation basique orange/rouge par seuil de teinte
+                orange_samples = samples[h_values < 20]
+                red_samples = samples[(h_values < 10) | (h_values > 170)]
                 
-                # Classification orange vs rouge
-                if h_mean < 25:  # Orange/Rouge
-                    if h_mean < 15:
-                        # Ajout prudent aux plages orange
-                        self.color_calibration['orange_ranges'].append(new_range)
-                    else:
-                        # Ajout aux plages rouge
-                        self.color_calibration['red_ranges'].append(new_range)
+                # Mise à jour conservative des plages existantes
+                if len(orange_samples) > 5:
+                    h_mean = np.mean(orange_samples[:, 0])
+                    s_mean = np.mean(orange_samples[:, 1])
+                    v_mean = np.mean(orange_samples[:, 2])
+                    
+                    new_orange_range = (
+                        [max(0, h_mean - 5), max(0, s_mean - 30), max(0, v_mean - 30)],
+                        [min(180, h_mean + 5), min(255, s_mean + 30), min(255, v_mean + 30)]
+                    )
+                    self.color_calibration['orange_ranges'].append(new_orange_range)
+                
+                if len(red_samples) > 5:
+                    h_mean = np.mean(red_samples[:, 0])
+                    s_mean = np.mean(red_samples[:, 1])
+                    v_mean = np.mean(red_samples[:, 2])
+                    
+                    new_red_range = (
+                        [max(0, h_mean - 5), max(0, s_mean - 30), max(0, v_mean - 30)],
+                        [min(180, h_mean + 5), min(255, s_mean + 30), min(255, v_mean + 30)]
+                    )
+                    self.color_calibration['red_ranges'].append(new_red_range)
             
             logger.info(f"🎨 Recalibration couleurs: {len(self.color_calibration['orange_ranges'])} orange, {len(self.color_calibration['red_ranges'])} rouge")
             
@@ -2177,22 +2222,45 @@ def main():
 
 def check_dependencies():
     """Vérification des dépendances requises"""
-    required_packages = [
-        'cv2', 'numpy', 'pyparrot', 'sklearn'
-    ]
+    required_packages = {
+        'cv2': 'opencv-python',
+        'numpy': 'numpy', 
+        'pyparrot': 'pyparrot'
+    }
     
-    missing = []
-    for package in required_packages:
+    optional_packages = {
+        'sklearn': 'scikit-learn',
+        'psutil': 'psutil'
+    }
+    
+    missing_required = []
+    missing_optional = []
+    
+    # Vérification des packages requis
+    for module, package in required_packages.items():
         try:
-            __import__(package)
+            __import__(module)
         except ImportError:
-            missing.append(package)
+            missing_required.append(package)
     
-    if missing:
-        logger.error(f"❌ Packages manquants: {missing}")
+    # Vérification des packages optionnels
+    for module, package in optional_packages.items():
+        try:
+            __import__(module)
+        except ImportError:
+            missing_optional.append(package)
+    
+    if missing_required:
+        logger.error(f"❌ Packages requis manquants: {missing_required}")
         logger.info("📦 Installation requise:")
-        logger.info("   pip install opencv-python numpy pyparrot scikit-learn")
+        logger.info(f"   pip install {' '.join(missing_required)}")
         return False
+    
+    if missing_optional:
+        logger.warning(f"⚠️ Packages optionnels manquants: {missing_optional}")
+        logger.info("📦 Pour fonctionnalités complètes:")
+        logger.info(f"   pip install {' '.join(missing_optional)}")
+        logger.info("   (Le programme fonctionnera avec des fonctionnalités réduites)")
     
     return True
 
