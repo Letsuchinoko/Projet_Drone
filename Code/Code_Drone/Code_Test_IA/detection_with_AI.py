@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 BEBOP 2 - DÉTECTION GANT AVEC IA DE RECONNAISSANCE DE POSITION
-Version complète intégrée - Fichier unique
+Version finale corrigée - Thread-safe
 """
 
 import cv2
@@ -21,20 +21,38 @@ from typing import List, Tuple, Optional, Dict
 import pickle
 import json
 
-# Import TensorFlow avec syntaxe compatible IDE
+# Import TensorFlow avec gestion sécurisée
+TF_AVAILABLE = False
+tf = None
+keras = None
+layers = None
+
 try:
     import tensorflow as tf
-    # Syntaxe alternative pour éviter les warnings IDE
     keras = tf.keras
     layers = tf.keras.layers
     TF_AVAILABLE = True
-    print("✅ TensorFlow disponible")
-except ImportError:
+    print("✅ TensorFlow chargé avec succès")
+    
+    # Optimisations TensorFlow
+    tf.config.threading.set_inter_op_parallelism_threads(1)
+    tf.config.threading.set_intra_op_parallelism_threads(1)
+    try:
+        gpus = tf.config.experimental.list_physical_devices('GPU')
+        if gpus:
+            tf.config.experimental.set_memory_growth(gpus[0], True)
+    except:
+        pass
+        
+except ImportError as e:
     TF_AVAILABLE = False
-    print("⚠️ TensorFlow non disponible - Mode détection simple uniquement")
+    print(f"⚠️ TensorFlow non disponible: {e}")
     print("   Installez avec: pip install tensorflow")
+except Exception as e:
+    TF_AVAILABLE = False
+    print(f"❌ Erreur TensorFlow: {e}")
 
-# === PARAMÈTRES OPTIMISÉS ===
+# === PARAMÈTRES ===
 BEBOP_IP = "192.168.42.1"
 WIDTH, HEIGHT = 856, 480
 
@@ -49,7 +67,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# === CONFIGURATION DES POSITIONS DE LA MAIN ===
+# === CONFIGURATION DES POSITIONS ===
 @dataclass
 class HandPosition:
     """Classe pour définir une position de main"""
@@ -57,7 +75,6 @@ class HandPosition:
     description: str
     confidence_threshold: float = 0.7
 
-# Positions prédéfinies
 HAND_POSITIONS = {
     0: HandPosition("poing", "Poing fermé - ARRÊT D'URGENCE", 0.9),
     1: HandPosition("paume", "Paume ouverte - AVANCER", 0.7),
@@ -115,17 +132,17 @@ class AdvancedHandFeatureExtractor:
             # Orientation
             if len(contour) >= 5:
                 ellipse = cv2.fitEllipse(contour)
-                orientation = ellipse[2] / 180.0  # Normalisation
+                orientation = ellipse[2] / 180.0
             else:
                 orientation = 0
             
-            # Centre de masse et distances
+            # Centre et distances
             if moments["m00"] != 0:
                 cx = int(moments["m10"] / moments["m00"])
                 cy = int(moments["m01"] / moments["m00"])
                 
                 distances = [np.sqrt((pt[0][0] - cx)**2 + (pt[0][1] - cy)**2) for pt in contour]
-                avg_distance = np.mean(distances) / 100.0  # Normalisation
+                avg_distance = np.mean(distances) / 100.0
                 std_distance = np.std(distances) / 100.0
             else:
                 avg_distance = std_distance = 0
@@ -133,16 +150,11 @@ class AdvancedHandFeatureExtractor:
             # Compilation
             geometric_features = [
                 aspect_ratio, extent, solidity, compactness,
-                area / 10000.0,  # Normalisation aire
-                perimeter / 1000.0,  # Normalisation périmètre
-                convexity_defects / 10.0,
-                orientation,
-                avg_distance,
-                std_distance,
-                *hu_moments[:7]  # 7 moments de Hu
+                area / 10000.0, perimeter / 1000.0, convexity_defects / 10.0,
+                orientation, avg_distance, std_distance, *hu_moments[:7]
             ]
             
-            return np.array(geometric_features[:17], dtype=np.float32)  # Limite à 17 features
+            return np.array(geometric_features[:17], dtype=np.float32)
             
         except Exception as e:
             self.logging.debug(f"Erreur extraction géométrique: {e}")
@@ -154,14 +166,12 @@ class AdvancedHandFeatureExtractor:
             if roi_image.size == 0:
                 return np.zeros(21, dtype=np.float32)
                 
-            # Redimensionnement ROI
             roi_resized = cv2.resize(roi_image, (64, 64))
             mask_resized = cv2.resize(contour_mask, (64, 64))
             
             # Caractéristiques couleur HSV
             hsv_roi = cv2.cvtColor(roi_resized, cv2.COLOR_BGR2HSV)
             
-            # Moyennes dans la zone de la main
             if np.any(mask_resized > 0):
                 h_mean = np.mean(hsv_roi[:, :, 0][mask_resized > 0]) / 180.0
                 s_mean = np.mean(hsv_roi[:, :, 1][mask_resized > 0]) / 255.0
@@ -169,7 +179,7 @@ class AdvancedHandFeatureExtractor:
             else:
                 h_mean = s_mean = v_mean = 0
             
-            # Gradients pour contours internes
+            # Gradients
             gray_roi = cv2.cvtColor(roi_resized, cv2.COLOR_BGR2GRAY)
             sobel_x = cv2.Sobel(gray_roi, cv2.CV_64F, 1, 0, ksize=3)
             sobel_y = cv2.Sobel(gray_roi, cv2.CV_64F, 0, 1, ksize=3)
@@ -180,24 +190,20 @@ class AdvancedHandFeatureExtractor:
             else:
                 gradient_mean = 0
             
-            # Détection contours (Canny)
+            # Contours
             edges = cv2.Canny(gray_roi, 50, 150)
             if np.sum(mask_resized > 0) > 0:
                 edge_density = np.sum(edges[mask_resized > 0]) / np.sum(mask_resized > 0) / 255.0
             else:
                 edge_density = 0
             
-            # Histogramme simplifié (8 bins)
+            # Histogramme
             hist = cv2.calcHist([gray_roi], [0], mask_resized, [8], [0, 256])
             hist_features = hist.flatten() / (np.sum(hist) + 1e-7)
             
-            # Compilation
-            visual_features = [
-                h_mean, s_mean, v_mean, gradient_mean, edge_density,
-                *hist_features  # 8 bins
-            ]
+            visual_features = [h_mean, s_mean, v_mean, gradient_mean, edge_density, *hist_features]
             
-            return np.array(visual_features[:13], dtype=np.float32)  # Limite à 13 features
+            return np.array(visual_features[:13], dtype=np.float32)
             
         except Exception as e:
             self.logging.debug(f"Erreur extraction visuelle: {e}")
@@ -208,36 +214,29 @@ class AdvancedHandFeatureExtractor:
         try:
             x, y, w, h = bounding_rect
             
-            # Vérifications de sécurité
             if x < 0 or y < 0 or x + w > frame.shape[1] or y + h > frame.shape[0]:
                 return np.zeros(self.feature_size, dtype=np.float32)
             
             if w <= 0 or h <= 0:
                 return np.zeros(self.feature_size, dtype=np.float32)
             
-            # ROI
             roi = frame[y:y+h, x:x+w]
             
-            # Masque du contour
             contour_mask = np.zeros((h, w), dtype=np.uint8)
             contour_relative = contour - [x, y]
             cv2.fillPoly(contour_mask, [contour_relative], 255)
             
-            # Extraction
             geometric_features = self.extract_geometric_features(contour, bounding_rect)
             visual_features = self.extract_visual_features(roi, contour_mask)
             
-            # Combinaison (17 + 13 = 30 features)
             combined_features = np.concatenate([geometric_features, visual_features])
             
-            # Padding pour atteindre feature_size
             if len(combined_features) < self.feature_size:
                 padding = np.zeros(self.feature_size - len(combined_features), dtype=np.float32)
                 combined_features = np.concatenate([combined_features, padding])
             else:
                 combined_features = combined_features[:self.feature_size]
             
-            # Stabilisation
             self.feature_history.append(combined_features)
             if len(self.feature_history) >= 3:
                 weights = np.array([0.2, 0.3, 0.5])
@@ -250,9 +249,9 @@ class AdvancedHandFeatureExtractor:
             self.logging.debug(f"Erreur extraction complète: {e}")
             return np.zeros(self.feature_size, dtype=np.float32)
 
-# === MODÈLE TENSORFLOW ===
+# === MODÈLE TENSORFLOW CORRIGÉ ===
 class HandPositionRecognizer:
-    """Modèle de reconnaissance de position de main"""
+    """Modèle de reconnaissance de position - VERSION CORRIGÉE"""
     
     def __init__(self, feature_size=64, num_classes=len(HAND_POSITIONS)):
         self.feature_size = feature_size
@@ -267,17 +266,21 @@ class HandPositionRecognizer:
         self.prediction_history = deque(maxlen=7)
         self.confidence_history = deque(maxlen=5)
         
+        # Variables pour optimisation prédictions
+        self.last_prediction_time = 0
+        self.last_prediction_result = (None, 0.0)
+        self.prediction_interval = 0.2  # 5 FPS max
+        
         # Métriques
         self.total_predictions = 0
         self.confident_predictions = 0
         
-        # Vérification TensorFlow
         self.tf_available = TF_AVAILABLE
         if not self.tf_available:
             self.logging.warning("⚠️ TensorFlow non disponible - IA désactivée")
     
     def create_model(self):
-        """Création du modèle de réseau de neurones"""
+        """Création du modèle"""
         if not self.tf_available:
             return False
             
@@ -316,7 +319,7 @@ class HandPositionRecognizer:
             return False
     
     def add_training_sample(self, features, position_class):
-        """Ajout d'un échantillon d'entraînement"""
+        """Ajout échantillon d'entraînement"""
         if not self.tf_available:
             return False
             
@@ -336,8 +339,8 @@ class HandPositionRecognizer:
             self.logging.error(f"❌ Erreur ajout échantillon: {e}")
             return False
     
-    def train_model(self, validation_split=0.2, epochs=50):
-        """Entraînement du modèle"""
+    def train_model(self, validation_split=0.2, epochs=25):
+        """Entraînement du modèle - VERSION CORRIGÉE"""
         if not self.tf_available:
             self.logging.error("❌ TensorFlow requis pour l'entraînement")
             return False
@@ -351,15 +354,12 @@ class HandPositionRecognizer:
                 if not self.create_model():
                     return False
             
-            # Préparation données
             X = np.array(self.training_data, dtype=np.float32)
             y = np.array(self.training_labels, dtype=np.int32)
             
-            # Vérification distribution
             unique, counts = np.unique(y, return_counts=True)
             self.logging.info(f"📊 Distribution: {dict(zip(unique, counts))}")
             
-            # Callbacks
             callbacks = [
                 keras.callbacks.EarlyStopping(
                     monitor='val_loss',
@@ -374,19 +374,17 @@ class HandPositionRecognizer:
                 )
             ]
             
-            # Entraînement
             self.logging.info(f"🚀 Entraînement: {len(X)} échantillons, {epochs} époques")
             
             history = self.model.fit(
                 X, y,
                 validation_split=validation_split,
                 epochs=epochs,
-                batch_size=min(32, len(X) // 4),
+                batch_size=min(16, len(X) // 4),  # Batch size réduit
                 callbacks=callbacks,
-                verbose=1
+                verbose=0  # Supprime les logs TensorFlow
             )
             
-            # Résultats
             final_accuracy = history.history['accuracy'][-1]
             val_accuracy = history.history.get('val_accuracy', [0])[-1]
             
@@ -402,7 +400,7 @@ class HandPositionRecognizer:
             return False
     
     def predict_position(self, features, use_stabilization=True):
-        """Prédiction de position"""
+        """Prédiction optimisée - VERSION CORRIGÉE"""
         if not self.tf_available or self.model is None or not self.is_trained:
             return None, 0.0
             
@@ -410,13 +408,19 @@ class HandPositionRecognizer:
             if len(features) != self.feature_size:
                 return None, 0.0
             
+            # Limitation fréquence
+            current_time = time.time()
+            if current_time - self.last_prediction_time < self.prediction_interval:
+                return self.last_prediction_result
+            
             # Prédiction
             features_batch = features.reshape(1, -1)
-            prediction = self.model.predict(features_batch, verbose=0)[0]
+            prediction = self.model.predict(features_batch, verbose=0, batch_size=1)[0]
             
             predicted_class = np.argmax(prediction)
             confidence = prediction[predicted_class]
             
+            self.last_prediction_time = current_time
             self.total_predictions += 1
             
             # Stabilisation
@@ -424,32 +428,34 @@ class HandPositionRecognizer:
                 self.prediction_history.append((predicted_class, confidence))
                 self.confidence_history.append(confidence)
                 
-                if len(self.prediction_history) >= 5:
-                    recent_classes = [p[0] for p in list(self.prediction_history)[-5:]]
-                    recent_confidences = [p[1] for p in list(self.prediction_history)[-5:]]
+                if len(self.prediction_history) >= 3:
+                    recent_classes = [p[0] for p in list(self.prediction_history)[-3:]]
+                    recent_confidences = [p[1] for p in list(self.prediction_history)[-3:]]
                     
-                    # Classe la plus fréquente
                     from collections import Counter
                     class_counts = Counter(recent_classes)
-                    most_common_class = class_counts.most_common(1)[0][0]
+                    most_common_class, count = class_counts.most_common(1)[0]
                     
-                    # Confiance moyenne
-                    class_confidences = [conf for cls, conf in zip(recent_classes, recent_confidences) 
-                                       if cls == most_common_class]
-                    avg_confidence = np.mean(class_confidences)
-                    
-                    if len(class_confidences) >= 3 and avg_confidence > 0.6:
+                    if count >= 2:
+                        class_confidences = [conf for cls, conf in zip(recent_classes, recent_confidences) 
+                                           if cls == most_common_class]
+                        avg_confidence = np.mean(class_confidences)
+                        
                         predicted_class = most_common_class
                         confidence = avg_confidence
             
-            # Vérification seuil
+            # Validation seuil
             if predicted_class in HAND_POSITIONS:
                 threshold = HAND_POSITIONS[predicted_class].confidence_threshold
                 if confidence >= threshold:
                     self.confident_predictions += 1
-                    return predicted_class, confidence
+                    result = (predicted_class, confidence)
+                    self.last_prediction_result = result
+                    return result
             
-            return None, confidence
+            result = (None, confidence)
+            self.last_prediction_result = result
+            return result
             
         except Exception as e:
             self.logging.debug(f"Erreur prédiction: {e}")
@@ -466,16 +472,25 @@ class HandPositionRecognizer:
         return f"Confiance: {confidence_rate:.1f}% | Moy: {avg_confidence:.2f}"
     
     def save_model(self, filepath):
-        """Sauvegarde du modèle"""
         if not self.tf_available or self.model is None:
             return False
             
         try:
-            # Sauvegarde modèle
-            model_path = f"{filepath}_model"
-            self.model.save(model_path)
+            import os
             
-            # Sauvegarde données
+            # === SAUVEGARDE MODÈLE TENSORFLOW ===
+            model_dir = f"{filepath}_model"
+            
+            # Suppression ancien modèle si existe
+            if os.path.exists(model_dir):
+                import shutil
+                shutil.rmtree(model_dir)
+            
+            # Sauvegarde au format TensorFlow moderne
+            self.model.save(model_dir, save_format='tf')
+            self.logging.info(f"✅ Modèle TF sauvegardé: {model_dir}")
+            
+            # === SAUVEGARDE DONNÉES ===
             data_path = f"{filepath}_data.pkl"
             with open(data_path, 'wb') as f:
                 pickle.dump({
@@ -483,32 +498,40 @@ class HandPositionRecognizer:
                     'training_labels': self.training_labels,
                     'feature_size': self.feature_size,
                     'num_classes': self.num_classes,
-                    'is_trained': self.is_trained
+                    'is_trained': self.is_trained,
+                    'total_predictions': getattr(self, 'total_predictions', 0),
+                    'confident_predictions': getattr(self, 'confident_predictions', 0)
                 }, f)
             
-            self.logging.info(f"✅ Modèle sauvegardé: {model_path}")
+            self.logging.info(f"✅ Données sauvegardées: {data_path}")
             return True
             
         except Exception as e:
             self.logging.error(f"❌ Erreur sauvegarde: {e}")
             return False
-    
+
     def load_model(self, filepath):
-        """Chargement du modèle"""
+        """Chargement du modèle - VERSION CORRIGÉE"""
         if not self.tf_available:
             return False
             
         try:
-            # Chargement modèle
-            model_path = f"{filepath}_model"
-            if os.path.exists(model_path):
-                self.model = keras.models.load_model(model_path)
-                self.logging.info(f"✅ Modèle chargé: {model_path}")
+            # === CHARGEMENT MODÈLE ===
+            model_dir = f"{filepath}_model"
+            if os.path.exists(model_dir):
+                self.model = keras.models.load_model(model_dir)
+                self.logging.info(f"✅ Modèle chargé: {model_dir}")
             else:
-                self.logging.warning(f"⚠️ Modèle non trouvé: {model_path}")
-                return False
+                # Tentative ancien format
+                old_model_path = f"{filepath}_model.h5"
+                if os.path.exists(old_model_path):
+                    self.model = keras.models.load_model(old_model_path)
+                    self.logging.info(f"✅ Ancien modèle chargé: {old_model_path}")
+                else:
+                    self.logging.warning(f"⚠️ Aucun modèle trouvé: {model_dir}")
+                    return False
             
-            # Chargement données
+            # === CHARGEMENT DONNÉES ===
             data_path = f"{filepath}_data.pkl"
             if os.path.exists(data_path):
                 with open(data_path, 'rb') as f:
@@ -516,7 +539,11 @@ class HandPositionRecognizer:
                 
                 self.training_data = data.get('training_data', [])
                 self.training_labels = data.get('training_labels', [])
+                self.feature_size = data.get('feature_size', 64)
+                self.num_classes = data.get('num_classes', len(HAND_POSITIONS))
                 self.is_trained = data.get('is_trained', False)
+                self.total_predictions = data.get('total_predictions', 0)
+                self.confident_predictions = data.get('confident_predictions', 0)
                 
                 self.logging.info(f"✅ Données chargées: {len(self.training_data)} échantillons")
             
@@ -525,12 +552,18 @@ class HandPositionRecognizer:
         except Exception as e:
             self.logging.error(f"❌ Erreur chargement: {e}")
             return False
+    
 
 # === DÉTECTEUR PRINCIPAL AVEC IA ===
 class OptimizedBicolorGloveDetectorWithAI:
     """Détecteur de gant avec IA de reconnaissance de position"""
     
-    def __init__(self):
+    def __init__(self, feature_size=64, num_classes=len(HAND_POSITIONS)):
+
+        self.last_prediction_time = 0
+        self.last_prediction_result = (None, 0.0)
+        self.prediction_interval = 0.3  # Prédiction toutes les 300ms seulement
+
         # === PARAMÈTRES DÉTECTION ORIGINAUX ===
         self.detection_history = deque(maxlen=15)
         self.stable_detections = deque(maxlen=5)
@@ -796,20 +829,68 @@ class OptimizedBicolorGloveDetectorWithAI:
             return None, 0.0
     
     def _start_model_training(self):
-        """Démarrage de l'entraînement du modèle"""
+    # === PROTECTION CONTRE MULTIPLE THREADS ===
+        if hasattr(self, '_training_in_progress') and self._training_in_progress:
+            self.logging.warning("⚠️ Entraînement déjà en cours - ignoré")
+            return
+        
+        self._training_in_progress = True
         self.logging.info("🚀 Démarrage entraînement du modèle IA...")
         
         def train():
-            success = self.position_recognizer.train_model(epochs=25)
-            if success:
-                self.position_recognizer.save_model("hand_position_model")
-                self.ai_mode = "recognition"
-                self.logging.info("✅ Modèle entraîné et sauvegardé!")
-            else:
-                self.logging.error("❌ Échec entraînement")
+            try:
+                # Protection supplémentaire
+                if not hasattr(self, '_training_in_progress') or not self._training_in_progress:
+                    return
+                    
+                success = self.position_recognizer.train_model(epochs=25)  # ÉPOQUE RÉDUITE
+                
+                if success:
+                    # Sauvegarde avec extension correcte
+                    try:
+                        import os
+                        model_path = "hand_position_model"
+                        
+                        # Création du dossier si nécessaire
+                        os.makedirs(model_path, exist_ok=True)
+                        
+                        # Sauvegarde TensorFlow moderne
+                        self.position_recognizer.model.save(model_path, save_format='tf')
+                        
+                        # Sauvegarde données séparément
+                        import pickle
+                        data_path = f"{model_path}_data.pkl"
+                        with open(data_path, 'wb') as f:
+                            pickle.dump({
+                                'training_data': self.position_recognizer.training_data,
+                                'training_labels': self.position_recognizer.training_labels,
+                                'feature_size': self.position_recognizer.feature_size,
+                                'num_classes': self.position_recognizer.num_classes,
+                                'is_trained': True
+                            }, f)
+                        
+                        self.logging.info("💾 Modèle sauvegardé avec succès")
+                        
+                    except Exception as save_error:
+                        self.logging.error(f"❌ Erreur sauvegarde: {save_error}")
+                    
+                    self.ai_mode = "recognition"
+                    self.logging.info("✅ Modèle entraîné et sauvegardé!")
+                    
+                else:
+                    self.logging.error("❌ Échec entraînement")
+                    self.ai_mode = "detection"
+                    
+            except Exception as e:
+                self.logging.error(f"❌ Erreur thread entraînement: {e}")
                 self.ai_mode = "detection"
+                
+            finally:
+                # Libération du verrou
+                self._training_in_progress = False
         
-        training_thread = threading.Thread(target=train, daemon=True)
+        # Lancement thread unique
+        training_thread = threading.Thread(target=train, daemon=True, name="ModelTraining")
         training_thread.start()
     
     def _execute_drone_command(self, position, confidence):
