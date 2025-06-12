@@ -1,175 +1,49 @@
-2025-06-10 12:31:07,675 - INFO - === BEBOP 2 OPTIMIZED BICOLOR DETECTION ===
-2025-06-10 12:31:07,675 - INFO - 🎯 Détection gant bicolore optimisée rouge/orange
-2025-06-10 12:31:07,676 - INFO - 📡 Connexion au drone...
-2025-06-10 12:31:08,737 - INFO - ✅ Drone connecté!
-2025-06-10 12:31:08,737 - INFO - 📹 Démarrage flux vidéo...
-2025-06-10 12:31:11,241 - INFO - Contrôle drone démarré.
-2025-06-10 12:31:11,241 - INFO - 🚀 FFmpeg optimisé couleurs: ffmpeg -protocol_whitelist file,rtp,udp -fflags nobuffer -flags low_delay -avioflags direct -analyzeduration 1000000 -probesize 1000000 -i C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\utils\bebop.sdp -vf eq=saturation=1.1:gamma=0.95 -f rawvideo -pix_fmt bgr24 -
-2025-06-10 12:31:11,260 - INFO - ✅ Pipeline optimisé initialisé
-2025-06-10 12:31:11,290 - INFO - ======================================================================
-2025-06-10 12:31:11,291 - INFO - 🎮 COMMANDES:
-2025-06-10 12:31:11,291 - INFO -   'q' = Quitter | 's' = Screenshot | 'r' = Reset détecteur
-2025-06-10 12:31:11,291 - INFO -   'z' = Reset zoom | '+/-' = Zoom manuel | 'd' = Debug
-2025-06-10 12:31:11,291 - INFO -   'c' = Calibrage couleurs | 'e' = Ajust exposition
-2025-06-10 12:31:11,291 - INFO - ======================================================================
-2025-06-10 12:31:11,291 - INFO - 🎯 OPTIMISATIONS:
-2025-06-10 12:31:11,291 - INFO -   ✓ Équilibrage rouge/orange automatique
-2025-06-10 12:31:11,292 - INFO -   ✓ Correction exposition adaptative
-2025-06-10 12:31:11,292 - INFO -   ✓ Zoom prédictif avec tracking
-2025-06-10 12:31:11,292 - INFO -   ✓ Scoring qualité bicolore
-2025-06-10 12:31:11,292 - INFO -   ✓ Morphologie adaptée au zoom
-2025-06-10 12:31:11,292 - INFO - ======================================================================
-2025-06-10 12:31:11,292 - INFO - 🎬 Démarrage détection optimisée...
-2025-06-10 12:31:17,159 - INFO - 📊 FPS: 15.3 | Détections: 100.0% | Qualité moy: 0.00 | Zoom: 1.0x | Exposition: 1.00
-2025-06-10 12:31:20,026 - INFO - 📊 FPS: 31.4 | Détections: 100.0% | Qualité moy: 0.00 | Zoom: 1.0x | Exposition: 1.00
-2025-06-10 12:31:23,037 - INFO - 📊 FPS: 29.9 | Détections: 100.0% | Qualité moy: 0.00 | Zoom: 1.0x | Exposition: 1.20
-2025-06-10 12:31:26,044 - INFO - 📊 FPS: 29.9 | Détections: 99.2% | Qualité moy: 0.00 | Zoom: 1.1x | Exposition: 1.05
-2025-06-10 12:31:29,044 - INFO - 📊 FPS: 30.0 | Détections: 99.3% | Qualité moy: 0.00 | Zoom: 1.1x | Exposition: 1.05
-2025-06-10 12:31:32,050 - INFO - 📊 FPS: 29.9 | Détections: 99.4% | Qualité moy: 0.00 | Zoom: 1.1x | Exposition: 1.05
-2025-06-10 12:31:35,070 - INFO - 📊 FPS: 29.8 | Détections: 99.5% | Qualité moy: 0.00 | Zoom: 1.1x | Exposition: 1.05
-2025-06-10 12:31:38,082 - INFO - 📊 FPS: 29.9 | Détections: 99.6% | Qualité moy: 0.00 | Zoom: 1.1x | Exposition: 1.05
-2025-06-10 12:31:41,067 - INFO - 📊 FPS: 30.2 | Détections: 99.6% | Qualité moy: 0.00 | Zoom: 1.1x | Exposition: 1.05
-2025-06-10 12:31:44,063 - INFO - 📊 FPS: 30.0 | Détections: 99.7% | Qualité moy: 0.00 | Zoom: 1.1x | Exposition: 1.05
-2025-06-10 12:31:47,061 - INFO - 📊 FPS: 30.0 | Détections: 99.7% | Qualité moy: 0.00 | Zoom: 1.1x | Exposition: 1.05
-2025-06-10 12:31:50,070 - INFO - 📊 FPS: 29.9 | Détections: 99.7% | Qualité moy: 0.00 | Zoom: 1.1x | Exposition: 1.05
-2025-06-10 12:31:53,076 - INFO - 📊 FPS: 29.9 | Détections: 99.7% | Qualité moy: 0.00 | Zoom: 1.1x | Exposition: 1.05
-2025-06-10 12:31:56,076 - INFO - 📊 FPS: 30.0 | Détections: 99.8% | Qualité moy: 0.00 | Zoom: 1.1x | Exposition: 1.05
-2025-06-10 12:31:59,107 - INFO - 📊 FPS: 29.7 | Détections: 99.8% | Qualité moy: 0.00 | Zoom: 1.1x | Exposition: 1.05
-2025-06-10 12:32:02,109 - INFO - 📊 FPS: 30.0 | Détections: 99.5% | Qualité moy: 0.00 | Zoom: 2.0x | Exposition: 1.05
-2025-06-10 12:32:05,102 - INFO - 📊 FPS: 30.1 | Détections: 99.5% | Qualité moy: 0.00 | Zoom: 2.0x | Exposition: 1.40
-2025-06-10 12:32:08,097 - INFO - 📊 FPS: 30.1 | Détections: 99.6% | Qualité moy: 0.00 | Zoom: 2.0x | Exposition: 1.05
-2025-06-10 12:32:11,096 - INFO - 📊 FPS: 30.0 | Détections: 99.6% | Qualité moy: 0.00 | Zoom: 2.0x | Exposition: 1.05
-2025-06-10 12:32:14,097 - INFO - 📊 FPS: 30.0 | Détections: 99.6% | Qualité moy: 0.00 | Zoom: 2.0x | Exposition: 1.05
-2025-06-10 12:32:17,110 - INFO - 📊 FPS: 29.9 | Détections: 99.6% | Qualité moy: 0.00 | Zoom: 2.0x | Exposition: 1.05
-2025-06-10 12:32:20,113 - INFO - 📊 FPS: 30.0 | Détections: 99.6% | Qualité moy: 0.00 | Zoom: 2.0x | Exposition: 1.05
-2025-06-10 12:32:23,111 - INFO - 📊 FPS: 30.0 | Détections: 99.7% | Qualité moy: 0.00 | Zoom: 2.0x | Exposition: 1.05
-2025-06-10 12:32:26,110 - INFO - 📊 FPS: 30.0 | Détections: 99.7% | Qualité moy: 0.00 | Zoom: 2.0x | Exposition: 1.05
-2025-06-10 12:32:29,112 - INFO - 📊 FPS: 30.0 | Détections: 99.7% | Qualité moy: 0.00 | Zoom: 2.0x | Exposition: 1.05
-2025-06-10 12:32:32,115 - INFO - 📊 FPS: 30.0 | Détections: 99.7% | Qualité moy: 0.00 | Zoom: 2.0x | Exposition: 1.05
-2025-06-10 12:32:35,543 - INFO - 📊 FPS: 26.3 | Détections: 99.1% | Qualité moy: 0.00 | Zoom: 1.6x | Exposition: 1.05
-2025-06-10 12:32:38,308 - INFO - 📊 FPS: 32.5 | Détections: 99.2% | Qualité moy: 0.00 | Zoom: 1.6x | Exposition: 1.05
-2025-06-10 12:32:41,150 - INFO - 📊 FPS: 31.7 | Détections: 99.2% | Qualité moy: 0.00 | Zoom: 1.6x | Exposition: 1.05
-2025-06-10 12:32:44,167 - INFO - 📊 FPS: 29.8 | Détections: 98.8% | Qualité moy: 0.81 | Zoom: 2.1x | Exposition: 1.05
-2025-06-10 12:32:47,168 - INFO - 📊 FPS: 30.0 | Détections: 96.2% | Qualité moy: 0.81 | Zoom: 2.2x | Exposition: 1.05
-2025-06-10 12:32:50,160 - INFO - 📊 FPS: 30.1 | Détections: 96.3% | Qualité moy: 0.81 | Zoom: 2.2x | Exposition: 1.05
-2025-06-10 12:32:53,170 - INFO - 📊 FPS: 29.9 | Détections: 96.4% | Qualité moy: 0.81 | Zoom: 2.2x | Exposition: 1.05
-2025-06-10 12:32:56,169 - INFO - 📊 FPS: 30.0 | Détections: 96.5% | Qualité moy: 0.81 | Zoom: 2.2x | Exposition: 1.05
-2025-06-10 12:32:59,175 - INFO - 📊 FPS: 29.9 | Détections: 96.6% | Qualité moy: 0.81 | Zoom: 2.2x | Exposition: 1.05
-2025-06-10 12:33:02,175 - INFO - 📊 FPS: 30.0 | Détections: 96.7% | Qualité moy: 0.81 | Zoom: 2.2x | Exposition: 1.05
-2025-06-10 12:33:05,154 - INFO - 📊 FPS: 30.2 | Détections: 96.8% | Qualité moy: 0.81 | Zoom: 2.2x | Exposition: 1.05
-2025-06-10 12:33:08,183 - INFO - 📊 FPS: 29.7 | Détections: 96.4% | Qualité moy: 0.81 | Zoom: 1.6x | Exposition: 1.40
-2025-06-10 12:33:11,189 - INFO - 📊 FPS: 29.9 | Détections: 96.5% | Qualité moy: 0.81 | Zoom: 1.6x | Exposition: 1.05
-2025-06-10 12:33:14,189 - INFO - 📊 FPS: 30.0 | Détections: 96.6% | Qualité moy: 0.81 | Zoom: 1.6x | Exposition: 1.05
-2025-06-10 12:33:17,204 - INFO - 📊 FPS: 29.9 | Détections: 96.7% | Qualité moy: 0.81 | Zoom: 1.6x | Exposition: 1.05
-2025-06-10 12:33:20,198 - INFO - 📊 FPS: 30.1 | Détections: 96.8% | Qualité moy: 0.81 | Zoom: 1.6x | Exposition: 1.05
-2025-06-10 12:33:23,188 - INFO - 📊 FPS: 30.1 | Détections: 96.8% | Qualité moy: 0.81 | Zoom: 1.6x | Exposition: 1.05
-2025-06-10 12:33:26,169 - INFO - 📊 FPS: 30.2 | Détections: 96.9% | Qualité moy: 0.81 | Zoom: 1.6x | Exposition: 1.05
-2025-06-10 12:33:29,164 - INFO - 📊 FPS: 30.0 | Détections: 97.0% | Qualité moy: 0.81 | Zoom: 1.6x | Exposition: 1.05
-2025-06-10 12:33:32,164 - INFO - 📊 FPS: 30.0 | Détections: 97.1% | Qualité moy: 0.81 | Zoom: 1.6x | Exposition: 1.05
-2025-06-10 12:33:35,166 - INFO - 📊 FPS: 30.0 | Détections: 97.1% | Qualité moy: 0.81 | Zoom: 1.6x | Exposition: 1.05
-2025-06-10 12:33:38,196 - INFO - 📊 FPS: 29.7 | Détections: 97.2% | Qualité moy: 0.81 | Zoom: 1.6x | Exposition: 1.05
-2025-06-10 12:33:41,174 - INFO - 📊 FPS: 30.2 | Détections: 97.2% | Qualité moy: 0.81 | Zoom: 1.6x | Exposition: 1.05
-2025-06-10 12:33:44,186 - INFO - 📊 FPS: 29.9 | Détections: 97.3% | Qualité moy: 0.81 | Zoom: 1.6x | Exposition: 1.05
-2025-06-10 12:33:47,188 - INFO - 📊 FPS: 30.0 | Détections: 97.3% | Qualité moy: 0.81 | Zoom: 1.6x | Exposition: 1.05
-2025-06-10 12:33:50,189 - INFO - 📊 FPS: 30.0 | Détections: 97.4% | Qualité moy: 0.81 | Zoom: 1.6x | Exposition: 1.05
-2025-06-10 12:33:53,204 - INFO - 📊 FPS: 29.9 | Détections: 97.4% | Qualité moy: 0.81 | Zoom: 1.6x | Exposition: 1.05
-2025-06-10 12:33:56,221 - INFO - 📊 FPS: 29.8 | Détections: 97.5% | Qualité moy: 0.81 | Zoom: 1.6x | Exposition: 1.05
-2025-06-10 12:33:59,222 - INFO - 📊 FPS: 30.0 | Détections: 97.5% | Qualité moy: 0.81 | Zoom: 1.6x | Exposition: 1.05
-2025-06-10 12:34:02,213 - INFO - 📊 FPS: 30.1 | Détections: 97.6% | Qualité moy: 0.81 | Zoom: 1.6x | Exposition: 1.05
-2025-06-10 12:34:05,221 - INFO - 📊 FPS: 29.9 | Détections: 97.6% | Qualité moy: 0.81 | Zoom: 1.6x | Exposition: 1.10
-2025-06-10 12:34:08,949 - INFO - 📊 FPS: 24.1 | Détections: 97.7% | Qualité moy: 0.81 | Zoom: 1.6x | Exposition: 1.40
-2025-06-10 12:34:11,794 - INFO - 📊 FPS: 31.6 | Détections: 97.7% | Qualité moy: 0.81 | Zoom: 1.6x | Exposition: 1.05
-2025-06-10 12:34:14,206 - INFO - 📊 FPS: 37.3 | Détections: 97.3% | Qualité moy: 0.71 | Zoom: 2.0x | Exposition: 0.95
-2025-06-10 12:34:17,248 - INFO - 📊 FPS: 29.6 | Détections: 97.3% | Qualité moy: 0.71 | Zoom: 2.0x | Exposition: 1.05
-2025-06-10 12:34:20,234 - INFO - 📊 FPS: 30.1 | Détections: 97.4% | Qualité moy: 0.71 | Zoom: 2.0x | Exposition: 1.05
-2025-06-10 12:34:23,239 - INFO - 📊 FPS: 29.9 | Détections: 97.4% | Qualité moy: 0.71 | Zoom: 2.0x | Exposition: 1.05
-2025-06-10 12:34:26,242 - INFO - 📊 FPS: 30.0 | Détections: 97.4% | Qualité moy: 0.71 | Zoom: 2.0x | Exposition: 1.05
-2025-06-10 12:34:29,249 - INFO - 📊 FPS: 29.9 | Détections: 97.5% | Qualité moy: 0.71 | Zoom: 2.0x | Exposition: 1.05
-2025-06-10 12:34:32,247 - INFO - 📊 FPS: 30.0 | Détections: 97.5% | Qualité moy: 0.71 | Zoom: 2.0x | Exposition: 1.05
-2025-06-10 12:34:35,251 - INFO - 📊 FPS: 30.0 | Détections: 97.6% | Qualité moy: 0.71 | Zoom: 2.0x | Exposition: 1.05
-2025-06-10 12:34:38,257 - INFO - 📊 FPS: 29.9 | Détections: 97.6% | Qualité moy: 1.05 | Zoom: 1.3x | Exposition: 1.05
-2025-06-10 12:34:41,232 - INFO - 📊 FPS: 30.3 | Détections: 97.6% | Qualité moy: 1.05 | Zoom: 1.3x | Exposition: 1.05
-2025-06-10 12:34:44,246 - INFO - 📊 FPS: 29.9 | Détections: 97.7% | Qualité moy: 1.05 | Zoom: 1.3x | Exposition: 1.05
-2025-06-10 12:34:47,253 - INFO - 📊 FPS: 29.9 | Détections: 97.6% | Qualité moy: 1.05 | Zoom: 1.1x | Exposition: 1.05
-2025-06-10 12:34:50,253 - INFO - 📊 FPS: 30.0 | Détections: 97.6% | Qualité moy: 1.05 | Zoom: 1.1x | Exposition: 1.05
-2025-06-10 12:34:53,243 - INFO - 📊 FPS: 30.1 | Détections: 97.6% | Qualité moy: 1.05 | Zoom: 1.4x | Exposition: 1.05
-2025-06-10 12:34:56,249 - INFO - 📊 FPS: 29.9 | Détections: 97.7% | Qualité moy: 1.05 | Zoom: 1.4x | Exposition: 1.05
-2025-06-10 12:34:59,272 - INFO - 📊 FPS: 29.8 | Détections: 96.8% | Qualité moy: 1.05 | Zoom: 2.0x | Exposition: 1.05
-2025-06-10 12:35:02,256 - INFO - 📊 FPS: 30.2 | Détections: 96.7% | Qualité moy: 1.00 | Zoom: 2.3x | Exposition: 1.05
-2025-06-10 12:35:05,260 - INFO - 📊 FPS: 30.0 | Détections: 95.9% | Qualité moy: 1.00 | Zoom: 1.1x | Exposition: 1.05
-2025-06-10 12:35:08,265 - INFO - 📊 FPS: 30.0 | Détections: 95.9% | Qualité moy: 1.00 | Zoom: 1.1x | Exposition: 1.05
-2025-06-10 12:35:11,284 - INFO - 📊 FPS: 29.8 | Détections: 96.0% | Qualité moy: 1.00 | Zoom: 1.1x | Exposition: 1.05
-2025-06-10 12:35:14,299 - INFO - 📊 FPS: 29.8 | Détections: 96.0% | Qualité moy: 1.00 | Zoom: 1.1x | Exposition: 1.05
-2025-06-10 12:35:17,773 - INFO - 📊 FPS: 25.9 | Détections: 96.0% | Qualité moy: 0.97 | Zoom: 1.6x | Exposition: 1.05
-2025-06-10 12:35:20,523 - INFO - 📊 FPS: 32.7 | Détections: 95.6% | Qualité moy: 0.91 | Zoom: 2.2x | Exposition: 1.05
-2025-06-10 12:35:23,660 - INFO - 📊 FPS: 28.7 | Détections: 95.7% | Qualité moy: 0.91 | Zoom: 2.2x | Exposition: 1.05
-2025-06-10 12:35:26,490 - INFO - 📊 FPS: 31.8 | Détections: 95.6% | Qualité moy: 0.90 | Zoom: 1.5x | Exposition: 1.05
-2025-06-10 12:35:29,790 - INFO - 📊 FPS: 27.3 | Détections: 94.6% | Qualité moy: 0.90 | Zoom: 1.0x | Exposition: 1.05
-2025-06-10 12:35:32,488 - INFO - 📊 FPS: 33.4 | Détections: 94.0% | Qualité moy: 0.90 | Zoom: 1.8x | Exposition: 1.05
-2025-06-10 12:35:35,606 - INFO - 📊 FPS: 28.9 | Détections: 94.1% | Qualité moy: 0.90 | Zoom: 2.4x | Exposition: 1.40
-2025-06-10 12:35:38,490 - INFO - 📊 FPS: 31.2 | Détections: 94.1% | Qualité moy: 0.90 | Zoom: 2.4x | Exposition: 1.40
-2025-06-10 12:35:41,478 - INFO - 📊 FPS: 30.1 | Détections: 93.7% | Qualité moy: 0.83 | Zoom: 1.3x | Exposition: 1.05
-2025-06-10 12:35:44,510 - INFO - 📊 FPS: 29.7 | Détections: 93.0% | Qualité moy: 0.69 | Zoom: 1.0x | Exposition: 1.05
-2025-06-10 12:35:47,491 - INFO - 📊 FPS: 30.2 | Détections: 92.1% | Qualité moy: 0.69 | Zoom: 1.0x | Exposition: 1.05
-2025-06-10 12:35:50,582 - INFO - 📊 FPS: 29.1 | Détections: 92.0% | Qualité moy: 0.72 | Zoom: 2.0x | Exposition: 1.05
-2025-06-10 12:35:53,544 - INFO - 📊 FPS: 30.4 | Détections: 92.1% | Qualité moy: 0.72 | Zoom: 2.0x | Exposition: 1.05
-2025-06-10 12:35:56,498 - INFO - 📊 FPS: 30.5 | Détections: 92.2% | Qualité moy: 0.72 | Zoom: 2.0x | Exposition: 1.05
-2025-06-10 12:35:59,500 - INFO - 📊 FPS: 30.0 | Détections: 92.3% | Qualité moy: 0.72 | Zoom: 2.0x | Exposition: 1.05
-2025-06-10 12:36:02,496 - INFO - 📊 FPS: 30.0 | Détections: 92.2% | Qualité moy: 0.72 | Zoom: 2.1x | Exposition: 1.05
-2025-06-10 12:36:05,554 - INFO - 📊 FPS: 29.4 | Détections: 91.9% | Qualité moy: 0.72 | Zoom: 2.0x | Exposition: 1.05
-2025-06-10 12:36:08,509 - INFO - 📊 FPS: 30.5 | Détections: 91.9% | Qualité moy: 0.72 | Zoom: 1.7x | Exposition: 1.05
-2025-06-10 12:36:11,499 - INFO - 📊 FPS: 30.1 | Détections: 92.0% | Qualité moy: 0.72 | Zoom: 1.7x | Exposition: 1.05
-2025-06-10 12:36:14,506 - INFO - 📊 FPS: 29.9 | Détections: 92.1% | Qualité moy: 0.72 | Zoom: 1.7x | Exposition: 1.05
-2025-06-10 12:36:17,506 - INFO - 📊 FPS: 30.0 | Détections: 92.2% | Qualité moy: 0.72 | Zoom: 1.7x | Exposition: 1.05
-2025-06-10 12:36:20,536 - INFO - 📊 FPS: 29.7 | Détections: 92.3% | Qualité moy: 0.72 | Zoom: 1.7x | Exposition: 1.05
-2025-06-10 12:36:23,539 - INFO - 📊 FPS: 30.0 | Détections: 92.3% | Qualité moy: 0.72 | Zoom: 1.5x | Exposition: 1.05
-2025-06-10 12:36:26,552 - INFO - 📊 FPS: 29.9 | Détections: 92.4% | Qualité moy: 0.72 | Zoom: 1.5x | Exposition: 1.05
-2025-06-10 12:36:29,546 - INFO - 📊 FPS: 30.1 | Détections: 92.4% | Qualité moy: 0.72 | Zoom: 1.4x | Exposition: 1.05
-2025-06-10 12:36:32,564 - INFO - 📊 FPS: 29.8 | Détections: 92.0% | Qualité moy: 0.71 | Zoom: 1.0x | Exposition: 1.05
-2025-06-10 12:36:35,602 - INFO - 📊 FPS: 29.6 | Détections: 91.8% | Qualité moy: 0.71 | Zoom: 2.9x | Exposition: 1.05
-2025-06-10 12:36:38,573 - INFO - 📊 FPS: 30.3 | Détections: 91.5% | Qualité moy: 0.65 | Zoom: 2.3x | Exposition: 1.05
-2025-06-10 12:36:41,572 - INFO - 📊 FPS: 30.0 | Détections: 91.0% | Qualité moy: 0.64 | Zoom: 1.1x | Exposition: 1.05
-2025-06-10 12:36:44,589 - INFO - 📊 FPS: 29.8 | Détections: 90.3% | Qualité moy: 0.64 | Zoom: 1.1x | Exposition: 1.05
-2025-06-10 12:36:47,557 - INFO - 📊 FPS: 30.3 | Détections: 90.1% | Qualité moy: 0.64 | Zoom: 2.5x | Exposition: 1.05
-2025-06-10 12:36:50,540 - INFO - 📊 FPS: 30.2 | Détections: 89.2% | Qualité moy: 0.64 | Zoom: 1.0x | Exposition: 1.05
-2025-06-10 12:36:53,534 - INFO - 📊 FPS: 30.1 | Détections: 89.1% | Qualité moy: 0.69 | Zoom: 1.8x | Exposition: 1.05
-2025-06-10 12:36:56,535 - INFO - 📊 FPS: 30.0 | Détections: 89.2% | Qualité moy: 0.69 | Zoom: 1.8x | Exposition: 1.05
-2025-06-10 12:36:59,564 - INFO - 📊 FPS: 29.7 | Détections: 89.3% | Qualité moy: 0.69 | Zoom: 1.8x | Exposition: 1.05
-2025-06-10 12:37:02,600 - INFO - 📊 FPS: 29.6 | Détections: 89.4% | Qualité moy: 0.69 | Zoom: 1.8x | Exposition: 1.05
-2025-06-10 12:37:05,638 - INFO - 📊 FPS: 29.6 | Détections: 89.5% | Qualité moy: 0.69 | Zoom: 2.1x | Exposition: 1.40
-2025-06-10 12:37:08,588 - INFO - 📊 FPS: 30.5 | Détections: 89.5% | Qualité moy: 0.69 | Zoom: 2.1x | Exposition: 1.05
-2025-06-10 12:37:11,702 - INFO - 📊 FPS: 28.9 | Détections: 88.9% | Qualité moy: 0.67 | Zoom: 1.0x | Exposition: 1.05
-2025-06-10 12:37:14,690 - INFO - 📊 FPS: 30.1 | Détections: 88.4% | Qualité moy: 0.70 | Zoom: 1.2x | Exposition: 1.05
-2025-06-10 12:37:17,650 - INFO - 📊 FPS: 30.4 | Détections: 87.7% | Qualité moy: 0.70 | Zoom: 1.0x | Exposition: 1.05
-2025-06-10 12:37:20,616 - INFO - 📊 FPS: 30.3 | Détections: 87.5% | Qualité moy: 0.70 | Zoom: 1.0x | Exposition: 1.40
-2025-06-10 12:37:23,604 - INFO - 📊 FPS: 30.1 | Détections: 87.6% | Qualité moy: 0.70 | Zoom: 1.2x | Exposition: 1.40
-2025-06-10 12:37:26,587 - INFO - 📊 FPS: 30.2 | Détections: 87.6% | Qualité moy: 0.96 | Zoom: 2.2x | Exposition: 1.05
-2025-06-10 12:37:29,602 - INFO - 📊 FPS: 29.8 | Détections: 87.7% | Qualité moy: 0.93 | Zoom: 2.2x | Exposition: 1.05
-2025-06-10 12:37:32,592 - INFO - 📊 FPS: 30.1 | Détections: 87.8% | Qualité moy: 0.93 | Zoom: 2.2x | Exposition: 1.05
-2025-06-10 12:37:35,599 - INFO - 📊 FPS: 29.9 | Détections: 87.8% | Qualité moy: 1.09 | Zoom: 1.3x | Exposition: 1.05
-2025-06-10 12:37:38,623 - INFO - 📊 FPS: 29.8 | Détections: 87.3% | Qualité moy: 1.09 | Zoom: 1.0x | Exposition: 1.05
-2025-06-10 12:37:41,610 - INFO - 📊 FPS: 30.1 | Détections: 86.6% | Qualité moy: 1.09 | Zoom: 1.0x | Exposition: 1.05
-2025-06-10 12:37:44,612 - INFO - 📊 FPS: 30.0 | Détections: 85.9% | Qualité moy: 1.09 | Zoom: 1.2x | Exposition: 1.05
-2025-06-10 12:37:47,614 - INFO - 📊 FPS: 30.0 | Détections: 86.0% | Qualité moy: 1.09 | Zoom: 1.1x | Exposition: 1.05
-2025-06-10 12:37:50,621 - INFO - 📊 FPS: 29.9 | Détections: 85.5% | Qualité moy: 1.09 | Zoom: 1.0x | Exposition: 1.05
-2025-06-10 12:38:13,297 - INFO - ⌨️ Interruption clavier
-2025-06-10 12:38:13,297 - INFO - 🧹 Nettoyage...
-2025-06-10 12:38:13,297 - INFO - ======================================================================
-2025-06-10 12:38:13,298 - INFO - 📊 STATS FINALES OPTIMISÉES:
-2025-06-10 12:38:13,298 - INFO -   ⏱️ Durée: 425.6s
-2025-06-10 12:38:13,298 - INFO -   🎞️ Frames: 11909
-2025-06-10 12:38:13,298 - INFO -   ⚡ FPS moyen: 28.0
-2025-06-10 12:38:13,298 - INFO -   🎯 Détections: 10178 (85.5%)
-2025-06-10 12:38:13,298 - INFO -   ⭐ Détections qualité: 352 (3.5%)
-2025-06-10 12:38:13,298 - INFO -   📈 Qualité moyenne: 1.09
-2025-06-10 12:38:13,298 - INFO -   🔍 Zoom final: 1.0x
-2025-06-10 12:38:13,299 - INFO -   📈 Ajustements zoom: 10199
-2025-06-10 12:38:13,299 - INFO -   💡 Exposition finale: 1.05
-2025-06-10 12:38:13,299 - INFO -   📸 Screenshots: 0
-2025-06-10 12:38:13,299 - INFO -   🎨 Équilibrage final R/O: 0.81/0.19
-2025-06-10 12:38:13,299 - INFO -   📏 Aire moyenne: 58538
-2025-06-10 12:38:13,299 - INFO - ======================================================================
-2025-06-10 12:38:13,299 - INFO - ✅ Pipeline fermé
-2025-06-10 12:38:13,307 - INFO - ✅ Interface fermée
-2025-06-10 12:38:13,808 - INFO - ✅ Drone déconnecté
-2025-06-10 12:38:13,808 - INFO - 🎉 Session détection optimisée terminée!
+2025-06-12 08:46:51,375 - INFO - === BEBOP 2 OPTIMIZED BICOLOR DETECTION ===
+2025-06-12 08:46:51,375 - INFO - 🎯 Détection gant bicolore optimisée rouge/orange
+2025-06-12 08:46:51,376 - INFO - 📡 Connexion au drone...
+2025-06-12 08:46:52,439 - INFO - ✅ Drone connecté!
+2025-06-12 08:46:52,440 - INFO - 📹 Démarrage flux vidéo...
+2025-06-12 08:46:54,945 - INFO - Contrôle drone démarré.
+2025-06-12 08:46:54,946 - INFO - 🚀 FFmpeg optimisé couleurs: ffmpeg -protocol_whitelist file,rtp,udp -fflags nobuffer -flags low_delay -avioflags direct -analyzeduration 1000000 -probesize 1000000 -i C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\utils\bebop.sdp -vf eq=saturation=1.1:gamma=0.95 -f rawvideo -pix_fmt bgr24 -
+2025-06-12 08:46:54,963 - INFO - ✅ Pipeline optimisé initialisé
+2025-06-12 08:46:55,018 - INFO - ======================================================================
+2025-06-12 08:46:55,019 - INFO - 🎮 COMMANDES:
+2025-06-12 08:46:55,019 - INFO -   'q' = Quitter | 's' = Screenshot | 'r' = Reset détecteur
+2025-06-12 08:46:55,019 - INFO -   'z' = Reset zoom | '+/-' = Zoom manuel | 'd' = Debug
+2025-06-12 08:46:55,020 - INFO -   'c' = Calibrage couleurs | 'e' = Ajust exposition
+2025-06-12 08:46:55,020 - INFO - ======================================================================
+2025-06-12 08:46:55,020 - INFO - 🎯 OPTIMISATIONS:
+2025-06-12 08:46:55,020 - INFO -   ✓ Équilibrage rouge/orange automatique
+2025-06-12 08:46:55,021 - INFO -   ✓ Correction exposition adaptative
+2025-06-12 08:46:55,021 - INFO -   ✓ Zoom prédictif avec tracking
+2025-06-12 08:46:55,021 - INFO -   ✓ Scoring qualité bicolore
+2025-06-12 08:46:55,021 - INFO -   ✓ Morphologie adaptée au zoom
+2025-06-12 08:46:55,022 - INFO - ======================================================================
+2025-06-12 08:46:55,022 - INFO - 🎬 Démarrage détection optimisée...
+2025-06-12 08:47:03,134 - INFO - 📊 FPS: 11.1 | Détections: 0.0% | Qualité moy: 0.00 | Zoom: 1.0x | Exposition: 1.00
+2025-06-12 08:47:09,635 - INFO - 📊 FPS: 13.8 | Détections: 2.2% | Qualité moy: 0.61 | Zoom: 1.0x | Exposition: 1.00
+2025-06-12 08:47:15,137 - INFO - 📊 FPS: 16.4 | Détections: 1.5% | Qualité moy: 0.61 | Zoom: 1.0x | Exposition: 1.00
+2025-06-12 08:47:19,938 - INFO - 📊 FPS: 18.7 | Détections: 22.5% | Qualité moy: 0.61 | Zoom: 1.0x | Exposition: 1.00
+2025-06-12 08:47:24,166 - INFO - 📊 FPS: 21.3 | Détections: 38.0% | Qualité moy: 0.61 | Zoom: 1.0x | Exposition: 1.00
+2025-06-12 08:47:30,284 - INFO - 📊 FPS: 14.7 | Détections: 42.2% | Qualité moy: 0.67 | Zoom: 1.5x | Exposition: 1.00
+2025-06-12 08:47:34,763 - INFO - ⌨️ Interruption clavier
+2025-06-12 08:47:34,765 - INFO - 🧹 Nettoyage...
+2025-06-12 08:47:34,765 - INFO - ======================================================================
+2025-06-12 08:47:34,766 - INFO - 📊 STATS FINALES OPTIMISÉES:
+2025-06-12 08:47:34,767 - INFO -   ⏱️ Durée: 43.4s
+2025-06-12 08:47:34,767 - INFO -   🎞️ Frames: 611
+2025-06-12 08:47:34,768 - INFO -   ⚡ FPS moyen: 14.1
+2025-06-12 08:47:34,769 - INFO -   🎯 Détections: 228 (37.3%)
+2025-06-12 08:47:34,769 - INFO -   ⭐ Détections qualité: 21 (9.2%)
+2025-06-12 08:47:34,770 - INFO -   📈 Qualité moyenne: 0.67
+2025-06-12 08:47:34,771 - INFO -   🔍 Zoom final: 1.0x
+2025-06-12 08:47:34,771 - INFO -   📈 Ajustements zoom: 230
+2025-06-12 08:47:34,772 - INFO -   💡 Exposition finale: 1.00
+2025-06-12 08:47:34,772 - INFO -   📸 Screenshots: 0
+2025-06-12 08:47:34,773 - INFO -   🎨 Équilibrage final R/O: 0.00/1.00
+2025-06-12 08:47:34,774 - INFO -   📏 Aire moyenne: 2414
+2025-06-12 08:47:34,775 - INFO - ======================================================================
+2025-06-12 08:47:34,777 - INFO - ✅ Pipeline fermé
+2025-06-12 08:47:34,793 - INFO - ✅ Interface fermée
+2025-06-12 08:47:35,296 - INFO - ✅ Drone déconnecté
+2025-06-12 08:47:35,298 - INFO - 🎉 Session détection optimisée terminée!
