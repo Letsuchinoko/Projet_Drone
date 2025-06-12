@@ -24,32 +24,32 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# === CONTRÔLEUR DRONE OPTIMISÉ CLAVIER ===
+# === CONTRÔLEUR DRONE OPTIMISÉ AVEC PROTECTION FLUX VIDÉO ===
 class OptimizedDroneController:
     def __init__(self, bebop):
         self.bebop = bebop
         self.is_flying = False
         self.last_command_time = 0
-        self.command_cooldown = 0.1  # 100ms entre commandes pour éviter spam
+        self.command_cooldown = 0.08  # Réduit à 80ms pour + de réactivité
         
         # Paramètres de vol optimisés
-        self.movement_duration = 0.2  # Durée des mouvements (réduite pour réactivité)
-        self.movement_power = 20      # Puissance des mouvements (ajustable)
+        self.movement_duration = 0.15  # Réduit pour éviter conflits vidéo
+        self.movement_power = 20      # Puissance des mouvements
         self.rotation_power = 30      # Puissance des rotations
         self.vertical_power = 15      # Puissance montée/descente
         
-        # État des touches pressées (pour mouvements continus)
-        self.keys_pressed = set()
-        self.last_movement_time = 0
-        self.continuous_movement_interval = 0.15  # Répétition des mouvements
+        # Protection flux vidéo
+        self.video_protection_mode = True  # Mode protection pendant commandes
+        self.commands_in_sequence = 0
+        self.max_sequence_commands = 3     # Max 3 commandes consécutives
         
         # Statistiques
         self.commands_sent = 0
         self.takeoff_time = None
         
-        logger.info("🎮 Contrôleur drone optimisé initialisé")
-        logger.info("🚁 Paramètres: power={}, duration={:.1f}s, cooldown={:.1f}s".format(
-            self.movement_power, self.movement_duration, self.command_cooldown))
+        logger.info("🎮 Contrôleur drone optimisé (protection vidéo) initialisé")
+        logger.info("🚁 Paramètres: power={}, duration={:.2f}s, cooldown={:.0f}ms".format(
+            self.movement_power, self.movement_duration, self.command_cooldown*1000))
 
     def can_send_command(self):
         """Vérifie si on peut envoyer une commande (anti-spam)"""
@@ -60,12 +60,16 @@ class OptimizedDroneController:
         return False
 
     def send_movement_command(self, roll=0, pitch=0, yaw=0, vertical=0, command_name=""):
-        """Envoi commande de mouvement avec gestion d'erreurs"""
+        """Envoi commande de mouvement avec protection flux vidéo"""
         if not self.can_send_command():
             return False
             
         try:
             if self.is_flying:
+                # Protection flux vidéo : pause courte avant/après commande
+                if self.video_protection_mode:
+                    time.sleep(0.02)  # Micro-pause avant
+                
                 self.bebop.fly_direct(
                     roll=roll, 
                     pitch=pitch, 
@@ -73,8 +77,18 @@ class OptimizedDroneController:
                     vertical_movement=vertical, 
                     duration=self.movement_duration
                 )
+                
                 self.commands_sent += 1
-                logger.debug(f"🎮 {command_name}: roll={roll}, pitch={pitch}, yaw={yaw}, vertical={vertical}")
+                self.commands_in_sequence += 1
+                
+                # Pause supplémentaire si trop de commandes consécutives
+                if self.commands_in_sequence >= self.max_sequence_commands:
+                    if self.video_protection_mode:
+                        time.sleep(0.05)  # Pause pour stabiliser flux
+                    self.commands_in_sequence = 0
+                    logger.debug(f"🛡️ Pause protection flux après {self.max_sequence_commands} commandes")
+                
+                logger.debug(f"🎮 {command_name}: r={roll}, p={pitch}, y={yaw}, v={vertical}")
                 return True
             else:
                 logger.warning(f"⚠️ Commande {command_name} ignorée - drone non en vol")
@@ -182,12 +196,14 @@ class OptimizedDroneController:
             'rotation_power': self.rotation_power,
             'vertical_power': self.vertical_power,
             'commands_sent': self.commands_sent,
-            'flight_time': time.time() - self.takeoff_time if self.takeoff_time else 0
+            'flight_time': time.time() - self.takeoff_time if self.takeoff_time else 0,
+            'video_protection': self.video_protection_mode,
+            'sequence_commands': self.commands_in_sequence
         }
         return status
 
 
-# === DÉTECTEUR GANT OPTIMISÉ (IDENTIQUE AU CODE ORIGINAL) ===
+# === DÉTECTEUR GANT OPTIMISÉ AVEC ANALYSE BICOLORE (COMPLET) ===
 class OptimizedBicolorGloveDetector:
     def __init__(self):
         # Configuration de base
@@ -1090,10 +1106,10 @@ class OptimizedBicolorGloveDetector:
 
 
 def main():
-    """Fonction principale optimisée avec contrôle clavier direct"""
+    """Fonction principale optimisée avec contrôle clavier direct et flux vidéo stabilisé"""
     logger.info("=== BEBOP 2 OPTIMIZED BICOLOR DETECTION + DIRECT KEYBOARD CONTROL ===")
     logger.info("🎯 Détection gant bicolore optimisée rouge/orange")
-    logger.info("🎮 Contrôle drone direct par clavier")
+    logger.info("🎮 Contrôle drone direct par clavier avec protection flux")
     
     bebop = None
     pipe = None
@@ -1119,42 +1135,47 @@ def main():
         bebop.start_video_stream()
         time.sleep(2)
         
-        # === PIPELINE FFMPEG OPTIMISÉ ===
+        # === PIPELINE FFMPEG OPTIMISÉ POUR STABILITÉ ===
         sdp_path = os.path.join(os.path.dirname(pyparrot.__file__), "utils", "bebop.sdp")
         if not os.path.exists(sdp_path):
             logger.error(f"❌ SDP introuvable: {sdp_path}")
             return False
         
-        # FFmpeg avec paramètres optimisés pour qualité couleur
+        # FFmpeg avec paramètres optimisés pour stabilité pendant pilotage
         ffmpeg_cmd = [
             'ffmpeg',
             '-protocol_whitelist', 'file,rtp,udp',
-            '-fflags', 'nobuffer',
+            '-fflags', 'nobuffer+flush_packets',  # Flush immédiat
             '-flags', 'low_delay',
             '-avioflags', 'direct',
-            '-analyzeduration', '1000000',
-            '-probesize', '1000000',
+            '-analyzeduration', '500000',  # Réduit pour réactivité
+            '-probesize', '500000',        # Réduit pour réactivité
+            '-max_delay', '100000',        # Max 100ms de délai
             '-i', sdp_path,
             '-vf', 'eq=saturation=1.1:gamma=0.95',
             '-f', 'rawvideo',
             '-pix_fmt', 'bgr24',
+            '-threads', '2',               # Limite threads pour éviter conflits
             '-'
         ]
         
-        logger.info(f"🚀 FFmpeg optimisé couleurs: {' '.join(ffmpeg_cmd)}")
+        logger.info(f"🚀 FFmpeg optimisé stabilité: {' '.join(ffmpeg_cmd)}")
+        
+        video_buffer_size = 8 * 1024 * 1024  # 8MB buffer pour stabilité
         
         try:
-            pipe = subprocess.Popen(ffmpeg_cmd, stdout=subprocess.PIPE, bufsize=2*1024*1024)
-            logger.info("✅ Pipeline optimisé initialisé")
+            pipe = subprocess.Popen(ffmpeg_cmd, stdout=subprocess.PIPE, 
+                                  bufsize=video_buffer_size)
+            logger.info("✅ Pipeline stabilisé initialisé")
         except FileNotFoundError:
             logger.error("❌ FFmpeg non trouvé!")
             return False
 
-        # === DÉTECTEUR OPTIMISÉ ===
+        # === DÉTECTEUR OPTIMISÉ COMPLET ===
         detector = OptimizedBicolorGloveDetector()
         
         # === INTERFACE ===
-        window_name = "Bebop 2 - Détection Bicolore + Contrôle Direct"
+        window_name = "Bebop 2 - Détection Bicolore + Contrôle Direct Stabilisé"
         cv2.namedWindow(window_name, cv2.WINDOW_AUTOSIZE)
         
         logger.info("=" * 80)
@@ -1168,35 +1189,61 @@ def main():
         logger.info("🔧 COMMANDES DÉTECTION:")
         logger.info("  'o' = Screenshot | 'p' = Reset détecteur | 'i' = Reset zoom")
         logger.info("  'u' = Calibrage couleurs | 'y' = Reset exposition | 'h' = Debug")
+        logger.info("  'v' = Toggle protection vidéo | 'b' = Reset séquence")
         logger.info("=" * 80)
         logger.info("🎯 OPTIMISATIONS:")
-        logger.info("  ✓ Contrôle drone ultra-réactif (100ms latence)")
+        logger.info("  ✓ Contrôle drone ultra-réactif (80ms latence)")
+        logger.info("  ✓ Flux vidéo stabilisé pendant pilotage")
         logger.info("  ✓ Équilibrage rouge/orange automatique")
         logger.info("  ✓ Correction exposition adaptative")
         logger.info("  ✓ Zoom prédictif avec tracking")
         logger.info("  ✓ Interface de vol intégrée")
+        logger.info("  ✓ Gestion intelligente des frames manquées")
         logger.info("=" * 80)
         
-        # === BOUCLE PRINCIPALE OPTIMISÉE ===
-        logger.info("🎬 Démarrage détection + contrôle direct...")
-        
+        # === VARIABLES POUR GESTION FLUX STABILISÉ ===
+        frame_skip_counter = 0
+        max_frame_skip = 2
+        last_valid_frame = None
         screenshot_count = 0
         last_fps_log = time.time()
         fps_counter = 0
         last_status_log = time.time()
         
+        # === BOUCLE PRINCIPALE OPTIMISÉE ===
+        logger.info("🎬 Démarrage détection + contrôle direct stabilisé...")
+        
         while True:
             try:
-                # Lecture frame
-                raw_frame = pipe.stdout.read(WIDTH * HEIGHT * 3)
-                
-                if len(raw_frame) != WIDTH * HEIGHT * 3:
-                    logger.warning("⚠️ Frame incomplète, reconnexion...")
-                    continue
-                
-                frame = np.frombuffer(raw_frame, np.uint8).reshape((HEIGHT, WIDTH, 3))
-                
-                # Détection optimisée
+                # === LECTURE FRAME STABILISÉE ===
+                try:
+                    raw_frame = pipe.stdout.read(WIDTH * HEIGHT * 3)
+                    
+                    if len(raw_frame) != WIDTH * HEIGHT * 3:
+                        frame_skip_counter += 1
+                        logger.debug(f"⚠️ Frame incomplète #{frame_skip_counter}")
+                        
+                        # Si trop de frames manquées, utiliser la dernière valide
+                        if frame_skip_counter > max_frame_skip and last_valid_frame is not None:
+                            logger.debug("🔄 Utilisation dernière frame valide")
+                            frame = last_valid_frame.copy()
+                            frame_skip_counter = 0
+                        else:
+                            continue
+                    else:
+                        frame = np.frombuffer(raw_frame, np.uint8).reshape((HEIGHT, WIDTH, 3))
+                        last_valid_frame = frame.copy()
+                        frame_skip_counter = 0
+                        
+                except Exception as read_error:
+                    logger.debug(f"❌ Erreur lecture frame: {read_error}")
+                    if last_valid_frame is not None:
+                        frame = last_valid_frame.copy()
+                        logger.debug("🔄 Frame de secours utilisée")
+                    else:
+                        continue
+
+                # === DÉTECTION OPTIMISÉE COMPLÈTE ===
                 processed_frame, detected = detector.detect_glove_optimized(frame)
                 
                 # === AFFICHAGE INFORMATIONS DE VOL ===
@@ -1213,10 +1260,15 @@ def main():
                 cv2.putText(processed_frame, power_text, (WIDTH - 250, 60), 
                            cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
                 
+                # Protection flux vidéo
+                protection_text = f"Protection: {'ON' if drone_status['video_protection'] else 'OFF'}"
+                cv2.putText(processed_frame, protection_text, (WIDTH - 150, 90), 
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.4, (100, 255, 255), 1)
+                
                 # Temps de vol
                 if drone_status['flying'] and drone_status['flight_time'] > 0:
                     flight_time_text = f"Vol: {drone_status['flight_time']:.0f}s"
-                    cv2.putText(processed_frame, flight_time_text, (WIDTH - 120, 90), 
+                    cv2.putText(processed_frame, flight_time_text, (WIDTH - 120, 120), 
                                cv2.FONT_HERSHEY_SIMPLEX, 0.4, (100, 255, 100), 1)
                 
                 # Commandes envoyées
@@ -1227,10 +1279,9 @@ def main():
                 # === AFFICHAGE ===
                 cv2.imshow(window_name, processed_frame)
                 
-                # === GESTION TOUCHES OPTIMISÉE ===
+                # === GESTION TOUCHES ULTRA-RÉACTIVE ===
                 key = cv2.waitKey(1) & 0xFF
                 
-                # Traitement immédiat des commandes drone
                 if key != 255:  # Une touche a été pressée
                     
                     # === COMMANDES DRONE (PRIORITÉ MAXIMALE) ===
@@ -1276,6 +1327,15 @@ def main():
                         detector.brightness_history.clear()
                         logger.info("💡 Exposition reset")
                         
+                    elif key == ord('v'):  # Toggle protection vidéo
+                        drone_controller.video_protection_mode = not drone_controller.video_protection_mode
+                        mode_text = "ACTIVÉE" if drone_controller.video_protection_mode else "DÉSACTIVÉE"
+                        logger.info(f"🛡️ Protection flux vidéo: {mode_text}")
+                        
+                    elif key == ord('b'):  # Reset séquence commandes
+                        drone_controller.commands_in_sequence = 0
+                        logger.info("🔄 Séquence commandes reset")
+                        
                     elif key == ord('h'):  # Debug détaillé
                         current_time = time.time()
                         if current_time - last_status_log > 2.0:  # Éviter spam
@@ -1291,6 +1351,8 @@ def main():
                             logger.info(f"   État: {'EN VOL' if drone_status['flying'] else 'AU SOL'}")
                             logger.info(f"   Puissances: M{drone_status['movement_power']} R{drone_status['rotation_power']} V{drone_status['vertical_power']}")
                             logger.info(f"   Commandes envoyées: {drone_status['commands_sent']}")
+                            logger.info(f"   Protection vidéo: {'ON' if drone_status['video_protection'] else 'OFF'}")
+                            logger.info(f"   Séquence actuelle: {drone_status['sequence_commands']}")
                             if drone_status['flying']:
                                 logger.info(f"   Temps de vol: {drone_status['flight_time']:.1f}s")
                             
@@ -1301,6 +1363,12 @@ def main():
                                 logger.info(f"   Qualité min/moy/max: {min(detector.quality_scores):.2f}/"
                                            f"{np.mean(detector.quality_scores):.2f}/"
                                            f"{max(detector.quality_scores):.2f}")
+                            if detector.area_history:
+                                logger.info(f"   Aires récentes: {list(detector.area_history)[-5:]}")
+                            
+                            logger.info(f"   === FLUX VIDÉO ===")
+                            logger.info(f"   Frames skip: {frame_skip_counter}")
+                            logger.info(f"   Frame valide dispo: {'OUI' if last_valid_frame is not None else 'NON'}")
                             last_status_log = current_time
 
                 # === LOGS PÉRIODIQUES OPTIMISÉS ===
@@ -1316,12 +1384,14 @@ def main():
                     
                     # Log avec info drone
                     drone_info = f"{'VOL' if drone_status['flying'] else 'SOL'} ({drone_status['commands_sent']} cmd)"
+                    protection_info = f"Prot:{'ON' if drone_status['video_protection'] else 'OFF'}"
                     
                     logger.info(f"📊 FPS: {display_fps:.1f} | "
                                f"Détections: {det_rate:.1f}% | "
                                f"Qualité: {qual_avg:.2f} | "
                                f"Zoom: {detector.zoom_factor:.1f}x | "
-                               f"Drone: {drone_info}")
+                               f"Drone: {drone_info} | "
+                               f"{protection_info}")
                     last_fps_log = current_time
 
             except KeyboardInterrupt:
@@ -1375,6 +1445,7 @@ def main():
             if drone_controller.takeoff_time:
                 total_flight_time = drone_status['flight_time'] if drone_status['flying'] else (time.time() - drone_controller.takeoff_time)
                 logger.info(f"  ✈️ Temps de vol total: {total_flight_time:.1f}s")
+            logger.info(f"  🛡️ Protection vidéo finale: {'ON' if drone_status['video_protection'] else 'OFF'}")
             
             if detector.red_orange_ratio_history:
                 final_ratios = np.mean(detector.red_orange_ratio_history, axis=0)
@@ -1403,7 +1474,7 @@ def main():
             except:
                 pass
         
-        logger.info("🎉 Session détection + contrôle direct terminée!")
+        logger.info("🎉 Session détection optimisée + contrôle direct stabilisé terminée!")
     
     return True
 
