@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import time
 import subprocess
+import threading
 import sys
 import logging
 import os
@@ -9,7 +10,7 @@ import pyparrot
 from pyparrot.Bebop import Bebop
 from collections import deque
 
-# === PARAMÈTRES OPTIMISÉS DETECTION BICOLORE PURE ===
+# === PARAMÈTRES OPTIMISÉS AVEC DETECTION BICOLORE AMÉLIORÉE ===
 BEBOP_IP = "192.168.42.1"
 WIDTH, HEIGHT = 856, 480
 
@@ -18,17 +19,17 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
         logging.StreamHandler(sys.stdout),
-        logging.FileHandler('bebop_pure_detection.log', mode='w', encoding='utf-8')
+        logging.FileHandler('bebop_optimized_detection.log', mode='w', encoding='utf-8')
     ]
 )
 logger = logging.getLogger(__name__)
 
-# === DÉTECTEUR GANT OPTIMISÉ - VERSION PURE ===
+# === DÉTECTEUR GANT OPTIMISÉ AVEC ANALYSE BICOLORE ===
 class OptimizedBicolorGloveDetector:
     def __init__(self):
         # Configuration de base
-        self.detection_history = deque(maxlen=15)
-        self.stable_detections = deque(maxlen=5)
+        self.detection_history = deque(maxlen=15)  # Plus long pour stabilité
+        self.stable_detections = deque(maxlen=5)   # Plus strict
         self.confidence_threshold = 3
         
         # Paramètres de détection affinés
@@ -50,7 +51,7 @@ class OptimizedBicolorGloveDetector:
         self.target_zoom = 1.0
         self.zoom_smooth_factor = 0.12
         self.zoom_min = 1.0
-        self.zoom_max = 4.5
+        self.zoom_max = 4.5  # Zoom plus élevé pour distance
         
         # Calibrage amélioré
         self.area_reference = 2800
@@ -666,11 +667,11 @@ class OptimizedBicolorGloveDetector:
             # Interface enrichie
             result_frame = self._create_advanced_overlay(frame, detected, area, quality_score)
             
-            return result_frame
+            return result_frame, detected
             
         except Exception as e:
             logger.debug(f"Finalization error: {e}")
-            return frame
+            return frame, False
 
     def _draw_advanced_detection(self, frame, contour, area, quality_score):
         """Visualisation avancée de la détection"""
@@ -925,11 +926,51 @@ class OptimizedBicolorGloveDetector:
             logger.debug(f"Tracking zone error: {e}")
 
 
+# === CONTRÔLE DRONE SIMPLE ===
+def simple_drone_control(bebop):
+    logger.info("Contrôle drone démarré.")
+    print("\n[Commandes drone]\n"
+          "  t = décoller | l = atterrir | e = quitter\n"
+          "  f/b/g/d = mouvements | h/m = haut/bas | a/c = rotations\n")
+    
+    while True:
+        try:
+            key = input("> ").strip().lower()
+        except EOFError:
+            break
+            
+        if key == 't':
+            bebop.safe_takeoff(10)
+            print("✈️ Décollage")
+        elif key == 'l':
+            bebop.safe_land(10)
+            print("🛬 Atterrissage")
+        elif key == 'e':
+            bebop.safe_land(10)
+            bebop.disconnect()
+            print("🔚 Arrêt")
+            break
+        elif key == 'f':
+            bebop.fly_direct(roll=0, pitch=25, yaw=0, vertical_movement=0, duration=0.3)
+        elif key == 'b':
+            bebop.fly_direct(roll=0, pitch=-25, yaw=0, vertical_movement=0, duration=0.3)
+        elif key == 'g':
+            bebop.fly_direct(roll=-25, pitch=0, yaw=0, vertical_movement=0, duration=0.3)
+        elif key == 'd':
+            bebop.fly_direct(roll=25, pitch=0, yaw=0, vertical_movement=0, duration=0.3)
+        elif key == 'h':
+            bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=20, duration=0.3)
+        elif key == 'm':
+            bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=-20, duration=0.3)
+        elif key == 'a':
+            bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=0, duration=0.3)
+        elif key == 'c':
+            bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=0, duration=0.3)
+
 def main():
-    """Fonction principale - Mode Détection Pure"""
-    logger.info("=== BEBOP 2 OPTIMIZED BICOLOR DETECTION - PURE MODE ===")
+    """Fonction principale optimisée"""
+    logger.info("=== BEBOP 2 OPTIMIZED BICOLOR DETECTION ===")
     logger.info("🎯 Détection gant bicolore optimisée rouge/orange")
-    logger.info("🚫 Mode détection pure - AUCUNE commande drone")
     
     bebop = None
     pipe = None
@@ -937,19 +978,23 @@ def main():
     start_time = time.time()
     
     try:
-        # === CONNEXION DRONE (FLUX UNIQUEMENT) ===
+        # === CONNEXION DRONE ===
         logger.info("📡 Connexion au drone...")
         bebop = Bebop()
         if not bebop.connect(10):
             logger.error("❌ Échec connexion drone")
             return False
 
-        logger.info("✅ Drone connecté! (mode détection pure)")
+        logger.info("✅ Drone connecté!")
         
-        # === FLUX VIDÉO UNIQUEMENT ===
+        # === FLUX VIDÉO ===
         logger.info("📹 Démarrage flux vidéo...")
         bebop.start_video_stream()
         time.sleep(2)
+        
+        # === CONTRÔLE DRONE ===
+        ctrl_thread = threading.Thread(target=simple_drone_control, args=(bebop,), daemon=True)
+        ctrl_thread.start()
         
         # === PIPELINE FFMPEG OPTIMISÉ ===
         sdp_path = os.path.join(os.path.dirname(pyparrot.__file__), "utils", "bebop.sdp")
@@ -986,7 +1031,7 @@ def main():
         detector = OptimizedBicolorGloveDetector()
         
         # === INTERFACE ===
-        window_name = "Bebop 2 - Détection Bicolore Pure"
+        window_name = "Bebop 2 - Détection Bicolore Optimisée"
         cv2.namedWindow(window_name, cv2.WINDOW_AUTOSIZE)
         
         logger.info("=" * 70)
@@ -1001,11 +1046,10 @@ def main():
         logger.info("  ✓ Zoom prédictif avec tracking")
         logger.info("  ✓ Scoring qualité bicolore")
         logger.info("  ✓ Morphologie adaptée au zoom")
-        logger.info("  🚫 AUCUNE commande drone (flux stable)")
         logger.info("=" * 70)
         
-        # === BOUCLE PRINCIPALE PURE ===
-        logger.info("🎬 Démarrage détection pure...")
+        # === BOUCLE PRINCIPALE OPTIMISÉE ===
+        logger.info("🎬 Démarrage détection optimisée...")
         
         screenshot_count = 0
         last_fps_log = time.time()
@@ -1055,9 +1099,9 @@ def main():
                     
                 elif key == ord('s'):
                     timestamp = int(time.time())
-                    screenshot_name = f"pure_capture_{timestamp}_{screenshot_count:03d}.png"
+                    screenshot_name = f"optimized_capture_{timestamp}_{screenshot_count:03d}.png"
                     cv2.imwrite(screenshot_name, processed_frame)
-                    logger.info(f"📸 Screenshot: {screenshot_name}")
+                    logger.info(f"📸 Screenshot optimisé: {screenshot_name}")
                     screenshot_count += 1
                     
                 elif key == ord('r'):
@@ -1094,7 +1138,7 @@ def main():
                     
                 elif key == ord('d'):
                     # Debug détaillé
-                    logger.info("🔍 INFOS DEBUG PURE:")
+                    logger.info("🔍 INFOS DEBUG OPTIMISÉES:")
                     logger.info(f"   Frames total: {detector.frame_count}")
                     logger.info(f"   Détections: {detector.detection_count}")
                     logger.info(f"   Détections qualité: {detector.quality_count}")
@@ -1134,7 +1178,7 @@ def main():
             avg_quality = np.mean(detector.quality_scores) if detector.quality_scores else 0
             
             logger.info("=" * 70)
-            logger.info("📊 STATS FINALES MODE PURE:")
+            logger.info("📊 STATS FINALES OPTIMISÉES:")
             logger.info(f"  ⏱️ Durée: {total_runtime:.1f}s")
             logger.info(f"  🎞️ Frames: {detector.frame_count}")
             logger.info(f"  ⚡ FPS moyen: {detector.frame_count/max(total_runtime,1):.1f}")
@@ -1172,7 +1216,7 @@ def main():
             except:
                 pass
         
-        logger.info("🎉 Session détection pure terminée!")
+        logger.info("🎉 Session détection optimisée terminée!")
     
     return True
 
