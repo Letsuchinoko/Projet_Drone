@@ -487,7 +487,7 @@ class HandPositionRecognizer:
                 shutil.rmtree(model_dir)
             
             # Sauvegarde au format TensorFlow moderne
-            self.model.save(model_dir, save_format='tf')
+            self.model.save(model_dir)
             self.logging.info(f"✅ Modèle TF sauvegardé: {model_dir}")
             
             # === SAUVEGARDE DONNÉES ===
@@ -855,8 +855,8 @@ class OptimizedBicolorGloveDetectorWithAI:
                         os.makedirs(model_path, exist_ok=True)
                         
                         # Sauvegarde TensorFlow moderne
-                        self.position_recognizer.model.save(model_path, save_format='tf')
-                        
+                        self.position_recognizer.model.save(model_path)
+
                         # Sauvegarde données séparément
                         import pickle
                         data_path = f"{model_path}_data.pkl"
