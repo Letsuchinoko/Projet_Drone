@@ -1,76 +1,63 @@
-2025-06-12 09:43:32,560 - INFO - 📁 Dossier IA créé: ai_dataset
-2025-06-12 09:43:32,560 - INFO - === BEBOP 2 AI READY DETECTION - LONGUE DISTANCE ===
-2025-06-12 09:43:32,560 - INFO - 🧠 Détection gant pour IA - Longue distance optimisée
-2025-06-12 09:43:32,560 - INFO - 🚫 Mode détection pure - AUCUNE commande drone
-2025-06-12 09:43:32,560 - INFO - 📡 Connexion au drone...
-2025-06-12 09:43:33,634 - INFO - ✅ Drone connecté! (mode détection pure)
-2025-06-12 09:43:33,635 - INFO - 📹 Démarrage flux vidéo...
-2025-06-12 09:43:36,138 - INFO - 🚀 FFmpeg IA longue distance: ffmpeg -protocol_whitelist file,rtp,udp -fflags nobuffer -flags low_delay -avioflags direct -analyzeduration 1500000 -probesize 1500000 -i C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\utils\bebop.sdp -vf eq=saturation=1.2:gamma=0.9:contrast=1.1 -f rawvideo -pix_fmt bgr24 -
-2025-06-12 09:43:36,155 - INFO - ✅ Pipeline IA initialisé
-2025-06-12 09:43:36,156 - INFO - 🧠 Détecteur IA Ready initialisé
-2025-06-12 09:43:36,156 - INFO - 📏 Longue distance: aire min=80, zoom max=6.0x
-2025-06-12 09:43:36,222 - INFO - ================================================================================
-2025-06-12 09:43:36,222 - INFO - 🧠 MODE IA READY - DÉTECTION PURE:
-2025-06-12 09:43:36,222 - INFO -   🚫 Aucune commande drone (flux stable)
-2025-06-12 09:43:36,223 - INFO -   📏 Optimisé longue distance (aire min: 80)
-2025-06-12 09:43:36,223 - INFO -   🔍 Zoom max: 6.0x pour objets distants
-2025-06-12 09:43:36,223 - INFO -   💾 Échantillons IA auto-sauvés
-2025-06-12 09:43:36,224 - INFO - ================================================================================
-2025-06-12 09:43:36,224 - INFO - 🎮 COMMANDES INTERFACE:
-2025-06-12 09:43:36,224 - INFO -   'q' = Quitter | 's' = Screenshot | 'r' = Reset détecteur
-2025-06-12 09:43:36,225 - INFO -   'z' = Reset zoom | '+/-' = Zoom manuel | 'd' = Debug IA
-2025-06-12 09:43:36,225 - INFO -   'c' = Calibrage couleurs | 'e' = Reset exposition
-2025-06-12 09:43:36,225 - INFO -   'i' = Info IA | 'x' = Export manuel IA
-2025-06-12 09:43:36,225 - INFO - ================================================================================
-2025-06-12 09:43:36,226 - INFO - 🎬 Démarrage détection IA longue distance...
-2025-06-12 09:43:46,576 - INFO - 🧠 IA samples: 50 échantillons sauvés
-2025-06-12 09:43:49,213 - INFO - 🧠 IA | FPS: 9.2 | Détections: 100.0% | Qualité: 0.00 | Zoom: 1.0x | Samples: 65
-2025-06-12 09:43:54,494 - INFO - 🧠 IA samples: 100 échantillons sauvés
-2025-06-12 09:43:59,682 - INFO - 🧠 IA | FPS: 11.5 | Détections: 100.0% | Qualité: 0.00 | Zoom: 1.0x | Samples: 131
-2025-06-12 09:44:02,361 - INFO - 🧠 IA samples: 150 échantillons sauvés
-2025-06-12 09:44:08,729 - INFO - 🧠 IA | FPS: 13.3 | Détections: 100.0% | Qualité: 0.00 | Zoom: 1.0x | Samples: 193
-2025-06-12 09:44:09,732 - INFO - 🧠 IA samples: 200 échantillons sauvés
-2025-06-12 09:44:17,236 - INFO - 🧠 IA samples: 250 échantillons sauvés
-2025-06-12 09:44:18,106 - INFO - 🧠 IA | FPS: 12.8 | Détections: 100.0% | Qualité: 0.00 | Zoom: 1.0x | Samples: 255
-2025-06-12 09:44:24,910 - INFO - 🧠 IA samples: 300 échantillons sauvés
-2025-06-12 09:44:28,032 - INFO - 🧠 IA | FPS: 12.1 | Détections: 100.0% | Qualité: 0.00 | Zoom: 1.0x | Samples: 319
-2025-06-12 09:44:32,470 - INFO - 🧠 IA samples: 350 échantillons sauvés
-2025-06-12 09:44:36,973 - INFO - 🧠 IA | FPS: 13.4 | Détections: 100.0% | Qualité: 0.00 | Zoom: 1.0x | Samples: 380
-2025-06-12 09:44:39,329 - INFO - ⌨️ Interruption clavier
-2025-06-12 09:44:39,330 - INFO - 🧹 Nettoyage IA...
-2025-06-12 09:44:39,330 - INFO - ================================================================================
-2025-06-12 09:44:39,331 - INFO - 🧠 STATS FINALES IA LONGUE DISTANCE:
-2025-06-12 09:44:39,331 - INFO -   ⏱️ Durée session: 66.8s
-2025-06-12 09:44:39,331 - INFO -   🎞️ Frames traitées: 750
-2025-06-12 09:44:39,331 - INFO -   ⚡ FPS moyen: 11.2
-2025-06-12 09:44:39,331 - INFO -   🎯 Détections totales: 749 (99.9%)
-2025-06-12 09:44:39,331 - INFO -   ⭐ Détections qualité: 0 (0.0%)
-2025-06-12 09:44:39,332 - INFO -   📈 Qualité moyenne: 0.00
-2025-06-12 09:44:39,332 - INFO -   🔍 Zoom final: 1.0x (max: 6.0x)
-2025-06-12 09:44:39,332 - INFO -   📈 Ajustements zoom: 749
-2025-06-12 09:44:39,332 - INFO -   💡 Exposition finale: 1.60
-2025-06-12 09:44:39,332 - INFO -   📸 Screenshots: 0
-2025-06-12 09:44:39,332 - INFO -   🧠 DATASET IA:
-2025-06-12 09:44:39,333 - INFO -       📁 Dossier: ai_dataset
-2025-06-12 09:44:39,333 - INFO -       💾 Échantillons auto: 395
-2025-06-12 09:44:39,333 - INFO -       ✋ Exports manuels: 0
-2025-06-12 09:44:39,333 - INFO -       📊 Total échantillons: 395
-2025-06-12 09:44:39,334 - INFO -       🔢 Taille IA: (224, 224)
-2025-06-12 09:44:39,334 - INFO -   📏 LONGUE DISTANCE:
-2025-06-12 09:44:39,334 - INFO -       🎯 Aire minimum: 80 (vs 200 standard)
-2025-06-12 09:44:39,334 - INFO -       🔍 Zoom maximum: 6.0x (vs 4.5x standard)
-2025-06-12 09:44:39,334 - INFO -       📐 Seuils tolérants: aspect 0.25-4.0 (vs 0.4-3.0)
-2025-06-12 09:44:39,335 - INFO -   🎨 Équilibrage final R/O: 0.21/0.79
-2025-06-12 09:44:39,335 - INFO -   📊 Aires détectées: min=33026, med=33026, max=33026
-2025-06-12 09:44:39,335 - INFO - ================================================================================
-2025-06-12 09:44:39,335 - INFO - 🧠 RAPPORT DATASET IA:
-2025-06-12 09:44:39,336 - INFO -    ✅ Dataset prêt avec 395 échantillons
-2025-06-12 09:44:39,336 - INFO -    📁 Emplacement: C:\Users\Baptiste\Documents\GitHub\Projet_Drone\ai_dataset
-2025-06-12 09:44:39,337 - INFO -    📐 Format: 224x224 pixels, fond noir
-2025-06-12 09:44:39,337 - INFO -    🎯 Optimisé pour reconnaissance de gestes
-2025-06-12 09:44:39,338 - INFO -    📈 Qualité moyenne échantillons: 0.00
-2025-06-12 09:44:39,338 - INFO -    🚀 Prêt pour entraînement IA!
-2025-06-12 09:44:39,365 - INFO - ✅ Interfaces IA fermées
-2025-06-12 09:44:39,366 - INFO - ✅ Pipeline IA fermé
-2025-06-12 09:44:39,868 - INFO - ✅ Drone déconnecté (mode IA)
-2025-06-12 09:44:39,869 - INFO - 🎉 Session IA Ready terminée - Dataset prêt!
+2025-06-12 10:13:10,562 - INFO - === BEBOP 2 AVEC IA DE RECONNAISSANCE DE POSITION ===
+2025-06-12 10:13:10,562 - INFO - 🤖 Système de reconnaissance de gestes pour drone
+2025-06-12 10:13:10,563 - WARNING - ⚠️ TensorFlow non disponible - Mode détection simple uniquement
+2025-06-12 10:13:10,563 - INFO -    Pour activer l'IA: pip install tensorflow
+2025-06-12 10:13:10,563 - INFO - 📡 Connexion au drone...
+2025-06-12 10:13:11,664 - INFO - ✅ Drone connecté!
+2025-06-12 10:13:11,665 - INFO - 📹 Démarrage flux vidéo...
+2025-06-12 10:13:14,169 - INFO - Contrôle drone démarré.
+2025-06-12 10:13:14,182 - INFO - ✅ Pipeline vidéo initialisé
+2025-06-12 10:13:14,182 - WARNING - ⚠️ TensorFlow non disponible - IA désactivée
+2025-06-12 10:13:14,184 - WARNING - ⚠️ IA désactivée - TensorFlow requis
+2025-06-12 10:13:14,247 - INFO - ================================================================================
+2025-06-12 10:13:14,248 - INFO - 🎮 COMMANDES:
+2025-06-12 10:13:14,248 - INFO -   'q' = Quitter | 's' = Screenshot | 'r' = Reset
+2025-06-12 10:13:14,249 - INFO - ================================================================================
+2025-06-12 10:13:14,249 - INFO - 🎯 POSITIONS RECONNUES:
+2025-06-12 10:13:14,249 - INFO -   0: poing - Poing fermé - ARRÊT D'URGENCE
+2025-06-12 10:13:14,250 - INFO -   1: paume - Paume ouverte - AVANCER
+2025-06-12 10:13:14,250 - INFO -   2: index - Index pointé - DIRECTION
+2025-06-12 10:13:14,251 - INFO -   3: victoire - Signe V - MONTÉE
+2025-06-12 10:13:14,251 - INFO -   4: ok - Signe OK - VALIDATION/HOVER
+2025-06-12 10:13:14,251 - INFO -   5: pouce - Pouce levé - MONTÉE DOUCE
+2025-06-12 10:13:14,251 - INFO -   6: stop - Main STOP - ARRÊT
+2025-06-12 10:13:14,252 - INFO -   7: salut - Salut - ROTATION
+2025-06-12 10:13:14,252 - INFO - ================================================================================
+2025-06-12 10:13:14,252 - INFO - 🎬 Démarrage détection avec IA...
+2025-06-12 10:13:19,441 - INFO - 📊 FPS: 17.3 | IA désactivée (TensorFlow requis)
+2025-06-12 10:13:22,584 - INFO - 📊 FPS: 28.6 | IA désactivée (TensorFlow requis)
+2025-06-12 10:13:25,504 - INFO - 📊 FPS: 30.8 | IA désactivée (TensorFlow requis)
+2025-06-12 10:13:28,462 - INFO - 📊 FPS: 30.4 | IA désactivée (TensorFlow requis)
+2025-06-12 10:13:31,450 - INFO - 📊 FPS: 30.1 | IA désactivée (TensorFlow requis)
+2025-06-12 10:13:34,459 - INFO - 📊 FPS: 29.9 | IA désactivée (TensorFlow requis)
+2025-06-12 10:13:37,461 - INFO - 📊 FPS: 30.0 | IA désactivée (TensorFlow requis)
+2025-06-12 10:13:40,746 - INFO - 📊 FPS: 27.4 | IA désactivée (TensorFlow requis)
+2025-06-12 10:13:43,703 - INFO - 📊 FPS: 30.4 | IA désactivée (TensorFlow requis)
+2025-06-12 10:13:46,712 - INFO - 📊 FPS: 29.9 | IA désactivée (TensorFlow requis)
+2025-06-12 10:13:49,715 - INFO - 📊 FPS: 30.0 | IA désactivée (TensorFlow requis)
+2025-06-12 10:13:52,715 - INFO - 📊 FPS: 30.0 | IA désactivée (TensorFlow requis)
+2025-06-12 10:13:55,705 - INFO - 📊 FPS: 30.1 | IA désactivée (TensorFlow requis)
+2025-06-12 10:13:58,735 - INFO - 📊 FPS: 29.7 | IA désactivée (TensorFlow requis)
+2025-06-12 10:14:01,740 - INFO - 📊 FPS: 29.9 | IA désactivée (TensorFlow requis)
+2025-06-12 10:14:04,766 - INFO - 📊 FPS: 29.7 | IA désactivée (TensorFlow requis)
+2025-06-12 10:14:07,735 - INFO - 📊 FPS: 30.3 | IA désactivée (TensorFlow requis)
+2025-06-12 10:14:10,735 - INFO - 📊 FPS: 30.0 | IA désactivée (TensorFlow requis)
+2025-06-12 10:14:13,745 - INFO - 📊 FPS: 29.9 | IA désactivée (TensorFlow requis)
+2025-06-12 10:14:16,712 - INFO - 📊 FPS: 30.3 | IA désactivée (TensorFlow requis)
+2025-06-12 10:14:19,718 - INFO - 📊 FPS: 29.9 | IA désactivée (TensorFlow requis)
+2025-06-12 10:14:22,723 - INFO - 📊 FPS: 30.0 | IA désactivée (TensorFlow requis)
+2025-06-12 10:14:25,719 - INFO - 📊 FPS: 30.0 | IA désactivée (TensorFlow requis)
+2025-06-12 10:14:28,717 - INFO - 📊 FPS: 30.0 | IA désactivée (TensorFlow requis)
+2025-06-12 10:14:29,112 - INFO - ⌨️ Interruption clavier
+2025-06-12 10:14:29,113 - INFO - 🧹 Nettoyage...
+2025-06-12 10:14:29,114 - INFO - ================================================================================
+2025-06-12 10:14:29,114 - INFO - 📊 STATS FINALES:
+2025-06-12 10:14:29,115 - INFO -   ⏱️ Durée: 78.6s
+2025-06-12 10:14:29,115 - INFO -   🎞️ Frames: 2171
+2025-06-12 10:14:29,116 - INFO -   🎯 Détections gant: 1994
+2025-06-12 10:14:29,116 - INFO -   📸 Screenshots: 0
+2025-06-12 10:14:29,117 - INFO - ================================================================================
+2025-06-12 10:14:29,118 - INFO - ✅ Pipeline fermé
+2025-06-12 10:14:29,128 - INFO - ✅ Interface fermée
+2025-06-12 10:14:29,631 - INFO - ✅ Drone déconnecté
+2025-06-12 10:14:29,632 - INFO - 🎉 Session IA terminée!
