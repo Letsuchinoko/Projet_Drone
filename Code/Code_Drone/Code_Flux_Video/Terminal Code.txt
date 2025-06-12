@@ -1,4 +1,11 @@
-[udp @ 0000023829861ec0] bind failed: Error number -10048 occurred
-[in#0 @ 000002382982e900] Error opening input: Invalid data found when processing input
-Error opening input file C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\utils\bebop.sdp.
-Error opening input files: Invalid data found when processing input
+C:\Users\Baptiste\Documents\GitHub\Projet_Drone> & C:/Users/Baptiste/anaconda3/python.exe c:/Users/Baptiste/Documents/GitHub/Projet_Drone/Code/Code_Drone/Code_Test_IA/test.py
+=== TEST TENSORFLOW ===
+❌ TensorFlow non installé: Traceback (most recent call last):
+  File "C:\Users\Baptiste\anaconda3\Lib\site-packages\tensorflow\python\pywrap_tensorflow.py", line 73, in <module>
+    from tensorflow.python._pywrap_tensorflow_internal import *
+ImportError: DLL load failed while importing _pywrap_tensorflow_internal: Une routine d’initialisation d’une bibliothèque de liens dynamiques (DLL) a échoué.
+
+
+Failed to load the native TensorFlow runtime.
+See https://www.tensorflow.org/install/errors for some common causes and solutions.
+If you need help, create an issue at https://github.com/tensorflow/tensorflow/issues and include the entire stack trace above this error message. 
