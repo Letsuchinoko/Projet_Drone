@@ -1,586 +1,531 @@
-2025-06-12 11:55:30,287 - INFO - === BEBOP 2 AVEC IA DE RECONNAISSANCE DE POSITION ===
-2025-06-12 11:55:30,287 - INFO - 🤖 Système de reconnaissance de gestes pour drone
-2025-06-12 11:55:30,288 - INFO - 📡 Connexion au drone...
-2025-06-12 11:55:31,349 - INFO - ✅ Drone connecté!
-2025-06-12 11:55:31,349 - INFO - 📹 Démarrage flux vidéo...
-2025-06-12 11:55:33,853 - INFO - Contrôle drone démarré.
-2025-06-12 11:55:33,862 - INFO - ✅ Pipeline vidéo initialisé
-2025-06-12 11:55:33,862 - INFO - 🤖 Aucun modèle existant - Utilisez 't' pour entraîner
-2025-06-12 11:55:33,888 - INFO - ================================================================================
-2025-06-12 11:55:33,889 - INFO - 🎮 COMMANDES:
-2025-06-12 11:55:33,889 - INFO -   'q' = Quitter | 's' = Screenshot | 'r' = Reset
-2025-06-12 11:55:33,889 - INFO - 🤖 COMMANDES IA:
-2025-06-12 11:55:33,889 - INFO -   'i' = Info IA | 't' = Entraînement | 'n' = Reconnaissance
-2025-06-12 11:55:33,889 - INFO -   'm' = Sauvegarder | 'l' = Charger | 'c' = Commandes drone
-2025-06-12 11:55:33,889 - INFO - ================================================================================
-2025-06-12 11:55:33,889 - INFO - 🎯 POSITIONS RECONNUES:
-2025-06-12 11:55:33,890 - INFO -   0: poing - Poing fermé - ARRÊT D'URGENCE
-2025-06-12 11:55:33,890 - INFO -   1: paume - Paume ouverte - AVANCER
-2025-06-12 11:55:33,890 - INFO -   2: index - Index pointé - DIRECTION
-2025-06-12 11:55:33,890 - INFO -   3: victoire - Signe V - MONTÉE
-2025-06-12 11:55:33,890 - INFO -   4: ok - Signe OK - VALIDATION/HOVER
-2025-06-12 11:55:33,890 - INFO -   5: pouce - Pouce levé - MONTÉE DOUCE
-2025-06-12 11:55:33,891 - INFO -   6: stop - Main STOP - ARRÊT
-2025-06-12 11:55:33,891 - INFO -   7: salut - Salut - ROTATION
-2025-06-12 11:55:33,891 - INFO - ================================================================================
-2025-06-12 11:55:33,891 - INFO - 🎬 Démarrage détection avec IA...
-2025-06-12 11:55:39,133 - INFO - 📊 FPS: 17.2 | Mode: detection | Détections: 0.0%
-2025-06-12 11:55:42,135 - INFO - 📊 FPS: 30.0 | Mode: detection | Détections: 0.0%
-2025-06-12 11:55:43,408 - INFO - 🎓 Mode entraînement IA démarré
-2025-06-12 11:55:43,408 - INFO - 📝 Positions à entraîner:
-2025-06-12 11:55:43,408 - INFO -    0: poing - Poing fermé - ARRÊT D'URGENCE
-2025-06-12 11:55:43,408 - INFO -    1: paume - Paume ouverte - AVANCER
-2025-06-12 11:55:43,408 - INFO -    2: index - Index pointé - DIRECTION
-2025-06-12 11:55:43,408 - INFO -    3: victoire - Signe V - MONTÉE
-2025-06-12 11:55:43,408 - INFO -    4: ok - Signe OK - VALIDATION/HOVER
-2025-06-12 11:55:43,408 - INFO -    5: pouce - Pouce levé - MONTÉE DOUCE
-2025-06-12 11:55:43,409 - INFO -    6: stop - Main STOP - ARRÊT
-2025-06-12 11:55:43,409 - INFO -    7: salut - Salut - ROTATION
-2025-06-12 11:55:43,409 - INFO - 🎓 Mode entraînement IA activé
-2025-06-12 11:55:43,409 - INFO - Effectuez chaque position quand demandé
-2025-06-12 11:55:45,142 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 19.3%
-2025-06-12 11:55:45,142 - INFO - 🤖 Position: training_poing (confiance: 0.13)
-2025-06-12 11:55:45,438 - INFO - 📊 Échantillon ajouté: poing - Total: 1
-2025-06-12 11:55:46,470 - INFO - 📊 Échantillon ajouté: poing - Total: 2
-2025-06-12 11:55:47,512 - INFO - 📊 Échantillon ajouté: poing - Total: 3
-2025-06-12 11:55:48,146 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 39.4% | Échantillons: 3
-2025-06-12 11:55:48,147 - INFO - 🤖 Position: training_poing (confiance: 0.18)
-2025-06-12 11:55:48,542 - INFO - 📊 Échantillon ajouté: poing - Total: 4
-2025-06-12 11:55:49,660 - INFO - 📊 Échantillon ajouté: poing - Total: 5
-2025-06-12 11:55:50,606 - INFO - 📊 Échantillon ajouté: poing - Total: 6
-2025-06-12 11:55:51,142 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 51.6% | Échantillons: 6
-2025-06-12 11:55:51,142 - INFO - 🤖 Position: training_poing (confiance: 0.23)
-2025-06-12 11:55:51,655 - INFO - 📊 Échantillon ajouté: poing - Total: 7
-2025-06-12 11:55:52,690 - INFO - 📊 Échantillon ajouté: poing - Total: 8
-2025-06-12 11:55:53,715 - INFO - 📊 Échantillon ajouté: poing - Total: 9
-2025-06-12 11:55:54,149 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 59.6% | Échantillons: 9
-2025-06-12 11:55:54,149 - INFO - 🤖 Position: training_poing (confiance: 0.28)
-2025-06-12 11:55:54,757 - INFO - 📊 Échantillon ajouté: poing - Total: 10
-2025-06-12 11:55:55,783 - INFO - 📊 Échantillon ajouté: poing - Total: 11
-2025-06-12 11:55:56,822 - INFO - 📊 Échantillon ajouté: poing - Total: 12
-2025-06-12 11:55:57,155 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 65.4% | Échantillons: 12
-2025-06-12 11:55:57,156 - INFO - 🤖 Position: training_poing (confiance: 0.33)
-2025-06-12 11:55:57,860 - INFO - 📊 Échantillon ajouté: poing - Total: 13
-2025-06-12 11:55:58,888 - INFO - 📊 Échantillon ajouté: poing - Total: 14
-2025-06-12 11:55:59,931 - INFO - 📊 Échantillon ajouté: poing - Total: 15
-2025-06-12 11:56:00,168 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 69.7% | Échantillons: 15
-2025-06-12 11:56:00,169 - INFO - 🤖 Position: training_poing (confiance: 0.38)
-2025-06-12 11:56:00,955 - INFO - 📊 Échantillon ajouté: poing - Total: 16
-2025-06-12 11:56:01,994 - INFO - 📊 Échantillon ajouté: poing - Total: 17
-2025-06-12 11:56:03,032 - INFO - 📊 Échantillon ajouté: poing - Total: 18
-2025-06-12 11:56:03,167 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 73.1% | Échantillons: 18
-2025-06-12 11:56:03,167 - INFO - 🤖 Position: training_poing (confiance: 0.43)
-2025-06-12 11:56:04,066 - INFO - 📊 Échantillon ajouté: poing - Total: 19
-2025-06-12 11:56:05,104 - INFO - 📊 Échantillon ajouté: poing - Total: 20
-2025-06-12 11:56:06,128 - INFO - 📊 Échantillon ajouté: poing - Total: 21
-2025-06-12 11:56:06,168 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 75.8% | Échantillons: 21
-2025-06-12 11:56:06,169 - INFO - 🤖 Position: training_poing (confiance: 0.48)
-2025-06-12 11:56:07,167 - INFO - 📊 Échantillon ajouté: poing - Total: 22
-2025-06-12 11:56:08,199 - INFO - 📊 Échantillon ajouté: poing - Total: 23
-2025-06-12 11:56:09,163 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 78.0% | Échantillons: 23
-2025-06-12 11:56:09,163 - INFO - 🤖 Position: training_poing (confiance: 0.02)
-2025-06-12 11:56:09,233 - INFO - 📊 Échantillon ajouté: poing - Total: 24
-2025-06-12 11:56:10,275 - INFO - 📊 Échantillon ajouté: poing - Total: 25
-2025-06-12 11:56:10,275 - INFO - 📝 Position suivante: paume
-2025-06-12 11:56:12,168 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 79.8% | Échantillons: 25
-2025-06-12 11:56:12,169 - INFO - 🤖 Position: training_paume (confiance: 0.05)
-2025-06-12 11:56:12,299 - INFO - 📊 Échantillon ajouté: paume - Total: 26
-2025-06-12 11:56:13,343 - INFO - 📊 Échantillon ajouté: paume - Total: 27
-2025-06-12 11:56:14,377 - INFO - 📊 Échantillon ajouté: paume - Total: 28
-2025-06-12 11:56:15,171 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 81.4% | Échantillons: 28
-2025-06-12 11:56:15,172 - INFO - 🤖 Position: training_paume (confiance: 0.10)
-2025-06-12 11:56:15,407 - INFO - 📊 Échantillon ajouté: paume - Total: 29
-2025-06-12 11:56:16,443 - INFO - 📊 Échantillon ajouté: paume - Total: 30
-2025-06-12 11:56:17,479 - INFO - 📊 Échantillon ajouté: paume - Total: 31
-2025-06-12 11:56:18,180 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 82.7% | Échantillons: 31
-2025-06-12 11:56:18,181 - INFO - 🤖 Position: training_paume (confiance: 0.15)
-2025-06-12 11:56:18,514 - INFO - 📊 Échantillon ajouté: paume - Total: 32
-2025-06-12 11:56:19,551 - INFO - 📊 Échantillon ajouté: paume - Total: 33
-2025-06-12 11:56:20,577 - INFO - 📊 Échantillon ajouté: paume - Total: 34
-2025-06-12 11:56:21,183 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 83.9% | Échantillons: 34
-2025-06-12 11:56:21,184 - INFO - 🤖 Position: training_paume (confiance: 0.20)
-2025-06-12 11:56:21,620 - INFO - 📊 Échantillon ajouté: paume - Total: 35
-2025-06-12 11:56:22,649 - INFO - 📊 Échantillon ajouté: paume - Total: 36
-2025-06-12 11:56:23,684 - INFO - 📊 Échantillon ajouté: paume - Total: 37
-2025-06-12 11:56:24,188 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 84.9% | Échantillons: 37
-2025-06-12 11:56:24,188 - INFO - 🤖 Position: training_paume (confiance: 0.25)
-2025-06-12 11:56:24,724 - INFO - 📊 Échantillon ajouté: paume - Total: 38
-2025-06-12 11:56:25,749 - INFO - 📊 Échantillon ajouté: paume - Total: 39
-2025-06-12 11:56:26,792 - INFO - 📊 Échantillon ajouté: paume - Total: 40
-2025-06-12 11:56:27,184 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 85.8% | Échantillons: 40
-2025-06-12 11:56:27,184 - INFO - 🤖 Position: training_paume (confiance: 0.30)
-2025-06-12 11:56:27,816 - INFO - 📊 Échantillon ajouté: paume - Total: 41
-2025-06-12 11:56:28,858 - INFO - 📊 Échantillon ajouté: paume - Total: 42
-2025-06-12 11:56:29,898 - INFO - 📊 Échantillon ajouté: paume - Total: 43
-2025-06-12 11:56:30,187 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 86.5% | Échantillons: 43
-2025-06-12 11:56:30,187 - INFO - 🤖 Position: training_paume (confiance: 0.35)
-2025-06-12 11:56:30,933 - INFO - 📊 Échantillon ajouté: paume - Total: 44
-2025-06-12 11:56:31,963 - INFO - 📊 Échantillon ajouté: paume - Total: 45
-2025-06-12 11:56:32,989 - INFO - 📊 Échantillon ajouté: paume - Total: 46
-2025-06-12 11:56:33,192 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 87.3% | Échantillons: 46
-2025-06-12 11:56:33,192 - INFO - 🤖 Position: training_paume (confiance: 0.40)
-2025-06-12 11:56:34,021 - INFO - 📊 Échantillon ajouté: paume - Total: 47
-2025-06-12 11:56:35,066 - INFO - 📊 Échantillon ajouté: paume - Total: 48
-2025-06-12 11:56:36,097 - INFO - 📊 Échantillon ajouté: paume - Total: 49
-2025-06-12 11:56:36,199 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 87.9% | Échantillons: 49
-2025-06-12 11:56:36,199 - INFO - 🤖 Position: training_paume (confiance: 0.45)
-2025-06-12 11:56:37,132 - INFO - 📊 Échantillon ajouté: paume - Total: 50
-2025-06-12 11:56:37,133 - INFO - 📝 Position suivante: index
-2025-06-12 11:56:39,172 - INFO - 📊 Échantillon ajouté: index - Total: 51
-2025-06-12 11:56:39,200 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 88.5% | Échantillons: 51
-2025-06-12 11:56:39,202 - INFO - 🤖 Position: training_index (confiance: 0.48)
-2025-06-12 11:56:40,196 - INFO - 📊 Échantillon ajouté: index - Total: 52
-2025-06-12 11:56:41,236 - INFO - 📊 Échantillon ajouté: index - Total: 53
-2025-06-12 11:56:42,203 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 89.0% | Échantillons: 53
-2025-06-12 11:56:42,204 - INFO - 🤖 Position: training_index (confiance: 0.02)
-2025-06-12 11:56:42,269 - INFO - 📊 Échantillon ajouté: index - Total: 54
-2025-06-12 11:56:43,309 - INFO - 📊 Échantillon ajouté: index - Total: 55
-2025-06-12 11:56:44,342 - INFO - 📊 Échantillon ajouté: index - Total: 56
-2025-06-12 11:56:45,207 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 89.5% | Échantillons: 56
-2025-06-12 11:56:45,207 - INFO - 🤖 Position: training_index (confiance: 0.07)
-2025-06-12 11:56:45,371 - INFO - 📊 Échantillon ajouté: index - Total: 57
-2025-06-12 11:56:46,409 - INFO - 📊 Échantillon ajouté: index - Total: 58
-2025-06-12 11:56:47,437 - INFO - 📊 Échantillon ajouté: index - Total: 59
-2025-06-12 11:56:48,202 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 89.9% | Échantillons: 59
-2025-06-12 11:56:48,203 - INFO - 🤖 Position: training_index (confiance: 0.12)
-2025-06-12 11:56:48,475 - INFO - 📊 Échantillon ajouté: index - Total: 60
-2025-06-12 11:56:49,503 - INFO - 📊 Échantillon ajouté: index - Total: 61
-2025-06-12 11:56:50,581 - INFO - 📊 Échantillon ajouté: index - Total: 62
-2025-06-12 11:56:51,211 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 90.3% | Échantillons: 62
-2025-06-12 11:56:51,211 - INFO - 🤖 Position: training_index (confiance: 0.17)
-2025-06-12 11:56:51,582 - INFO - 📊 Échantillon ajouté: index - Total: 63
-2025-06-12 11:56:52,632 - INFO - 📊 Échantillon ajouté: index - Total: 64
-2025-06-12 11:56:53,652 - INFO - 📊 Échantillon ajouté: index - Total: 65
-2025-06-12 11:56:54,216 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 90.7% | Échantillons: 65
-2025-06-12 11:56:54,216 - INFO - 🤖 Position: training_index (confiance: 0.22)
-2025-06-12 11:56:54,684 - INFO - 📊 Échantillon ajouté: index - Total: 66
-2025-06-12 11:56:55,718 - INFO - 📊 Échantillon ajouté: index - Total: 67
-2025-06-12 11:56:56,752 - INFO - 📊 Échantillon ajouté: index - Total: 68
-2025-06-12 11:56:57,220 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 91.0% | Échantillons: 68
-2025-06-12 11:56:57,221 - INFO - 🤖 Position: training_index (confiance: 0.27)
-2025-06-12 11:56:57,783 - INFO - 📊 Échantillon ajouté: index - Total: 69
-2025-06-12 11:56:58,901 - INFO - 📊 Échantillon ajouté: index - Total: 70
-2025-06-12 11:56:59,888 - INFO - 📊 Échantillon ajouté: index - Total: 71
-2025-06-12 11:57:00,256 - INFO - 📊 FPS: 29.6 | Mode: training | Détections: 91.3% | Échantillons: 71
-2025-06-12 11:57:00,256 - INFO - 🤖 Position: training_index (confiance: 0.32)
-2025-06-12 11:57:00,918 - INFO - 📊 Échantillon ajouté: index - Total: 72
-2025-06-12 11:57:01,958 - INFO - 📊 Échantillon ajouté: index - Total: 73
-2025-06-12 11:57:02,984 - INFO - 📊 Échantillon ajouté: index - Total: 74
-2025-06-12 11:57:03,261 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 91.6% | Échantillons: 74
-2025-06-12 11:57:03,261 - INFO - 🤖 Position: training_index (confiance: 0.37)
-2025-06-12 11:57:04,020 - INFO - 📊 Échantillon ajouté: index - Total: 75
-2025-06-12 11:57:04,020 - INFO - 📝 Position suivante: victoire
-2025-06-12 11:57:06,064 - INFO - 📊 Échantillon ajouté: victoire - Total: 76
-2025-06-12 11:57:06,265 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 91.9% | Échantillons: 76
-2025-06-12 11:57:06,265 - INFO - 🤖 Position: training_victoire (confiance: 0.40)
-2025-06-12 11:57:07,087 - INFO - 📊 Échantillon ajouté: victoire - Total: 77
-2025-06-12 11:57:08,125 - INFO - 📊 Échantillon ajouté: victoire - Total: 78
-2025-06-12 11:57:09,165 - INFO - 📊 Échantillon ajouté: victoire - Total: 79
-2025-06-12 11:57:09,264 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 92.2% | Échantillons: 79
-2025-06-12 11:57:09,265 - INFO - 🤖 Position: training_victoire (confiance: 0.45)
-2025-06-12 11:57:10,193 - INFO - 📊 Échantillon ajouté: victoire - Total: 80
-2025-06-12 11:57:11,230 - INFO - 📊 Échantillon ajouté: victoire - Total: 81
-2025-06-12 11:57:12,266 - INFO - 📊 Échantillon ajouté: victoire - Total: 82
-2025-06-12 11:57:12,268 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 92.4% | Échantillons: 82
-2025-06-12 11:57:12,268 - INFO - 🤖 Position: captured_victoire (confiance: 1.00)
-2025-06-12 11:57:13,296 - INFO - 📊 Échantillon ajouté: victoire - Total: 83
-2025-06-12 11:57:14,338 - INFO - 📊 Échantillon ajouté: victoire - Total: 84
-2025-06-12 11:57:15,341 - INFO - 📊 FPS: 29.3 | Mode: training | Détections: 92.7% | Échantillons: 84
-2025-06-12 11:57:15,341 - INFO - 🤖 Position: training_victoire (confiance: 0.03)
-2025-06-12 11:57:15,388 - INFO - 📊 Échantillon ajouté: victoire - Total: 85
-2025-06-12 11:57:16,405 - INFO - 📊 Échantillon ajouté: victoire - Total: 86
-2025-06-12 11:57:17,432 - INFO - 📊 Échantillon ajouté: victoire - Total: 87
-2025-06-12 11:57:18,276 - INFO - 📊 FPS: 30.7 | Mode: training | Détections: 92.9% | Échantillons: 87
-2025-06-12 11:57:18,277 - INFO - 🤖 Position: training_victoire (confiance: 0.08)
-2025-06-12 11:57:18,475 - INFO - 📊 Échantillon ajouté: victoire - Total: 88
-2025-06-12 11:57:19,511 - INFO - 📊 Échantillon ajouté: victoire - Total: 89
-2025-06-12 11:57:20,543 - INFO - 📊 Échantillon ajouté: victoire - Total: 90
-2025-06-12 11:57:21,276 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 93.1% | Échantillons: 90
-2025-06-12 11:57:21,277 - INFO - 🤖 Position: training_victoire (confiance: 0.13)
-2025-06-12 11:57:21,580 - INFO - 📊 Échantillon ajouté: victoire - Total: 91
-2025-06-12 11:57:22,605 - INFO - 📊 Échantillon ajouté: victoire - Total: 92
-2025-06-12 11:57:23,647 - INFO - 📊 Échantillon ajouté: victoire - Total: 93
-2025-06-12 11:57:24,284 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 93.3% | Échantillons: 93
-2025-06-12 11:57:24,284 - INFO - 🤖 Position: training_victoire (confiance: 0.18)
-2025-06-12 11:57:24,679 - INFO - 📊 Échantillon ajouté: victoire - Total: 94
-2025-06-12 11:57:25,714 - INFO - 📊 Échantillon ajouté: victoire - Total: 95
-2025-06-12 11:57:26,754 - INFO - 📊 Échantillon ajouté: victoire - Total: 96
-2025-06-12 11:57:27,288 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 93.5% | Échantillons: 96
-2025-06-12 11:57:27,288 - INFO - 🤖 Position: training_victoire (confiance: 0.23)
-2025-06-12 11:57:27,786 - INFO - 📊 Échantillon ajouté: victoire - Total: 97
-2025-06-12 11:57:28,825 - INFO - 📊 Échantillon ajouté: victoire - Total: 98
-2025-06-12 11:57:29,853 - INFO - 📊 Échantillon ajouté: victoire - Total: 99
-2025-06-12 11:57:30,289 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 93.6% | Échantillons: 99
-2025-06-12 11:57:30,290 - INFO - 🤖 Position: training_victoire (confiance: 0.28)
-2025-06-12 11:57:30,892 - INFO - 📊 Échantillon ajouté: victoire - Total: 100
-2025-06-12 11:57:30,892 - INFO - 📝 Position suivante: ok
-2025-06-12 11:57:32,930 - INFO - 📊 Échantillon ajouté: ok - Total: 101
-2025-06-12 11:57:33,295 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 93.8% | Échantillons: 101
-2025-06-12 11:57:33,296 - INFO - 🤖 Position: training_ok (confiance: 0.32)
-2025-06-12 11:57:33,959 - INFO - 📊 Échantillon ajouté: ok - Total: 102
-2025-06-12 11:57:34,990 - INFO - 📊 Échantillon ajouté: ok - Total: 103
-2025-06-12 11:57:36,028 - INFO - 📊 Échantillon ajouté: ok - Total: 104
-2025-06-12 11:57:36,298 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 93.9% | Échantillons: 104
-2025-06-12 11:57:36,299 - INFO - 🤖 Position: training_ok (confiance: 0.37)
-2025-06-12 11:57:37,060 - INFO - 📊 Échantillon ajouté: ok - Total: 105
-2025-06-12 11:57:38,096 - INFO - 📊 Échantillon ajouté: ok - Total: 106
-2025-06-12 11:57:39,128 - INFO - 📊 Échantillon ajouté: ok - Total: 107
-2025-06-12 11:57:39,298 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 94.1% | Échantillons: 107
-2025-06-12 11:57:39,298 - INFO - 🤖 Position: training_ok (confiance: 0.42)
-2025-06-12 11:57:40,157 - INFO - 📊 Échantillon ajouté: ok - Total: 108
-2025-06-12 11:57:41,198 - INFO - 📊 Échantillon ajouté: ok - Total: 109
-2025-06-12 11:57:42,225 - INFO - 📊 Échantillon ajouté: ok - Total: 110
-2025-06-12 11:57:42,306 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 94.2% | Échantillons: 110
-2025-06-12 11:57:42,306 - INFO - 🤖 Position: training_ok (confiance: 0.47)
-2025-06-12 11:57:43,264 - INFO - 📊 Échantillon ajouté: ok - Total: 111
-2025-06-12 11:57:44,295 - INFO - 📊 Échantillon ajouté: ok - Total: 112
-2025-06-12 11:57:45,310 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 94.4% | Échantillons: 112
-2025-06-12 11:57:45,310 - INFO - 🤖 Position: training_ok (confiance: 0.00)
-2025-06-12 11:57:45,329 - INFO - 📊 Échantillon ajouté: ok - Total: 113
-2025-06-12 11:57:46,370 - INFO - 📊 Échantillon ajouté: ok - Total: 114
-2025-06-12 11:57:47,397 - INFO - 📊 Échantillon ajouté: ok - Total: 115
-2025-06-12 11:57:48,307 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 94.5% | Échantillons: 115
-2025-06-12 11:57:48,308 - INFO - 🤖 Position: training_ok (confiance: 0.05)
-2025-06-12 11:57:48,438 - INFO - 📊 Échantillon ajouté: ok - Total: 116
-2025-06-12 11:57:49,466 - INFO - 📊 Échantillon ajouté: ok - Total: 117
-2025-06-12 11:57:50,508 - INFO - 📊 Échantillon ajouté: ok - Total: 118
-2025-06-12 11:57:51,310 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 94.6% | Échantillons: 118
-2025-06-12 11:57:51,310 - INFO - 🤖 Position: training_ok (confiance: 0.10)
-2025-06-12 11:57:51,554 - INFO - 📊 Échantillon ajouté: ok - Total: 119
-2025-06-12 11:57:52,575 - INFO - 📊 Échantillon ajouté: ok - Total: 120
-2025-06-12 11:57:53,608 - INFO - 📊 Échantillon ajouté: ok - Total: 121
-2025-06-12 11:57:54,308 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 94.7% | Échantillons: 121
-2025-06-12 11:57:54,309 - INFO - 🤖 Position: training_ok (confiance: 0.15)
-2025-06-12 11:57:54,637 - INFO - 📊 Échantillon ajouté: ok - Total: 122
-2025-06-12 11:57:55,676 - INFO - 📊 Échantillon ajouté: ok - Total: 123
-2025-06-12 11:57:56,713 - INFO - 📊 Échantillon ajouté: ok - Total: 124
-2025-06-12 11:57:57,312 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 94.8% | Échantillons: 124
-2025-06-12 11:57:57,312 - INFO - 🤖 Position: training_ok (confiance: 0.20)
-2025-06-12 11:57:57,743 - INFO - 📊 Échantillon ajouté: ok - Total: 125
-2025-06-12 11:57:57,743 - INFO - 📝 Position suivante: pouce
-2025-06-12 11:57:59,782 - INFO - 📊 Échantillon ajouté: pouce - Total: 126
-2025-06-12 11:58:00,319 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 95.0% | Échantillons: 126
-2025-06-12 11:58:00,319 - INFO - 🤖 Position: training_pouce (confiance: 0.23)
-2025-06-12 11:58:00,825 - INFO - 📊 Échantillon ajouté: pouce - Total: 127
-2025-06-12 11:58:01,847 - INFO - 📊 Échantillon ajouté: pouce - Total: 128
-2025-06-12 11:58:02,876 - INFO - 📊 Échantillon ajouté: pouce - Total: 129
-2025-06-12 11:58:03,319 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 95.1% | Échantillons: 129
-2025-06-12 11:58:03,319 - INFO - 🤖 Position: training_pouce (confiance: 0.28)
-2025-06-12 11:58:03,907 - INFO - 📊 Échantillon ajouté: pouce - Total: 130
-2025-06-12 11:58:04,944 - INFO - 📊 Échantillon ajouté: pouce - Total: 131
-2025-06-12 11:58:05,988 - INFO - 📊 Échantillon ajouté: pouce - Total: 132
-2025-06-12 11:58:06,327 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 95.2% | Échantillons: 132
-2025-06-12 11:58:06,327 - INFO - 🤖 Position: training_pouce (confiance: 0.33)
-2025-06-12 11:58:07,011 - INFO - 📊 Échantillon ajouté: pouce - Total: 133
-2025-06-12 11:58:08,050 - INFO - 📊 Échantillon ajouté: pouce - Total: 134
-2025-06-12 11:58:09,078 - INFO - 📊 Échantillon ajouté: pouce - Total: 135
-2025-06-12 11:58:09,329 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 95.3% | Échantillons: 135
-2025-06-12 11:58:09,329 - INFO - 🤖 Position: training_pouce (confiance: 0.38)
-2025-06-12 11:58:10,117 - INFO - 📊 Échantillon ajouté: pouce - Total: 136
-2025-06-12 11:58:11,158 - INFO - 📊 Échantillon ajouté: pouce - Total: 137
-2025-06-12 11:58:12,184 - INFO - 📊 Échantillon ajouté: pouce - Total: 138
-2025-06-12 11:58:12,319 - INFO - 📊 FPS: 30.1 | Mode: training | Détections: 95.3% | Échantillons: 138
-2025-06-12 11:58:12,319 - INFO - 🤖 Position: training_pouce (confiance: 0.43)
-2025-06-12 11:58:13,228 - INFO - 📊 Échantillon ajouté: pouce - Total: 139
-2025-06-12 11:58:14,257 - INFO - 📊 Échantillon ajouté: pouce - Total: 140
-2025-06-12 11:58:15,289 - INFO - 📊 Échantillon ajouté: pouce - Total: 141
-2025-06-12 11:58:15,323 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 95.4% | Échantillons: 141
-2025-06-12 11:58:15,323 - INFO - 🤖 Position: training_pouce (confiance: 0.48)
-2025-06-12 11:58:16,332 - INFO - 📊 Échantillon ajouté: pouce - Total: 142
-2025-06-12 11:58:17,357 - INFO - 📊 Échantillon ajouté: pouce - Total: 143
-2025-06-12 11:58:18,329 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 95.5% | Échantillons: 143
-2025-06-12 11:58:18,329 - INFO - 🤖 Position: training_pouce (confiance: 0.02)
-2025-06-12 11:58:18,396 - INFO - 📊 Échantillon ajouté: pouce - Total: 144
-2025-06-12 11:58:19,423 - INFO - 📊 Échantillon ajouté: pouce - Total: 145
-2025-06-12 11:58:20,461 - INFO - 📊 Échantillon ajouté: pouce - Total: 146
-2025-06-12 11:58:21,401 - INFO - 📊 FPS: 29.3 | Mode: training | Détections: 95.6% | Échantillons: 146
-2025-06-12 11:58:21,402 - INFO - 🤖 Position: training_pouce (confiance: 0.07)
-2025-06-12 11:58:21,509 - INFO - 📊 Échantillon ajouté: pouce - Total: 147
-2025-06-12 11:58:22,624 - INFO - 📊 Échantillon ajouté: pouce - Total: 148
-2025-06-12 11:58:23,567 - INFO - 📊 Échantillon ajouté: pouce - Total: 149
-2025-06-12 11:58:24,332 - INFO - 📊 FPS: 30.7 | Mode: training | Détections: 95.7% | Échantillons: 149
-2025-06-12 11:58:24,334 - INFO - 🤖 Position: training_pouce (confiance: 0.12)
-2025-06-12 11:58:24,598 - INFO - 📊 Échantillon ajouté: pouce - Total: 150
-2025-06-12 11:58:24,599 - INFO - 📝 Position suivante: stop
-2025-06-12 11:58:26,634 - INFO - 📊 Échantillon ajouté: stop - Total: 151
-2025-06-12 11:58:27,338 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 95.8% | Échantillons: 151
-2025-06-12 11:58:27,338 - INFO - 🤖 Position: training_stop (confiance: 0.15)
-2025-06-12 11:58:27,674 - INFO - 📊 Échantillon ajouté: stop - Total: 152
-2025-06-12 11:58:28,700 - INFO - 📊 Échantillon ajouté: stop - Total: 153
-2025-06-12 11:58:29,736 - INFO - 📊 Échantillon ajouté: stop - Total: 154
-2025-06-12 11:58:30,335 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 95.8% | Échantillons: 154
-2025-06-12 11:58:30,335 - INFO - 🤖 Position: training_stop (confiance: 0.20)
-2025-06-12 11:58:30,773 - INFO - 📊 Échantillon ajouté: stop - Total: 155
-2025-06-12 11:58:31,804 - INFO - 📊 Échantillon ajouté: stop - Total: 156
-2025-06-12 11:58:32,850 - INFO - 📊 Échantillon ajouté: stop - Total: 157
-2025-06-12 11:58:33,348 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 95.9% | Échantillons: 157
-2025-06-12 11:58:33,348 - INFO - 🤖 Position: training_stop (confiance: 0.25)
-2025-06-12 11:58:33,878 - INFO - 📊 Échantillon ajouté: stop - Total: 158
-2025-06-12 11:58:34,916 - INFO - 📊 Échantillon ajouté: stop - Total: 159
-2025-06-12 11:58:35,944 - INFO - 📊 Échantillon ajouté: stop - Total: 160
-2025-06-12 11:58:36,352 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 96.0% | Échantillons: 160
-2025-06-12 11:58:36,352 - INFO - 🤖 Position: training_stop (confiance: 0.30)
-2025-06-12 11:58:36,984 - INFO - 📊 Échantillon ajouté: stop - Total: 161
-2025-06-12 11:58:38,021 - INFO - 📊 Échantillon ajouté: stop - Total: 162
-2025-06-12 11:58:39,043 - INFO - 📊 Échantillon ajouté: stop - Total: 163
-2025-06-12 11:58:39,352 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 96.0% | Échantillons: 163
-2025-06-12 11:58:39,352 - INFO - 🤖 Position: training_stop (confiance: 0.35)
-2025-06-12 11:58:40,089 - INFO - 📊 Échantillon ajouté: stop - Total: 164
-2025-06-12 11:58:41,112 - INFO - 📊 Échantillon ajouté: stop - Total: 165
-2025-06-12 11:58:42,149 - INFO - 📊 Échantillon ajouté: stop - Total: 166
-2025-06-12 11:58:42,357 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 96.1% | Échantillons: 166
-2025-06-12 11:58:42,358 - INFO - 🤖 Position: training_stop (confiance: 0.40)
-2025-06-12 11:58:43,189 - INFO - 📊 Échantillon ajouté: stop - Total: 167
-2025-06-12 11:58:44,220 - INFO - 📊 Échantillon ajouté: stop - Total: 168
-2025-06-12 11:58:45,255 - INFO - 📊 Échantillon ajouté: stop - Total: 169
-2025-06-12 11:58:45,354 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 96.2% | Échantillons: 169
-2025-06-12 11:58:45,355 - INFO - 🤖 Position: training_stop (confiance: 0.45)
-2025-06-12 11:58:46,283 - INFO - 📊 Échantillon ajouté: stop - Total: 170
-2025-06-12 11:58:47,320 - INFO - 📊 Échantillon ajouté: stop - Total: 171
-2025-06-12 11:58:48,360 - INFO - 📊 Échantillon ajouté: stop - Total: 172
-2025-06-12 11:58:48,361 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 96.2% | Échantillons: 172
-2025-06-12 11:58:48,362 - INFO - 🤖 Position: captured_stop (confiance: 1.00)
-2025-06-12 11:58:49,388 - INFO - 📊 Échantillon ajouté: stop - Total: 173
-2025-06-12 11:58:50,432 - INFO - 📊 Échantillon ajouté: stop - Total: 174
-2025-06-12 11:58:51,360 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 96.3% | Échantillons: 174
-2025-06-12 11:58:51,361 - INFO - 🤖 Position: training_stop (confiance: 0.03)
-2025-06-12 11:58:51,462 - INFO - 📊 Échantillon ajouté: stop - Total: 175
-2025-06-12 11:58:51,462 - INFO - 📝 Position suivante: salut
-2025-06-12 11:58:53,492 - INFO - 📊 Échantillon ajouté: salut - Total: 176
-2025-06-12 11:58:54,367 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 96.3% | Échantillons: 176
-2025-06-12 11:58:54,367 - INFO - 🤖 Position: training_salut (confiance: 0.07)
-2025-06-12 11:58:54,533 - INFO - 📊 Échantillon ajouté: salut - Total: 177
-2025-06-12 11:58:55,559 - INFO - 📊 Échantillon ajouté: salut - Total: 178
-2025-06-12 11:58:56,601 - INFO - 📊 Échantillon ajouté: salut - Total: 179
-2025-06-12 11:58:57,367 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 96.4% | Échantillons: 179
-2025-06-12 11:58:57,367 - INFO - 🤖 Position: training_salut (confiance: 0.12)
-2025-06-12 11:58:57,645 - INFO - 📊 Échantillon ajouté: salut - Total: 180
-2025-06-12 11:58:58,665 - INFO - 📊 Échantillon ajouté: salut - Total: 181
-2025-06-12 11:58:59,703 - INFO - 📊 Échantillon ajouté: salut - Total: 182
-2025-06-12 11:59:00,370 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 96.4% | Échantillons: 182
-2025-06-12 11:59:00,371 - INFO - 🤖 Position: training_salut (confiance: 0.17)
-2025-06-12 11:59:00,734 - INFO - 📊 Échantillon ajouté: salut - Total: 183
-2025-06-12 11:59:01,771 - INFO - 📊 Échantillon ajouté: salut - Total: 184
-2025-06-12 11:59:02,804 - INFO - 📊 Échantillon ajouté: salut - Total: 185
-2025-06-12 11:59:03,374 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 96.5% | Échantillons: 185
-2025-06-12 11:59:03,375 - INFO - 🤖 Position: training_salut (confiance: 0.22)
-2025-06-12 11:59:03,838 - INFO - 📊 Échantillon ajouté: salut - Total: 186
-2025-06-12 11:59:04,875 - INFO - 📊 Échantillon ajouté: salut - Total: 187
-2025-06-12 11:59:05,904 - INFO - 📊 Échantillon ajouté: salut - Total: 188
-2025-06-12 11:59:06,380 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 96.5% | Échantillons: 188
-2025-06-12 11:59:06,380 - INFO - 🤖 Position: training_salut (confiance: 0.27)
-2025-06-12 11:59:06,943 - INFO - 📊 Échantillon ajouté: salut - Total: 189
-2025-06-12 11:59:07,976 - INFO - 📊 Échantillon ajouté: salut - Total: 190
-2025-06-12 11:59:09,015 - INFO - 📊 Échantillon ajouté: salut - Total: 191
-2025-06-12 11:59:09,379 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 96.6% | Échantillons: 191
-2025-06-12 11:59:09,379 - INFO - 🤖 Position: training_salut (confiance: 0.32)
-2025-06-12 11:59:10,054 - INFO - 📊 Échantillon ajouté: salut - Total: 192
-2025-06-12 11:59:11,081 - INFO - 📊 Échantillon ajouté: salut - Total: 193
-2025-06-12 11:59:12,124 - INFO - 📊 Échantillon ajouté: salut - Total: 194
-2025-06-12 11:59:12,389 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 96.6% | Échantillons: 194
-2025-06-12 11:59:12,389 - INFO - 🤖 Position: training_salut (confiance: 0.37)
-2025-06-12 11:59:13,149 - INFO - 📊 Échantillon ajouté: salut - Total: 195
-2025-06-12 11:59:14,188 - INFO - 📊 Échantillon ajouté: salut - Total: 196
-2025-06-12 11:59:15,226 - INFO - 📊 Échantillon ajouté: salut - Total: 197
-2025-06-12 11:59:15,394 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 96.7% | Échantillons: 197
-2025-06-12 11:59:15,394 - INFO - 🤖 Position: training_salut (confiance: 0.42)
-2025-06-12 11:59:16,253 - INFO - 📊 Échantillon ajouté: salut - Total: 198
-2025-06-12 11:59:17,294 - INFO - 📊 Échantillon ajouté: salut - Total: 199
-2025-06-12 11:59:18,318 - INFO - 📊 Échantillon ajouté: salut - Total: 200
-2025-06-12 11:59:18,354 - INFO - 🚀 Démarrage entraînement du modèle IA...
-2025-06-12 11:59:18,393 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:18,397 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 96.7% | Échantillons: 200
-2025-06-12 11:59:18,397 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 11:59:18,436 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:18,448 - INFO - ✅ Modèle créé: 30408 paramètres
-2025-06-12 11:59:18,448 - INFO - 📊 Distribution: {0: 25, 1: 25, 2: 25, 3: 25, 4: 25, 5: 25, 6: 25, 7: 25}
-2025-06-12 11:59:18,449 - INFO - 🚀 Entraînement: 200 échantillons, 25 époques
-2025-06-12 11:59:18,460 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:18,489 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:18,542 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:18,588 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:18,633 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:18,663 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:18,694 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:18,725 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:18,743 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:18,778 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:18,811 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:18,834 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:18,868 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:18,901 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:18,933 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:18,960 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:19,007 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:19,038 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:19,071 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:19,099 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:19,138 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:19,171 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:19,218 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:19,261 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:19,291 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:19,322 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:19,344 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:19,432 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:19,476 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:19,502 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:19,526 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:19,574 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:19,617 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:19,661 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:19,693 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:19,721 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:19,750 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:19,787 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:19,835 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:19,863 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:19,908 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:19,940 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:19,969 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:19,999 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,074 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,094 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,111 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,124 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,140 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,155 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,170 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,187 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,202 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,217 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,250 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,289 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,320 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,352 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,391 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,424 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,456 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,483 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,543 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,580 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,594 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,637 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,664 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,682 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,735 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,752 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,785 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,835 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,857 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,885 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,918 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,963 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:20,991 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:21,017 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:21,057 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:21,088 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:21,121 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:21,166 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:21,193 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:21,222 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:21,262 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:21,291 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:21,323 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:21,367 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:21,399 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:21,400 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 96.8% | Échantillons: 200
-2025-06-12 11:59:21,400 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 11:59:21,426 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:21,452 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:21,490 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:21,519 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:21,558 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:21,596 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:21,630 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:21,654 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:21,689 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:21,725 - INFO - ✅ Entraînement terminé:
-2025-06-12 11:59:21,725 - INFO -    Précision: 0.7563
-2025-06-12 11:59:21,725 - INFO -    Validation: 0.0000
-2025-06-12 11:59:21,725 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
-2025-06-12 11:59:21,725 - ERROR - ❌ Erreur sauvegarde: The `save_format` argument is deprecated in Keras 3. Please remove this argument and pass a file path with either `.keras` or `.h5` extension.Received: save_format=tf
-2025-06-12 11:59:21,726 - INFO - ✅ Modèle entraîné et sauvegardé!
-2025-06-12 11:59:24,394 - INFO - 📊 FPS: 30.1 | Mode: recognition (Entraînée) | Détections: 95.6% | Échantillons: 200
-2025-06-12 11:59:24,395 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 11:59:27,538 - INFO - 📊 FPS: 28.6 | Mode: recognition (Entraînée) | Détections: 94.4% | Échantillons: 200
-2025-06-12 11:59:27,539 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 11:59:30,404 - INFO - 📊 FPS: 31.4 | Mode: recognition (Entraînée) | Détections: 93.2% | Échantillons: 200
-2025-06-12 11:59:30,404 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 11:59:33,406 - INFO - 📊 FPS: 30.0 | Mode: recognition (Entraînée) | Détections: 92.0% | Échantillons: 200
-2025-06-12 11:59:33,407 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 11:59:36,415 - INFO - 📊 FPS: 29.9 | Mode: recognition (Entraînée) | Détections: 90.9% | Échantillons: 200
-2025-06-12 11:59:36,416 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 11:59:36,676 - WARNING - ⚠️ Aucun modèle trouvé: hand_position_model_model
-2025-06-12 11:59:36,676 - WARNING - ⚠️ Aucun modèle à charger
-2025-06-12 11:59:39,418 - INFO - 📊 FPS: 30.0 | Mode: recognition (Entraînée) | Détections: 89.7% | Échantillons: 200
-2025-06-12 11:59:39,418 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 11:59:41,174 - INFO - 🤖 Mode reconnaissance activé
-2025-06-12 11:59:41,174 - INFO - 🤖 Mode reconnaissance IA activé
-2025-06-12 11:59:42,424 - INFO - 📊 FPS: 29.9 | Mode: recognition (Entraînée) | Détections: 88.6% | Échantillons: 200
-2025-06-12 11:59:42,424 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 11:59:45,436 - INFO - 📊 FPS: 29.9 | Mode: recognition (Entraînée) | Détections: 87.6% | Échantillons: 200
-2025-06-12 11:59:45,437 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 11:59:47,878 - INFO - 🤖 Mode reconnaissance activé
-2025-06-12 11:59:47,879 - INFO - 🤖 Mode reconnaissance IA activé
-2025-06-12 11:59:48,425 - INFO - 📊 FPS: 30.1 | Mode: recognition (Entraînée) | Détections: 86.5% | Échantillons: 200
-2025-06-12 11:59:48,425 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 11:59:51,435 - INFO - 📊 FPS: 29.9 | Mode: recognition (Entraînée) | Détections: 85.5% | Échantillons: 200
-2025-06-12 11:59:51,436 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 11:59:54,457 - INFO - 📊 FPS: 29.8 | Mode: recognition (Entraînée) | Détections: 84.5% | Échantillons: 200
-2025-06-12 11:59:54,458 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 11:59:57,457 - INFO - 📊 FPS: 30.0 | Mode: recognition (Entraînée) | Détections: 83.6% | Échantillons: 200
-2025-06-12 11:59:57,457 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 12:00:00,483 - INFO - 📊 FPS: 29.7 | Mode: recognition (Entraînée) | Détections: 82.6% | Échantillons: 200
-2025-06-12 12:00:00,483 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 12:00:03,434 - INFO - 📊 FPS: 30.5 | Mode: recognition (Entraînée) | Détections: 81.7% | Échantillons: 200
-2025-06-12 12:00:03,435 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 12:00:06,443 - INFO - 📊 FPS: 29.9 | Mode: recognition (Entraînée) | Détections: 80.8% | Échantillons: 200
-2025-06-12 12:00:06,443 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 12:00:08,947 - INFO - 🤖 Mode reconnaissance activé
-2025-06-12 12:00:08,948 - INFO - 🤖 Mode reconnaissance IA activé
-2025-06-12 12:00:09,437 - INFO - 📊 FPS: 30.1 | Mode: recognition (Entraînée) | Détections: 79.9% | Échantillons: 200
-2025-06-12 12:00:09,437 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 12:00:10,622 - WARNING - ⚠️ Aucun modèle trouvé: hand_position_model_model
-2025-06-12 12:00:10,622 - WARNING - ⚠️ Aucun modèle à charger
-2025-06-12 12:00:12,453 - INFO - 📊 FPS: 29.8 | Mode: recognition (Entraînée) | Détections: 79.0% | Échantillons: 200
-2025-06-12 12:00:12,454 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 12:00:15,466 - INFO - 📊 FPS: 29.9 | Mode: recognition (Entraînée) | Détections: 78.2% | Échantillons: 200
-2025-06-12 12:00:15,467 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 12:00:18,465 - INFO - 📊 FPS: 30.0 | Mode: recognition (Entraînée) | Détections: 77.3% | Échantillons: 200
-2025-06-12 12:00:18,466 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 12:00:21,503 - INFO - 📊 FPS: 29.6 | Mode: recognition (Entraînée) | Détections: 76.5% | Échantillons: 200
-2025-06-12 12:00:21,503 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 12:00:24,500 - INFO - 📊 FPS: 30.0 | Mode: recognition (Entraînée) | Détections: 75.9% | Échantillons: 200
-2025-06-12 12:00:24,500 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 12:00:27,490 - INFO - 📊 FPS: 30.1 | Mode: recognition (Entraînée) | Détections: 75.1% | Échantillons: 200
-2025-06-12 12:00:27,491 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 12:00:30,466 - INFO - 📊 FPS: 30.2 | Mode: recognition (Entraînée) | Détections: 74.6% | Échantillons: 200
-2025-06-12 12:00:30,466 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 12:00:33,461 - INFO - 📊 FPS: 30.0 | Mode: recognition (Entraînée) | Détections: 74.4% | Échantillons: 200
-2025-06-12 12:00:33,462 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 12:00:36,511 - INFO - 📊 FPS: 29.5 | Mode: recognition (Entraînée) | Détections: 73.9% | Échantillons: 200
-2025-06-12 12:00:36,511 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 12:00:39,494 - INFO - 📊 FPS: 30.2 | Mode: recognition (Entraînée) | Détections: 73.3% | Échantillons: 200
-2025-06-12 12:00:39,494 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 12:00:42,461 - INFO - 📊 FPS: 30.4 | Mode: recognition (Entraînée) | Détections: 72.6% | Échantillons: 200
-2025-06-12 12:00:42,461 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 12:00:45,498 - INFO - 📊 FPS: 29.6 | Mode: recognition (Entraînée) | Détections: 71.9% | Échantillons: 200
-2025-06-12 12:00:45,499 - INFO - 🤖 Position: training_complete (confiance: 1.00)
-2025-06-12 12:00:45,718 - INFO - 🛑 Arrêt demandé
-2025-06-12 12:00:45,718 - INFO - 🧹 Nettoyage...
-2025-06-12 12:00:45,718 - INFO - ================================================================================
-2025-06-12 12:00:45,718 - INFO - 📊 STATS FINALES:
-2025-06-12 12:00:45,718 - INFO -   ⏱️ Durée: 315.4s
-2025-06-12 12:00:45,718 - INFO -   🎞️ Frames: 9277
-2025-06-12 12:00:45,718 - INFO -   🎯 Détections gant: 9106
-2025-06-12 12:00:45,718 - INFO -   🤖 Frames IA: 9106
-2025-06-12 12:00:45,719 - INFO -   🎭 Détections position: 6542
-2025-06-12 12:00:45,719 - INFO -   📈 Taux reconnaissance: 71.8%
-2025-06-12 12:00:45,719 - INFO -   📚 Échantillons: 200
-2025-06-12 12:00:45,719 - INFO -   📸 Screenshots: 0
-2025-06-12 12:00:45,719 - INFO - ================================================================================
-2025-06-12 12:00:45,719 - INFO - ✅ Pipeline fermé
-2025-06-12 12:00:45,725 - INFO - ✅ Interface fermée
-2025-06-12 12:00:46,228 - INFO - ✅ Drone déconnecté
-2025-06-12 12:00:46,229 - INFO - 🎉 Session IA terminée!
+2025-06-12 12:08:55,118 - INFO - === BEBOP 2 AVEC IA DE RECONNAISSANCE DE POSITION ===
+2025-06-12 12:08:55,118 - INFO - 🤖 Système de reconnaissance de gestes pour drone
+2025-06-12 12:08:55,118 - INFO - 📡 Connexion au drone...
+2025-06-12 12:08:56,179 - INFO - ✅ Drone connecté!
+2025-06-12 12:08:56,179 - INFO - 📹 Démarrage flux vidéo...
+2025-06-12 12:08:58,683 - INFO - Contrôle drone démarré.
+2025-06-12 12:08:58,690 - INFO - ✅ Pipeline vidéo initialisé
+2025-06-12 12:08:58,691 - INFO - 🤖 Aucun modèle existant - Utilisez 't' pour entraîner
+2025-06-12 12:08:58,716 - INFO - ================================================================================
+2025-06-12 12:08:58,724 - INFO - 🎮 COMMANDES:
+2025-06-12 12:08:58,725 - INFO -   'q' = Quitter | 's' = Screenshot | 'r' = Reset
+2025-06-12 12:08:58,725 - INFO - 🤖 COMMANDES IA:
+2025-06-12 12:08:58,725 - INFO -   'i' = Info IA | 't' = Entraînement | 'n' = Reconnaissance
+2025-06-12 12:08:58,725 - INFO -   'm' = Sauvegarder | 'l' = Charger | 'c' = Commandes drone
+2025-06-12 12:08:58,725 - INFO - ================================================================================
+2025-06-12 12:08:58,725 - INFO - 🎯 POSITIONS RECONNUES:
+2025-06-12 12:08:58,725 - INFO -   0: poing - Poing fermé - ARRÊT D'URGENCE
+2025-06-12 12:08:58,725 - INFO -   1: paume - Paume ouverte - AVANCER
+2025-06-12 12:08:58,726 - INFO -   2: index - Index pointé - DIRECTION
+2025-06-12 12:08:58,726 - INFO -   3: victoire - Signe V - MONTÉE
+2025-06-12 12:08:58,726 - INFO -   4: ok - Signe OK - VALIDATION/HOVER
+2025-06-12 12:08:58,726 - INFO -   5: pouce - Pouce levé - MONTÉE DOUCE
+2025-06-12 12:08:58,726 - INFO -   6: stop - Main STOP - ARRÊT
+2025-06-12 12:08:58,726 - INFO -   7: salut - Salut - ROTATION
+2025-06-12 12:08:58,726 - INFO - ================================================================================
+2025-06-12 12:08:58,726 - INFO - 🎬 Démarrage détection avec IA...
+2025-06-12 12:09:03,773 - INFO - 📊 FPS: 17.8 | Mode: detection | Détections: 0.0%
+2025-06-12 12:09:06,813 - INFO - 📊 FPS: 29.6 | Mode: detection | Détections: 0.0%
+2025-06-12 12:09:09,777 - INFO - 📊 FPS: 30.4 | Mode: detection | Détections: 0.0%
+2025-06-12 12:09:10,551 - INFO - 🎓 Mode entraînement IA démarré
+2025-06-12 12:09:10,552 - INFO - 📝 Positions à entraîner:
+2025-06-12 12:09:10,552 - INFO -    0: poing - Poing fermé - ARRÊT D'URGENCE
+2025-06-12 12:09:10,552 - INFO -    1: paume - Paume ouverte - AVANCER
+2025-06-12 12:09:10,552 - INFO -    2: index - Index pointé - DIRECTION
+2025-06-12 12:09:10,552 - INFO -    3: victoire - Signe V - MONTÉE
+2025-06-12 12:09:10,552 - INFO -    4: ok - Signe OK - VALIDATION/HOVER
+2025-06-12 12:09:10,552 - INFO -    5: pouce - Pouce levé - MONTÉE DOUCE
+2025-06-12 12:09:10,552 - INFO -    6: stop - Main STOP - ARRÊT
+2025-06-12 12:09:10,552 - INFO -    7: salut - Salut - ROTATION
+2025-06-12 12:09:10,552 - INFO - 🎓 Mode entraînement IA activé
+2025-06-12 12:09:10,552 - INFO - Effectuez chaque position quand demandé
+2025-06-12 12:09:12,579 - INFO - 📊 Échantillon ajouté: poing - Total: 1
+2025-06-12 12:09:12,782 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 18.6% | Échantillons: 1
+2025-06-12 12:09:12,783 - INFO - 🤖 Position: training_poing (confiance: 0.40)
+2025-06-12 12:09:13,612 - INFO - 📊 Échantillon ajouté: poing - Total: 2
+2025-06-12 12:09:14,651 - INFO - 📊 Échantillon ajouté: poing - Total: 3
+2025-06-12 12:09:15,680 - INFO - 📊 Échantillon ajouté: poing - Total: 4
+2025-06-12 12:09:15,781 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 34.9% | Échantillons: 4
+2025-06-12 12:09:15,781 - INFO - 🤖 Position: training_poing (confiance: 0.45)
+2025-06-12 12:09:16,739 - INFO - 📊 Échantillon ajouté: poing - Total: 5
+2025-06-12 12:09:17,749 - INFO - 📊 Échantillon ajouté: poing - Total: 6
+2025-06-12 12:09:18,787 - INFO - 📊 Échantillon ajouté: poing - Total: 7
+2025-06-12 12:09:18,788 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 45.7% | Échantillons: 7
+2025-06-12 12:09:18,788 - INFO - 🤖 Position: captured_poing (confiance: 1.00)
+2025-06-12 12:09:19,823 - INFO - 📊 Échantillon ajouté: poing - Total: 8
+2025-06-12 12:09:20,853 - INFO - 📊 Échantillon ajouté: poing - Total: 9
+2025-06-12 12:09:21,790 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 53.5% | Échantillons: 9
+2025-06-12 12:09:21,790 - INFO - 🤖 Position: training_poing (confiance: 0.03)
+2025-06-12 12:09:21,908 - INFO - 📊 Échantillon ajouté: poing - Total: 10
+2025-06-12 12:09:22,921 - INFO - 📊 Échantillon ajouté: poing - Total: 11
+2025-06-12 12:09:23,959 - INFO - 📊 Échantillon ajouté: poing - Total: 12
+2025-06-12 12:09:24,795 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 59.3% | Échantillons: 12
+2025-06-12 12:09:24,795 - INFO - 🤖 Position: training_poing (confiance: 0.08)
+2025-06-12 12:09:24,989 - INFO - 📊 Échantillon ajouté: poing - Total: 13
+2025-06-12 12:09:26,045 - INFO - 📊 Échantillon ajouté: poing - Total: 14
+2025-06-12 12:09:27,065 - INFO - 📊 Échantillon ajouté: poing - Total: 15
+2025-06-12 12:09:27,792 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 63.8% | Échantillons: 15
+2025-06-12 12:09:27,792 - INFO - 🤖 Position: training_poing (confiance: 0.13)
+2025-06-12 12:09:28,098 - INFO - 📊 Échantillon ajouté: poing - Total: 16
+2025-06-12 12:09:29,130 - INFO - 📊 Échantillon ajouté: poing - Total: 17
+2025-06-12 12:09:30,166 - INFO - 📊 Échantillon ajouté: poing - Total: 18
+2025-06-12 12:09:30,797 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 67.4% | Échantillons: 18
+2025-06-12 12:09:30,797 - INFO - 🤖 Position: training_poing (confiance: 0.18)
+2025-06-12 12:09:31,197 - INFO - 📊 Échantillon ajouté: poing - Total: 19
+2025-06-12 12:09:32,240 - INFO - 📊 Échantillon ajouté: poing - Total: 20
+2025-06-12 12:09:33,263 - INFO - 📊 Échantillon ajouté: poing - Total: 21
+2025-06-12 12:09:33,798 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 70.4% | Échantillons: 21
+2025-06-12 12:09:33,799 - INFO - 🤖 Position: training_poing (confiance: 0.23)
+2025-06-12 12:09:34,303 - INFO - 📊 Échantillon ajouté: poing - Total: 22
+2025-06-12 12:09:35,332 - INFO - 📊 Échantillon ajouté: poing - Total: 23
+2025-06-12 12:09:36,373 - INFO - 📊 Échantillon ajouté: poing - Total: 24
+2025-06-12 12:09:36,803 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 72.9% | Échantillons: 24
+2025-06-12 12:09:36,803 - INFO - 🤖 Position: training_poing (confiance: 0.28)
+2025-06-12 12:09:37,409 - INFO - 📊 Échantillon ajouté: poing - Total: 25
+2025-06-12 12:09:37,410 - INFO - 📝 Position suivante: paume
+2025-06-12 12:09:39,438 - INFO - 📊 Échantillon ajouté: paume - Total: 26
+2025-06-12 12:09:39,807 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 75.0% | Échantillons: 26
+2025-06-12 12:09:39,808 - INFO - 🤖 Position: training_paume (confiance: 0.32)
+2025-06-12 12:09:40,473 - INFO - 📊 Échantillon ajouté: paume - Total: 27
+2025-06-12 12:09:41,513 - INFO - 📊 Échantillon ajouté: paume - Total: 28
+2025-06-12 12:09:42,540 - INFO - 📊 Échantillon ajouté: paume - Total: 29
+2025-06-12 12:09:42,811 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 76.7% | Échantillons: 29
+2025-06-12 12:09:42,812 - INFO - 🤖 Position: training_paume (confiance: 0.37)
+2025-06-12 12:09:43,579 - INFO - 📊 Échantillon ajouté: paume - Total: 30
+2025-06-12 12:09:44,613 - INFO - 📊 Échantillon ajouté: paume - Total: 31
+2025-06-12 12:09:45,645 - INFO - 📊 Échantillon ajouté: paume - Total: 32
+2025-06-12 12:09:45,812 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 78.3% | Échantillons: 32
+2025-06-12 12:09:45,812 - INFO - 🤖 Position: training_paume (confiance: 0.42)
+2025-06-12 12:09:46,685 - INFO - 📊 Échantillon ajouté: paume - Total: 33
+2025-06-12 12:09:47,711 - INFO - 📊 Échantillon ajouté: paume - Total: 34
+2025-06-12 12:09:48,755 - INFO - 📊 Échantillon ajouté: paume - Total: 35
+2025-06-12 12:09:48,817 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 79.7% | Échantillons: 35
+2025-06-12 12:09:48,818 - INFO - 🤖 Position: training_paume (confiance: 0.47)
+2025-06-12 12:09:49,786 - INFO - 📊 Échantillon ajouté: paume - Total: 36
+2025-06-12 12:09:50,817 - INFO - 📊 Échantillon ajouté: paume - Total: 37
+2025-06-12 12:09:51,820 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 80.8% | Échantillons: 37
+2025-06-12 12:09:51,821 - INFO - 🤖 Position: training_paume (confiance: 0.00)
+2025-06-12 12:09:51,852 - INFO - 📊 Échantillon ajouté: paume - Total: 38
+2025-06-12 12:09:52,888 - INFO - 📊 Échantillon ajouté: paume - Total: 39
+2025-06-12 12:09:53,923 - INFO - 📊 Échantillon ajouté: paume - Total: 40
+2025-06-12 12:09:54,819 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 81.9% | Échantillons: 40
+2025-06-12 12:09:54,820 - INFO - 🤖 Position: training_paume (confiance: 0.05)
+2025-06-12 12:09:54,963 - INFO - 📊 Échantillon ajouté: paume - Total: 41
+2025-06-12 12:09:55,989 - INFO - 📊 Échantillon ajouté: paume - Total: 42
+2025-06-12 12:09:57,026 - INFO - 📊 Échantillon ajouté: paume - Total: 43
+2025-06-12 12:09:57,822 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 82.9% | Échantillons: 43
+2025-06-12 12:09:57,823 - INFO - 🤖 Position: training_paume (confiance: 0.10)
+2025-06-12 12:09:58,059 - INFO - 📊 Échantillon ajouté: paume - Total: 44
+2025-06-12 12:09:59,101 - INFO - 📊 Échantillon ajouté: paume - Total: 45
+2025-06-12 12:10:00,128 - INFO - 📊 Échantillon ajouté: paume - Total: 46
+2025-06-12 12:10:00,830 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 83.7% | Échantillons: 46
+2025-06-12 12:10:00,830 - INFO - 🤖 Position: training_paume (confiance: 0.15)
+2025-06-12 12:10:01,165 - INFO - 📊 Échantillon ajouté: paume - Total: 47
+2025-06-12 12:10:02,210 - INFO - 📊 Échantillon ajouté: paume - Total: 48
+2025-06-12 12:10:03,228 - INFO - 📊 Échantillon ajouté: paume - Total: 49
+2025-06-12 12:10:03,833 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 84.5% | Échantillons: 49
+2025-06-12 12:10:03,833 - INFO - 🤖 Position: training_paume (confiance: 0.20)
+2025-06-12 12:10:04,270 - INFO - 📊 Échantillon ajouté: paume - Total: 50
+2025-06-12 12:10:04,270 - INFO - 📝 Position suivante: index
+2025-06-12 12:10:06,300 - INFO - 📊 Échantillon ajouté: index - Total: 51
+2025-06-12 12:10:06,826 - INFO - 📊 FPS: 30.1 | Mode: training | Détections: 85.2% | Échantillons: 51
+2025-06-12 12:10:06,826 - INFO - 🤖 Position: training_index (confiance: 0.23)
+2025-06-12 12:10:07,336 - INFO - 📊 Échantillon ajouté: index - Total: 52
+2025-06-12 12:10:08,371 - INFO - 📊 Échantillon ajouté: index - Total: 53
+2025-06-12 12:10:09,406 - INFO - 📊 Échantillon ajouté: index - Total: 54
+2025-06-12 12:10:09,856 - INFO - 📊 FPS: 29.7 | Mode: training | Détections: 85.8% | Échantillons: 54
+2025-06-12 12:10:09,857 - INFO - 🤖 Position: training_index (confiance: 0.28)
+2025-06-12 12:10:10,520 - INFO - 📊 Échantillon ajouté: index - Total: 55
+2025-06-12 12:10:11,508 - INFO - 📊 Échantillon ajouté: index - Total: 56
+2025-06-12 12:10:12,513 - INFO - 📊 Échantillon ajouté: index - Total: 57
+2025-06-12 12:10:12,837 - INFO - 📊 FPS: 30.2 | Mode: training | Détections: 86.4% | Échantillons: 57
+2025-06-12 12:10:12,837 - INFO - 🤖 Position: training_index (confiance: 0.33)
+2025-06-12 12:10:13,544 - INFO - 📊 Échantillon ajouté: index - Total: 58
+2025-06-12 12:10:14,573 - INFO - 📊 Échantillon ajouté: index - Total: 59
+2025-06-12 12:10:15,610 - INFO - 📊 Échantillon ajouté: index - Total: 60
+2025-06-12 12:10:15,843 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 87.0% | Échantillons: 60
+2025-06-12 12:10:15,843 - INFO - 🤖 Position: training_index (confiance: 0.38)
+2025-06-12 12:10:16,645 - INFO - 📊 Échantillon ajouté: index - Total: 61
+2025-06-12 12:10:17,675 - INFO - 📊 Échantillon ajouté: index - Total: 62
+2025-06-12 12:10:18,714 - INFO - 📊 Échantillon ajouté: index - Total: 63
+2025-06-12 12:10:18,847 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 87.5% | Échantillons: 63
+2025-06-12 12:10:18,847 - INFO - 🤖 Position: training_index (confiance: 0.43)
+2025-06-12 12:10:19,746 - INFO - 📊 Échantillon ajouté: index - Total: 64
+2025-06-12 12:10:20,786 - INFO - 📊 Échantillon ajouté: index - Total: 65
+2025-06-12 12:10:21,813 - INFO - 📊 Échantillon ajouté: index - Total: 66
+2025-06-12 12:10:21,849 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 87.9% | Échantillons: 66
+2025-06-12 12:10:21,849 - INFO - 🤖 Position: training_index (confiance: 0.48)
+2025-06-12 12:10:22,849 - INFO - 📊 Échantillon ajouté: index - Total: 67
+2025-06-12 12:10:23,886 - INFO - 📊 Échantillon ajouté: index - Total: 68
+2025-06-12 12:10:24,848 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 88.4% | Échantillons: 68
+2025-06-12 12:10:24,848 - INFO - 🤖 Position: training_index (confiance: 0.02)
+2025-06-12 12:10:24,916 - INFO - 📊 Échantillon ajouté: index - Total: 69
+2025-06-12 12:10:25,956 - INFO - 📊 Échantillon ajouté: index - Total: 70
+2025-06-12 12:10:26,985 - INFO - 📊 Échantillon ajouté: index - Total: 71
+2025-06-12 12:10:27,859 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 88.8% | Échantillons: 71
+2025-06-12 12:10:27,860 - INFO - 🤖 Position: training_index (confiance: 0.07)
+2025-06-12 12:10:28,022 - INFO - 📊 Échantillon ajouté: index - Total: 72
+2025-06-12 12:10:29,053 - INFO - 📊 Échantillon ajouté: index - Total: 73
+2025-06-12 12:10:30,088 - INFO - 📊 Échantillon ajouté: index - Total: 74
+2025-06-12 12:10:30,858 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 89.1% | Échantillons: 74
+2025-06-12 12:10:30,858 - INFO - 🤖 Position: training_index (confiance: 0.12)
+2025-06-12 12:10:31,132 - INFO - 📊 Échantillon ajouté: index - Total: 75
+2025-06-12 12:10:31,132 - INFO - 📝 Position suivante: victoire
+2025-06-12 12:10:33,165 - INFO - 📊 Échantillon ajouté: victoire - Total: 76
+2025-06-12 12:10:33,858 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 89.5% | Échantillons: 76
+2025-06-12 12:10:33,858 - INFO - 🤖 Position: training_victoire (confiance: 0.15)
+2025-06-12 12:10:34,195 - INFO - 📊 Échantillon ajouté: victoire - Total: 77
+2025-06-12 12:10:35,230 - INFO - 📊 Échantillon ajouté: victoire - Total: 78
+2025-06-12 12:10:36,261 - INFO - 📊 Échantillon ajouté: victoire - Total: 79
+2025-06-12 12:10:36,862 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 89.8% | Échantillons: 79
+2025-06-12 12:10:36,863 - INFO - 🤖 Position: training_victoire (confiance: 0.20)
+2025-06-12 12:10:37,299 - INFO - 📊 Échantillon ajouté: victoire - Total: 80
+2025-06-12 12:10:38,326 - INFO - 📊 Échantillon ajouté: victoire - Total: 81
+2025-06-12 12:10:39,365 - INFO - 📊 Échantillon ajouté: victoire - Total: 82
+2025-06-12 12:10:39,870 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 90.1% | Échantillons: 82
+2025-06-12 12:10:39,870 - INFO - 🤖 Position: training_victoire (confiance: 0.25)
+2025-06-12 12:10:40,407 - INFO - 📊 Échantillon ajouté: victoire - Total: 83
+2025-06-12 12:10:41,436 - INFO - 📊 Échantillon ajouté: victoire - Total: 84
+2025-06-12 12:10:42,470 - INFO - 📊 Échantillon ajouté: victoire - Total: 85
+2025-06-12 12:10:42,876 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 90.4% | Échantillons: 85
+2025-06-12 12:10:42,876 - INFO - 🤖 Position: training_victoire (confiance: 0.30)
+2025-06-12 12:10:43,499 - INFO - 📊 Échantillon ajouté: victoire - Total: 86
+2025-06-12 12:10:44,536 - INFO - 📊 Échantillon ajouté: victoire - Total: 87
+2025-06-12 12:10:45,576 - INFO - 📊 Échantillon ajouté: victoire - Total: 88
+2025-06-12 12:10:45,867 - INFO - 📊 FPS: 30.1 | Mode: training | Détections: 90.7% | Échantillons: 88
+2025-06-12 12:10:45,868 - INFO - 🤖 Position: training_victoire (confiance: 0.35)
+2025-06-12 12:10:46,607 - INFO - 📊 Échantillon ajouté: victoire - Total: 89
+2025-06-12 12:10:47,643 - INFO - 📊 Échantillon ajouté: victoire - Total: 90
+2025-06-12 12:10:48,672 - INFO - 📊 Échantillon ajouté: victoire - Total: 91
+2025-06-12 12:10:48,999 - INFO - 📊 FPS: 28.7 | Mode: training | Détections: 91.0% | Échantillons: 91
+2025-06-12 12:10:48,999 - INFO - 🤖 Position: training_victoire (confiance: 0.40)
+2025-06-12 12:10:49,708 - INFO - 📊 Échantillon ajouté: victoire - Total: 92
+2025-06-12 12:10:50,746 - INFO - 📊 Échantillon ajouté: victoire - Total: 93
+2025-06-12 12:10:51,778 - INFO - 📊 Échantillon ajouté: victoire - Total: 94
+2025-06-12 12:10:51,877 - INFO - 📊 FPS: 31.3 | Mode: training | Détections: 91.2% | Échantillons: 94
+2025-06-12 12:10:51,877 - INFO - 🤖 Position: training_victoire (confiance: 0.45)
+2025-06-12 12:10:52,814 - INFO - 📊 Échantillon ajouté: victoire - Total: 95
+2025-06-12 12:10:53,843 - INFO - 📊 Échantillon ajouté: victoire - Total: 96
+2025-06-12 12:10:54,883 - INFO - 📊 Échantillon ajouté: victoire - Total: 97
+2025-06-12 12:10:54,884 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 91.4% | Échantillons: 97
+2025-06-12 12:10:54,885 - INFO - 🤖 Position: captured_victoire (confiance: 1.00)
+2025-06-12 12:10:55,920 - INFO - 📊 Échantillon ajouté: victoire - Total: 98
+2025-06-12 12:10:56,948 - INFO - 📊 Échantillon ajouté: victoire - Total: 99
+2025-06-12 12:10:57,894 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 91.7% | Échantillons: 99
+2025-06-12 12:10:57,894 - INFO - 🤖 Position: training_victoire (confiance: 0.03)
+2025-06-12 12:10:58,002 - INFO - 📊 Échantillon ajouté: victoire - Total: 100
+2025-06-12 12:10:58,003 - INFO - 📝 Position suivante: ok
+2025-06-12 12:11:00,025 - INFO - 📊 Échantillon ajouté: ok - Total: 101
+2025-06-12 12:11:00,894 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 91.9% | Échantillons: 101
+2025-06-12 12:11:00,894 - INFO - 🤖 Position: training_ok (confiance: 0.07)
+2025-06-12 12:11:01,051 - INFO - 📊 Échantillon ajouté: ok - Total: 102
+2025-06-12 12:11:02,091 - INFO - 📊 Échantillon ajouté: ok - Total: 103
+2025-06-12 12:11:03,123 - INFO - 📊 Échantillon ajouté: ok - Total: 104
+2025-06-12 12:11:03,886 - INFO - 📊 FPS: 30.1 | Mode: training | Détections: 92.1% | Échantillons: 104
+2025-06-12 12:11:03,886 - INFO - 🤖 Position: training_ok (confiance: 0.12)
+2025-06-12 12:11:04,156 - INFO - 📊 Échantillon ajouté: ok - Total: 105
+2025-06-12 12:11:05,197 - INFO - 📊 Échantillon ajouté: ok - Total: 106
+2025-06-12 12:11:06,225 - INFO - 📊 Échantillon ajouté: ok - Total: 107
+2025-06-12 12:11:06,899 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 92.2% | Échantillons: 107
+2025-06-12 12:11:06,900 - INFO - 🤖 Position: training_ok (confiance: 0.17)
+2025-06-12 12:11:07,263 - INFO - 📊 Échantillon ajouté: ok - Total: 108
+2025-06-12 12:11:08,299 - INFO - 📊 Échantillon ajouté: ok - Total: 109
+2025-06-12 12:11:09,329 - INFO - 📊 Échantillon ajouté: ok - Total: 110
+2025-06-12 12:11:09,894 - INFO - 📊 FPS: 30.1 | Mode: training | Détections: 92.4% | Échantillons: 110
+2025-06-12 12:11:09,894 - INFO - 🤖 Position: training_ok (confiance: 0.22)
+2025-06-12 12:11:10,362 - INFO - 📊 Échantillon ajouté: ok - Total: 111
+2025-06-12 12:11:11,397 - INFO - 📊 Échantillon ajouté: ok - Total: 112
+2025-06-12 12:11:12,435 - INFO - 📊 Échantillon ajouté: ok - Total: 113
+2025-06-12 12:11:12,898 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 92.6% | Échantillons: 113
+2025-06-12 12:11:12,898 - INFO - 🤖 Position: training_ok (confiance: 0.27)
+2025-06-12 12:11:13,467 - INFO - 📊 Échantillon ajouté: ok - Total: 114
+2025-06-12 12:11:14,502 - INFO - 📊 Échantillon ajouté: ok - Total: 115
+2025-06-12 12:11:15,536 - INFO - 📊 Échantillon ajouté: ok - Total: 116
+2025-06-12 12:11:15,907 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 92.8% | Échantillons: 116
+2025-06-12 12:11:15,908 - INFO - 🤖 Position: training_ok (confiance: 0.32)
+2025-06-12 12:11:16,568 - INFO - 📊 Échantillon ajouté: ok - Total: 117
+2025-06-12 12:11:17,611 - INFO - 📊 Échantillon ajouté: ok - Total: 118
+2025-06-12 12:11:18,641 - INFO - 📊 Échantillon ajouté: ok - Total: 119
+2025-06-12 12:11:18,908 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 92.9% | Échantillons: 119
+2025-06-12 12:11:18,909 - INFO - 🤖 Position: training_ok (confiance: 0.37)
+2025-06-12 12:11:19,678 - INFO - 📊 Échantillon ajouté: ok - Total: 120
+2025-06-12 12:11:20,706 - INFO - 📊 Échantillon ajouté: ok - Total: 121
+2025-06-12 12:11:21,741 - INFO - 📊 Échantillon ajouté: ok - Total: 122
+2025-06-12 12:11:21,925 - INFO - 📊 FPS: 29.8 | Mode: training | Détections: 93.1% | Échantillons: 122
+2025-06-12 12:11:21,925 - INFO - 🤖 Position: training_ok (confiance: 0.42)
+2025-06-12 12:11:22,779 - INFO - 📊 Échantillon ajouté: ok - Total: 123
+2025-06-12 12:11:23,808 - INFO - 📊 Échantillon ajouté: ok - Total: 124
+2025-06-12 12:11:24,845 - INFO - 📊 Échantillon ajouté: ok - Total: 125
+2025-06-12 12:11:24,846 - INFO - 📝 Position suivante: pouce
+2025-06-12 12:11:24,910 - INFO - 📊 FPS: 30.2 | Mode: training | Détections: 93.2% | Échantillons: 125
+2025-06-12 12:11:24,910 - INFO - 🤖 Position: training_pouce (confiance: 0.97)
+2025-06-12 12:11:26,886 - INFO - 📊 Échantillon ajouté: pouce - Total: 126
+2025-06-12 12:11:27,916 - INFO - 📊 Échantillon ajouté: pouce - Total: 127
+2025-06-12 12:11:27,918 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 93.4% | Échantillons: 127
+2025-06-12 12:11:27,918 - INFO - 🤖 Position: captured_pouce (confiance: 1.00)
+2025-06-12 12:11:28,950 - INFO - 📊 Échantillon ajouté: pouce - Total: 128
+2025-06-12 12:11:29,981 - INFO - 📊 Échantillon ajouté: pouce - Total: 129
+2025-06-12 12:11:30,917 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 93.5% | Échantillons: 129
+2025-06-12 12:11:30,917 - INFO - 🤖 Position: training_pouce (confiance: 0.03)
+2025-06-12 12:11:31,019 - INFO - 📊 Échantillon ajouté: pouce - Total: 130
+2025-06-12 12:11:32,057 - INFO - 📊 Échantillon ajouté: pouce - Total: 131
+2025-06-12 12:11:33,085 - INFO - 📊 Échantillon ajouté: pouce - Total: 132
+2025-06-12 12:11:33,920 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 93.6% | Échantillons: 132
+2025-06-12 12:11:33,920 - INFO - 🤖 Position: training_pouce (confiance: 0.08)
+2025-06-12 12:11:34,127 - INFO - 📊 Échantillon ajouté: pouce - Total: 133
+2025-06-12 12:11:35,194 - INFO - 📊 Échantillon ajouté: pouce - Total: 134
+2025-06-12 12:11:36,299 - INFO - 📊 Échantillon ajouté: pouce - Total: 135
+2025-06-12 12:11:36,924 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 93.7% | Échantillons: 135
+2025-06-12 12:11:36,925 - INFO - 🤖 Position: training_pouce (confiance: 0.13)
+2025-06-12 12:11:37,237 - INFO - 📊 Échantillon ajouté: pouce - Total: 136
+2025-06-12 12:11:38,260 - INFO - 📊 Échantillon ajouté: pouce - Total: 137
+2025-06-12 12:11:39,294 - INFO - 📊 Échantillon ajouté: pouce - Total: 138
+2025-06-12 12:11:39,932 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 93.9% | Échantillons: 138
+2025-06-12 12:11:39,932 - INFO - 🤖 Position: training_pouce (confiance: 0.18)
+2025-06-12 12:11:40,328 - INFO - 📊 Échantillon ajouté: pouce - Total: 139
+2025-06-12 12:11:41,360 - INFO - 📊 Échantillon ajouté: pouce - Total: 140
+2025-06-12 12:11:42,392 - INFO - 📊 Échantillon ajouté: pouce - Total: 141
+2025-06-12 12:11:42,927 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 94.0% | Échantillons: 141
+2025-06-12 12:11:42,927 - INFO - 🤖 Position: training_pouce (confiance: 0.23)
+2025-06-12 12:11:43,432 - INFO - 📊 Échantillon ajouté: pouce - Total: 142
+2025-06-12 12:11:44,467 - INFO - 📊 Échantillon ajouté: pouce - Total: 143
+2025-06-12 12:11:45,498 - INFO - 📊 Échantillon ajouté: pouce - Total: 144
+2025-06-12 12:11:45,931 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 94.1% | Échantillons: 144
+2025-06-12 12:11:45,931 - INFO - 🤖 Position: training_pouce (confiance: 0.28)
+2025-06-12 12:11:46,533 - INFO - 📊 Échantillon ajouté: pouce - Total: 145
+2025-06-12 12:11:47,568 - INFO - 📊 Échantillon ajouté: pouce - Total: 146
+2025-06-12 12:11:48,600 - INFO - 📊 Échantillon ajouté: pouce - Total: 147
+2025-06-12 12:11:48,934 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 94.2% | Échantillons: 147
+2025-06-12 12:11:48,934 - INFO - 🤖 Position: training_pouce (confiance: 0.33)
+2025-06-12 12:11:49,641 - INFO - 📊 Échantillon ajouté: pouce - Total: 148
+2025-06-12 12:11:50,670 - INFO - 📊 Échantillon ajouté: pouce - Total: 149
+2025-06-12 12:11:51,713 - INFO - 📊 Échantillon ajouté: pouce - Total: 150
+2025-06-12 12:11:51,713 - INFO - 📝 Position suivante: stop
+2025-06-12 12:11:51,940 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 94.3% | Échantillons: 150
+2025-06-12 12:11:51,941 - INFO - 🤖 Position: training_stop (confiance: 0.88)
+2025-06-12 12:11:53,745 - INFO - 📊 Échantillon ajouté: stop - Total: 151
+2025-06-12 12:11:54,775 - INFO - 📊 Échantillon ajouté: stop - Total: 152
+2025-06-12 12:11:54,944 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 94.4% | Échantillons: 152
+2025-06-12 12:11:54,945 - INFO - 🤖 Position: training_stop (confiance: 0.42)
+2025-06-12 12:11:55,809 - INFO - 📊 Échantillon ajouté: stop - Total: 153
+2025-06-12 12:11:56,840 - INFO - 📊 Échantillon ajouté: stop - Total: 154
+2025-06-12 12:11:57,877 - INFO - 📊 Échantillon ajouté: stop - Total: 155
+2025-06-12 12:11:57,947 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 94.5% | Échantillons: 155
+2025-06-12 12:11:57,947 - INFO - 🤖 Position: training_stop (confiance: 0.47)
+2025-06-12 12:11:58,919 - INFO - 📊 Échantillon ajouté: stop - Total: 156
+2025-06-12 12:11:59,953 - INFO - 📊 Échantillon ajouté: stop - Total: 157
+2025-06-12 12:12:00,945 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 94.6% | Échantillons: 157
+2025-06-12 12:12:00,945 - INFO - 🤖 Position: training_stop (confiance: 0.00)
+2025-06-12 12:12:00,982 - INFO - 📊 Échantillon ajouté: stop - Total: 158
+2025-06-12 12:12:02,034 - INFO - 📊 Échantillon ajouté: stop - Total: 159
+2025-06-12 12:12:03,049 - INFO - 📊 Échantillon ajouté: stop - Total: 160
+2025-06-12 12:12:03,948 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 94.7% | Échantillons: 160
+2025-06-12 12:12:03,948 - INFO - 🤖 Position: training_stop (confiance: 0.05)
+2025-06-12 12:12:04,091 - INFO - 📊 Échantillon ajouté: stop - Total: 161
+2025-06-12 12:12:05,116 - INFO - 📊 Échantillon ajouté: stop - Total: 162
+2025-06-12 12:12:06,164 - INFO - 📊 Échantillon ajouté: stop - Total: 163
+2025-06-12 12:12:06,952 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 94.7% | Échantillons: 163
+2025-06-12 12:12:06,952 - INFO - 🤖 Position: training_stop (confiance: 0.10)
+2025-06-12 12:12:07,187 - INFO - 📊 Échantillon ajouté: stop - Total: 164
+2025-06-12 12:12:08,224 - INFO - 📊 Échantillon ajouté: stop - Total: 165
+2025-06-12 12:12:09,260 - INFO - 📊 Échantillon ajouté: stop - Total: 166
+2025-06-12 12:12:09,954 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 94.8% | Échantillons: 166
+2025-06-12 12:12:09,954 - INFO - 🤖 Position: training_stop (confiance: 0.15)
+2025-06-12 12:12:10,293 - INFO - 📊 Échantillon ajouté: stop - Total: 167
+2025-06-12 12:12:11,329 - INFO - 📊 Échantillon ajouté: stop - Total: 168
+2025-06-12 12:12:12,366 - INFO - 📊 Échantillon ajouté: stop - Total: 169
+2025-06-12 12:12:12,959 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 94.9% | Échantillons: 169
+2025-06-12 12:12:12,960 - INFO - 🤖 Position: training_stop (confiance: 0.20)
+2025-06-12 12:12:13,395 - INFO - 📊 Échantillon ajouté: stop - Total: 170
+2025-06-12 12:12:14,441 - INFO - 📊 Échantillon ajouté: stop - Total: 171
+2025-06-12 12:12:15,461 - INFO - 📊 Échantillon ajouté: stop - Total: 172
+2025-06-12 12:12:15,966 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 95.0% | Échantillons: 172
+2025-06-12 12:12:15,966 - INFO - 🤖 Position: training_stop (confiance: 0.25)
+2025-06-12 12:12:16,504 - INFO - 📊 Échantillon ajouté: stop - Total: 173
+2025-06-12 12:12:17,531 - INFO - 📊 Échantillon ajouté: stop - Total: 174
+2025-06-12 12:12:18,570 - INFO - 📊 Échantillon ajouté: stop - Total: 175
+2025-06-12 12:12:18,570 - INFO - 📝 Position suivante: salut
+2025-06-12 12:12:18,983 - INFO - 📊 FPS: 29.8 | Mode: training | Détections: 95.1% | Échantillons: 175
+2025-06-12 12:12:18,983 - INFO - 🤖 Position: training_salut (confiance: 0.80)
+2025-06-12 12:12:20,604 - INFO - 📊 Échantillon ajouté: salut - Total: 176
+2025-06-12 12:12:21,633 - INFO - 📊 Échantillon ajouté: salut - Total: 177
+2025-06-12 12:12:21,975 - INFO - 📊 FPS: 30.1 | Mode: training | Détections: 95.1% | Échantillons: 177
+2025-06-12 12:12:21,976 - INFO - 🤖 Position: training_salut (confiance: 0.33)
+2025-06-12 12:12:22,670 - INFO - 📊 Échantillon ajouté: salut - Total: 178
+2025-06-12 12:12:23,703 - INFO - 📊 Échantillon ajouté: salut - Total: 179
+2025-06-12 12:12:24,748 - INFO - 📊 Échantillon ajouté: salut - Total: 180
+2025-06-12 12:12:24,971 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 95.2% | Échantillons: 180
+2025-06-12 12:12:24,972 - INFO - 🤖 Position: training_salut (confiance: 0.38)
+2025-06-12 12:12:25,778 - INFO - 📊 Échantillon ajouté: salut - Total: 181
+2025-06-12 12:12:26,806 - INFO - 📊 Échantillon ajouté: salut - Total: 182
+2025-06-12 12:12:27,841 - INFO - 📊 Échantillon ajouté: salut - Total: 183
+2025-06-12 12:12:27,974 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 95.3% | Échantillons: 183
+2025-06-12 12:12:27,974 - INFO - 🤖 Position: training_salut (confiance: 0.43)
+2025-06-12 12:12:28,873 - INFO - 📊 Échantillon ajouté: salut - Total: 184
+2025-06-12 12:12:29,911 - INFO - 📊 Échantillon ajouté: salut - Total: 185
+2025-06-12 12:12:30,947 - INFO - 📊 Échantillon ajouté: salut - Total: 186
+2025-06-12 12:12:31,001 - INFO - 📊 FPS: 29.7 | Mode: training | Détections: 95.3% | Échantillons: 186
+2025-06-12 12:12:31,001 - INFO - 🤖 Position: training_salut (confiance: 0.48)
+2025-06-12 12:12:31,982 - INFO - 📊 Échantillon ajouté: salut - Total: 187
+2025-06-12 12:12:33,036 - INFO - 📊 Échantillon ajouté: salut - Total: 188
+2025-06-12 12:12:33,980 - INFO - 📊 FPS: 30.2 | Mode: training | Détections: 95.4% | Échantillons: 188
+2025-06-12 12:12:33,980 - INFO - 🤖 Position: training_salut (confiance: 0.02)
+2025-06-12 12:12:34,040 - INFO - 📊 Échantillon ajouté: salut - Total: 189
+2025-06-12 12:12:35,083 - INFO - 📊 Échantillon ajouté: salut - Total: 190
+2025-06-12 12:12:36,120 - INFO - 📊 Échantillon ajouté: salut - Total: 191
+2025-06-12 12:12:36,989 - INFO - 📊 FPS: 29.9 | Mode: training | Détections: 95.5% | Échantillons: 191
+2025-06-12 12:12:36,989 - INFO - 🤖 Position: training_salut (confiance: 0.07)
+2025-06-12 12:12:37,163 - INFO - 📊 Échantillon ajouté: salut - Total: 192
+2025-06-12 12:12:38,189 - INFO - 📊 Échantillon ajouté: salut - Total: 193
+2025-06-12 12:12:39,215 - INFO - 📊 Échantillon ajouté: salut - Total: 194
+2025-06-12 12:12:39,984 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 95.5% | Échantillons: 194
+2025-06-12 12:12:39,984 - INFO - 🤖 Position: training_salut (confiance: 0.12)
+2025-06-12 12:12:40,251 - INFO - 📊 Échantillon ajouté: salut - Total: 195
+2025-06-12 12:12:41,288 - INFO - 📊 Échantillon ajouté: salut - Total: 196
+2025-06-12 12:12:42,315 - INFO - 📊 Échantillon ajouté: salut - Total: 197
+2025-06-12 12:12:42,981 - INFO - 📊 FPS: 30.0 | Mode: training | Détections: 95.6% | Échantillons: 197
+2025-06-12 12:12:42,981 - INFO - 🤖 Position: training_salut (confiance: 0.17)
+2025-06-12 12:12:43,358 - INFO - 📊 Échantillon ajouté: salut - Total: 198
+2025-06-12 12:12:44,381 - INFO - 📊 Échantillon ajouté: salut - Total: 199
+2025-06-12 12:12:45,420 - INFO - 📊 Échantillon ajouté: salut - Total: 200
+2025-06-12 12:12:45,449 - INFO - 🚀 Démarrage entraînement du modèle IA...
+2025-06-12 12:12:45,496 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:45,524 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:45,536 - INFO - ✅ Modèle créé: 30408 paramètres
+2025-06-12 12:12:45,537 - INFO - 📊 Distribution: {0: 25, 1: 25, 2: 25, 3: 25, 4: 25, 5: 25, 6: 25, 7: 25}
+2025-06-12 12:12:45,537 - INFO - 🚀 Entraînement: 200 échantillons, 25 époques
+2025-06-12 12:12:45,563 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:45,588 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:45,655 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:45,697 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:45,730 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:45,757 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:45,787 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:45,817 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:45,846 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:45,869 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:45,910 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:45,940 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:45,966 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:45,997 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:46,001 - INFO - 📊 FPS: 29.8 | Mode: training | Détections: 95.7% | Échantillons: 200
+2025-06-12 12:12:46,002 - INFO - 🤖 Position: training_complete (confiance: 1.00)
+2025-06-12 12:12:46,048 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:46,074 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:46,108 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:46,148 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:46,179 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:46,216 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:46,246 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:46,283 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:46,324 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:46,358 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:46,403 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:46,426 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:46,519 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:46,538 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:46,566 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:46,592 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:46,631 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:46,663 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:46,705 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:46,736 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:46,765 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:46,799 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:46,828 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:46,864 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:46,892 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:46,925 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:46,956 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:46,987 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,019 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,046 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,080 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,152 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,178 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,186 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,203 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,217 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,233 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,262 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,285 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,324 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,356 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,383 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,423 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,458 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,485 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,515 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,603 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,630 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,663 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,681 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,695 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,720 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,759 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,791 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,821 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,859 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,895 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,926 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,957 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:47,990 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:48,035 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:48,068 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:48,091 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:48,132 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:48,164 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:48,194 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:48,222 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:48,251 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:48,293 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:48,326 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:48,355 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:48,382 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:48,425 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:48,455 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:48,485 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:48,528 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:48,554 - INFO - ✅ Entraînement terminé:
+2025-06-12 12:12:48,554 - INFO -    Précision: 0.7125
+2025-06-12 12:12:48,554 - WARNING - ⚠️ Entraînement déjà en cours - ignoré
+2025-06-12 12:12:48,555 - INFO -    Validation: 0.0000
+2025-06-12 12:12:48,555 - ERROR - ❌ Erreur sauvegarde: Invalid filepath extension for saving. Please add either a `.keras` extension for the native Keras format (recommended) or a `.h5` extension. Use `model.export(filepath)` if you want to export a SavedModel for use with TFLite/TFServing/etc. Received: filepath=hand_position_model.
+2025-06-12 12:12:48,555 - INFO - ✅ Modèle entraîné et sauvegardé!
+2025-06-12 12:12:48,991 - INFO - 📊 FPS: 30.1 | Mode: recognition (Entraînée) | Détections: 95.5% | Échantillons: 200
+2025-06-12 12:12:48,991 - INFO - 🤖 Position: training_complete (confiance: 1.00)
+2025-06-12 12:12:52,044 - INFO - 📊 FPS: 29.5 | Mode: recognition (Entraînée) | Détections: 94.3% | Échantillons: 200
+2025-06-12 12:12:52,044 - INFO - 🤖 Position: training_complete (confiance: 1.00)
+2025-06-12 12:12:55,049 - INFO - 📊 FPS: 29.9 | Mode: recognition (Entraînée) | Détections: 93.1% | Échantillons: 200
+2025-06-12 12:12:55,049 - INFO - 🤖 Position: training_complete (confiance: 1.00)
+2025-06-12 12:12:58,051 - INFO - 📊 FPS: 30.0 | Mode: recognition (Entraînée) | Détections: 91.9% | Échantillons: 200
+2025-06-12 12:12:58,052 - INFO - 🤖 Position: training_complete (confiance: 1.00)
+2025-06-12 12:13:01,001 - INFO - 📊 FPS: 30.5 | Mode: recognition (Entraînée) | Détections: 90.8% | Échantillons: 200
+2025-06-12 12:13:01,001 - INFO - 🤖 Position: training_complete (confiance: 1.00)
+2025-06-12 12:13:02,178 - INFO - 🤖 Mode reconnaissance activé
+2025-06-12 12:13:02,178 - INFO - 🤖 Mode reconnaissance IA activé
+2025-06-12 12:13:04,005 - INFO - 📊 FPS: 30.0 | Mode: recognition (Entraînée) | Détections: 89.6% | Échantillons: 200
+2025-06-12 12:13:04,005 - INFO - 🤖 Position: training_complete (confiance: 1.00)
+2025-06-12 12:13:06,577 - WARNING - ⚠️ Aucun modèle trouvé: hand_position_model_model
+2025-06-12 12:13:06,577 - WARNING - ⚠️ Aucun modèle à charger
+2025-06-12 12:13:07,007 - INFO - 📊 FPS: 30.0 | Mode: recognition (Entraînée) | Détections: 88.5% | Échantillons: 200
+2025-06-12 12:13:07,008 - INFO - 🤖 Position: training_complete (confiance: 1.00)
+2025-06-12 12:13:10,008 - INFO - 📊 FPS: 30.0 | Mode: recognition (Entraînée) | Détections: 87.5% | Échantillons: 200
+2025-06-12 12:13:10,008 - INFO - 🤖 Position: training_complete (confiance: 1.00)
+2025-06-12 12:13:12,608 - INFO - 🛑 Arrêt demandé
+2025-06-12 12:13:12,608 - INFO - 🧹 Nettoyage...
+2025-06-12 12:13:12,609 - INFO - ================================================================================
+2025-06-12 12:13:12,609 - INFO - 📊 STATS FINALES:
+2025-06-12 12:13:12,609 - INFO -   ⏱️ Durée: 257.5s
+2025-06-12 12:13:12,609 - INFO -   🎞️ Frames: 7548
+2025-06-12 12:13:12,609 - INFO -   🎯 Détections gant: 7548
+2025-06-12 12:13:12,609 - INFO -   🤖 Frames IA: 7548
+2025-06-12 12:13:12,609 - INFO -   🎭 Détections position: 6534
+2025-06-12 12:13:12,609 - INFO -   📈 Taux reconnaissance: 86.6%
+2025-06-12 12:13:12,609 - INFO -   📚 Échantillons: 200
+2025-06-12 12:13:12,609 - INFO -   📸 Screenshots: 0
+2025-06-12 12:13:12,609 - INFO - ================================================================================
+2025-06-12 12:13:12,610 - INFO - ✅ Pipeline fermé
+2025-06-12 12:13:12,617 - INFO - ✅ Interface fermée
+2025-06-12 12:13:13,119 - INFO - ✅ Drone déconnecté
+2025-06-12 12:13:13,120 - INFO - 🎉 Session IA terminée!
