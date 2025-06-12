@@ -1,49 +1,71 @@
-2025-06-12 08:46:51,375 - INFO - === BEBOP 2 OPTIMIZED BICOLOR DETECTION ===
-2025-06-12 08:46:51,375 - INFO - 🎯 Détection gant bicolore optimisée rouge/orange
-2025-06-12 08:46:51,376 - INFO - 📡 Connexion au drone...
-2025-06-12 08:46:52,439 - INFO - ✅ Drone connecté!
-2025-06-12 08:46:52,440 - INFO - 📹 Démarrage flux vidéo...
-2025-06-12 08:46:54,945 - INFO - Contrôle drone démarré.
-2025-06-12 08:46:54,946 - INFO - 🚀 FFmpeg optimisé couleurs: ffmpeg -protocol_whitelist file,rtp,udp -fflags nobuffer -flags low_delay -avioflags direct -analyzeduration 1000000 -probesize 1000000 -i C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\utils\bebop.sdp -vf eq=saturation=1.1:gamma=0.95 -f rawvideo -pix_fmt bgr24 -
-2025-06-12 08:46:54,963 - INFO - ✅ Pipeline optimisé initialisé
-2025-06-12 08:46:55,018 - INFO - ======================================================================
-2025-06-12 08:46:55,019 - INFO - 🎮 COMMANDES:
-2025-06-12 08:46:55,019 - INFO -   'q' = Quitter | 's' = Screenshot | 'r' = Reset détecteur
-2025-06-12 08:46:55,019 - INFO -   'z' = Reset zoom | '+/-' = Zoom manuel | 'd' = Debug
-2025-06-12 08:46:55,020 - INFO -   'c' = Calibrage couleurs | 'e' = Ajust exposition
-2025-06-12 08:46:55,020 - INFO - ======================================================================
-2025-06-12 08:46:55,020 - INFO - 🎯 OPTIMISATIONS:
-2025-06-12 08:46:55,020 - INFO -   ✓ Équilibrage rouge/orange automatique
-2025-06-12 08:46:55,021 - INFO -   ✓ Correction exposition adaptative
-2025-06-12 08:46:55,021 - INFO -   ✓ Zoom prédictif avec tracking
-2025-06-12 08:46:55,021 - INFO -   ✓ Scoring qualité bicolore
-2025-06-12 08:46:55,021 - INFO -   ✓ Morphologie adaptée au zoom
-2025-06-12 08:46:55,022 - INFO - ======================================================================
-2025-06-12 08:46:55,022 - INFO - 🎬 Démarrage détection optimisée...
-2025-06-12 08:47:03,134 - INFO - 📊 FPS: 11.1 | Détections: 0.0% | Qualité moy: 0.00 | Zoom: 1.0x | Exposition: 1.00
-2025-06-12 08:47:09,635 - INFO - 📊 FPS: 13.8 | Détections: 2.2% | Qualité moy: 0.61 | Zoom: 1.0x | Exposition: 1.00
-2025-06-12 08:47:15,137 - INFO - 📊 FPS: 16.4 | Détections: 1.5% | Qualité moy: 0.61 | Zoom: 1.0x | Exposition: 1.00
-2025-06-12 08:47:19,938 - INFO - 📊 FPS: 18.7 | Détections: 22.5% | Qualité moy: 0.61 | Zoom: 1.0x | Exposition: 1.00
-2025-06-12 08:47:24,166 - INFO - 📊 FPS: 21.3 | Détections: 38.0% | Qualité moy: 0.61 | Zoom: 1.0x | Exposition: 1.00
-2025-06-12 08:47:30,284 - INFO - 📊 FPS: 14.7 | Détections: 42.2% | Qualité moy: 0.67 | Zoom: 1.5x | Exposition: 1.00
-2025-06-12 08:47:34,763 - INFO - ⌨️ Interruption clavier
-2025-06-12 08:47:34,765 - INFO - 🧹 Nettoyage...
-2025-06-12 08:47:34,765 - INFO - ======================================================================
-2025-06-12 08:47:34,766 - INFO - 📊 STATS FINALES OPTIMISÉES:
-2025-06-12 08:47:34,767 - INFO -   ⏱️ Durée: 43.4s
-2025-06-12 08:47:34,767 - INFO -   🎞️ Frames: 611
-2025-06-12 08:47:34,768 - INFO -   ⚡ FPS moyen: 14.1
-2025-06-12 08:47:34,769 - INFO -   🎯 Détections: 228 (37.3%)
-2025-06-12 08:47:34,769 - INFO -   ⭐ Détections qualité: 21 (9.2%)
-2025-06-12 08:47:34,770 - INFO -   📈 Qualité moyenne: 0.67
-2025-06-12 08:47:34,771 - INFO -   🔍 Zoom final: 1.0x
-2025-06-12 08:47:34,771 - INFO -   📈 Ajustements zoom: 230
-2025-06-12 08:47:34,772 - INFO -   💡 Exposition finale: 1.00
-2025-06-12 08:47:34,772 - INFO -   📸 Screenshots: 0
-2025-06-12 08:47:34,773 - INFO -   🎨 Équilibrage final R/O: 0.00/1.00
-2025-06-12 08:47:34,774 - INFO -   📏 Aire moyenne: 2414
-2025-06-12 08:47:34,775 - INFO - ======================================================================
-2025-06-12 08:47:34,777 - INFO - ✅ Pipeline fermé
-2025-06-12 08:47:34,793 - INFO - ✅ Interface fermée
-2025-06-12 08:47:35,296 - INFO - ✅ Drone déconnecté
-2025-06-12 08:47:35,298 - INFO - 🎉 Session détection optimisée terminée!
+2025-06-12 09:06:32,671 - INFO - === BEBOP 2 OPTIMIZED BICOLOR DETECTION + DIRECT KEYBOARD CONTROL ===
+2025-06-12 09:06:32,671 - INFO - 🎯 Détection gant bicolore optimisée rouge/orange
+2025-06-12 09:06:32,672 - INFO - 🎮 Contrôle drone direct par clavier
+2025-06-12 09:06:32,672 - INFO - 📡 Connexion au drone...
+2025-06-12 09:06:34,508 - INFO - ✅ Drone connecté!
+2025-06-12 09:06:34,510 - INFO - 🎮 Contrôleur drone optimisé initialisé
+2025-06-12 09:06:34,510 - INFO - 🚁 Paramètres: power=20, duration=0.2s, cooldown=0.1s
+2025-06-12 09:06:34,513 - INFO - 📹 Démarrage flux vidéo...
+2025-06-12 09:06:37,016 - INFO - 🚀 FFmpeg optimisé couleurs: ffmpeg -protocol_whitelist file,rtp,udp -fflags nobuffer -flags low_delay -avioflags direct -analyzeduration 1000000 -probesize 1000000 -i C:\Users\Baptiste\anaconda3\Lib\site-packages\pyparrot\utils\bebop.sdp -vf eq=saturation=1.1:gamma=0.95 -f rawvideo -pix_fmt bgr24 -
+2025-06-12 09:06:37,030 - INFO - ✅ Pipeline optimisé initialisé
+2025-06-12 09:06:37,099 - INFO - ================================================================================
+2025-06-12 09:06:37,100 - INFO - 🎮 COMMANDES DRONE (CONTRÔLE DIRECT CLAVIER):
+2025-06-12 09:06:37,100 - INFO -   DÉCOLLAGE/ATTERRISSAGE: 't' = décoller | 'l' = atterrir
+2025-06-12 09:06:37,100 - INFO -   MOUVEMENTS: 'z'=avant | 's'=arrière | 'q'=gauche | 'd'=droite
+2025-06-12 09:06:37,101 - INFO -   VERTICAL: 'r'=monter | 'f'=descendre
+2025-06-12 09:06:37,102 - INFO -   ROTATIONS: 'a'=gauche | 'e'=droite
+2025-06-12 09:06:37,102 - INFO -   URGENCE: 'x' = arrêt | '+/-' = puissance | 'Échap' = quitter
+2025-06-12 09:06:37,103 - INFO - ================================================================================
+2025-06-12 09:06:37,103 - INFO - 🔧 COMMANDES DÉTECTION:
+2025-06-12 09:06:37,104 - INFO -   'o' = Screenshot | 'p' = Reset détecteur | 'i' = Reset zoom
+2025-06-12 09:06:37,104 - INFO -   'u' = Calibrage couleurs | 'y' = Reset exposition | 'h' = Debug
+2025-06-12 09:06:37,104 - INFO - ================================================================================
+2025-06-12 09:06:37,104 - INFO - 🎯 OPTIMISATIONS:
+2025-06-12 09:06:37,105 - INFO -   ✓ Contrôle drone ultra-réactif (100ms latence)
+2025-06-12 09:06:37,105 - INFO -   ✓ Équilibrage rouge/orange automatique
+2025-06-12 09:06:37,105 - INFO -   ✓ Correction exposition adaptative
+2025-06-12 09:06:37,105 - INFO -   ✓ Zoom prédictif avec tracking
+2025-06-12 09:06:37,105 - INFO -   ✓ Interface de vol intégrée
+2025-06-12 09:06:37,106 - INFO - ================================================================================
+2025-06-12 09:06:37,106 - INFO - 🎬 Démarrage détection + contrôle direct...
+2025-06-12 09:06:42,757 - INFO - 📊 FPS: 15.9 | Détections: 100.0% | Qualité: 0.00 | Zoom: 1.0x | Drone: SOL (0 cmd)
+2025-06-12 09:06:45,765 - INFO - 📊 FPS: 29.9 | Détections: 100.0% | Qualité: 0.00 | Zoom: 1.0x | Drone: SOL (0 cmd)
+2025-06-12 09:06:48,773 - INFO - 📊 FPS: 29.9 | Détections: 100.0% | Qualité: 0.00 | Zoom: 1.0x | Drone: SOL (0 cmd)
+2025-06-12 09:06:51,767 - INFO - 📊 FPS: 30.1 | Détections: 100.0% | Qualité: 0.00 | Zoom: 1.0x | Drone: SOL (0 cmd)
+2025-06-12 09:06:54,873 - INFO - 📊 FPS: 29.0 | Détections: 100.0% | Qualité: 0.00 | Zoom: 1.0x | Drone: SOL (0 cmd)
+2025-06-12 09:06:57,852 - INFO - 📊 FPS: 30.2 | Détections: 100.0% | Qualité: 0.00 | Zoom: 1.0x | Drone: SOL (0 cmd)
+2025-06-12 09:06:59,951 - INFO - 🚁 DÉCOLLAGE...
+2025-06-12 09:07:05,474 - INFO - ✅ Décollage effectué
+2025-06-12 09:07:06,544 - INFO - 📊 FPS: 10.4 | Détections: 100.0% | Qualité: 0.00 | Zoom: 1.0x | Drone: VOL (0 cmd)
+2025-06-12 09:07:09,527 - INFO - 📊 FPS: 30.2 | Détections: 100.0% | Qualité: 0.00 | Zoom: 1.0x | Drone: VOL (0 cmd)
+2025-06-12 09:07:12,486 - INFO - 📊 FPS: 30.4 | Détections: 100.0% | Qualité: 0.00 | Zoom: 1.0x | Drone: VOL (0 cmd)
+2025-06-12 09:07:15,615 - INFO - 📊 FPS: 28.8 | Détections: 100.0% | Qualité: 0.00 | Zoom: 1.0x | Drone: VOL (0 cmd)
+2025-06-12 09:07:17,106 - INFO - 🛬 ATTERRISSAGE...
+2025-06-12 09:07:21,626 - INFO - ✅ Atterrissage - Vol de 17.2s
+2025-06-12 09:07:23,352 - INFO - 📊 FPS: 11.6 | Détections: 100.0% | Qualité: 0.00 | Zoom: 1.0x | Drone: SOL (0 cmd)
+2025-06-12 09:07:26,407 - INFO - 📊 FPS: 29.5 | Détections: 100.0% | Qualité: 0.00 | Zoom: 1.0x | Drone: SOL (0 cmd)
+2025-06-12 09:07:29,239 - INFO - 📊 FPS: 31.8 | Détections: 100.0% | Qualité: 0.00 | Zoom: 1.0x | Drone: SOL (0 cmd)
+2025-06-12 09:07:32,112 - INFO - 📊 FPS: 31.3 | Détections: 100.0% | Qualité: 0.00 | Zoom: 1.0x | Drone: SOL (0 cmd)
+2025-06-12 09:07:32,386 - INFO - ⌨️ Interruption clavier
+2025-06-12 09:07:32,386 - INFO - 🧹 Nettoyage...
+2025-06-12 09:07:32,387 - INFO - ================================================================================
+2025-06-12 09:07:32,387 - INFO - 📊 STATS FINALES OPTIMISÉES:
+2025-06-12 09:07:32,387 - INFO -   ⏱️ Durée totale: 59.7s
+2025-06-12 09:07:32,387 - INFO -   🎞️ Frames traitées: 1269
+2025-06-12 09:07:32,387 - INFO -   ⚡ FPS moyen: 21.3
+2025-06-12 09:07:32,387 - INFO -   🎯 Détections: 1268 (99.9%)
+2025-06-12 09:07:32,388 - INFO -   ⭐ Détections qualité: 0 (0.0%)
+2025-06-12 09:07:32,388 - INFO -   📈 Qualité moyenne: 0.00
+2025-06-12 09:07:32,388 - INFO -   🔍 Zoom final: 1.0x
+2025-06-12 09:07:32,388 - INFO -   📈 Ajustements zoom: 1268
+2025-06-12 09:07:32,388 - INFO -   💡 Exposition finale: 1.05
+2025-06-12 09:07:32,388 - INFO -   📸 Screenshots: 0
+2025-06-12 09:07:32,390 - INFO -   🚁 Commandes drone: 0
+2025-06-12 09:07:32,390 - INFO -   ✈️ Temps de vol total: 32.4s
+2025-06-12 09:07:32,390 - INFO -   🎨 Équilibrage final R/O: 0.24/0.76
+2025-06-12 09:07:32,390 - INFO -   📏 Aire moyenne: 10498
+2025-06-12 09:07:32,391 - INFO - ================================================================================
+2025-06-12 09:07:32,391 - INFO - ✅ Pipeline fermé
+2025-06-12 09:07:32,399 - INFO - ✅ Interface fermée
+2025-06-12 09:07:32,903 - INFO - ✅ Drone déconnecté
+2025-06-12 09:07:32,904 - INFO - 🎉 Session détection + contrôle direct terminée!
