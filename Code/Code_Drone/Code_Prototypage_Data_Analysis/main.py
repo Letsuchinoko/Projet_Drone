@@ -24,7 +24,170 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# === DÉTECTEUR GANT OPTIMISÉ AVEC ANALYSE BICOLORE ===
+# === CONTRÔLEUR DRONE OPTIMISÉ CLAVIER ===
+class OptimizedDroneController:
+    def __init__(self, bebop):
+        self.bebop = bebop
+        self.is_flying = False
+        self.last_command_time = 0
+        self.command_cooldown = 0.1  # 100ms entre commandes pour éviter spam
+        
+        # Paramètres de vol optimisés
+        self.movement_duration = 0.2  # Durée des mouvements (réduite pour réactivité)
+        self.movement_power = 20      # Puissance des mouvements (ajustable)
+        self.rotation_power = 30      # Puissance des rotations
+        self.vertical_power = 15      # Puissance montée/descente
+        
+        # État des touches pressées (pour mouvements continus)
+        self.keys_pressed = set()
+        self.last_movement_time = 0
+        self.continuous_movement_interval = 0.15  # Répétition des mouvements
+        
+        # Statistiques
+        self.commands_sent = 0
+        self.takeoff_time = None
+        
+        logger.info("🎮 Contrôleur drone optimisé initialisé")
+        logger.info("🚁 Paramètres: power={}, duration={:.1f}s, cooldown={:.1f}s".format(
+            self.movement_power, self.movement_duration, self.command_cooldown))
+
+    def can_send_command(self):
+        """Vérifie si on peut envoyer une commande (anti-spam)"""
+        current_time = time.time()
+        if current_time - self.last_command_time >= self.command_cooldown:
+            self.last_command_time = current_time
+            return True
+        return False
+
+    def send_movement_command(self, roll=0, pitch=0, yaw=0, vertical=0, command_name=""):
+        """Envoi commande de mouvement avec gestion d'erreurs"""
+        if not self.can_send_command():
+            return False
+            
+        try:
+            if self.is_flying:
+                self.bebop.fly_direct(
+                    roll=roll, 
+                    pitch=pitch, 
+                    yaw=yaw, 
+                    vertical_movement=vertical, 
+                    duration=self.movement_duration
+                )
+                self.commands_sent += 1
+                logger.debug(f"🎮 {command_name}: roll={roll}, pitch={pitch}, yaw={yaw}, vertical={vertical}")
+                return True
+            else:
+                logger.warning(f"⚠️ Commande {command_name} ignorée - drone non en vol")
+                return False
+        except Exception as e:
+            logger.error(f"❌ Erreur commande {command_name}: {e}")
+            return False
+
+    def handle_key_press(self, key):
+        """Gestion optimisée des touches pressées"""
+        current_time = time.time()
+        command_sent = False
+        
+        # === COMMANDES DE VOL DE BASE ===
+        if key == ord('t') and not self.is_flying:
+            if self.can_send_command():
+                try:
+                    logger.info("🚁 DÉCOLLAGE...")
+                    self.bebop.safe_takeoff(10)
+                    self.is_flying = True
+                    self.takeoff_time = current_time
+                    logger.info("✅ Décollage effectué")
+                    command_sent = True
+                except Exception as e:
+                    logger.error(f"❌ Erreur décollage: {e}")
+        
+        elif key == ord('l') and self.is_flying:
+            if self.can_send_command():
+                try:
+                    logger.info("🛬 ATTERRISSAGE...")
+                    self.bebop.safe_land(10)
+                    self.is_flying = False
+                    if self.takeoff_time:
+                        flight_duration = current_time - self.takeoff_time
+                        logger.info(f"✅ Atterrissage - Vol de {flight_duration:.1f}s")
+                    command_sent = True
+                except Exception as e:
+                    logger.error(f"❌ Erreur atterrissage: {e}")
+        
+        # === MOUVEMENTS DIRECTIONNELS ===
+        elif key == ord('z'):  # AVANT
+            command_sent = self.send_movement_command(
+                pitch=self.movement_power, command_name="AVANT")
+            
+        elif key == ord('s'):  # ARRIÈRE  
+            command_sent = self.send_movement_command(
+                pitch=-self.movement_power, command_name="ARRIÈRE")
+            
+        elif key == ord('q'):  # GAUCHE
+            command_sent = self.send_movement_command(
+                roll=-self.movement_power, command_name="GAUCHE")
+            
+        elif key == ord('d'):  # DROITE
+            command_sent = self.send_movement_command(
+                roll=self.movement_power, command_name="DROITE")
+        
+        # === MOUVEMENTS VERTICAUX ===
+        elif key == ord('r'):  # MONTÉE
+            command_sent = self.send_movement_command(
+                vertical=self.vertical_power, command_name="MONTÉE")
+            
+        elif key == ord('f'):  # DESCENTE
+            command_sent = self.send_movement_command(
+                vertical=-self.vertical_power, command_name="DESCENTE")
+        
+        # === ROTATIONS ===
+        elif key == ord('a'):  # ROTATION GAUCHE
+            command_sent = self.send_movement_command(
+                yaw=-self.rotation_power, command_name="ROTATION GAUCHE")
+            
+        elif key == ord('e'):  # ROTATION DROITE
+            command_sent = self.send_movement_command(
+                yaw=self.rotation_power, command_name="ROTATION DROITE")
+        
+        # === ARRÊT D'URGENCE ===
+        elif key == ord('x'):  # STOP
+            if self.is_flying and self.can_send_command():
+                try:
+                    self.bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=0, duration=0.1)
+                    logger.info("🛑 ARRÊT D'URGENCE")
+                    command_sent = True
+                except Exception as e:
+                    logger.error(f"❌ Erreur arrêt urgence: {e}")
+        
+        # === AJUSTEMENTS DE PUISSANCE ===
+        elif key == ord('+') or key == ord('='):
+            self.movement_power = min(50, self.movement_power + 5)
+            self.rotation_power = min(60, self.rotation_power + 5)
+            self.vertical_power = min(30, self.vertical_power + 3)
+            logger.info(f"⚡ Puissance augmentée: mouv={self.movement_power}, rot={self.rotation_power}, vert={self.vertical_power}")
+            
+        elif key == ord('-'):
+            self.movement_power = max(5, self.movement_power - 5)
+            self.rotation_power = max(10, self.rotation_power - 5)
+            self.vertical_power = max(5, self.vertical_power - 3)
+            logger.info(f"⚡ Puissance réduite: mouv={self.movement_power}, rot={self.rotation_power}, vert={self.vertical_power}")
+        
+        return command_sent
+
+    def get_status_info(self):
+        """Informations de statut pour affichage"""
+        status = {
+            'flying': self.is_flying,
+            'movement_power': self.movement_power,
+            'rotation_power': self.rotation_power,
+            'vertical_power': self.vertical_power,
+            'commands_sent': self.commands_sent,
+            'flight_time': time.time() - self.takeoff_time if self.takeoff_time else 0
+        }
+        return status
+
+
+# === DÉTECTEUR GANT OPTIMISÉ (IDENTIQUE AU CODE ORIGINAL) ===
 class OptimizedBicolorGloveDetector:
     def __init__(self):
         # Configuration de base
@@ -751,7 +914,7 @@ class OptimizedBicolorGloveDetector:
             return 0.0
 
     def _create_advanced_overlay(self, frame, detected, area, quality_score):
-        """Interface utilisateur enrichie"""
+        """Interface utilisateur enrichie avec informations de vol"""
         try:
             h, w = frame.shape[:2]
             
@@ -926,55 +1089,16 @@ class OptimizedBicolorGloveDetector:
             logger.debug(f"Tracking zone error: {e}")
 
 
-# === CONTRÔLE DRONE SIMPLE ===
-def simple_drone_control(bebop):
-    logger.info("Contrôle drone démarré.")
-    print("\n[Commandes drone]\n"
-          "  t = décoller | l = atterrir | e = quitter\n"
-          "  f/b/g/d = mouvements | h/m = haut/bas | a/c = rotations\n")
-    
-    while True:
-        try:
-            key = input("> ").strip().lower()
-        except EOFError:
-            break
-            
-        if key == 't':
-            bebop.safe_takeoff(10)
-            print("✈️ Décollage")
-        elif key == 'l':
-            bebop.safe_land(10)
-            print("🛬 Atterrissage")
-        elif key == 'e':
-            bebop.safe_land(10)
-            bebop.disconnect()
-            print("🔚 Arrêt")
-            break
-        elif key == 'f':
-            bebop.fly_direct(roll=0, pitch=25, yaw=0, vertical_movement=0, duration=0.3)
-        elif key == 'b':
-            bebop.fly_direct(roll=0, pitch=-25, yaw=0, vertical_movement=0, duration=0.3)
-        elif key == 'g':
-            bebop.fly_direct(roll=-25, pitch=0, yaw=0, vertical_movement=0, duration=0.3)
-        elif key == 'd':
-            bebop.fly_direct(roll=25, pitch=0, yaw=0, vertical_movement=0, duration=0.3)
-        elif key == 'h':
-            bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=20, duration=0.3)
-        elif key == 'm':
-            bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=-20, duration=0.3)
-        elif key == 'a':
-            bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=0, duration=0.3)
-        elif key == 'c':
-            bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=0, duration=0.3)
-
 def main():
-    """Fonction principale optimisée"""
-    logger.info("=== BEBOP 2 OPTIMIZED BICOLOR DETECTION ===")
+    """Fonction principale optimisée avec contrôle clavier direct"""
+    logger.info("=== BEBOP 2 OPTIMIZED BICOLOR DETECTION + DIRECT KEYBOARD CONTROL ===")
     logger.info("🎯 Détection gant bicolore optimisée rouge/orange")
+    logger.info("🎮 Contrôle drone direct par clavier")
     
     bebop = None
     pipe = None
     detector = None
+    drone_controller = None
     start_time = time.time()
     
     try:
@@ -987,14 +1111,13 @@ def main():
 
         logger.info("✅ Drone connecté!")
         
+        # === CONTRÔLEUR DRONE ===
+        drone_controller = OptimizedDroneController(bebop)
+        
         # === FLUX VIDÉO ===
         logger.info("📹 Démarrage flux vidéo...")
         bebop.start_video_stream()
         time.sleep(2)
-        
-        # === CONTRÔLE DRONE ===
-        ctrl_thread = threading.Thread(target=simple_drone_control, args=(bebop,), daemon=True)
-        ctrl_thread.start()
         
         # === PIPELINE FFMPEG OPTIMISÉ ===
         sdp_path = os.path.join(os.path.dirname(pyparrot.__file__), "utils", "bebop.sdp")
@@ -1009,10 +1132,10 @@ def main():
             '-fflags', 'nobuffer',
             '-flags', 'low_delay',
             '-avioflags', 'direct',
-            '-analyzeduration', '1000000',  # Plus élevé pour qualité
+            '-analyzeduration', '1000000',
             '-probesize', '1000000',
             '-i', sdp_path,
-            '-vf', 'eq=saturation=1.1:gamma=0.95',  # Amélioration couleurs
+            '-vf', 'eq=saturation=1.1:gamma=0.95',
             '-f', 'rawvideo',
             '-pix_fmt', 'bgr24',
             '-'
@@ -1031,29 +1154,36 @@ def main():
         detector = OptimizedBicolorGloveDetector()
         
         # === INTERFACE ===
-        window_name = "Bebop 2 - Détection Bicolore Optimisée"
+        window_name = "Bebop 2 - Détection Bicolore + Contrôle Direct"
         cv2.namedWindow(window_name, cv2.WINDOW_AUTOSIZE)
         
-        logger.info("=" * 70)
-        logger.info("🎮 COMMANDES:")
-        logger.info("  'q' = Quitter | 's' = Screenshot | 'r' = Reset détecteur")
-        logger.info("  'z' = Reset zoom | '+/-' = Zoom manuel | 'd' = Debug")
-        logger.info("  'c' = Calibrage couleurs | 'e' = Ajust exposition")
-        logger.info("=" * 70)
+        logger.info("=" * 80)
+        logger.info("🎮 COMMANDES DRONE (CONTRÔLE DIRECT CLAVIER):")
+        logger.info("  DÉCOLLAGE/ATTERRISSAGE: 't' = décoller | 'l' = atterrir")
+        logger.info("  MOUVEMENTS: 'z'=avant | 's'=arrière | 'q'=gauche | 'd'=droite")
+        logger.info("  VERTICAL: 'r'=monter | 'f'=descendre")
+        logger.info("  ROTATIONS: 'a'=gauche | 'e'=droite")
+        logger.info("  URGENCE: 'x' = arrêt | '+/-' = puissance | 'Échap' = quitter")
+        logger.info("=" * 80)
+        logger.info("🔧 COMMANDES DÉTECTION:")
+        logger.info("  'o' = Screenshot | 'p' = Reset détecteur | 'i' = Reset zoom")
+        logger.info("  'u' = Calibrage couleurs | 'y' = Reset exposition | 'h' = Debug")
+        logger.info("=" * 80)
         logger.info("🎯 OPTIMISATIONS:")
+        logger.info("  ✓ Contrôle drone ultra-réactif (100ms latence)")
         logger.info("  ✓ Équilibrage rouge/orange automatique")
         logger.info("  ✓ Correction exposition adaptative")
         logger.info("  ✓ Zoom prédictif avec tracking")
-        logger.info("  ✓ Scoring qualité bicolore")
-        logger.info("  ✓ Morphologie adaptée au zoom")
-        logger.info("=" * 70)
+        logger.info("  ✓ Interface de vol intégrée")
+        logger.info("=" * 80)
         
         # === BOUCLE PRINCIPALE OPTIMISÉE ===
-        logger.info("🎬 Démarrage détection optimisée...")
+        logger.info("🎬 Démarrage détection + contrôle direct...")
         
         screenshot_count = 0
         last_fps_log = time.time()
         fps_counter = 0
+        last_status_log = time.time()
         
         while True:
             try:
@@ -1069,10 +1199,111 @@ def main():
                 # Détection optimisée
                 processed_frame, detected = detector.detect_glove_optimized(frame)
                 
-                # Affichage
+                # === AFFICHAGE INFORMATIONS DE VOL ===
+                drone_status = drone_controller.get_status_info()
+                
+                # Statut vol dans le coin supérieur droit
+                status_text = "🚁 EN VOL" if drone_status['flying'] else "🛬 AU SOL"
+                status_color = (0, 255, 0) if drone_status['flying'] else (0, 0, 255)
+                cv2.putText(processed_frame, status_text, (WIDTH - 150, 30), 
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.7, status_color, 2)
+                
+                # Puissances de contrôle
+                power_text = f"Puiss: M{drone_status['movement_power']} R{drone_status['rotation_power']} V{drone_status['vertical_power']}"
+                cv2.putText(processed_frame, power_text, (WIDTH - 250, 60), 
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
+                
+                # Temps de vol
+                if drone_status['flying'] and drone_status['flight_time'] > 0:
+                    flight_time_text = f"Vol: {drone_status['flight_time']:.0f}s"
+                    cv2.putText(processed_frame, flight_time_text, (WIDTH - 120, 90), 
+                               cv2.FONT_HERSHEY_SIMPLEX, 0.4, (100, 255, 100), 1)
+                
+                # Commandes envoyées
+                commands_text = f"Cmd: {drone_status['commands_sent']}"
+                cv2.putText(processed_frame, commands_text, (WIDTH - 100, HEIGHT - 20), 
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.4, (200, 200, 255), 1)
+                
+                # === AFFICHAGE ===
                 cv2.imshow(window_name, processed_frame)
                 
-                # Logs périodiques
+                # === GESTION TOUCHES OPTIMISÉE ===
+                key = cv2.waitKey(1) & 0xFF
+                
+                # Traitement immédiat des commandes drone
+                if key != 255:  # Une touche a été pressée
+                    
+                    # === COMMANDES DRONE (PRIORITÉ MAXIMALE) ===
+                    if key in [ord('t'), ord('l'), ord('z'), ord('s'), ord('q'), ord('d'), 
+                              ord('r'), ord('f'), ord('a'), ord('e'), ord('x'), ord('+'), 
+                              ord('='), ord('-')]:
+                        command_sent = drone_controller.handle_key_press(key)
+                        if command_sent:
+                            logger.debug(f"🎮 Commande drone envoyée: {chr(key)}")
+                    
+                    # === COMMANDES SYSTÈME ===
+                    elif key == 27:  # Échap
+                        logger.info("🛑 Arrêt demandé par Échap")
+                        break
+                        
+                    # === COMMANDES DÉTECTION ===
+                    elif key == ord('o'):  # Screenshot
+                        timestamp = int(time.time())
+                        screenshot_name = f"optimized_capture_{timestamp}_{screenshot_count:03d}.png"
+                        cv2.imwrite(screenshot_name, processed_frame)
+                        logger.info(f"📸 Screenshot: {screenshot_name}")
+                        screenshot_count += 1
+                        
+                    elif key == ord('p'):  # Reset détecteur
+                        old_count = detector.detection_count
+                        detector = OptimizedBicolorGloveDetector()
+                        logger.info(f"🔄 Détecteur reset (détections: {old_count})")
+                        
+                    elif key == ord('i'):  # Reset zoom
+                        detector.zoom_factor = 1.0
+                        detector.target_zoom = 1.0
+                        detector.search_zone = None
+                        detector.zone_tracking.clear()
+                        logger.info("🔍 Zoom et tracking reset")
+                        
+                    elif key == ord('u'):  # Calibrage couleurs
+                        detector.red_orange_ratio_history.clear()
+                        detector.color_balance_history.clear()
+                        logger.info("🎨 Calibrage couleurs reset")
+                        
+                    elif key == ord('y'):  # Reset exposition
+                        detector.auto_exposure_factor = 1.0
+                        detector.brightness_history.clear()
+                        logger.info("💡 Exposition reset")
+                        
+                    elif key == ord('h'):  # Debug détaillé
+                        current_time = time.time()
+                        if current_time - last_status_log > 2.0:  # Éviter spam
+                            logger.info("🔍 INFOS DEBUG OPTIMISÉES:")
+                            logger.info(f"   === DÉTECTION ===")
+                            logger.info(f"   Frames total: {detector.frame_count}")
+                            logger.info(f"   Détections: {detector.detection_count}")
+                            logger.info(f"   Détections qualité: {detector.quality_count}")
+                            logger.info(f"   Zoom: {detector.zoom_factor:.2f}x -> {detector.target_zoom:.2f}x")
+                            logger.info(f"   Exposition: {detector.auto_exposure_factor:.2f}")
+                            
+                            logger.info(f"   === DRONE ===")
+                            logger.info(f"   État: {'EN VOL' if drone_status['flying'] else 'AU SOL'}")
+                            logger.info(f"   Puissances: M{drone_status['movement_power']} R{drone_status['rotation_power']} V{drone_status['vertical_power']}")
+                            logger.info(f"   Commandes envoyées: {drone_status['commands_sent']}")
+                            if drone_status['flying']:
+                                logger.info(f"   Temps de vol: {drone_status['flight_time']:.1f}s")
+                            
+                            if detector.red_orange_ratio_history:
+                                avg_ratios = np.mean(detector.red_orange_ratio_history, axis=0)
+                                logger.info(f"   Ratio Rouge/Orange: {avg_ratios[0]:.2f}/{avg_ratios[1]:.2f}")
+                            if detector.quality_scores:
+                                logger.info(f"   Qualité min/moy/max: {min(detector.quality_scores):.2f}/"
+                                           f"{np.mean(detector.quality_scores):.2f}/"
+                                           f"{max(detector.quality_scores):.2f}")
+                            last_status_log = current_time
+
+                # === LOGS PÉRIODIQUES OPTIMISÉS ===
                 fps_counter += 1
                 if fps_counter % 90 == 0:  # Toutes les 3 secondes
                     current_time = time.time()
@@ -1083,76 +1314,15 @@ def main():
                     det_rate = (detector.detection_count / max(detector.frame_count, 1)) * 100
                     qual_avg = np.mean(detector.quality_scores) if detector.quality_scores else 0
                     
+                    # Log avec info drone
+                    drone_info = f"{'VOL' if drone_status['flying'] else 'SOL'} ({drone_status['commands_sent']} cmd)"
+                    
                     logger.info(f"📊 FPS: {display_fps:.1f} | "
                                f"Détections: {det_rate:.1f}% | "
-                               f"Qualité moy: {qual_avg:.2f} | "
+                               f"Qualité: {qual_avg:.2f} | "
                                f"Zoom: {detector.zoom_factor:.1f}x | "
-                               f"Exposition: {detector.auto_exposure_factor:.2f}")
+                               f"Drone: {drone_info}")
                     last_fps_log = current_time
-                
-                # Gestion touches
-                key = cv2.waitKey(1) & 0xFF
-                
-                if key == ord('q') or key == 27:
-                    logger.info("🛑 Arrêt demandé")
-                    break
-                    
-                elif key == ord('s'):
-                    timestamp = int(time.time())
-                    screenshot_name = f"optimized_capture_{timestamp}_{screenshot_count:03d}.png"
-                    cv2.imwrite(screenshot_name, processed_frame)
-                    logger.info(f"📸 Screenshot optimisé: {screenshot_name}")
-                    screenshot_count += 1
-                    
-                elif key == ord('r'):
-                    old_count = detector.detection_count
-                    detector = OptimizedBicolorGloveDetector()
-                    logger.info(f"🔄 Détecteur reset (détections: {old_count})")
-                    
-                elif key == ord('z'):
-                    detector.zoom_factor = 1.0
-                    detector.target_zoom = 1.0
-                    detector.search_zone = None
-                    detector.zone_tracking.clear()
-                    logger.info("🔍 Zoom et tracking reset")
-                    
-                elif key == ord('+') or key == ord('='):
-                    detector.target_zoom = min(detector.zoom_max, detector.target_zoom + 0.5)
-                    logger.info(f"🔍 Zoom manuel: {detector.target_zoom:.1f}x")
-                    
-                elif key == ord('-'):
-                    detector.target_zoom = max(detector.zoom_min, detector.target_zoom - 0.5)
-                    logger.info(f"🔍 Zoom manuel: {detector.target_zoom:.1f}x")
-                    
-                elif key == ord('c'):
-                    # Reset historique couleurs
-                    detector.red_orange_ratio_history.clear()
-                    detector.color_balance_history.clear()
-                    logger.info("🎨 Calibrage couleurs reset")
-                    
-                elif key == ord('e'):
-                    # Reset exposition
-                    detector.auto_exposure_factor = 1.0
-                    detector.brightness_history.clear()
-                    logger.info("💡 Exposition reset")
-                    
-                elif key == ord('d'):
-                    # Debug détaillé
-                    logger.info("🔍 INFOS DEBUG OPTIMISÉES:")
-                    logger.info(f"   Frames total: {detector.frame_count}")
-                    logger.info(f"   Détections: {detector.detection_count}")
-                    logger.info(f"   Détections qualité: {detector.quality_count}")
-                    logger.info(f"   Zoom: {detector.zoom_factor:.2f}x -> {detector.target_zoom:.2f}x")
-                    logger.info(f"   Exposition: {detector.auto_exposure_factor:.2f}")
-                    if detector.red_orange_ratio_history:
-                        avg_ratios = np.mean(detector.red_orange_ratio_history, axis=0)
-                        logger.info(f"   Ratio Rouge/Orange: {avg_ratios[0]:.2f}/{avg_ratios[1]:.2f}")
-                    if detector.quality_scores:
-                        logger.info(f"   Qualité min/moy/max: {min(detector.quality_scores):.2f}/"
-                                   f"{np.mean(detector.quality_scores):.2f}/"
-                                   f"{max(detector.quality_scores):.2f}")
-                    if detector.area_history:
-                        logger.info(f"   Aires récentes: {list(detector.area_history)[-5:]}")
 
             except KeyboardInterrupt:
                 logger.info("⌨️ Interruption clavier")
@@ -1171,16 +1341,25 @@ def main():
         # === NETTOYAGE ET STATS FINALES ===
         logger.info("🧹 Nettoyage...")
         
-        if detector:
+        # Atterrissage de sécurité si nécessaire
+        if drone_controller and drone_controller.is_flying:
+            try:
+                logger.info("🛬 Atterrissage de sécurité...")
+                bebop.safe_land(10)
+                time.sleep(2)
+            except Exception as e:
+                logger.error(f"❌ Erreur atterrissage sécurité: {e}")
+        
+        if detector and drone_controller:
             total_runtime = time.time() - start_time
             detection_rate = (detector.detection_count / max(detector.frame_count, 1)) * 100
             quality_rate = (detector.quality_count / max(detector.detection_count, 1)) * 100 if detector.detection_count > 0 else 0
             avg_quality = np.mean(detector.quality_scores) if detector.quality_scores else 0
             
-            logger.info("=" * 70)
+            logger.info("=" * 80)
             logger.info("📊 STATS FINALES OPTIMISÉES:")
-            logger.info(f"  ⏱️ Durée: {total_runtime:.1f}s")
-            logger.info(f"  🎞️ Frames: {detector.frame_count}")
+            logger.info(f"  ⏱️ Durée totale: {total_runtime:.1f}s")
+            logger.info(f"  🎞️ Frames traitées: {detector.frame_count}")
             logger.info(f"  ⚡ FPS moyen: {detector.frame_count/max(total_runtime,1):.1f}")
             logger.info(f"  🎯 Détections: {detector.detection_count} ({detection_rate:.1f}%)")
             logger.info(f"  ⭐ Détections qualité: {detector.quality_count} ({quality_rate:.1f}%)")
@@ -1189,12 +1368,20 @@ def main():
             logger.info(f"  📈 Ajustements zoom: {detector.zoom_adjustments}")
             logger.info(f"  💡 Exposition finale: {detector.auto_exposure_factor:.2f}")
             logger.info(f"  📸 Screenshots: {screenshot_count}")
+            
+            # Stats drone
+            drone_status = drone_controller.get_status_info()
+            logger.info(f"  🚁 Commandes drone: {drone_status['commands_sent']}")
+            if drone_controller.takeoff_time:
+                total_flight_time = drone_status['flight_time'] if drone_status['flying'] else (time.time() - drone_controller.takeoff_time)
+                logger.info(f"  ✈️ Temps de vol total: {total_flight_time:.1f}s")
+            
             if detector.red_orange_ratio_history:
                 final_ratios = np.mean(detector.red_orange_ratio_history, axis=0)
                 logger.info(f"  🎨 Équilibrage final R/O: {final_ratios[0]:.2f}/{final_ratios[1]:.2f}")
             if detector.area_history:
                 logger.info(f"  📏 Aire moyenne: {np.mean(detector.area_history):.0f}")
-            logger.info("=" * 70)
+            logger.info("=" * 80)
         
         if pipe:
             try:
@@ -1216,7 +1403,7 @@ def main():
             except:
                 pass
         
-        logger.info("🎉 Session détection optimisée terminée!")
+        logger.info("🎉 Session détection + contrôle direct terminée!")
     
     return True
 
