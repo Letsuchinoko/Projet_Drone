@@ -800,7 +800,7 @@ class OptimizedBicolorGloveDetectorWithAI:
         self.logging.info("🚀 Démarrage entraînement du modèle IA...")
         
         def train():
-            success = self.position_recognizer.train_model(epochs=80)
+            success = self.position_recognizer.train_model(epochs=25)
             if success:
                 self.position_recognizer.save_model("hand_position_model")
                 self.ai_mode = "recognition"
