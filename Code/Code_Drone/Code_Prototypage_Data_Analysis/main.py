@@ -10,32 +10,42 @@ import pyparrot
 from pyparrot.Bebop import Bebop
 from collections import deque
 
-# === PARAMÈTRES OPTIMISÉS AVEC DETECTION BICOLORE AMÉLIORÉE ===
+# === PARAMÈTRES OPTIMISÉS POUR IA + LONGUE DISTANCE ===
 BEBOP_IP = "192.168.42.1"
 WIDTH, HEIGHT = 856, 480
+
+# === PARAMÈTRES IA ===
+AI_OUTPUT_SIZE = (224, 224)  # Taille standard pour IA
+SAVE_AI_SAMPLES = True       # Sauvegarder échantillons pour dataset
+AI_SAMPLES_DIR = "ai_dataset"
 
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
         logging.StreamHandler(sys.stdout),
-        logging.FileHandler('bebop_optimized_detection.log', mode='w', encoding='utf-8')
+        logging.FileHandler('bebop_ai_detection.log', mode='w', encoding='utf-8')
     ]
 )
 logger = logging.getLogger(__name__)
 
-# === DÉTECTEUR GANT OPTIMISÉ AVEC ANALYSE BICOLORE ===
-class OptimizedBicolorGloveDetector:
+# Créer dossier échantillons IA
+if SAVE_AI_SAMPLES and not os.path.exists(AI_SAMPLES_DIR):
+    os.makedirs(AI_SAMPLES_DIR)
+    logger.info(f"📁 Dossier IA créé: {AI_SAMPLES_DIR}")
+
+# === DÉTECTEUR GANT OPTIMISÉ POUR IA + LONGUE DISTANCE ===
+class AIReadyGloveDetector:
     def __init__(self):
         # Configuration de base
-        self.detection_history = deque(maxlen=15)  # Plus long pour stabilité
-        self.stable_detections = deque(maxlen=5)   # Plus strict
+        self.detection_history = deque(maxlen=15)
+        self.stable_detections = deque(maxlen=4)   # Plus réactif pour IA
         self.confidence_threshold = 3
         
-        # Paramètres de détection affinés
-        self.min_area = 200
-        self.max_area = 120000
-        self.min_contour_points = 8
+        # === PARAMÈTRES LONGUE DISTANCE AMÉLIORÉS ===
+        self.min_area = 80      # Réduit pour détecter plus loin
+        self.max_area = 150000  # Augmenté pour gros plans
+        self.min_contour_points = 6  # Plus tolérant
         
         # Historique des couleurs détectées
         self.color_balance_history = deque(maxlen=20)
@@ -46,15 +56,15 @@ class OptimizedBicolorGloveDetector:
         self.kernel_medium = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
         self.kernel_large = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
         
-        # === SYSTÈME DE ZOOM ADAPTATIF AMÉLIORÉ ===
+        # === SYSTÈME DE ZOOM ADAPTATIF LONGUE DISTANCE ===
         self.zoom_factor = 1.0
         self.target_zoom = 1.0
-        self.zoom_smooth_factor = 0.12
+        self.zoom_smooth_factor = 0.15  # Plus réactif
         self.zoom_min = 1.0
-        self.zoom_max = 4.5  # Zoom plus élevé pour distance
+        self.zoom_max = 6.0  # Zoom plus élevé pour longue distance
         
-        # Calibrage amélioré
-        self.area_reference = 2800
+        # Calibrage longue distance
+        self.area_reference = 1800  # Réduit pour adaptation distance
         self.area_history = deque(maxlen=15)
         self.quality_scores = deque(maxlen=10)
         
@@ -73,40 +83,48 @@ class OptimizedBicolorGloveDetector:
         # Adaptation éclairage
         self.brightness_history = deque(maxlen=10)
         self.auto_exposure_factor = 1.0
+        
+        # === NOUVEAUX: EXPORT IA ===
+        self.ai_export_count = 0
+        self.last_ai_export = 0
+        self.ai_export_interval = 0.1  # Export toutes les 100ms pour dataset
+        
+        logger.info("🧠 Détecteur IA Ready initialisé")
+        logger.info(f"📏 Longue distance: aire min={self.min_area}, zoom max={self.zoom_max}x")
 
-    def detect_glove_optimized(self, frame):
-        """Détection optimisée avec analyse bicolore équilibrée"""
+    def detect_glove_for_ai(self, frame):
+        """Détection optimisée avec export automatique pour IA"""
         if frame is None:
-            return frame, False
+            return frame, False, None, None
             
         original_frame = frame.copy()
         self.frame_count += 1
         
         try:
-            # === PHASE 1: ANALYSE ÉCLAIRAGE ===
-            exposure_adjusted_frame = self._adaptive_exposure_correction(frame)
+            # === PHASE 1: ANALYSE ÉCLAIRAGE RENFORCÉE ===
+            exposure_adjusted_frame = self._enhanced_exposure_correction(frame)
             
-            # === PHASE 2: RECHERCHE GLOBALE OU ZOOMÉE ===
+            # === PHASE 2: RECHERCHE GLOBALE LONGUE DISTANCE ===
             if sum(self.stable_detections) < 2 or self.zoom_factor < 1.3:
-                # Recherche globale améliorée
-                global_result = self._enhanced_global_detection(exposure_adjusted_frame)
+                global_result = self._long_range_global_detection(exposure_adjusted_frame)
                 if global_result:
                     detected, contour, area, quality_score = global_result
-                    if detected and quality_score > 0.4:
+                    if detected and quality_score > 0.3:  # Plus tolérant
                         self._update_zoom_and_tracking(area, contour)
-                        return self._finalize_detection(original_frame, detected, contour, area, quality_score)
+                        ai_mask, ai_image = self._extract_for_ai(original_frame, contour)
+                        return self._finalize_detection(original_frame, detected, contour, area, quality_score), detected, ai_mask, ai_image
             
-            # === PHASE 3: DÉTECTION ZOOMÉE OPTIMISÉE ===
-            zoomed_frame, zoom_info = self._apply_predictive_zoom(exposure_adjusted_frame)
+            # === PHASE 3: DÉTECTION ZOOMÉE LONGUE DISTANCE ===
+            zoomed_frame, zoom_info = self._apply_enhanced_zoom(exposure_adjusted_frame)
             
-            # Détection bicolore équilibrée
-            red_mask, orange_mask, combined_mask = self._create_balanced_color_masks(zoomed_frame)
+            # Détection bicolore optimisée longue distance
+            red_mask, orange_mask, combined_mask = self._create_long_range_masks(zoomed_frame)
             
-            # Morphologie adaptative
-            processed_mask = self._advanced_morphology(combined_mask)
+            # Morphologie adaptative longue distance
+            processed_mask = self._enhanced_morphology(combined_mask)
             
-            # Analyse de contours avec scoring
-            best_contour, area, quality_score = self._intelligent_contour_selection(
+            # Analyse de contours avec scoring longue distance
+            best_contour, area, quality_score = self._long_range_contour_selection(
                 processed_mask, red_mask, orange_mask, zoomed_frame
             )
             
@@ -115,9 +133,14 @@ class OptimizedBicolorGloveDetector:
                 best_contour = self._remap_contour_to_original(best_contour, zoom_info)
                 area = cv2.contourArea(best_contour)
             
-            # Validation avec critères de qualité
-            detected = self._validate_detection(best_contour, area, quality_score)
+            # Validation plus tolérante pour longue distance
+            detected = self._validate_long_range_detection(best_contour, area, quality_score)
             
+            # Extraction pour IA si détection valide
+            ai_mask, ai_image = None, None
+            if detected and best_contour is not None:
+                ai_mask, ai_image = self._extract_for_ai(original_frame, best_contour)
+                
             # Mise à jour système de tracking
             if detected:
                 self._update_zoom_and_tracking(area, best_contour)
@@ -130,126 +153,132 @@ class OptimizedBicolorGloveDetector:
             self.stable_detections.append(detected)
             final_detected = sum(self.stable_detections) >= self.confidence_threshold
             
-            return self._finalize_detection(original_frame, final_detected, best_contour, area, quality_score)
+            return self._finalize_detection(original_frame, final_detected, best_contour, area, quality_score), final_detected, ai_mask, ai_image
             
         except Exception as e:
-            logger.debug(f"Optimized detection error: {e}")
-            return original_frame, False
+            logger.debug(f"AI detection error: {e}")
+            return original_frame, False, None, None
 
-    def _adaptive_exposure_correction(self, frame):
-        """Correction d'exposition adaptative pour améliorer les couleurs"""
+    def _enhanced_exposure_correction(self, frame):
+        """Correction d'exposition renforcée pour longue distance"""
         try:
-            # Analyse de luminosité
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             mean_brightness = np.mean(gray)
             self.brightness_history.append(mean_brightness)
             
-            # Calcul facteur d'exposition
-            target_brightness = 128
             brightness_avg = np.mean(self.brightness_history) if self.brightness_history else mean_brightness
             
-            if brightness_avg < 100:  # Sombre
-                self.auto_exposure_factor = min(1.4, self.auto_exposure_factor + 0.05)
-            elif brightness_avg > 160:  # Trop clair
-                self.auto_exposure_factor = max(0.7, self.auto_exposure_factor - 0.05)
+            # Correction plus agressive pour longue distance
+            if brightness_avg < 110:  # Sombre
+                self.auto_exposure_factor = min(1.6, self.auto_exposure_factor + 0.08)
+            elif brightness_avg > 150:  # Trop clair
+                self.auto_exposure_factor = max(0.6, self.auto_exposure_factor - 0.08)
             else:
-                self.auto_exposure_factor = max(0.95, min(1.05, self.auto_exposure_factor))
+                self.auto_exposure_factor = max(0.9, min(1.1, self.auto_exposure_factor))
             
-            # Application correction douce
-            if abs(self.auto_exposure_factor - 1.0) > 0.05:
-                hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-                hsv[:, :, 2] = np.clip(hsv[:, :, 2] * self.auto_exposure_factor, 0, 255)
-                corrected_frame = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
-                return corrected_frame
+            # Application correction
+            if abs(self.auto_exposure_factor - 1.0) > 0.03:
+                # Correction gamma pour améliorer contraste longue distance
+                corrected = np.power(frame / 255.0, 1.0/self.auto_exposure_factor) * 255.0
+                corrected = np.clip(corrected, 0, 255).astype(np.uint8)
+                
+                # Amélioration saturation pour longue distance
+                hsv = cv2.cvtColor(corrected, cv2.COLOR_BGR2HSV)
+                hsv[:, :, 1] = np.clip(hsv[:, :, 1] * 1.2, 0, 255)
+                return cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
             
             return frame
             
         except Exception as e:
-            logger.debug(f"Exposure correction error: {e}")
+            logger.debug(f"Enhanced exposure correction error: {e}")
             return frame
 
-    def _enhanced_global_detection(self, frame):
-        """Détection globale améliorée avec analyse bicolore"""
+    def _long_range_global_detection(self, frame):
+        """Détection globale optimisée longue distance"""
         try:
-            # Préprocessing amélioré
+            # Préprocessing renforcé pour longue distance
             blurred = cv2.GaussianBlur(frame, (3, 3), 0)
             
-            # Masques couleur équilibrés
-            red_mask, orange_mask, combined_mask = self._create_balanced_color_masks(blurred)
+            # Amélioration contraste pour petits objets
+            lab = cv2.cvtColor(blurred, cv2.COLOR_BGR2LAB)
+            l, a, b = cv2.split(lab)
+            l = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8)).apply(l)
+            enhanced = cv2.merge([l, a, b])
+            enhanced = cv2.cvtColor(enhanced, cv2.COLOR_LAB2BGR)
             
-            # Morphologie légère pour recherche globale
+            # Masques couleur longue distance
+            red_mask, orange_mask, combined_mask = self._create_long_range_masks(enhanced)
+            
+            # Morphologie adaptée longue distance
             processed_mask = cv2.morphologyEx(combined_mask, cv2.MORPH_CLOSE, self.kernel_medium)
             processed_mask = cv2.morphologyEx(processed_mask, cv2.MORPH_OPEN, self.kernel_small)
             
-            # Sélection contour avec analyse qualité
-            best_contour, area, quality_score = self._intelligent_contour_selection(
-                processed_mask, red_mask, orange_mask, blurred
+            # Sélection contour longue distance
+            best_contour, area, quality_score = self._long_range_contour_selection(
+                processed_mask, red_mask, orange_mask, enhanced
             )
             
-            if best_contour is not None and area > self.min_area and quality_score > 0.3:
+            if best_contour is not None and area > self.min_area and quality_score > 0.25:
                 return True, best_contour, area, quality_score
             
             return None
             
         except Exception as e:
-            logger.debug(f"Enhanced global detection error: {e}")
+            logger.debug(f"Long range global detection error: {e}")
             return None
 
-    def _create_balanced_color_masks(self, frame):
-        """Création de masques couleur équilibrés rouge/orange"""
+    def _create_long_range_masks(self, frame):
+        """Masques couleur optimisés pour longue distance"""
         try:
             hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
             h, w = hsv.shape[:2]
             
-            # Analyse adaptative des couleurs présentes
+            # Analyse adaptative plus sensible
             brightness_factor = np.mean(hsv[:, :, 2]) / 255.0
             saturation_factor = np.mean(hsv[:, :, 1]) / 255.0
             
-            # Ajustements dynamiques
-            sat_adjust = max(-25, min(25, int((0.7 - saturation_factor) * 50)))
-            val_adjust = max(-20, min(20, int((0.5 - brightness_factor) * 40)))
+            # Ajustements plus agressifs pour longue distance
+            sat_adjust = max(-35, min(35, int((0.6 - saturation_factor) * 60)))
+            val_adjust = max(-30, min(30, int((0.4 - brightness_factor) * 50)))
             
-            # === MASQUES ROUGE OPTIMISÉS ===
-            # Rouge principal (teinte basse)
-            red_lower1 = np.array([0, max(140, 160 + sat_adjust), max(120, 140 + val_adjust)])
-            red_upper1 = np.array([8, 255, 255])
+            # === MASQUES ROUGE ÉTENDUS LONGUE DISTANCE ===
+            # Rouge principal étendu
+            red_lower1 = np.array([0, max(100, 140 + sat_adjust), max(80, 120 + val_adjust)])
+            red_upper1 = np.array([12, 255, 255])
             mask_red1 = cv2.inRange(hsv, red_lower1, red_upper1)
             
-            # Rouge principal (teinte haute)
-            red_lower2 = np.array([172, max(140, 160 + sat_adjust), max(120, 140 + val_adjust)])
+            # Rouge teinte haute étendu
+            red_lower2 = np.array([168, max(100, 140 + sat_adjust), max(80, 120 + val_adjust)])
             red_upper2 = np.array([180, 255, 255])
             mask_red2 = cv2.inRange(hsv, red_lower2, red_upper2)
             
-            # Rouge avec orange
-            red_orange_lower = np.array([0, max(120, 140 + sat_adjust), max(100, 120 + val_adjust)])
-            red_orange_upper = np.array([12, 255, 255])
+            # Rouge-orange transition
+            red_orange_lower = np.array([0, max(80, 120 + sat_adjust), max(60, 100 + val_adjust)])
+            red_orange_upper = np.array([15, 255, 255])
             mask_red_orange = cv2.inRange(hsv, red_orange_lower, red_orange_upper)
             
-            # Combinaison rouge
             mask_red = cv2.bitwise_or(mask_red1, cv2.bitwise_or(mask_red2, mask_red_orange))
             
-            # === MASQUES ORANGE OPTIMISÉS ===
-            # Orange vif
-            orange_bright_lower = np.array([8, max(160, 180 + sat_adjust), max(140, 160 + val_adjust)])
-            orange_bright_upper = np.array([18, 255, 255])
+            # === MASQUES ORANGE ÉTENDUS LONGUE DISTANCE ===
+            # Orange vif étendu
+            orange_bright_lower = np.array([6, max(120, 160 + sat_adjust), max(100, 140 + val_adjust)])
+            orange_bright_upper = np.array([22, 255, 255])
             mask_orange_bright = cv2.inRange(hsv, orange_bright_lower, orange_bright_upper)
             
-            # Orange moyen
-            orange_mid_lower = np.array([10, max(130, 150 + sat_adjust), max(120, 140 + val_adjust)])
-            orange_mid_upper = np.array([22, 255, 245])
+            # Orange moyen étendu
+            orange_mid_lower = np.array([8, max(100, 130 + sat_adjust), max(80, 120 + val_adjust)])
+            orange_mid_upper = np.array([25, 255, 250])
             mask_orange_mid = cv2.inRange(hsv, orange_mid_lower, orange_mid_upper)
             
-            # Orange avec ombres
-            orange_shadow_lower = np.array([12, max(100, 120 + sat_adjust//2), max(80, 100 + val_adjust)])
-            orange_shadow_upper = np.array([20, 200, 200])
+            # Orange avec ombres étendues
+            orange_shadow_lower = np.array([10, max(60, 100 + sat_adjust//2), max(50, 80 + val_adjust)])
+            orange_shadow_upper = np.array([22, 220, 220])
             mask_orange_shadow = cv2.inRange(hsv, orange_shadow_lower, orange_shadow_upper)
             
-            # Combinaison orange
             mask_orange = cv2.bitwise_or(mask_orange_bright, 
                          cv2.bitwise_or(mask_orange_mid, mask_orange_shadow))
             
-            # === ÉQUILIBRAGE ROUGE/ORANGE ===
-            # Calcul des proportions
+            # === ÉQUILIBRAGE INTELLIGENT ===
             red_pixels = np.sum(mask_red > 0)
             orange_pixels = np.sum(mask_orange > 0)
             total_color_pixels = red_pixels + orange_pixels
@@ -259,51 +288,31 @@ class OptimizedBicolorGloveDetector:
                 orange_ratio = orange_pixels / total_color_pixels
                 self.red_orange_ratio_history.append((red_ratio, orange_ratio))
                 
-                # Équilibrage dynamique si orange domine trop
-                if orange_ratio > 0.75 and red_ratio < 0.25:
-                    # Boost du rouge, réduction orange
-                    mask_red = cv2.dilate(mask_red, self.kernel_small, iterations=1)
+                # Boost plus agressif pour longue distance
+                if orange_ratio > 0.8 and red_ratio < 0.2:
+                    mask_red = cv2.dilate(mask_red, self.kernel_medium, iterations=1)
                     mask_orange = cv2.erode(mask_orange, self.kernel_small, iterations=1)
-                    logger.debug("Équilibrage: boost rouge, réduction orange")
-                    
-                elif red_ratio > 0.75 and orange_ratio < 0.25:
-                    # Boost de l'orange
-                    mask_orange = cv2.dilate(mask_orange, self.kernel_small, iterations=1)
-                    logger.debug("Équilibrage: boost orange")
+                elif red_ratio > 0.8 and orange_ratio < 0.2:
+                    mask_orange = cv2.dilate(mask_orange, self.kernel_medium, iterations=1)
             
-            # === EXCLUSIONS INTELLIGENTES ===
-            # Exclusion peau adaptée
-            skin_lower = np.array([5, 50, 80])
-            skin_upper = np.array([15, min(140, 120 - sat_adjust//2), 240])
+            # === EXCLUSIONS ADAPTÉES ===
+            # Exclusion peau plus tolérante
+            skin_lower = np.array([3, 30, 60])
+            skin_upper = np.array([18, min(160, 140 - sat_adjust//3), 250])
             mask_skin = cv2.inRange(hsv, skin_lower, skin_upper)
             mask_skin = cv2.erode(mask_skin, self.kernel_small, iterations=1)
             
-            # Application exclusions
             mask_red = cv2.bitwise_and(mask_red, cv2.bitwise_not(mask_skin))
             mask_orange = cv2.bitwise_and(mask_orange, cv2.bitwise_not(mask_skin))
-            
-            # === COMBINAISON FINALE PONDÉRÉE ===
-            # Pondération pour équilibrer
-            avg_ratios = np.mean(self.red_orange_ratio_history, axis=0) if self.red_orange_ratio_history else (0.5, 0.5)
-            
-            if len(avg_ratios) == 2:
-                red_weight = 1.0 + max(0, 0.4 - avg_ratios[0]) * 2  # Boost si rouge sous-représenté
-                orange_weight = 1.0 + max(0, 0.4 - avg_ratios[1]) * 2
-                
-                # Application pondération
-                if red_weight > 1.1:
-                    mask_red = cv2.dilate(mask_red, self.kernel_small, iterations=1)
-                if orange_weight > 1.1:
-                    mask_orange = cv2.dilate(mask_orange, self.kernel_small, iterations=1)
             
             # Combinaison finale
             mask_combined = cv2.bitwise_or(mask_red, mask_orange)
             
-            # Nettoyage final
+            # Nettoyage avec préservation petits objets
             mask_combined = cv2.medianBlur(mask_combined, 3)
             
-            # Bordures
-            border_size = max(8, int(20 / max(self.zoom_factor, 1.0)))
+            # Bordures réduites pour longue distance
+            border_size = max(4, int(15 / max(self.zoom_factor, 1.0)))
             border_mask = np.ones((h, w), dtype=np.uint8) * 255
             border_mask[:border_size, :] = 0
             border_mask[-border_size:, :] = 0
@@ -315,50 +324,45 @@ class OptimizedBicolorGloveDetector:
             return mask_red, mask_orange, mask_combined
             
         except Exception as e:
-            logger.debug(f"Balanced color masks error: {e}")
-            # Fallback
+            logger.debug(f"Long range masks error: {e}")
             hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-            fallback = cv2.inRange(hsv, np.array([0, 120, 120]), np.array([25, 255, 255]))
+            fallback = cv2.inRange(hsv, np.array([0, 80, 80]), np.array([30, 255, 255]))
             return fallback, fallback, fallback
 
-    def _advanced_morphology(self, mask):
-        """Morphologie avancée adaptée au zoom"""
+    def _enhanced_morphology(self, mask):
+        """Morphologie optimisée pour longue distance"""
         try:
-            # Sélection kernels selon zoom
-            if self.zoom_factor > 2.5:
-                kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (9, 9))
-                kernel_open = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (4, 4))
-                iterations_close = 2
-                iterations_open = 1
-            elif self.zoom_factor > 1.5:
+            # Kernels plus conservateurs pour petits objets
+            if self.zoom_factor > 3.0:
                 kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
                 kernel_open = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
                 iterations_close = 2
                 iterations_open = 1
+            elif self.zoom_factor > 2.0:
+                kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+                kernel_open = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+                iterations_close = 1
+                iterations_open = 1
             else:
                 kernel_close = self.kernel_medium
-                kernel_open = self.kernel_small
+                kernel_open = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2, 2))
                 iterations_close = 1
                 iterations_open = 1
             
-            # Fermeture pour connecter les zones
+            # Fermeture conservative
             processed = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel_close, iterations=iterations_close)
             
-            # Ouverture pour nettoyer
+            # Ouverture très légère pour préserver petits objets
             processed = cv2.morphologyEx(processed, cv2.MORPH_OPEN, kernel_open, iterations=iterations_open)
-            
-            # Dilatation finale légère pour robustesse
-            if self.zoom_factor > 2.0:
-                processed = cv2.dilate(processed, self.kernel_small, iterations=1)
             
             return processed
             
         except Exception as e:
-            logger.debug(f"Advanced morphology error: {e}")
+            logger.debug(f"Enhanced morphology error: {e}")
             return mask
 
-    def _intelligent_contour_selection(self, mask, red_mask, orange_mask, frame):
-        """Sélection intelligente avec analyse bicolore"""
+    def _long_range_contour_selection(self, mask, red_mask, orange_mask, frame):
+        """Sélection contours optimisée longue distance"""
         try:
             contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             
@@ -369,31 +373,30 @@ class OptimizedBicolorGloveDetector:
             best_score = 0
             best_area = 0
             
-            # Ajustement seuils selon zoom
-            min_area_adj = self.min_area * max(1.0, self.zoom_factor ** 1.3)
-            max_area_adj = self.max_area * max(1.0, self.zoom_factor ** 1.5)
+            # Seuils adaptés longue distance
+            min_area_adj = self.min_area * max(0.8, self.zoom_factor ** 1.1)
+            max_area_adj = self.max_area * max(1.0, self.zoom_factor ** 1.3)
             
             for contour in contours:
                 area = cv2.contourArea(contour)
                 
-                # Filtres de base
+                # Filtres plus tolérants
                 if area < min_area_adj or area > max_area_adj:
                     continue
                 if len(contour) < self.min_contour_points:
                     continue
                 
-                # Analyse géométrique
+                # Géométrie plus tolérante
                 x, y, w, h = cv2.boundingRect(contour)
                 aspect_ratio = w / float(h) if h > 0 else 0
                 
-                if not (0.4 <= aspect_ratio <= 3.0):
+                if not (0.3 <= aspect_ratio <= 4.0):  # Plus tolérant
                     continue
                 
-                # === ANALYSE BICOLORE DANS LE CONTOUR ===
+                # === ANALYSE BICOLORE ADAPTÉE ===
                 mask_contour = np.zeros(mask.shape, dtype=np.uint8)
                 cv2.fillPoly(mask_contour, [contour], 255)
                 
-                # Pixels rouge et orange dans le contour
                 red_in_contour = np.sum(cv2.bitwise_and(red_mask, mask_contour) > 0)
                 orange_in_contour = np.sum(cv2.bitwise_and(orange_mask, mask_contour) > 0)
                 total_color_in_contour = red_in_contour + orange_in_contour
@@ -401,69 +404,66 @@ class OptimizedBicolorGloveDetector:
                 if total_color_in_contour == 0:
                     continue
                 
-                # Ratio rouge/orange dans le contour
                 red_ratio_contour = red_in_contour / total_color_in_contour
                 orange_ratio_contour = orange_in_contour / total_color_in_contour
                 
-                # Score bicolore (optimal entre 30% et 70% pour chaque couleur)
+                # Score bicolore plus tolérant longue distance
                 bicolor_score = 1.0
-                if red_ratio_contour < 0.1 or orange_ratio_contour < 0.1:
-                    bicolor_score *= 0.3  # Pénalité pour quasi-monocolore
-                elif red_ratio_contour > 0.9 or orange_ratio_contour > 0.9:
-                    bicolor_score *= 0.5  # Pénalité pour trop monocolore
+                if red_ratio_contour < 0.05 or orange_ratio_contour < 0.05:
+                    bicolor_score *= 0.4  # Moins pénalisant
+                elif red_ratio_contour > 0.95 or orange_ratio_contour > 0.95:
+                    bicolor_score *= 0.6  # Moins pénalisant
                 else:
-                    # Bonus pour équilibre bicolore
                     balance = 1.0 - abs(red_ratio_contour - orange_ratio_contour)
-                    bicolor_score *= (0.7 + balance * 0.6)
+                    bicolor_score *= (0.6 + balance * 0.7)
                 
-                # === SCORE GÉOMÉTRIQUE ===
-                # Aire normalisée
+                # === SCORING ADAPTÉ LONGUE DISTANCE ===
                 area_score = min(area / (self.area_reference * max(self.zoom_factor, 1.0)), 1.0)
                 
-                # Forme (proximité rectangle)
+                # Forme plus tolérante
                 rect_area = w * h
                 extent = area / rect_area if rect_area > 0 else 0
-                shape_score = min(extent * 1.5, 1.0)  # Bonus pour formes pleines
+                shape_score = min(extent * 1.3, 1.0)
                 
-                # Position (centré est mieux)
+                # Position moins contraignante
                 center_x, center_y = x + w//2, y + h//2
                 dist_from_center = np.sqrt((center_x - WIDTH//2)**2 + (center_y - HEIGHT//2)**2)
                 max_dist = np.sqrt((WIDTH//2)**2 + (HEIGHT//2)**2)
-                position_score = 1.0 - (dist_from_center / max_dist) * 0.3
+                position_score = 1.0 - (dist_from_center / max_dist) * 0.2  # Moins contraignant
                 
-                # === SCORE QUALITÉ COULEUR ===
-                # Analyse saturation et valeur dans le contour
-                hsv_roi = cv2.cvtColor(frame[y:y+h, x:x+w], cv2.COLOR_BGR2HSV)
-                contour_relative = contour - [x, y]  # Ajustement coordonnées
+                # Qualité couleur
+                try:
+                    hsv_roi = cv2.cvtColor(frame[y:y+h, x:x+w], cv2.COLOR_BGR2HSV)
+                    contour_relative = contour - [x, y]
+                    
+                    mask_roi = np.zeros(hsv_roi.shape[:2], dtype=np.uint8)
+                    cv2.fillPoly(mask_roi, [contour_relative], 255)
+                    
+                    sat_mean = np.mean(hsv_roi[:, :, 1][mask_roi > 0]) if np.any(mask_roi > 0) else 0
+                    val_mean = np.mean(hsv_roi[:, :, 2][mask_roi > 0]) if np.any(mask_roi > 0) else 0
+                    
+                    sat_score = min(sat_mean / 150.0, 1.0)  # Moins strict
+                    val_score = min(val_mean / 180.0, 1.0)  # Moins strict
+                    
+                    color_quality_score = (sat_score + val_score) / 2.0
+                except:
+                    color_quality_score = 0.5
                 
-                mask_roi = np.zeros(hsv_roi.shape[:2], dtype=np.uint8)
-                cv2.fillPoly(mask_roi, [contour_relative], 255)
-                
-                # Saturation moyenne
-                sat_mean = np.mean(hsv_roi[:, :, 1][mask_roi > 0]) if np.any(mask_roi > 0) else 0
-                sat_score = min(sat_mean / 180.0, 1.0)  # Bonus pour saturation élevée
-                
-                # Valeur (luminosité)
-                val_mean = np.mean(hsv_roi[:, :, 2][mask_roi > 0]) if np.any(mask_roi > 0) else 0
-                val_score = min(val_mean / 200.0, 1.0)
-                
-                color_quality_score = (sat_score + val_score) / 2.0
-                
-                # === SCORE FINAL ===
+                # Score final ajusté longue distance
                 final_score = (
-                    area_score * 0.25 +
-                    bicolor_score * 0.35 +  # Poids important pour bicolore
-                    shape_score * 0.15 +
-                    position_score * 0.1 +
-                    color_quality_score * 0.15
+                    area_score * 0.3 +           # Plus de poids à l'aire
+                    bicolor_score * 0.3 +        # Équilibré
+                    shape_score * 0.2 +          # Moins strict sur forme
+                    position_score * 0.1 +       # Moins contraignant
+                    color_quality_score * 0.1    # Moins strict
                 )
                 
-                # Bonus historique si proche des détections précédentes
+                # Bonus tracking plus généreux
                 if self.zone_tracking:
                     last_zone = self.zone_tracking[-1]
                     zone_dist = np.sqrt((center_x - last_zone[0])**2 + (center_y - last_zone[1])**2)
-                    if zone_dist < 100:  # Proche de la dernière détection
-                        final_score *= 1.2
+                    if zone_dist < 150:  # Zone plus large
+                        final_score *= 1.3
                 
                 if final_score > best_score:
                     best_score = final_score
@@ -473,65 +473,65 @@ class OptimizedBicolorGloveDetector:
             return best_contour, best_area, best_score
             
         except Exception as e:
-            logger.debug(f"Intelligent contour selection error: {e}")
+            logger.debug(f"Long range contour selection error: {e}")
             return None, 0, 0
 
-    def _validate_detection(self, contour, area, quality_score):
-        """Validation avec critères de qualité stricts"""
+    def _validate_long_range_detection(self, contour, area, quality_score):
+        """Validation adaptée longue distance"""
         try:
             if contour is None or area <= 0:
                 return False
             
-            # Seuils adaptatifs
-            min_quality = 0.35 if self.zoom_factor > 2.0 else 0.4
-            min_area_final = self.min_area * max(1.0, (self.zoom_factor ** 1.2))
+            # Seuils plus tolérants
+            min_quality = 0.25 if self.zoom_factor > 2.0 else 0.3
+            min_area_final = self.min_area * max(0.8, (self.zoom_factor ** 1.0))
             
-            # Validation de base
             if quality_score < min_quality:
                 return False
             if area < min_area_final:
                 return False
             
-            # Validation géométrique avancée
+            # Géométrie plus tolérante
             x, y, w, h = cv2.boundingRect(contour)
             aspect_ratio = w / float(h) if h > 0 else 0
             
-            if not (0.3 <= aspect_ratio <= 2.8):
+            if not (0.25 <= aspect_ratio <= 4.0):
                 return False
             
-            # Validation par rapport à l'historique
+            # Historique plus tolérant
             if self.area_history:
                 area_median = np.median(self.area_history)
-                if area > area_median * 3 or area < area_median * 0.3:
-                    return False  # Changement trop brusque
+                if area > area_median * 4 or area < area_median * 0.2:
+                    return False
             
             return True
             
         except Exception as e:
-            logger.debug(f"Detection validation error: {e}")
+            logger.debug(f"Long range validation error: {e}")
             return False
 
     def _update_zoom_and_tracking(self, area, contour):
-        """Mise à jour zoom et tracking prédictif"""
+        """Zoom et tracking adaptés longue distance"""
         try:
-            # Mise à jour historique
             self.area_history.append(area)
             
-            # Calcul zoom optimal avec lissage amélioré
-            if area < 600:          # Très loin
-                self.target_zoom = min(self.zoom_max, 4.0)
+            # Calcul zoom optimisé longue distance
+            if area < 300:          # Très très loin
+                self.target_zoom = min(self.zoom_max, 6.0)
+            elif area < 600:        # Très loin
+                self.target_zoom = min(self.zoom_max, 4.5)
             elif area < 1200:       # Loin
-                self.target_zoom = min(self.zoom_max, 3.0)
+                self.target_zoom = min(self.zoom_max, 3.5)
             elif area < 2400:       # Moyen-loin
-                self.target_zoom = 2.2
+                self.target_zoom = 2.5
             elif area < 4800:       # Moyen
-                self.target_zoom = 1.6
+                self.target_zoom = 1.8
             elif area < 8000:       # Proche
-                self.target_zoom = 1.2
+                self.target_zoom = 1.3
             else:                   # Très proche
                 self.target_zoom = 1.0
             
-            # Tracking zone prédictif
+            # Tracking adapté
             if contour is not None:
                 M = cv2.moments(contour)
                 if M["m00"] != 0:
@@ -539,18 +539,14 @@ class OptimizedBicolorGloveDetector:
                     cy = int(M["m01"] / M["m00"])
                     self.zone_tracking.append((cx, cy))
                     
-                    # Prédiction position future basée sur mouvement
                     if len(self.zone_tracking) >= 3:
-                        # Calcul vélocité
                         dx = self.zone_tracking[-1][0] - self.zone_tracking[-3][0]
                         dy = self.zone_tracking[-1][1] - self.zone_tracking[-3][1]
                         
-                        # Prédiction
                         pred_x = cx + dx // 2
                         pred_y = cy + dy // 2
                         
-                        # Zone de recherche prédictive
-                        zone_size = max(80, int(150 / max(self.zoom_factor, 1.0)))
+                        zone_size = max(100, int(180 / max(self.zoom_factor, 1.0)))
                         self.search_zone = (pred_x, pred_y, zone_size, zone_size)
             
             self.zoom_adjustments += 1
@@ -559,60 +555,54 @@ class OptimizedBicolorGloveDetector:
             logger.debug(f"Zoom and tracking update error: {e}")
 
     def _handle_detection_loss(self):
-        """Gestion de la perte de détection"""
+        """Gestion perte détection longue distance"""
         try:
-            # Zoom out progressif
             if sum(self.stable_detections) == 0:
-                self.target_zoom = max(self.zoom_min, self.target_zoom * 0.92)
+                self.target_zoom = max(self.zoom_min, self.target_zoom * 0.95)
                 
-                # Élargissement zone de recherche
                 if self.search_zone and self.target_zoom < 1.5:
                     x, y, w, h = self.search_zone
-                    self.search_zone = (x, y, min(w * 1.1, WIDTH//2), min(h * 1.1, HEIGHT//2))
+                    self.search_zone = (x, y, min(w * 1.2, WIDTH//2), min(h * 1.2, HEIGHT//2))
                 
-                # Reset zone si zoom très faible
-                if self.target_zoom < 1.15:
+                if self.target_zoom < 1.2:
                     self.search_zone = None
                     self.zone_tracking.clear()
                     
         except Exception as e:
             logger.debug(f"Detection loss handling error: {e}")
 
-    def _apply_predictive_zoom(self, frame):
-        """Application zoom avec prédiction améliorée"""
+    def _apply_enhanced_zoom(self, frame):
+        """Zoom amélioré pour longue distance"""
         try:
             h, w = frame.shape[:2]
             
-            # Lissage zoom
             self.zoom_factor += (self.target_zoom - self.zoom_factor) * self.zoom_smooth_factor
             self.zoom_factor = np.clip(self.zoom_factor, self.zoom_min, self.zoom_max)
-            
-            if self.zoom_factor <= 1.08:
+
+            if self.zoom_factor <= 1.1:
                 return frame, {'zoom': 1.0, 'offset_x': 0, 'offset_y': 0, 'crop_w': w, 'crop_h': h}
             
             # Zone de focus intelligente
             if self.search_zone:
                 center_x, center_y, zone_w, zone_h = self.search_zone
-                # Contraintes dans les limites de l'image
                 center_x = max(zone_w//2, min(center_x, w - zone_w//2))
                 center_y = max(zone_h//2, min(center_y, h - zone_h//2))
             else:
-                # Centre par défaut avec léger décalage vers le haut (position naturelle main)
                 center_x, center_y = w // 2, int(h * 0.45)
             
             # Calcul zone de crop
             crop_w = int(w / self.zoom_factor)
             crop_h = int(h / self.zoom_factor)
             
-            # Positionnement crop centré sur zone de focus
             offset_x = max(0, min(center_x - crop_w // 2, w - crop_w))
             offset_y = max(0, min(center_y - crop_h // 2, h - crop_h))
             
-            # Extraction et redimensionnement
             cropped = frame[offset_y:offset_y + crop_h, offset_x:offset_x + crop_w]
             
-            # Interpolation adaptée au niveau de zoom
-            if self.zoom_factor > 3.0:
+            # Interpolation haute qualité pour IA
+            if self.zoom_factor > 4.0:
+                zoomed = cv2.resize(cropped, (w, h), interpolation=cv2.INTER_LANCZOS4)
+            elif self.zoom_factor > 2.0:
                 zoomed = cv2.resize(cropped, (w, h), interpolation=cv2.INTER_CUBIC)
             else:
                 zoomed = cv2.resize(cropped, (w, h), interpolation=cv2.INTER_LINEAR)
@@ -628,20 +618,18 @@ class OptimizedBicolorGloveDetector:
             return zoomed, zoom_info
             
         except Exception as e:
-            logger.debug(f"Predictive zoom error: {e}")
+            logger.debug(f"Enhanced zoom error: {e}")
             return frame, {'zoom': 1.0, 'offset_x': 0, 'offset_y': 0, 'crop_w': w, 'crop_h': h}
 
     def _remap_contour_to_original(self, contour, zoom_info):
-        """Remapping optimisé vers coordonnées originales"""
+        """Remapping précis pour IA"""
         try:
-            if zoom_info['zoom'] <= 1.08:
+            if zoom_info['zoom'] <= 1.1:
                 return contour
             
-            # Facteurs de conversion précis
             scale_x = zoom_info['crop_w'] / WIDTH
             scale_y = zoom_info['crop_h'] / HEIGHT
             
-            # Remapping avec arrondi approprié
             remapped_contour = contour.copy().astype(np.float32)
             remapped_contour[:, :, 0] = remapped_contour[:, :, 0] * scale_x + zoom_info['offset_x']
             remapped_contour[:, :, 1] = remapped_contour[:, :, 1] * scale_y + zoom_info['offset_y']
@@ -652,145 +640,215 @@ class OptimizedBicolorGloveDetector:
             logger.debug(f"Contour remapping error: {e}")
             return contour
 
-    def _finalize_detection(self, frame, detected, contour, area, quality_score):
-        """Finalisation avec visualisation enrichie"""
+    def _extract_for_ai(self, frame, contour):
+        """NOUVEAU: Extraction gant sur fond noir pour IA"""
         try:
-            # Mise à jour historiques
+            if contour is None:
+                return None, None
+            
+            h, w = frame.shape[:2]
+            
+            # === CRÉATION MASQUE GANT ===
+            mask = np.zeros((h, w), dtype=np.uint8)
+            cv2.fillPoly(mask, [contour], 255)
+            
+            # Dilatation légère pour capturer bordures
+            kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+            mask = cv2.dilate(mask, kernel, iterations=1)
+            
+            # === EXTRACTION GANT SUR FOND NOIR ===
+            glove_extracted = np.zeros_like(frame)
+            glove_extracted[mask > 0] = frame[mask > 0]
+            
+            # === REDIMENSIONNEMENT POUR IA ===
+            # Trouver bounding rect pour crop intelligent
+            x, y, w_rect, h_rect = cv2.boundingRect(contour)
+            
+            # Ajouter padding
+            padding = 20
+            x = max(0, x - padding)
+            y = max(0, y - padding)
+            w_rect = min(w - x, w_rect + 2*padding)
+            h_rect = min(h - y, h_rect + 2*padding)
+            
+            # Crop région d'intérêt
+            roi_extracted = glove_extracted[y:y+h_rect, x:x+w_rect]
+            roi_mask = mask[y:y+h_rect, x:x+w_rect]
+            
+            # Redimensionner pour IA (carré)
+            ai_size = AI_OUTPUT_SIZE[0]
+            
+            # Créer image carrée avec fond noir
+            square_size = max(roi_extracted.shape[:2])
+            square_img = np.zeros((square_size, square_size, 3), dtype=np.uint8)
+            square_mask = np.zeros((square_size, square_size), dtype=np.uint8)
+            
+            # Centrer l'image
+            y_offset = (square_size - roi_extracted.shape[0]) // 2
+            x_offset = (square_size - roi_extracted.shape[1]) // 2
+            
+            square_img[y_offset:y_offset+roi_extracted.shape[0], 
+                      x_offset:x_offset+roi_extracted.shape[1]] = roi_extracted
+            square_mask[y_offset:y_offset+roi_mask.shape[0], 
+                       x_offset:x_offset+roi_mask.shape[1]] = roi_mask
+            
+            # Redimensionner à la taille IA
+            ai_image = cv2.resize(square_img, AI_OUTPUT_SIZE, interpolation=cv2.INTER_AREA)
+            ai_mask = cv2.resize(square_mask, AI_OUTPUT_SIZE, interpolation=cv2.INTER_AREA)
+            
+            # === SAUVEGARDE ÉCHANTILLON IA ===
+            if SAVE_AI_SAMPLES:
+                current_time = time.time()
+                if current_time - self.last_ai_export > self.ai_export_interval:
+                    timestamp = int(current_time * 1000)
+                    
+                    # Nom fichier avec métadonnées
+                    area = cv2.contourArea(contour)
+                    quality = self.quality_scores[-1] if self.quality_scores else 0
+                    
+                    filename = f"glove_{timestamp}_area{int(area)}_q{quality:.2f}_zoom{self.zoom_factor:.1f}x.png"
+                    filepath = os.path.join(AI_SAMPLES_DIR, filename)
+                    
+                    cv2.imwrite(filepath, ai_image)
+                    
+                    self.ai_export_count += 1
+                    self.last_ai_export = current_time
+                    
+                    if self.ai_export_count % 50 == 0:
+                        logger.info(f"🧠 IA samples: {self.ai_export_count} échantillons sauvés")
+            
+            return ai_mask, ai_image
+            
+        except Exception as e:
+            logger.debug(f"AI extraction error: {e}")
+            return None, None
+
+    def _finalize_detection(self, frame, detected, contour, area, quality_score):
+        """Finalisation avec interface IA"""
+        try:
             self.detection_history.append(detected)
             if detected:
                 self.detection_count += 1
             
             # Visualisation
             if detected and contour is not None:
-                self._draw_advanced_detection(frame, contour, area, quality_score)
+                self._draw_ai_detection(frame, contour, area, quality_score)
             
-            # Interface enrichie
-            result_frame = self._create_advanced_overlay(frame, detected, area, quality_score)
+            # Interface IA
+            result_frame = self._create_ai_overlay(frame, detected, area, quality_score)
             
-            return result_frame, detected
+            return result_frame
             
         except Exception as e:
             logger.debug(f"Finalization error: {e}")
-            return frame, False
+            return frame
 
-    def _draw_advanced_detection(self, frame, contour, area, quality_score):
-        """Visualisation avancée de la détection"""
+    def _draw_ai_detection(self, frame, contour, area, quality_score):
+        """Visualisation optimisée pour IA"""
         try:
-            # Couleurs selon qualité et distance
-            if quality_score > 0.7:
-                if area > 3000:
-                    color = (0, 255, 0)      # Vert - excellente qualité proche
-                    quality_text = "PARFAIT"
-                else:
-                    color = (0, 255, 100)    # Vert-jaune - excellente qualité loin
-                    quality_text = "EXCELLENT"
-            elif quality_score > 0.5:
-                color = (0, 255, 255)        # Jaune - bonne qualité
-                quality_text = "BON"
+            # Couleurs selon distance estimée
+            if area > 5000:
+                color = (0, 255, 0)      # Vert - très proche
+                distance_text = "TRÈS PROCHE"
+            elif area > 2000:
+                color = (0, 255, 100)    # Vert-jaune - proche
+                distance_text = "PROCHE"
+            elif area > 800:
+                color = (0, 255, 255)    # Jaune - moyen
+                distance_text = "MOYEN"
+            elif area > 300:
+                color = (0, 150, 255)    # Orange - loin
+                distance_text = "LOIN"
             else:
-                color = (0, 150, 255)        # Orange - qualité acceptable
-                quality_text = "ACCEPTABLE"
+                color = (0, 100, 255)    # Rouge - très loin
+                distance_text = "TRÈS LOIN"
             
-            # Contour principal avec épaisseur adaptée
-            thickness = max(2, int(3 * min(self.zoom_factor, 2.0)))
+            # Contour principal
+            thickness = max(2, int(4 * min(self.zoom_factor, 2.0)))
             cv2.drawContours(frame, [contour], -1, color, thickness)
             
             # Rectangle englobant
             x, y, w, h = cv2.boundingRect(contour)
             cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
             
-            # Centre avec croix
+            # Centre avec croix IA
             M = cv2.moments(contour)
             if M["m00"] != 0:
                 cx = int(M["m10"] / M["m00"])
                 cy = int(M["m01"] / M["m00"])
                 
-                # Point central
-                cv2.circle(frame, (cx, cy), 6, (0, 0, 255), -1)
-                cv2.circle(frame, (cx, cy), 10, (255, 255, 255), 2)
+                # Point central avec indicateur IA
+                cv2.circle(frame, (cx, cy), 8, (0, 0, 255), -1)
+                cv2.circle(frame, (cx, cy), 12, (255, 255, 255), 2)
+                cv2.putText(frame, "AI", (cx-8, cy+4), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
                 
                 # Croix directionnelle
-                cross_size = 15
-                cv2.line(frame, (cx - cross_size, cy), (cx + cross_size, cy), (255, 255, 255), 2)
-                cv2.line(frame, (cx, cy - cross_size), (cx, cy + cross_size), (255, 255, 255), 2)
+                cross_size = 20
+                cv2.line(frame, (cx - cross_size, cy), (cx + cross_size, cy), (255, 255, 255), 3)
+                cv2.line(frame, (cx, cy - cross_size), (cx, cy + cross_size), (255, 255, 255), 3)
             
-            # Informations détaillées
-            info_y = max(y - 20, 30)
-            cv2.putText(frame, f"GANT {quality_text}", (x, info_y),
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
+            # Informations détaillées pour IA
+            info_y = max(y - 25, 35)
+            cv2.putText(frame, f"GANT {distance_text}", (x, info_y),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2)
+            
+            info_y += 30
+            cv2.putText(frame, f"IA Ready | Q: {quality_score:.2f} | Aire: {int(area)}", (x, info_y),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
             
             info_y += 25
-            cv2.putText(frame, f"Qualite: {quality_score:.2f} | Aire: {int(area)}", (x, info_y),
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-            
-            info_y += 20
-            distance_est = self._estimate_distance(area)
-            cv2.putText(frame, f"Distance: ~{distance_est:.1f}m | Zoom: {self.zoom_factor:.1f}x", 
+            cv2.putText(frame, f"Zoom: {self.zoom_factor:.1f}x | Samples: {self.ai_export_count}", 
                        (x, info_y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (200, 255, 200), 1)
                        
         except Exception as e:
-            logger.debug(f"Advanced drawing error: {e}")
+            logger.debug(f"AI drawing error: {e}")
 
-    def _estimate_distance(self, area):
-        """Estimation de distance basée sur l'aire"""
-        try:
-            # Calibrage approximatif (à ajuster selon votre setup)
-            if area > 8000:
-                return 0.5  # Très proche
-            elif area > 4000:
-                return 1.0  # Proche
-            elif area > 2000:
-                return 2.0  # Moyen
-            elif area > 1000:
-                return 3.5  # Loin
-            elif area > 500:
-                return 5.0  # Très loin
-            else:
-                return 7.0  # Très très loin
-        except:
-            return 0.0
-
-    def _create_advanced_overlay(self, frame, detected, area, quality_score):
-        """Interface utilisateur enrichie"""
+    def _create_ai_overlay(self, frame, detected, area, quality_score):
+        """Interface utilisateur IA enrichie"""
         try:
             h, w = frame.shape[:2]
             
-            # === STATUS PRINCIPAL ===
+            # === STATUS PRINCIPAL IA ===
             if detected:
                 if quality_score > 0.6:
-                    status = f"🎯 GANT CAPTURÉ (Q:{quality_score:.2f})"
+                    status = f"🧠 IA READY - GANT CAPTURÉ (Q:{quality_score:.2f})"
                     status_color = (0, 255, 0)
                 else:
-                    status = f"🎯 GANT DÉTECTÉ (Q:{quality_score:.2f})"
+                    status = f"🧠 IA READY - GANT DÉTECTÉ (Q:{quality_score:.2f})"
                     status_color = (0, 255, 255)
             else:
-                status = f"🔍 RECHERCHE GANT (Zoom {self.zoom_factor:.1f}x)"
+                status = f"🔍 RECHERCHE GANT LONGUE DISTANCE (Zoom {self.zoom_factor:.1f}x)"
                 status_color = (100, 100, 255)
             
-            cv2.putText(frame, status, (10, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.8, status_color, 2)
+            cv2.putText(frame, status, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, status_color, 2)
             
-            # === BARRE DE ZOOM VISUELLE ===
-            self._draw_zoom_bar(frame, 10, 65)
+            # === BARRE DE ZOOM LONGUE DISTANCE ===
+            self._draw_enhanced_zoom_bar(frame, 10, 60)
             
-            # === BARRE DE QUALITÉ ===
-            if detected and quality_score > 0:
-                self._draw_quality_bar(frame, 10, 95, quality_score)
+            # === COMPTEUR ÉCHANTILLONS IA ===
+            ai_text = f"🧠 Échantillons IA: {self.ai_export_count}"
+            cv2.putText(frame, ai_text, (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 100, 255), 2)
             
             # === ANALYSE COULEURS ===
-            self._draw_color_analysis(frame, 10, 125)
+            if self.red_orange_ratio_history:
+                avg_ratios = np.mean(self.red_orange_ratio_history, axis=0)
+                red_ratio, orange_ratio = avg_ratios
+                
+                color_text = f"🎨 R/O: {red_ratio:.2f}/{orange_ratio:.2f}"
+                cv2.putText(frame, color_text, (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
             
-            # === STATISTIQUES ===
+            # === STATISTIQUES LONGUE DISTANCE ===
             detection_rate = (self.detection_count / max(self.frame_count, 1)) * 100
             quality_rate = (self.quality_count / max(self.detection_count, 1)) * 100 if self.detection_count > 0 else 0
             
-            stats_y = h - 100
-            stats = f"Frames: {self.frame_count} | Détections: {detection_rate:.1f}% | Qualité moy: {quality_rate:.1f}%"
+            stats_y = h - 120
+            stats = f"Frames: {self.frame_count} | Détections: {detection_rate:.1f}% | Qualité: {quality_rate:.1f}%"
             cv2.putText(frame, stats, (10, stats_y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
             
-            # Zoom et exposition
+            # Paramètres longue distance
             stats_y += 20
-            expo_text = f"Exposition: {self.auto_exposure_factor:.2f} | Zoom ajust: {self.zoom_adjustments}"
-            cv2.putText(frame, expo_text, (10, stats_y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (200, 255, 200), 1)
+            ld_text = f"Longue Distance | Min aire: {self.min_area} | Zoom max: {self.zoom_max:.1f}x"
+            cv2.putText(frame, ld_text, (10, stats_y), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (200, 255, 200), 1)
             
             # === FPS ===
             if self.frame_count % 30 == 0:
@@ -804,23 +862,23 @@ class OptimizedBicolorGloveDetector:
             
             # === HISTORIQUE DÉTECTION ===
             history = "".join(["●" if x else "○" for x in list(self.detection_history)[-15:]])
-            cv2.putText(frame, f"Historique: {history}", (10, h - 35), 
+            cv2.putText(frame, f"Hist: {history}", (10, h - 40), 
                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
             
             # === ZONE DE TRACKING ===
-            if self.search_zone and self.zoom_factor > 1.3:
-                self._draw_tracking_zone(frame)
+            if self.search_zone and self.zoom_factor > 1.5:
+                self._draw_ai_tracking_zone(frame)
             
             return frame
             
         except Exception as e:
-            logger.debug(f"Advanced overlay error: {e}")
+            logger.debug(f"AI overlay error: {e}")
             return frame
 
-    def _draw_zoom_bar(self, frame, x, y):
-        """Barre de zoom visuelle"""
+    def _draw_enhanced_zoom_bar(self, frame, x, y):
+        """Barre de zoom longue distance"""
         try:
-            bar_w, bar_h = 200, 12
+            bar_w, bar_h = 250, 15
             
             # Fond
             cv2.rectangle(frame, (x, y), (x + bar_w, y + bar_h), (60, 60, 60), -1)
@@ -829,148 +887,58 @@ class OptimizedBicolorGloveDetector:
             zoom_progress = (self.zoom_factor - self.zoom_min) / (self.zoom_max - self.zoom_min)
             zoom_w = int(bar_w * zoom_progress)
             
-            # Couleur selon niveau
-            if self.zoom_factor > 3.0:
-                zoom_color = (0, 100, 255)  # Rouge - zoom élevé
+            # Couleur selon niveau longue distance
+            if self.zoom_factor > 4.0:
+                zoom_color = (0, 0, 255)    # Rouge - zoom très élevé
+            elif self.zoom_factor > 3.0:
+                zoom_color = (0, 100, 255)  # Orange - zoom élevé
             elif self.zoom_factor > 2.0:
-                zoom_color = (0, 200, 255)  # Orange
+                zoom_color = (0, 200, 255)  # Jaune
             else:
                 zoom_color = (100, 255, 200)  # Vert
             
             cv2.rectangle(frame, (x, y), (x + zoom_w, y + bar_h), zoom_color, -1)
             
-            # Texte
-            cv2.putText(frame, f"Zoom: {self.zoom_factor:.1f}x / {self.zoom_max:.1f}x", 
-                       (x + bar_w + 10, y + 10), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
+            # Texte longue distance
+            cv2.putText(frame, f"Zoom LD: {self.zoom_factor:.1f}x / {self.zoom_max:.1f}x", 
+                       (x + bar_w + 15, y + 12), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
                        
         except Exception as e:
-            logger.debug(f"Zoom bar error: {e}")
+            logger.debug(f"Enhanced zoom bar error: {e}")
 
-    def _draw_quality_bar(self, frame, x, y, quality_score):
-        """Barre de qualité visuelle"""
-        try:
-            bar_w, bar_h = 150, 10
-            
-            # Fond
-            cv2.rectangle(frame, (x, y), (x + bar_w, y + bar_h), (50, 50, 50), -1)
-            
-            # Niveau qualité
-            quality_w = int(bar_w * quality_score)
-            
-            # Couleur selon qualité
-            if quality_score > 0.7:
-                quality_color = (0, 255, 0)    # Vert
-            elif quality_score > 0.5:
-                quality_color = (0, 255, 255)  # Jaune
-            else:
-                quality_color = (0, 150, 255)  # Orange
-            
-            cv2.rectangle(frame, (x, y), (x + quality_w, y + bar_h), quality_color, -1)
-            
-            # Texte
-            cv2.putText(frame, f"Qualité: {quality_score:.2f}", 
-                       (x + bar_w + 10, y + 8), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
-                       
-        except Exception as e:
-            logger.debug(f"Quality bar error: {e}")
-
-    def _draw_color_analysis(self, frame, x, y):
-        """Analyse des couleurs détectées"""
-        try:
-            if self.red_orange_ratio_history:
-                avg_ratios = np.mean(self.red_orange_ratio_history, axis=0)
-                red_ratio, orange_ratio = avg_ratios
-                
-                # Barres rouge et orange
-                bar_w = 80
-                red_w = int(bar_w * red_ratio)
-                orange_w = int(bar_w * orange_ratio)
-                
-                # Rouge
-                cv2.rectangle(frame, (x, y), (x + red_w, y + 8), (0, 0, 255), -1)
-                cv2.putText(frame, f"R:{red_ratio:.2f}", (x, y + 20), 
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 0, 255), 1)
-                
-                # Orange
-                cv2.rectangle(frame, (x + 100, y), (x + 100 + orange_w, y + 8), (0, 165, 255), -1)
-                cv2.putText(frame, f"O:{orange_ratio:.2f}", (x + 100, y + 20), 
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 165, 255), 1)
-                           
-        except Exception as e:
-            logger.debug(f"Color analysis error: {e}")
-
-    def _draw_tracking_zone(self, frame):
-        """Zone de tracking prédictif"""
+    def _draw_ai_tracking_zone(self, frame):
+        """Zone de tracking pour IA"""
         try:
             if self.search_zone:
                 cx, cy, zw, zh = self.search_zone
                 
-                # Rectangle zone de recherche
+                # Rectangle zone de recherche IA
                 cv2.rectangle(frame, (cx - zw//2, cy - zh//2), (cx + zw//2, cy + zh//2), 
-                             (150, 100, 255), 2)
+                             (255, 100, 255), 3)
                 
-                # Point central
-                cv2.circle(frame, (cx, cy), 4, (255, 100, 150), -1)
+                # Point central IA
+                cv2.circle(frame, (cx, cy), 6, (255, 100, 255), -1)
                 
-                # Texte
-                cv2.putText(frame, "ZONE TRACK", (cx - 35, cy - zh//2 - 10),
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.4, (150, 100, 255), 1)
+                # Texte IA
+                cv2.putText(frame, "IA TRACK", (cx - 35, cy - zh//2 - 15),
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 100, 255), 2)
                            
-                # Trajectoire prédite
+                # Trajectoire prédite IA
                 if len(self.zone_tracking) >= 2:
-                    points = list(self.zone_tracking)[-5:]  # 5 derniers points
+                    points = list(self.zone_tracking)[-5:]
                     for i in range(1, len(points)):
-                        cv2.line(frame, points[i-1], points[i], (200, 150, 255), 1)
+                        cv2.line(frame, points[i-1], points[i], (255, 150, 255), 2)
                         
         except Exception as e:
-            logger.debug(f"Tracking zone error: {e}")
+            logger.debug(f"AI tracking zone error: {e}")
 
 
-# === CONTRÔLE DRONE SIMPLE ===
-def simple_drone_control(bebop):
-    logger.info("Contrôle drone démarré.")
-    print("\n[Commandes drone]\n"
-          "  t = décoller | l = atterrir | e = quitter\n"
-          "  f/b/g/d = mouvements | h/m = haut/bas | a/c = rotations\n")
-    
-    while True:
-        try:
-            key = input("> ").strip().lower()
-        except EOFError:
-            break
-            
-        if key == 't':
-            bebop.safe_takeoff(10)
-            print("✈️ Décollage")
-        elif key == 'l':
-            bebop.safe_land(10)
-            print("🛬 Atterrissage")
-        elif key == 'e':
-            bebop.safe_land(10)
-            bebop.disconnect()
-            print("🔚 Arrêt")
-            break
-        elif key == 'f':
-            bebop.fly_direct(roll=0, pitch=25, yaw=0, vertical_movement=0, duration=0.3)
-        elif key == 'b':
-            bebop.fly_direct(roll=0, pitch=-25, yaw=0, vertical_movement=0, duration=0.3)
-        elif key == 'g':
-            bebop.fly_direct(roll=-25, pitch=0, yaw=0, vertical_movement=0, duration=0.3)
-        elif key == 'd':
-            bebop.fly_direct(roll=25, pitch=0, yaw=0, vertical_movement=0, duration=0.3)
-        elif key == 'h':
-            bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=20, duration=0.3)
-        elif key == 'm':
-            bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=-20, duration=0.3)
-        elif key == 'a':
-            bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=0, duration=0.3)
-        elif key == 'c':
-            bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=0, duration=0.3)
-
+# === PAS DE CONTRÔLE DRONE - DÉTECTION PURE ===
 def main():
-    """Fonction principale optimisée"""
-    logger.info("=== BEBOP 2 OPTIMIZED BICOLOR DETECTION ===")
-    logger.info("🎯 Détection gant bicolore optimisée rouge/orange")
+    """Fonction principale - Mode Détection Pure pour IA"""
+    logger.info("=== BEBOP 2 AI READY DETECTION - LONGUE DISTANCE ===")
+    logger.info("🧠 Détection gant pour IA - Longue distance optimisée")
+    logger.info("🚫 Mode détection pure - AUCUNE commande drone")
     
     bebop = None
     pipe = None
@@ -978,82 +946,79 @@ def main():
     start_time = time.time()
     
     try:
-        # === CONNEXION DRONE ===
+        # === CONNEXION DRONE (FLUX UNIQUEMENT) ===
         logger.info("📡 Connexion au drone...")
         bebop = Bebop()
         if not bebop.connect(10):
             logger.error("❌ Échec connexion drone")
             return False
 
-        logger.info("✅ Drone connecté!")
+        logger.info("✅ Drone connecté! (mode détection pure)")
         
-        # === FLUX VIDÉO ===
+        # === FLUX VIDÉO UNIQUEMENT ===
         logger.info("📹 Démarrage flux vidéo...")
         bebop.start_video_stream()
         time.sleep(2)
         
-        # === CONTRÔLE DRONE ===
-        ctrl_thread = threading.Thread(target=simple_drone_control, args=(bebop,), daemon=True)
-        ctrl_thread.start()
-        
-        # === PIPELINE FFMPEG OPTIMISÉ ===
+        # === PIPELINE FFMPEG OPTIMISÉ IA ===
         sdp_path = os.path.join(os.path.dirname(pyparrot.__file__), "utils", "bebop.sdp")
         if not os.path.exists(sdp_path):
             logger.error(f"❌ SDP introuvable: {sdp_path}")
             return False
         
-        # FFmpeg avec paramètres optimisés pour qualité couleur
+        # FFmpeg optimisé pour IA et longue distance
         ffmpeg_cmd = [
             'ffmpeg',
             '-protocol_whitelist', 'file,rtp,udp',
             '-fflags', 'nobuffer',
             '-flags', 'low_delay',
             '-avioflags', 'direct',
-            '-analyzeduration', '1000000',  # Plus élevé pour qualité
-            '-probesize', '1000000',
+            '-analyzeduration', '1500000',  # Plus élevé pour stabilité
+            '-probesize', '1500000',
             '-i', sdp_path,
-            '-vf', 'eq=saturation=1.1:gamma=0.95',  # Amélioration couleurs
+            '-vf', 'eq=saturation=1.2:gamma=0.9:contrast=1.1',  # Optimisé longue distance
             '-f', 'rawvideo',
             '-pix_fmt', 'bgr24',
             '-'
         ]
         
-        logger.info(f"🚀 FFmpeg optimisé couleurs: {' '.join(ffmpeg_cmd)}")
+        logger.info(f"🚀 FFmpeg IA longue distance: {' '.join(ffmpeg_cmd)}")
         
         try:
-            pipe = subprocess.Popen(ffmpeg_cmd, stdout=subprocess.PIPE, bufsize=2*1024*1024)
-            logger.info("✅ Pipeline optimisé initialisé")
+            pipe = subprocess.Popen(ffmpeg_cmd, stdout=subprocess.PIPE, bufsize=4*1024*1024)
+            logger.info("✅ Pipeline IA initialisé")
         except FileNotFoundError:
             logger.error("❌ FFmpeg non trouvé!")
             return False
 
-        # === DÉTECTEUR OPTIMISÉ ===
-        detector = OptimizedBicolorGloveDetector()
+        # === DÉTECTEUR IA LONGUE DISTANCE ===
+        detector = AIReadyGloveDetector()
         
-        # === INTERFACE ===
-        window_name = "Bebop 2 - Détection Bicolore Optimisée"
+        # === INTERFACE IA ===
+        window_name = "Bebop 2 - IA Ready Detection (Longue Distance)"
         cv2.namedWindow(window_name, cv2.WINDOW_AUTOSIZE)
         
-        logger.info("=" * 70)
-        logger.info("🎮 COMMANDES:")
+        logger.info("=" * 80)
+        logger.info("🧠 MODE IA READY - DÉTECTION PURE:")
+        logger.info("  🚫 Aucune commande drone (flux stable)")
+        logger.info("  📏 Optimisé longue distance (aire min: 80)")
+        logger.info("  🔍 Zoom max: 6.0x pour objets distants")
+        logger.info("  💾 Échantillons IA auto-sauvés")
+        logger.info("=" * 80)
+        logger.info("🎮 COMMANDES INTERFACE:")
         logger.info("  'q' = Quitter | 's' = Screenshot | 'r' = Reset détecteur")
-        logger.info("  'z' = Reset zoom | '+/-' = Zoom manuel | 'd' = Debug")
-        logger.info("  'c' = Calibrage couleurs | 'e' = Ajust exposition")
-        logger.info("=" * 70)
-        logger.info("🎯 OPTIMISATIONS:")
-        logger.info("  ✓ Équilibrage rouge/orange automatique")
-        logger.info("  ✓ Correction exposition adaptative")
-        logger.info("  ✓ Zoom prédictif avec tracking")
-        logger.info("  ✓ Scoring qualité bicolore")
-        logger.info("  ✓ Morphologie adaptée au zoom")
-        logger.info("=" * 70)
+        logger.info("  'z' = Reset zoom | '+/-' = Zoom manuel | 'd' = Debug IA")
+        logger.info("  'c' = Calibrage couleurs | 'e' = Reset exposition")
+        logger.info("  'i' = Info IA | 'x' = Export manuel IA")
+        logger.info("=" * 80)
         
-        # === BOUCLE PRINCIPALE OPTIMISÉE ===
-        logger.info("🎬 Démarrage détection optimisée...")
+        # === BOUCLE PRINCIPALE IA ===
+        logger.info("🎬 Démarrage détection IA longue distance...")
         
         screenshot_count = 0
         last_fps_log = time.time()
         fps_counter = 0
+        manual_ai_exports = 0
         
         while True:
             try:
@@ -1061,115 +1026,144 @@ def main():
                 raw_frame = pipe.stdout.read(WIDTH * HEIGHT * 3)
                 
                 if len(raw_frame) != WIDTH * HEIGHT * 3:
-                    logger.warning("⚠️ Frame incomplète, reconnexion...")
+                    logger.warning("⚠️ Frame incomplète...")
                     continue
                 
                 frame = np.frombuffer(raw_frame, np.uint8).reshape((HEIGHT, WIDTH, 3))
                 
-                # Détection optimisée
-                processed_frame, detected = detector.detect_glove_optimized(frame)
+                # === DÉTECTION IA PURE ===
+                processed_frame, detected, ai_mask, ai_image = detector.detect_glove_for_ai(frame)
                 
                 # Affichage
                 cv2.imshow(window_name, processed_frame)
                 
-                # Logs périodiques
+                # Affichage IA en fenêtre séparée si détecté
+                if detected and ai_image is not None:
+                    cv2.imshow("AI Sample (Gant Détouré)", ai_image)
+                
+                # Logs périodiques IA
                 fps_counter += 1
-                if fps_counter % 90 == 0:  # Toutes les 3 secondes
+                if fps_counter % 120 == 0:  # Toutes les 4 secondes
                     current_time = time.time()
                     elapsed = current_time - last_fps_log
-                    display_fps = 90 / elapsed if elapsed > 0 else 0
+                    display_fps = 120 / elapsed if elapsed > 0 else 0
                     
-                    # Stats détaillées
                     det_rate = (detector.detection_count / max(detector.frame_count, 1)) * 100
                     qual_avg = np.mean(detector.quality_scores) if detector.quality_scores else 0
                     
-                    logger.info(f"📊 FPS: {display_fps:.1f} | "
+                    logger.info(f"🧠 IA | FPS: {display_fps:.1f} | "
                                f"Détections: {det_rate:.1f}% | "
-                               f"Qualité moy: {qual_avg:.2f} | "
+                               f"Qualité: {qual_avg:.2f} | "
                                f"Zoom: {detector.zoom_factor:.1f}x | "
-                               f"Exposition: {detector.auto_exposure_factor:.2f}")
+                               f"Samples: {detector.ai_export_count}")
                     last_fps_log = current_time
                 
-                # Gestion touches
+                # === GESTION TOUCHES IA ===
                 key = cv2.waitKey(1) & 0xFF
                 
                 if key == ord('q') or key == 27:
-                    logger.info("🛑 Arrêt demandé")
+                    logger.info("🛑 Arrêt mode IA")
                     break
                     
                 elif key == ord('s'):
                     timestamp = int(time.time())
-                    screenshot_name = f"optimized_capture_{timestamp}_{screenshot_count:03d}.png"
+                    screenshot_name = f"ai_detection_{timestamp}_{screenshot_count:03d}.png"
                     cv2.imwrite(screenshot_name, processed_frame)
-                    logger.info(f"📸 Screenshot optimisé: {screenshot_name}")
+                    logger.info(f"📸 Screenshot IA: {screenshot_name}")
                     screenshot_count += 1
+                    
+                elif key == ord('x') and detected and ai_image is not None:
+                    # Export manuel échantillon IA
+                    timestamp = int(time.time() * 1000)
+                    manual_name = f"manual_ai_{timestamp}_{manual_ai_exports:03d}.png"
+                    manual_path = os.path.join(AI_SAMPLES_DIR, manual_name)
+                    cv2.imwrite(manual_path, ai_image)
+                    manual_ai_exports += 1
+                    logger.info(f"🧠 Export manuel IA: {manual_name}")
                     
                 elif key == ord('r'):
                     old_count = detector.detection_count
-                    detector = OptimizedBicolorGloveDetector()
-                    logger.info(f"🔄 Détecteur reset (détections: {old_count})")
+                    old_ai_count = detector.ai_export_count
+                    detector = AIReadyGloveDetector()
+                    logger.info(f"🔄 Détecteur IA reset (détections: {old_count}, samples: {old_ai_count})")
                     
                 elif key == ord('z'):
                     detector.zoom_factor = 1.0
                     detector.target_zoom = 1.0
                     detector.search_zone = None
                     detector.zone_tracking.clear()
-                    logger.info("🔍 Zoom et tracking reset")
+                    logger.info("🔍 Zoom IA reset")
                     
                 elif key == ord('+') or key == ord('='):
                     detector.target_zoom = min(detector.zoom_max, detector.target_zoom + 0.5)
-                    logger.info(f"🔍 Zoom manuel: {detector.target_zoom:.1f}x")
+                    logger.info(f"🔍 Zoom IA manuel: {detector.target_zoom:.1f}x")
                     
                 elif key == ord('-'):
                     detector.target_zoom = max(detector.zoom_min, detector.target_zoom - 0.5)
-                    logger.info(f"🔍 Zoom manuel: {detector.target_zoom:.1f}x")
+                    logger.info(f"🔍 Zoom IA manuel: {detector.target_zoom:.1f}x")
                     
                 elif key == ord('c'):
-                    # Reset historique couleurs
                     detector.red_orange_ratio_history.clear()
                     detector.color_balance_history.clear()
-                    logger.info("🎨 Calibrage couleurs reset")
+                    logger.info("🎨 Calibrage couleurs IA reset")
                     
                 elif key == ord('e'):
-                    # Reset exposition
                     detector.auto_exposure_factor = 1.0
                     detector.brightness_history.clear()
-                    logger.info("💡 Exposition reset")
+                    logger.info("💡 Exposition IA reset")
                     
-                elif key == ord('d'):
-                    # Debug détaillé
-                    logger.info("🔍 INFOS DEBUG OPTIMISÉES:")
+                elif key == ord('i'):
+                    # Infos IA détaillées
+                    logger.info("🧠 INFOS IA DÉTAILLÉES:")
+                    logger.info(f"   === DÉTECTION IA ===")
                     logger.info(f"   Frames total: {detector.frame_count}")
                     logger.info(f"   Détections: {detector.detection_count}")
-                    logger.info(f"   Détections qualité: {detector.quality_count}")
+                    logger.info(f"   Échantillons IA: {detector.ai_export_count}")
+                    logger.info(f"   Exports manuels: {manual_ai_exports}")
+                    logger.info(f"   Dossier: {AI_SAMPLES_DIR}")
+                    
+                    logger.info(f"   === LONGUE DISTANCE ===")
+                    logger.info(f"   Aire min: {detector.min_area}")
                     logger.info(f"   Zoom: {detector.zoom_factor:.2f}x -> {detector.target_zoom:.2f}x")
+                    logger.info(f"   Zoom max: {detector.zoom_max:.1f}x")
                     logger.info(f"   Exposition: {detector.auto_exposure_factor:.2f}")
+                    
+                    if detector.area_history:
+                        areas = list(detector.area_history)[-5:]
+                        logger.info(f"   Aires récentes: {areas}")
+                        logger.info(f"   Aire médiane: {np.median(detector.area_history):.0f}")
+                    
+                elif key == ord('d'):
+                    # Debug IA complet
+                    logger.info("🔍 DEBUG IA COMPLET:")
+                    logger.info(f"   Paramètres IA: {AI_OUTPUT_SIZE}")
+                    logger.info(f"   Sauvegarde: {SAVE_AI_SAMPLES}")
+                    logger.info(f"   Intervalle export: {detector.ai_export_interval:.2f}s")
+                    
                     if detector.red_orange_ratio_history:
                         avg_ratios = np.mean(detector.red_orange_ratio_history, axis=0)
-                        logger.info(f"   Ratio Rouge/Orange: {avg_ratios[0]:.2f}/{avg_ratios[1]:.2f}")
+                        logger.info(f"   Équilibrage R/O: {avg_ratios[0]:.2f}/{avg_ratios[1]:.2f}")
                     if detector.quality_scores:
                         logger.info(f"   Qualité min/moy/max: {min(detector.quality_scores):.2f}/"
                                    f"{np.mean(detector.quality_scores):.2f}/"
                                    f"{max(detector.quality_scores):.2f}")
-                    if detector.area_history:
-                        logger.info(f"   Aires récentes: {list(detector.area_history)[-5:]}")
 
             except KeyboardInterrupt:
                 logger.info("⌨️ Interruption clavier")
                 break
             except Exception as e:
-                logger.error(f"❌ Erreur boucle: {e}")
+                logger.error(f"❌ Erreur boucle IA: {e}")
                 continue
 
     except Exception as e:
-        logger.error(f"❌ Erreur critique: {e}")
+        logger.error(f"❌ Erreur critique IA: {e}")
         import traceback
         logger.error(f"Traceback: {traceback.format_exc()}")
         return False
         
     finally:
-        # === NETTOYAGE ET STATS FINALES ===
-        logger.info("🧹 Nettoyage...")
+        # === NETTOYAGE ET STATS FINALES IA ===
+        logger.info("🧹 Nettoyage IA...")
         
         if detector:
             total_runtime = time.time() - start_time
@@ -1177,46 +1171,79 @@ def main():
             quality_rate = (detector.quality_count / max(detector.detection_count, 1)) * 100 if detector.detection_count > 0 else 0
             avg_quality = np.mean(detector.quality_scores) if detector.quality_scores else 0
             
-            logger.info("=" * 70)
-            logger.info("📊 STATS FINALES OPTIMISÉES:")
-            logger.info(f"  ⏱️ Durée: {total_runtime:.1f}s")
-            logger.info(f"  🎞️ Frames: {detector.frame_count}")
+            logger.info("=" * 80)
+            logger.info("🧠 STATS FINALES IA LONGUE DISTANCE:")
+            logger.info(f"  ⏱️ Durée session: {total_runtime:.1f}s")
+            logger.info(f"  🎞️ Frames traitées: {detector.frame_count}")
             logger.info(f"  ⚡ FPS moyen: {detector.frame_count/max(total_runtime,1):.1f}")
-            logger.info(f"  🎯 Détections: {detector.detection_count} ({detection_rate:.1f}%)")
+            logger.info(f"  🎯 Détections totales: {detector.detection_count} ({detection_rate:.1f}%)")
             logger.info(f"  ⭐ Détections qualité: {detector.quality_count} ({quality_rate:.1f}%)")
             logger.info(f"  📈 Qualité moyenne: {avg_quality:.2f}")
-            logger.info(f"  🔍 Zoom final: {detector.zoom_factor:.1f}x")
+            logger.info(f"  🔍 Zoom final: {detector.zoom_factor:.1f}x (max: {detector.zoom_max:.1f}x)")
             logger.info(f"  📈 Ajustements zoom: {detector.zoom_adjustments}")
             logger.info(f"  💡 Exposition finale: {detector.auto_exposure_factor:.2f}")
             logger.info(f"  📸 Screenshots: {screenshot_count}")
+            
+            # === STATS IA SPÉCIFIQUES ===
+            logger.info(f"  🧠 DATASET IA:")
+            logger.info(f"      📁 Dossier: {AI_SAMPLES_DIR}")
+            logger.info(f"      💾 Échantillons auto: {detector.ai_export_count}")
+            logger.info(f"      ✋ Exports manuels: {manual_ai_exports}")
+            logger.info(f"      📊 Total échantillons: {detector.ai_export_count + manual_ai_exports}")
+            logger.info(f"      🔢 Taille IA: {AI_OUTPUT_SIZE}")
+            
+            # === STATS LONGUE DISTANCE ===
+            logger.info(f"  📏 LONGUE DISTANCE:")
+            logger.info(f"      🎯 Aire minimum: {detector.min_area} (vs 200 standard)")
+            logger.info(f"      🔍 Zoom maximum: {detector.zoom_max:.1f}x (vs 4.5x standard)")
+            logger.info(f"      📐 Seuils tolérants: aspect 0.25-4.0 (vs 0.4-3.0)")
+            
             if detector.red_orange_ratio_history:
                 final_ratios = np.mean(detector.red_orange_ratio_history, axis=0)
                 logger.info(f"  🎨 Équilibrage final R/O: {final_ratios[0]:.2f}/{final_ratios[1]:.2f}")
             if detector.area_history:
-                logger.info(f"  📏 Aire moyenne: {np.mean(detector.area_history):.0f}")
-            logger.info("=" * 70)
+                min_area = min(detector.area_history)
+                max_area = max(detector.area_history)
+                med_area = np.median(detector.area_history)
+                logger.info(f"  📊 Aires détectées: min={min_area:.0f}, med={med_area:.0f}, max={max_area:.0f}")
+            
+            logger.info("=" * 80)
+            
+            # === RAPPORT IA FINAL ===
+            total_samples = detector.ai_export_count + manual_ai_exports
+            if total_samples > 0:
+                logger.info("🧠 RAPPORT DATASET IA:")
+                logger.info(f"   ✅ Dataset prêt avec {total_samples} échantillons")
+                logger.info(f"   📁 Emplacement: {os.path.abspath(AI_SAMPLES_DIR)}")
+                logger.info(f"   📐 Format: {AI_OUTPUT_SIZE[0]}x{AI_OUTPUT_SIZE[1]} pixels, fond noir")
+                logger.info(f"   🎯 Optimisé pour reconnaissance de gestes")
+                logger.info(f"   📈 Qualité moyenne échantillons: {avg_quality:.2f}")
+                logger.info("   🚀 Prêt pour entraînement IA!")
+            else:
+                logger.info("⚠️ Aucun échantillon IA généré - vérifiez la détection")
+        
+        # Fermeture fenêtres IA
+        try:
+            cv2.destroyAllWindows()
+            logger.info("✅ Interfaces IA fermées")
+        except:
+            pass
         
         if pipe:
             try:
                 pipe.terminate()
-                logger.info("✅ Pipeline fermé")
+                logger.info("✅ Pipeline IA fermé")
             except:
                 pass
-        
-        try:
-            cv2.destroyAllWindows()
-            logger.info("✅ Interface fermée")
-        except:
-            pass
         
         if bebop:
             try:
                 bebop.disconnect()
-                logger.info("✅ Drone déconnecté")
+                logger.info("✅ Drone déconnecté (mode IA)")
             except:
                 pass
         
-        logger.info("🎉 Session détection optimisée terminée!")
+        logger.info("🎉 Session IA Ready terminée - Dataset prêt!")
     
     return True
 
@@ -1224,10 +1251,10 @@ if __name__ == "__main__":
     try:
         success = main()
         exit_code = 0 if success else 1
-        print(f"\n🏁 Code de sortie: {exit_code}")
+        print(f"\n🏁 Code de sortie IA: {exit_code}")
         sys.exit(exit_code)
     except Exception as e:
-        logger.error(f"💥 Exception finale: {e}")
+        logger.error(f"💥 Exception finale IA: {e}")
         import traceback
         logger.error(f"Traceback: {traceback.format_exc()}")
         sys.exit(1)
