@@ -21,11 +21,12 @@ from typing import List, Tuple, Optional, Dict
 import pickle
 import json
 
-# Import TensorFlow avec gestion d'erreur
+# Import TensorFlow avec syntaxe compatible IDE
 try:
     import tensorflow as tf
-    from tensorflow import keras
-    from tensorflow.keras import layers
+    # Syntaxe alternative pour éviter les warnings IDE
+    keras = tf.keras
+    layers = tf.keras.layers
     TF_AVAILABLE = True
     print("✅ TensorFlow disponible")
 except ImportError:
