@@ -1,6 +1,0 @@
-<resources>
-    <!-- Style personnalisé pour agrandir le texte des items du menu -->
-    <style name="NavigationItemText" parent="TextAppearance.AppCompat.Body1">
-        <item name="android:textSize">24sp</item> <!-- Agrandir ici -->
-    </style>
-</resources>
