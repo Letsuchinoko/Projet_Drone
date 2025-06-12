@@ -471,28 +471,19 @@ class HandPositionRecognizer:
         
         return f"Confiance: {confidence_rate:.1f}% | Moy: {avg_confidence:.2f}"
     
-    def save_model(self, filepath):
+    def save_model(self, filepath="hand_position_model"):
         if not self.tf_available or self.model is None:
             return False
-            
         try:
-            import os
-            
-            # === SAUVEGARDE MODÈLE TENSORFLOW ===
-            model_dir = f"{filepath}_model"
-            
-            # Suppression ancien modèle si existe
-            if os.path.exists(model_dir):
-                import shutil
-                shutil.rmtree(model_dir)
-            
-            # Sauvegarde au format TensorFlow moderne
-            self.model.save(model_dir)
-            self.logging.info(f"✅ Modèle TF sauvegardé: {model_dir}")
-            
-            # === SAUVEGARDE DONNÉES ===
+            # --- Correction sauvegarde avec extension .keras ---
+            model_file = f"{filepath}_model.keras"
+            self.model.save(model_file)
+            self.logging.info(f"✅ Modèle sauvegardé dans {model_file}")
+
+            # Sauvegarde des données
             data_path = f"{filepath}_data.pkl"
             with open(data_path, 'wb') as f:
+                import pickle
                 pickle.dump({
                     'training_data': self.training_data,
                     'training_labels': self.training_labels,
@@ -502,41 +493,38 @@ class HandPositionRecognizer:
                     'total_predictions': getattr(self, 'total_predictions', 0),
                     'confident_predictions': getattr(self, 'confident_predictions', 0)
                 }, f)
-            
             self.logging.info(f"✅ Données sauvegardées: {data_path}")
             return True
-            
         except Exception as e:
             self.logging.error(f"❌ Erreur sauvegarde: {e}")
             return False
 
-    def load_model(self, filepath):
+    def load_model(self, filepath="hand_position_model"):
         """Chargement du modèle - VERSION CORRIGÉE"""
         if not self.tf_available:
             return False
-            
         try:
-            # === CHARGEMENT MODÈLE ===
-            model_dir = f"{filepath}_model"
-            if os.path.exists(model_dir):
-                self.model = keras.models.load_model(model_dir)
-                self.logging.info(f"✅ Modèle chargé: {model_dir}")
+            # --- Correction chargement .keras d'abord ---
+            model_file = f"{filepath}_model.keras"
+            if os.path.exists(model_file):
+                self.model = keras.models.load_model(model_file)
+                self.logging.info(f"✅ Modèle chargé: {model_file}")
             else:
-                # Tentative ancien format
+                # Tentative ancien format .h5
                 old_model_path = f"{filepath}_model.h5"
                 if os.path.exists(old_model_path):
                     self.model = keras.models.load_model(old_model_path)
                     self.logging.info(f"✅ Ancien modèle chargé: {old_model_path}")
                 else:
-                    self.logging.warning(f"⚠️ Aucun modèle trouvé: {model_dir}")
+                    self.logging.warning(f"⚠️ Aucun modèle trouvé: {model_file} ou {old_model_path}")
                     return False
-            
-            # === CHARGEMENT DONNÉES ===
+
+            # Chargement données
             data_path = f"{filepath}_data.pkl"
             if os.path.exists(data_path):
                 with open(data_path, 'rb') as f:
+                    import pickle
                     data = pickle.load(f)
-                
                 self.training_data = data.get('training_data', [])
                 self.training_labels = data.get('training_labels', [])
                 self.feature_size = data.get('feature_size', 64)
@@ -544,15 +532,11 @@ class HandPositionRecognizer:
                 self.is_trained = data.get('is_trained', False)
                 self.total_predictions = data.get('total_predictions', 0)
                 self.confident_predictions = data.get('confident_predictions', 0)
-                
                 self.logging.info(f"✅ Données chargées: {len(self.training_data)} échantillons")
-            
             return True
-            
         except Exception as e:
             self.logging.error(f"❌ Erreur chargement: {e}")
             return False
-    
 
 # === DÉTECTEUR PRINCIPAL AVEC IA ===
 class OptimizedBicolorGloveDetectorWithAI:
@@ -829,67 +813,38 @@ class OptimizedBicolorGloveDetectorWithAI:
             return None, 0.0
     
     def _start_model_training(self):
-    # === PROTECTION CONTRE MULTIPLE THREADS ===
+        # === PROTECTION CONTRE MULTIPLE THREADS ===
         if hasattr(self, '_training_in_progress') and self._training_in_progress:
             self.logging.warning("⚠️ Entraînement déjà en cours - ignoré")
             return
-        
+
         self._training_in_progress = True
         self.logging.info("🚀 Démarrage entraînement du modèle IA...")
-        
+
         def train():
             try:
-                # Protection supplémentaire
                 if not hasattr(self, '_training_in_progress') or not self._training_in_progress:
                     return
-                    
-                success = self.position_recognizer.train_model(epochs=25)  # ÉPOQUE RÉDUITE
-                
+                success = self.position_recognizer.train_model(epochs=25)
                 if success:
-                    # Sauvegarde avec extension correcte
                     try:
-                        import os
                         model_path = "hand_position_model"
-                        
-                        # Création du dossier si nécessaire
-                        os.makedirs(model_path, exist_ok=True)
-                        
-                        # Sauvegarde TensorFlow moderne
-                        self.position_recognizer.model.save(model_path)
-
-                        # Sauvegarde données séparément
-                        import pickle
-                        data_path = f"{model_path}_data.pkl"
-                        with open(data_path, 'wb') as f:
-                            pickle.dump({
-                                'training_data': self.position_recognizer.training_data,
-                                'training_labels': self.position_recognizer.training_labels,
-                                'feature_size': self.position_recognizer.feature_size,
-                                'num_classes': self.position_recognizer.num_classes,
-                                'is_trained': True
-                            }, f)
-                        
+                        # --- Correction sauvegarde .keras ---
+                        self.position_recognizer.save_model(model_path)
                         self.logging.info("💾 Modèle sauvegardé avec succès")
-                        
                     except Exception as save_error:
                         self.logging.error(f"❌ Erreur sauvegarde: {save_error}")
-                    
                     self.ai_mode = "recognition"
                     self.logging.info("✅ Modèle entraîné et sauvegardé!")
-                    
                 else:
                     self.logging.error("❌ Échec entraînement")
                     self.ai_mode = "detection"
-                    
             except Exception as e:
                 self.logging.error(f"❌ Erreur thread entraînement: {e}")
                 self.ai_mode = "detection"
-                
             finally:
-                # Libération du verrou
                 self._training_in_progress = False
-        
-        # Lancement thread unique
+
         training_thread = threading.Thread(target=train, daemon=True, name="ModelTraining")
         training_thread.start()
     
