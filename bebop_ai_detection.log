@@ -1,60 +1,1302 @@
-2025-06-16 15:04:36,764 - INFO - === BEBOP 2 AVEC IA DE RECONNAISSANCE DE POSITION ===
-2025-06-16 15:04:36,764 - INFO - 🤖 Système de reconnaissance de gestes pour drone
-2025-06-16 15:04:36,765 - INFO - 📡 Connexion au drone...
-2025-06-16 15:04:37,840 - INFO - ✅ Drone connecté!
-2025-06-16 15:04:37,841 - INFO - 📹 Démarrage flux vidéo...
-2025-06-16 15:04:40,347 - INFO - Contrôle drone démarré.
-2025-06-16 15:04:40,363 - INFO - ✅ Pipeline vidéo initialisé
-2025-06-16 15:04:40,365 - INFO - 🤖 Aucun modèle existant - Utilisez 't' pour entraîner
-2025-06-16 15:04:40,433 - INFO - ================================================================================
-2025-06-16 15:04:40,433 - INFO - 🎮 COMMANDES:
-2025-06-16 15:04:40,433 - INFO -   'q' = Quitter | 's' = Screenshot | 'r' = Reset
-2025-06-16 15:04:40,434 - INFO - 🤖 COMMANDES IA:
-2025-06-16 15:04:40,434 - INFO -   'i' = Info IA | 't' = Entraînement | 'n' = Reconnaissance
-2025-06-16 15:04:40,434 - INFO -   'm' = Sauvegarder | 'l' = Charger | 'c' = Commandes drone
-2025-06-16 15:04:40,435 - INFO - ================================================================================
-2025-06-16 15:04:40,435 - INFO - 🎯 POSITIONS RECONNUES:
-2025-06-16 15:04:40,435 - INFO -   0: poing - Poing fermé - ARRÊT D'URGENCE
-2025-06-16 15:04:40,436 - INFO -   1: paume - Paume ouverte - AVANCER
-2025-06-16 15:04:40,436 - INFO -   2: index - Index pointé - DIRECTION
-2025-06-16 15:04:40,436 - INFO -   3: victoire - Signe V - MONTÉE
-2025-06-16 15:04:40,436 - INFO -   4: ok - Signe OK - VALIDATION/HOVER
-2025-06-16 15:04:40,437 - INFO -   5: pouce - Pouce levé - MONTÉE DOUCE
-2025-06-16 15:04:40,437 - INFO -   6: stop - Main STOP - ARRÊT
-2025-06-16 15:04:40,437 - INFO -   7: salut - Salut - ROTATION
-2025-06-16 15:04:40,438 - INFO - ================================================================================
-2025-06-16 15:04:40,439 - INFO - 🎬 Démarrage détection avec IA...
-2025-06-16 15:04:45,188 - INFO - ✅ Modèle chargé: hand_position_model_model.keras
-2025-06-16 15:04:45,192 - INFO - ✅ Données chargées: 200 échantillons
-2025-06-16 15:04:45,192 - INFO - 📂 Modèle IA chargé
-2025-06-16 15:04:45,193 - INFO - 📂 Modèle IA chargé
-2025-06-16 15:04:46,159 - INFO - 📊 FPS: 15.7 | Mode: recognition (Entraînée) | Détections: 0.0% | Échantillons: 200
-2025-06-16 15:04:48,803 - INFO - 📊 FPS: 34.0 | Mode: recognition (Entraînée) | Détections: 0.0% | Échantillons: 200
-2025-06-16 15:04:51,800 - INFO - 📊 FPS: 30.0 | Mode: recognition (Entraînée) | Détections: 0.0% | Échantillons: 200
-2025-06-16 15:04:52,660 - INFO - 🤖 Mode reconnaissance activé
-2025-06-16 15:04:52,660 - INFO - 🤖 Mode reconnaissance IA activé
-2025-06-16 15:04:54,795 - INFO - 📊 FPS: 30.1 | Mode: recognition (Entraînée) | Détections: 0.0% | Échantillons: 200
-2025-06-16 15:04:57,853 - INFO - 📊 FPS: 29.4 | Mode: recognition (Entraînée) | Détections: 0.0% | Échantillons: 200
-2025-06-16 15:05:00,884 - INFO - 📊 FPS: 29.7 | Mode: recognition (Entraînée) | Détections: 0.0% | Échantillons: 200
-2025-06-16 15:05:03,887 - INFO - 📊 FPS: 30.0 | Mode: recognition (Entraînée) | Détections: 0.0% | Échantillons: 200
-2025-06-16 15:05:06,914 - INFO - 📊 FPS: 29.7 | Mode: recognition (Entraînée) | Détections: 0.0% | Échantillons: 200
-2025-06-16 15:05:09,898 - INFO - 📊 FPS: 30.2 | Mode: recognition (Entraînée) | Détections: 0.0% | Échantillons: 200
-2025-06-16 15:05:12,837 - INFO - 📊 FPS: 30.6 | Mode: recognition (Entraînée) | Détections: 0.0% | Échantillons: 200
-2025-06-16 15:05:15,820 - INFO - 📊 FPS: 30.2 | Mode: recognition (Entraînée) | Détections: 0.0% | Échantillons: 200
-2025-06-16 15:05:17,238 - INFO - 🛑 Arrêt demandé
-2025-06-16 15:05:17,238 - INFO - 🧹 Nettoyage...
-2025-06-16 15:05:17,238 - INFO - ================================================================================
-2025-06-16 15:05:17,238 - INFO - 📊 STATS FINALES:
-2025-06-16 15:05:17,240 - INFO -   ⏱️ Durée: 40.5s
-2025-06-16 15:05:17,240 - INFO -   🎞️ Frames: 1030
-2025-06-16 15:05:17,240 - INFO -   🎯 Détections gant: 1030
-2025-06-16 15:05:17,241 - INFO -   🤖 Frames IA: 1030
-2025-06-16 15:05:17,241 - INFO -   🎭 Détections position: 0
-2025-06-16 15:05:17,241 - INFO -   📈 Taux reconnaissance: 0.0%
-2025-06-16 15:05:17,242 - INFO -   📚 Échantillons: 200
-2025-06-16 15:05:17,242 - INFO -   📸 Screenshots: 0
-2025-06-16 15:05:17,242 - INFO - ================================================================================
-2025-06-16 15:05:17,243 - INFO - ✅ Pipeline fermé
-2025-06-16 15:05:17,276 - INFO - ✅ Interface fermée
-2025-06-16 15:05:17,779 - INFO - ✅ Drone déconnecté
-2025-06-16 15:05:17,779 - INFO - 🎉 Session IA terminée!
+2025-06-16 15:26:26,364 - INFO - === BEBOP 2 AVEC IA DE RECONNAISSANCE DE POSITION ===
+2025-06-16 15:26:26,366 - INFO - 🤖 Système de reconnaissance de gestes pour drone
+2025-06-16 15:26:26,366 - INFO - 📡 Connexion au drone...
+2025-06-16 15:26:27,448 - INFO - ✅ Drone connecté!
+2025-06-16 15:26:27,449 - INFO - 📹 Démarrage flux vidéo...
+2025-06-16 15:26:29,953 - INFO - Contrôle drone démarré.
+2025-06-16 15:26:29,970 - INFO - ✅ Pipeline vidéo initialisé
+2025-06-16 15:26:29,971 - INFO - 🤖 Aucun modèle existant - Utilisez 't' pour entraîner
+2025-06-16 15:26:30,039 - INFO - ================================================================================
+2025-06-16 15:26:30,040 - INFO - 🎮 COMMANDES:
+2025-06-16 15:26:30,040 - INFO -   'q' = Quitter | 's' = Screenshot | 'r' = Reset
+2025-06-16 15:26:30,041 - INFO - 🤖 COMMANDES IA:
+2025-06-16 15:26:30,041 - INFO -   'i' = Info IA | 't' = Entraînement | 'n' = Reconnaissance
+2025-06-16 15:26:30,042 - INFO -   'm' = Sauvegarder | 'l' = Charger | 'c' = Commandes drone
+2025-06-16 15:26:30,042 - INFO - ================================================================================
+2025-06-16 15:26:30,042 - INFO - 🎯 POSITIONS RECONNUES:
+2025-06-16 15:26:30,043 - INFO -   0: poing - Poing fermé - ARRÊT D'URGENCE
+2025-06-16 15:26:30,043 - INFO -   1: paume - Paume ouverte - AVANCER
+2025-06-16 15:26:30,043 - INFO -   2: index - Index pointé - DIRECTION
+2025-06-16 15:26:30,043 - INFO -   3: victoire - Signe V - MONTÉE
+2025-06-16 15:26:30,044 - INFO -   4: ok - Signe OK - VALIDATION/HOVER
+2025-06-16 15:26:30,044 - INFO -   5: pouce - Pouce levé - MONTÉE DOUCE
+2025-06-16 15:26:30,044 - INFO -   6: stop - Main STOP - ARRÊT
+2025-06-16 15:26:30,045 - INFO -   7: salut - Salut - ROTATION
+2025-06-16 15:26:30,045 - INFO - ================================================================================
+2025-06-16 15:26:30,045 - INFO - 🎬 Démarrage détection avec IA...
+2025-06-16 15:26:32,173 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:32,190 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:32,201 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:32,239 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:32,272 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:32,306 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:32,332 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:32,372 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:32,447 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:32,472 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:32,505 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:32,591 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:32,607 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:32,623 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:32,638 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:32,670 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:32,736 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:32,746 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:32,778 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:32,804 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:32,866 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:32,883 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:32,911 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:32,940 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:32,969 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,002 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,036 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,065 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,141 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,156 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,173 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,200 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,263 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,279 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,298 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,343 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,371 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,420 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,449 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,475 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,511 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,536 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,576 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,604 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,643 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,674 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,703 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,737 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,777 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,806 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,834 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,880 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,906 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,939 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:33,970 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,010 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,048 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,074 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,105 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,136 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,169 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,210 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,242 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,275 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,318 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,353 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,380 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,404 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,441 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,481 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,503 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,544 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,576 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,606 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,644 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,679 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,707 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,744 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,780 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,807 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,837 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,877 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,902 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,938 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:34,976 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:35,006 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:35,038 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:35,075 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:35,109 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:35,141 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:35,146 - INFO - 📊 FPS: 17.6 | Mode: detection | Détections: 0.0%
+2025-06-16 15:26:35,184 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:35,213 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:35,245 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:35,270 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:35,314 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:35,340 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:35,372 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:35,640 - INFO - ✅ Modèle chargé: hand_position_model_model.keras
+2025-06-16 15:26:35,641 - INFO - ✅ Données chargées: 200 échantillons
+2025-06-16 15:26:35,641 - INFO - 📂 Modèle IA chargé
+2025-06-16 15:26:35,641 - INFO - 📂 Modèle IA chargé
+2025-06-16 15:26:35,660 - INFO - [DEBUG] Features: [1.1428572  0.49465522 0.8133191  0.37089807 0.80055    0.52080107
+ 1.6        0.33778393]... sum=9.95
+2025-06-16 15:26:35,856 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:35,857 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:35,873 - INFO - [DEBUG] Features: [1.1333333  0.48872548 0.8163349  0.3768341  0.7976     0.51573
+ 1.6        0.33554828]... sum=9.93
+2025-06-16 15:26:35,952 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:35,952 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:35,976 - INFO - [DEBUG] Features: [1.13940476 0.48627254 0.80875037 0.36547135 0.79513997 0.52298687
+ 1.65000004 0.33402968]... sum=9.99
+2025-06-16 15:26:35,976 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:35,977 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:35,992 - INFO - [DEBUG] Features: [1.14244252 0.49204977 0.80589698 0.39426763 0.78247    0.50064717
+ 1.53000001 0.34044676]... sum=9.88
+2025-06-16 15:26:35,993 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:35,993 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,007 - INFO - [DEBUG] Features: [1.16440412 0.50001292 0.81791021 0.39632915 0.7802     0.49810158
+ 1.65999998 0.34464653]... sum=10.04
+2025-06-16 15:26:36,008 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,008 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,026 - INFO - [DEBUG] Features: [1.16352087 0.50246142 0.82193336 0.4108303  0.76510999 0.48390158
+ 1.61999999 0.34293874]... sum=9.99
+2025-06-16 15:26:36,027 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,027 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,045 - INFO - [DEBUG] Features: [1.17349626 0.5112988  0.83521054 0.41754825 0.76602    0.48031336
+ 1.73999997 0.34565869]... sum=10.13
+2025-06-16 15:26:36,046 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,046 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,063 - INFO - [DEBUG] Features: [1.16037163 0.51618943 0.83491327 0.42709598 0.76333001 0.47393934
+ 1.75999997 0.34046693]... sum=10.14
+2025-06-16 15:26:36,063 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,064 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,079 - INFO - [DEBUG] Features: [1.14606441 0.51763535 0.83484999 0.41832481 0.76808001 0.4804967
+ 1.75       0.34514696]... sum=10.10
+2025-06-16 15:26:36,154 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,154 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,166 - INFO - [DEBUG] Features: [1.1162275  0.51387208 0.83151269 0.42336267 0.76619501 0.47702391
+ 1.81999999 0.34013496]... sum=10.12
+2025-06-16 15:26:36,167 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,167 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,181 - INFO - [DEBUG] Features: [1.09666498 0.51517255 0.82908891 0.41649069 0.77457001 0.48352858
+ 1.71000001 0.33347894]... sum=9.99
+2025-06-16 15:26:36,181 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,182 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,193 - INFO - [DEBUG] Features: [1.0733938  0.51526473 0.83049751 0.40347592 0.78045502 0.49339548
+ 1.86       0.32612409]... sum=10.13
+2025-06-16 15:26:36,194 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,194 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,205 - INFO - [DEBUG] Features: [1.0467442  0.51163433 0.83272994 0.40784358 0.77857502 0.49001802
+ 1.86999999 0.32198086]... sum=10.11
+2025-06-16 15:26:36,205 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,206 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,234 - INFO - [DEBUG] Features: [1.04404367 0.51555983 0.8352882  0.41655883 0.78274    0.48617366
+ 1.77       0.32706392]... sum=10.03
+2025-06-16 15:26:36,234 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,235 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,248 - INFO - [DEBUG] Features: [1.04534172 0.5213241  0.83591107 0.42504099 0.77668998 0.47919965
+ 1.50999998 0.32777819]... sum=9.76
+2025-06-16 15:26:36,249 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,249 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,264 - INFO - [DEBUG] Features: [1.04644063 0.52447979 0.834443   0.42928407 0.76940998 0.47458543
+ 1.51       0.32808847]... sum=9.74
+2025-06-16 15:26:36,265 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,265 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,278 - INFO - [DEBUG] Features: [1.04874343 0.53189962 0.83639969 0.43570622 0.76349999 0.46930016
+ 1.59000002 0.32890375]... sum=9.81
+2025-06-16 15:26:36,279 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,279 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,292 - INFO - [DEBUG] Features: [1.04985392 0.53221112 0.83830525 0.43691589 0.75698    0.46661142
+ 1.68000004 0.33179061]... sum=9.89
+2025-06-16 15:26:36,380 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,380 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,398 - INFO - [DEBUG] Features: [1.05656385 0.53580862 0.83109086 0.41604083 0.74866    0.47597366
+ 1.75       0.33170102]... sum=9.95
+2025-06-16 15:26:36,398 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,399 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,412 - INFO - [DEBUG] Features: [1.0550817  0.53738512 0.82694243 0.4031198  0.74199999 0.4811903
+ 1.77999997 0.32867585]... sum=9.96
+2025-06-16 15:26:36,412 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,412 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,428 - INFO - [DEBUG] Features: [1.05019406 0.54326919 0.82997711 0.4051569  0.73493998 0.47757366
+ 1.75       0.32660324]... sum=9.92
+2025-06-16 15:26:36,428 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,429 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,442 - INFO - [DEBUG] Features: [1.05477408 0.54113114 0.83944307 0.42427108 0.73135498 0.46576706
+ 1.76999998 0.32813031]... sum=9.93
+2025-06-16 15:26:36,443 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,443 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,453 - INFO - [DEBUG] Features: [1.04955748 0.54535362 0.84917463 0.4387533  0.73081999 0.45763741
+ 1.77999997 0.32659559]... sum=9.94
+2025-06-16 15:26:36,454 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,454 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,481 - INFO - [DEBUG] Features: [1.05221238 0.54401789 0.85266949 0.44996468 0.73089499 0.45182493
+ 1.75       0.32279487]... sum=9.92
+2025-06-16 15:26:36,483 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,483 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,502 - INFO - [DEBUG] Features: [1.04670856 0.5431762  0.85095846 0.44990501 0.73238499 0.45229944
+ 1.81999999 0.32263011]... sum=9.98
+2025-06-16 15:26:36,632 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,633 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,647 - INFO - [DEBUG] Features: [1.05009316 0.53979678 0.84148844 0.43850954 0.73406    0.45880066
+ 1.80999998 0.32411476]... sum=9.96
+2025-06-16 15:26:36,647 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,647 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,660 - INFO - [DEBUG] Features: [1.05087721 0.5388506  0.84235751 0.44056025 0.735915   0.45823913
+ 1.77       0.327118  ]... sum=9.93
+2025-06-16 15:26:36,661 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,661 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,675 - INFO - [DEBUG] Features: [1.05263162 0.53788743 0.84220063 0.4408938  0.73582999 0.45800898
+ 1.72000003 0.32885281]... sum=9.89
+2025-06-16 15:26:36,676 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,676 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,692 - INFO - [DEBUG] Features: [1.06140351 0.53491702 0.84561986 0.4451557  0.73783001 0.45638056
+ 1.65000004 0.33040252]... sum=9.82
+2025-06-16 15:26:36,693 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,693 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,709 - INFO - [DEBUG] Features: [1.0622807  0.53466087 0.84652833 0.44072249 0.73810502 0.4587705
+ 1.71999999 0.33015024]... sum=9.90
+2025-06-16 15:26:36,788 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,788 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,802 - INFO - [DEBUG] Features: [1.06693891 0.52747997 0.84707228 0.43749748 0.74419    0.46235456
+ 1.60999999 0.33138117]... sum=9.80
+2025-06-16 15:26:36,802 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,802 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,821 - INFO - [DEBUG] Features: [1.05883247 0.52792232 0.84464461 0.43805203 0.74690999 0.46289183
+ 1.50999998 0.33204742]... sum=9.71
+2025-06-16 15:26:36,821 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,821 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,836 - INFO - [DEBUG] Features: [1.05473408 0.52118213 0.84224989 0.43876331 0.75238999 0.46420898
+ 1.52       0.32694946]... sum=9.72
+2025-06-16 15:26:36,836 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,837 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,850 - INFO - [DEBUG] Features: [1.03831095 0.5257168  0.8384317  0.44409855 0.75477    0.46215213
+ 1.56000001 0.33043334]... sum=9.75
+2025-06-16 15:26:36,852 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,852 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,865 - INFO - [DEBUG] Features: [1.03050849 0.52832217 0.83718012 0.44262713 0.75799501 0.46390777
+ 1.65000004 0.32498655]... sum=9.84
+2025-06-16 15:26:36,867 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,867 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,879 - INFO - [DEBUG] Features: [1.02542377 0.5320038  0.83519529 0.44044074 0.759595   0.46555285
+ 1.48       0.32730788]... sum=9.67
+2025-06-16 15:26:36,879 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,880 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,895 - INFO - [DEBUG] Features: [1.02118647 0.53512939 0.83862517 0.46933337 0.76088499 0.45208766
+ 1.33000002 0.32025463]... sum=9.54
+2025-06-16 15:26:36,896 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:36,896 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:36,912 - INFO - [DEBUG] Features: [1.0144068  0.53869228 0.84256415 0.49425018 0.76085001 0.44044086
+ 1.22000003 0.31543846]... sum=9.44
+2025-06-16 15:26:37,019 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:37,020 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,039 - INFO - [DEBUG] Features: [1.0144068  0.53839855 0.8463069  0.50818756 0.760455   0.43365436
+ 1.20000005 0.31447069]... sum=9.42
+2025-06-16 15:26:37,039 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:37,040 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,061 - INFO - [DEBUG] Features: [1.01949155 0.53506547 0.85274212 0.5054253  0.75951002 0.4345698
+ 1.20000005 0.30832904]... sum=9.41
+2025-06-16 15:26:37,062 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:37,063 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,078 - INFO - [DEBUG] Features: [1.02362204 0.53868257 0.86312544 0.48159051 0.77439001 0.44995213
+ 1.45000005 0.30287738]... sum=9.68
+2025-06-16 15:26:37,078 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:37,079 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,095 - INFO - [DEBUG] Features: [1.02514778 0.55857467 0.87713955 0.48564182 0.81538501 0.45935285
+ 1.55000004 0.29001068]... sum=9.85
+2025-06-16 15:26:37,095 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:37,096 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,111 - INFO - [DEBUG] Features: [0.99587534 0.60913311 0.88875877 0.49782599 0.86898999 0.46822909
+ 1.57000002 0.28468198]... sum=9.95
+2025-06-16 15:26:37,111 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:37,112 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,124 - INFO - [DEBUG] Features: [0.89702703 0.58164729 0.88888156 0.53899088 0.91900001 0.4631629
+ 1.81999996 0.24934953]... sum=10.14
+2025-06-16 15:26:37,200 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.132
+2025-06-16 15:26:37,200 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,214 - INFO - [DEBUG] Features: [0.78211052 0.55626865 0.86911399 0.54532763 0.96       0.47047072
+ 1.82999995 0.1764089 ]... sum=9.97
+2025-06-16 15:26:37,215 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.132
+2025-06-16 15:26:37,215 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,226 - INFO - [DEBUG] Features: [0.71160931 0.5310227  0.84781488 0.54207546 0.99763003 0.48108981
+ 2.10999994 0.08962646]... sum=10.13
+2025-06-16 15:26:37,227 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.132
+2025-06-16 15:26:37,227 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,239 - INFO - [DEBUG] Features: [0.68941077 0.52543077 0.83154129 0.53009425 1.03095001 0.4943893
+ 2.09999993 0.5201602 ]... sum=10.57
+2025-06-16 15:26:37,239 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.132
+2025-06-16 15:26:37,240 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,250 - INFO - [DEBUG] Features: [0.68106516 0.52105392 0.8238808  0.52615353 1.05449003 0.50184026
+ 2.08999996 0.78503065]... sum=10.86
+2025-06-16 15:26:37,250 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.132
+2025-06-16 15:26:37,252 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,263 - INFO - [DEBUG] Features: [0.66990635 0.51360027 0.81749498 0.5128561  1.06765    0.51159418
+ 2.16999996 0.97556567]... sum=11.14
+2025-06-16 15:26:37,263 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.132
+2025-06-16 15:26:37,263 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,276 - INFO - [DEBUG] Features: [0.66127421 0.51428821 0.81474826 0.50783016 1.07375    0.51552556
+ 2.03999997 0.97666507]... sum=11.01
+2025-06-16 15:26:37,276 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.132
+2025-06-16 15:26:37,276 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,290 - INFO - [DEBUG] Features: [0.65125683 0.51469232 0.81303546 0.50697992 1.0763     0.51651725
+ 1.97999997 0.98266871]... sum=10.96
+2025-06-16 15:26:37,290 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.132
+2025-06-16 15:26:37,290 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,302 - INFO - [DEBUG] Features: [0.6386829  0.51919232 0.81132309 0.51109979 1.06941998 0.51278342
+ 1.94999999 0.97896484]... sum=10.93
+2025-06-16 15:26:37,302 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.132
+2025-06-16 15:26:37,302 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,314 - INFO - [DEBUG] Features: [0.62555556 0.521834   0.81520186 0.51307362 1.05754999 0.50893489
+ 1.92999998 0.98643755]... sum=10.91
+2025-06-16 15:26:37,315 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.132
+2025-06-16 15:26:37,316 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,328 - INFO - [DEBUG] Features: [0.61055557 0.52844574 0.81777716 0.51443359 1.04518499 0.50528219
+ 1.86999997 0.98052245]... sum=10.82
+2025-06-16 15:26:37,439 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.141
+2025-06-16 15:26:37,439 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,452 - INFO - [DEBUG] Features: [0.60333335 0.53205776 0.82066786 0.51533181 1.03997999 0.50358685
+ 1.86999997 0.98586358]... sum=10.82
+2025-06-16 15:26:37,452 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.141
+2025-06-16 15:26:37,452 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,462 - INFO - [DEBUG] Features: [0.60000002 0.53417696 0.82078132 0.51626524 1.03843999 0.50275841
+ 1.92999998 0.98673888]... sum=10.88
+2025-06-16 15:26:37,462 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.141
+2025-06-16 15:26:37,462 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,487 - INFO - [DEBUG] Features: [0.60000002 0.53379631 0.82184146 0.51531845 1.0377     0.50304126
+ 1.98       0.9816628 ]... sum=10.93
+2025-06-16 15:26:37,487 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.141
+2025-06-16 15:26:37,489 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,505 - INFO - [DEBUG] Features: [0.60277778 0.53162757 0.82168757 0.51728174 1.03825002 0.50222118
+ 2.10000002 0.97926697]... sum=11.05
+2025-06-16 15:26:37,507 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.141
+2025-06-16 15:26:37,507 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,522 - INFO - [DEBUG] Features: [0.60722222 0.52943903 0.82299602 0.51692356 1.04159    0.50320109
+ 2.16000004 0.97783535]... sum=11.12
+2025-06-16 15:26:37,524 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.141
+2025-06-16 15:26:37,524 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,540 - INFO - [DEBUG] Features: [0.60999999 0.52907141 0.82387344 0.5212003  1.04565501 0.50211408
+ 2.         0.98198628]... sum=10.97
+2025-06-16 15:26:37,619 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.142
+2025-06-16 15:26:37,620 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,632 - INFO - [DEBUG] Features: [0.60833332 0.5307619  0.82341434 0.52452185 1.04611498 0.50063712
+ 1.78000001 0.98654347]... sum=10.75
+2025-06-16 15:26:37,633 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.142
+2025-06-16 15:26:37,633 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,648 - INFO - [DEBUG] Features: [0.60666665 0.53154861 0.82220483 0.52841074 1.04480497 0.49847143
+ 1.64000001 0.98998448]... sum=10.60
+2025-06-16 15:26:37,648 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.142
+2025-06-16 15:26:37,648 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,660 - INFO - [DEBUG] Features: [0.6111111  0.52833934 0.82336585 0.52960073 1.04604498 0.4982028
+ 1.69999999 0.99487991]... sum=10.67
+2025-06-16 15:26:37,660 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.142
+2025-06-16 15:26:37,660 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,673 - INFO - [DEBUG] Features: [0.61166666 0.52732124 0.82580094 0.5329475  1.04501497 0.49639691
+ 1.96000001 0.99458519]... sum=10.96
+2025-06-16 15:26:37,674 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.142
+2025-06-16 15:26:37,674 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,688 - INFO - [DEBUG] Features: [0.61222222 0.52563452 0.82696736 0.52658243 1.042645   0.49884545
+ 1.91999998 0.98809173]... sum=10.90
+2025-06-16 15:26:37,689 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.142
+2025-06-16 15:26:37,689 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,703 - INFO - [DEBUG] Features: [0.6111111  0.52562119 0.82754891 0.52863348 1.04072999 0.49741286
+ 1.92999998 0.98372968]... sum=10.93
+2025-06-16 15:26:37,704 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.142
+2025-06-16 15:26:37,704 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,719 - INFO - [DEBUG] Features: [0.60723153 0.52973298 0.82630738 0.52085848 1.03636998 0.50006483
+ 2.07999996 0.98785155]... sum=11.06
+2025-06-16 15:26:37,719 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.142
+2025-06-16 15:26:37,720 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,729 - INFO - [DEBUG] Features: [0.60659858 0.53330605 0.82526323 0.51857511 1.03300999 0.50034522
+ 2.01999997 0.49975167]... sum=10.50
+2025-06-16 15:26:37,731 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.142
+2025-06-16 15:26:37,731 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,747 - INFO - [DEBUG] Features: [0.60606363 0.53498026 0.82408144 0.51907337 1.02959999 0.49926827
+ 2.02999998 0.20574589]... sum=10.20
+2025-06-16 15:26:37,818 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.142
+2025-06-16 15:26:37,820 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,830 - INFO - [DEBUG] Features: [0.60674155 0.53449073 0.82534638 0.52095788 1.02750499 0.49785234
+ 2.08000002 0.00710301]... sum=10.05
+2025-06-16 15:26:37,830 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.142
+2025-06-16 15:26:37,830 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,841 - INFO - [DEBUG] Features: [0.60504675 0.53239933 0.82487699 0.51844813 1.02635002 0.49877956
+ 2.06000001 0.49857301]... sum=10.52
+2025-06-16 15:26:37,843 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.142
+2025-06-16 15:26:37,843 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,857 - INFO - [DEBUG] Features: [0.60402987 0.53104334 0.8249689  0.51670279 1.02546003 0.49939966
+ 2.04000001 0.79604083]... sum=10.80
+2025-06-16 15:26:37,858 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.142
+2025-06-16 15:26:37,859 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,874 - INFO - [DEBUG] Features: [0.60676071 0.53272232 0.82752758 0.52260982 1.02408004 0.49626829
+ 1.89999998 0.49872012]... sum=10.38
+2025-06-16 15:26:37,874 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.142
+2025-06-16 15:26:37,875 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,890 - INFO - [DEBUG] Features: [0.60819052 0.52850119 0.82637416 0.52091392 1.02292004 0.49677955
+ 1.88999997 0.70023793]... sum=10.56
+2025-06-16 15:26:37,890 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.142
+2025-06-16 15:26:37,890 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,905 - INFO - [DEBUG] Features: [0.61089523 0.52611199 0.82732233 0.51953331 1.01941501 0.49657782
+ 1.82999996 0.30946944]... sum=10.08
+2025-06-16 15:26:37,905 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.142
+2025-06-16 15:26:37,906 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,920 - INFO - [DEBUG] Features: [0.61167533 0.52345527 0.82659296 0.51586404 1.01674998 0.49767315
+ 1.71999999 0.21562281]... sum=9.85
+2025-06-16 15:26:37,920 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.142
+2025-06-16 15:26:37,920 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,944 - INFO - [DEBUG] Features: [0.61235952 0.52308783 0.82739846 0.51611783 1.01489501 0.49709742
+ 1.64000001 0.02037272]... sum=9.57
+2025-06-16 15:26:37,944 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.142
+2025-06-16 15:26:37,945 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:37,984 - INFO - [DEBUG] Features: [0.61235952 0.52188693 0.82717107 0.51429024 1.01256499 0.4974087
+ 1.65000004 0.02184591]... sum=9.57
+2025-06-16 15:26:38,104 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:38,105 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:38,125 - INFO - [DEBUG] Features: [0.61691421 0.51865619 0.82579654 0.51177786 1.00804998 0.4975158
+ 1.87999997 0.01252139]... sum=9.80
+2025-06-16 15:26:38,126 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:38,126 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:38,142 - INFO - [DEBUG] Features: [0.61964703 0.51628319 0.82537491 0.513561   1.00449497 0.49578026
+ 1.96999998 0.50302651]... sum=10.40
+2025-06-16 15:26:38,142 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:38,143 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:38,155 - INFO - [DEBUG] Features: [0.62323445 0.51535208 0.82562138 0.51457495 1.00055497 0.49431752
+ 2.16999996 0.79588152]... sum=10.91
+2025-06-16 15:26:38,155 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:38,156 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:38,169 - INFO - [DEBUG] Features: [0.62145287 0.51833984 0.82450811 0.51716769 1.00005001 0.49294767
+ 2.19000001 0.49953891]... sum=10.64
+2025-06-16 15:26:38,169 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:38,171 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:38,184 - INFO - [DEBUG] Features: [0.62222403 0.52162063 0.82282158 0.51537647 0.999635   0.49370331
+ 2.12       0.20405003]... sum=10.26
+2025-06-16 15:26:38,184 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:38,185 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:38,186 - INFO - 📊 FPS: 29.6 | Mode: recognition (Entraînée) | Détections: 0.0% | Échantillons: 200
+2025-06-16 15:26:38,201 - INFO - [DEBUG] Features: [0.61929221 0.52505367 0.82402567 0.52444348 0.99806501 0.4890891
+ 1.74       0.01121984]... sum=9.68
+2025-06-16 15:26:38,288 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:38,288 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:38,304 - INFO - [DEBUG] Features: [0.61653247 0.52472919 0.82547925 0.52611442 0.99639999 0.48787904
+ 1.86999995 0.01485728]... sum=9.80
+2025-06-16 15:26:38,305 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:38,305 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:38,321 - INFO - [DEBUG] Features: [0.62073787 0.52507961 0.82729785 0.5279735  0.99583    0.48685061
+ 1.85999995 0.01482537]... sum=9.79
+2025-06-16 15:26:38,321 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:38,322 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:38,339 - INFO - [DEBUG] Features: [0.62100312 0.52597734 0.82734976 0.53088819 0.99342    0.48493346
+ 1.93999996 0.01271841]... sum=9.88
+2025-06-16 15:26:38,339 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:38,340 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:38,356 - INFO - [DEBUG] Features: [0.61896552 0.52854308 0.82754351 0.53215992 0.99045001 0.48362219
+ 1.89999998 0.00717471]... sum=9.83
+2025-06-16 15:26:38,356 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:38,357 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:38,370 - INFO - [DEBUG] Features: [0.63045979 0.52078157 0.82260344 0.52674114 0.99371001 0.48693346
+ 2.05000001 0.0147881 ]... sum=9.98
+2025-06-16 15:26:38,370 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:38,370 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:38,388 - INFO - [DEBUG] Features: [0.63401104 0.52043265 0.82225528 0.52665896 0.99305    0.48679032
+ 1.89000003 0.0175662 ]... sum=9.83
+2025-06-16 15:26:38,388 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:38,389 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:38,418 - INFO - [DEBUG] Features: [0.63845261 0.51668151 0.82020879 0.51955541 0.99525999 0.49066139
+ 1.99999998 0.01892346]... sum=9.92
+2025-06-16 15:26:38,496 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:38,496 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:38,507 - INFO - [DEBUG] Features: [0.64224636 0.51701406 0.82063308 0.52013419 0.99719999 0.49085549
+ 1.82       0.50731941]... sum=10.23
+2025-06-16 15:26:38,509 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:38,509 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:38,525 - INFO - [DEBUG] Features: [0.65128561 0.51368532 0.81920912 0.52131898 1.00352497 0.49183711
+ 1.82999997 0.3145385 ]... sum=10.05
+2025-06-16 15:26:38,525 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:38,526 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:38,542 - INFO - [DEBUG] Features: [0.66242774 0.50976506 0.81865513 0.52371529 1.01054499 0.49241701
+ 2.08000004 0.22182202]... sum=10.23
+2025-06-16 15:26:38,543 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:38,543 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:38,560 - INFO - [DEBUG] Features: [0.68178517 0.50617821 0.81691906 0.5269042  1.02667497 0.49481458
+ 1.73       0.04138951]... sum=9.72
+2025-06-16 15:26:38,560 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:38,560 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:38,573 - INFO - [DEBUG] Features: [0.70178788 0.5084612  0.81494384 0.52505007 1.06446002 0.50469327
+ 1.67000002 0.04573863]... sum=9.72
+2025-06-16 15:26:38,573 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:38,575 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:38,610 - INFO - [DEBUG] Features: [0.72956378 0.51364314 0.80894843 0.50496313 1.13982499 0.53300039
+ 1.59000002 0.06625502]... sum=9.78
+2025-06-16 15:26:38,612 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:38,612 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:38,657 - INFO - [DEBUG] Features: [0.76665769 0.51787757 0.80728498 0.49898162 1.22974497 0.55649397
+ 1.78000001 0.07270953]... sum=10.13
+2025-06-16 15:26:38,734 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:38,734 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:38,763 - INFO - [DEBUG] Features: [0.80471338 0.5261962  0.80626332 0.49135926 1.33231    0.58347213
+ 1.71000001 0.09466012]... sum=10.25
+2025-06-16 15:26:38,764 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:38,765 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:38,780 - INFO - [DEBUG] Features: [0.84282617 0.53230413 0.8056675  0.48523188 1.45262002 0.61324269
+ 2.06000005 0.07048182]... sum=10.80
+2025-06-16 15:26:38,781 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:38,781 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:38,793 - INFO - [DEBUG] Features: [0.89412301 0.53195711 0.80260035 0.48468769 1.580415   0.63978657
+ 1.89000006 0.0572499 ]... sum=10.85
+2025-06-16 15:26:38,793 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:38,794 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:38,807 - INFO - [DEBUG] Features: [0.91721905 0.53329266 0.80229652 0.47900043 1.70462502 0.66853703
+ 2.03999999 0.0228965 ]... sum=11.18
+2025-06-16 15:26:38,807 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:38,809 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:38,819 - INFO - [DEBUG] Features: [0.94412586 0.52862861 0.79806734 0.47008809 1.80824503 0.69538798
+ 2.17000003 0.01861473]... sum=11.49
+2025-06-16 15:26:38,820 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:38,820 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:38,847 - INFO - [DEBUG] Features: [0.95497078 0.52577763 0.79776727 0.46385449 1.88806003 0.71520047
+ 2.03999999 0.50485345]... sum=11.98
+2025-06-16 15:26:38,848 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:38,848 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:38,884 - INFO - [DEBUG] Features: [0.93099555 0.53619091 0.79996264 0.46629372 1.94356002 0.72368922
+ 2.31999996 0.79483536]... sum=12.64
+2025-06-16 15:26:39,006 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.132
+2025-06-16 15:26:39,008 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,019 - INFO - [DEBUG] Features: [0.90188153 0.54058446 0.80053579 0.4650506  1.98144505 0.73173015
+ 2.28999994 0.52630499]... sum=12.37
+2025-06-16 15:26:39,019 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.132
+2025-06-16 15:26:39,019 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,044 - INFO - [DEBUG] Features: [0.87610695 0.54168232 0.80144271 0.46426753 2.00345998 0.73641714
+ 2.30999999 0.23492273]... sum=12.11
+2025-06-16 15:26:39,044 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.132
+2025-06-16 15:26:39,046 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,058 - INFO - [DEBUG] Features: [0.86551361 0.54338642 0.8005358  0.46178467 2.02289    0.74194263
+ 2.32000005 0.0567258 ]... sum=11.96
+2025-06-16 15:26:39,058 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.132
+2025-06-16 15:26:39,060 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,079 - INFO - [DEBUG] Features: [0.85779029 0.54607584 0.80144092 0.46587417 2.05591502 0.7446674
+ 2.20999999 0.07108259]... sum=11.91
+2025-06-16 15:26:39,080 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.132
+2025-06-16 15:26:39,081 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,094 - INFO - [DEBUG] Features: [0.85093675 0.5471857  0.80120884 0.46782115 2.09063008 0.74936031
+ 2.25999997 0.10519932]... sum=12.05
+2025-06-16 15:26:39,164 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.135
+2025-06-16 15:26:39,164 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,185 - INFO - [DEBUG] Features: [0.84253623 0.5432067  0.8009689  0.47555348 2.14284008 0.75245735
+ 2.31000001 0.10543865]... sum=12.16
+2025-06-16 15:26:39,185 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.135
+2025-06-16 15:26:39,186 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,197 - INFO - [DEBUG] Features: [0.83784574 0.53746202 0.80201779 0.47909328 2.20506501 0.76044384
+ 2.43000002 0.1027302 ]... sum=12.36
+2025-06-16 15:26:39,198 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.135
+2025-06-16 15:26:39,198 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,212 - INFO - [DEBUG] Features: [0.83679905 0.53609347 0.80033677 0.46890751 2.28155003 0.78221855
+ 2.27999997 0.08942892]... sum=12.30
+2025-06-16 15:26:39,213 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.135
+2025-06-16 15:26:39,213 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,230 - INFO - [DEBUG] Features: [0.82868332 0.53485575 0.79958991 0.46504361 2.35276504 0.79745358
+ 2.02999995 0.09031599]... sum=12.13
+2025-06-16 15:26:39,231 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.135
+2025-06-16 15:26:39,231 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,247 - INFO - [DEBUG] Features: [0.81245803 0.53386652 0.79846009 0.46793358 2.43106506 0.80793887
+ 2.16000001 0.09453786]... sum=12.37
+2025-06-16 15:26:39,247 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.135
+2025-06-16 15:26:39,249 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,264 - INFO - [DEBUG] Features: [0.80255231 0.52737643 0.79456171 0.46365313 2.50669503 0.82432365
+ 2.28000007 0.08896786]... sum=12.56
+2025-06-16 15:26:39,264 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.135
+2025-06-16 15:26:39,264 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,287 - INFO - [DEBUG] Features: [0.78573901 0.51826477 0.79771369 0.47344386 2.55979996 0.82441655
+ 2.30000007 0.07005548]... sum=12.63
+2025-06-16 15:26:39,287 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.135
+2025-06-16 15:26:39,289 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,309 - INFO - [DEBUG] Features: [0.76813453 0.50930005 0.80036244 0.47690075 2.59991496 0.82779716
+ 2.39000003 0.06833551]... sum=12.76
+2025-06-16 15:26:39,387 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:39,387 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,401 - INFO - [DEBUG] Features: [0.74621465 0.50497562 0.80108883 0.47471527 2.62688496 0.83397948
+ 2.19000001 0.06092985]... sum=12.58
+2025-06-16 15:26:39,402 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:39,402 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,419 - INFO - [DEBUG] Features: [0.71868181 0.50933437 0.80853693 0.48467178 2.63714499 0.82710497
+ 2.14999995 0.06391566]... sum=12.55
+2025-06-16 15:26:39,419 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:39,420 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,437 - INFO - [DEBUG] Features: [0.6949098  0.51472384 0.81113667 0.48204005 2.64293001 0.83020131
+ 2.02999997 0.05606984]... sum=12.43
+2025-06-16 15:26:39,437 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:39,439 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,459 - INFO - [DEBUG] Features: [0.67524981 0.51954521 0.81987512 0.48902119 2.62184999 0.82087584
+ 2.01999998 0.06034322]... sum=12.42
+2025-06-16 15:26:39,459 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:39,460 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,475 - INFO - [DEBUG] Features: [0.66104383 0.52023252 0.82371355 0.48440152 2.57255497 0.81691775
+ 2.10000002 0.05776594]... sum=12.43
+2025-06-16 15:26:39,476 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:39,476 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,519 - INFO - [DEBUG] Features: [0.64462759 0.52287088 0.82802159 0.47976426 2.50660501 0.8102266
+ 2.35999997 0.05330239]... sum=12.60
+2025-06-16 15:26:39,650 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.138
+2025-06-16 15:26:39,650 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,672 - INFO - [DEBUG] Features: [0.62047513 0.52794214 0.82960002 0.48185672 2.43513997 0.79692884
+ 2.32       0.04360158]... sum=12.46
+2025-06-16 15:26:39,673 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.138
+2025-06-16 15:26:39,673 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,692 - INFO - [DEBUG] Features: [0.60004832 0.53101216 0.82785954 0.47664407 2.35379004 0.78770629
+ 2.22999995 0.04196794]... sum=12.25
+2025-06-16 15:26:39,692 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.138
+2025-06-16 15:26:39,693 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,710 - INFO - [DEBUG] Features: [0.57660409 0.5361654  0.83145283 0.4974729  2.27701504 0.75896586
+ 2.27000003 0.03634924]... sum=12.20
+2025-06-16 15:26:39,710 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.138
+2025-06-16 15:26:39,711 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,725 - INFO - [DEBUG] Features: [0.55597922 0.54066339 0.83461491 0.50347589 2.19905009 0.7412019
+ 2.39000001 0.03232578]... sum=12.23
+2025-06-16 15:26:39,805 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:39,806 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,819 - INFO - [DEBUG] Features: [0.53943694 0.55102565 0.83931916 0.51062976 2.13774002 0.72526565
+ 2.52999997 0.03058078]... sum=12.27
+2025-06-16 15:26:39,819 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:39,819 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,836 - INFO - [DEBUG] Features: [0.52463338 0.55369639 0.84026409 0.50941127 2.08308005 0.71681712
+ 2.57999992 0.02678541]... sum=12.23
+2025-06-16 15:26:39,836 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:39,837 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,853 - INFO - [DEBUG] Features: [0.51049265 0.55889577 0.83844526 0.50372699 2.04275503 0.71385559
+ 2.5        0.01835527]... sum=12.09
+2025-06-16 15:26:39,854 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:39,854 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,869 - INFO - [DEBUG] Features: [0.49925373 0.56178162 0.83892912 0.50125513 2.01420504 0.71060462
+ 2.49000001 0.01476648]... sum=12.03
+2025-06-16 15:26:39,870 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:39,870 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,888 - INFO - [DEBUG] Features: [0.4921221  0.56862069 0.83859041 0.49521923 1.99474504 0.71146492
+ 2.33000004 0.01105516]... sum=11.84
+2025-06-16 15:26:39,889 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:39,890 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,907 - INFO - [DEBUG] Features: [0.4885697  0.57106348 0.84163253 0.49861425 1.98745003 0.70775782
+ 2.26000004 0.01453867]... sum=11.77
+2025-06-16 15:26:39,907 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:39,908 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,922 - INFO - [DEBUG] Features: [0.48261774 0.57455752 0.84556926 0.49681957 1.981095   0.70789335
+ 2.39999998 0.01207253]... sum=11.91
+2025-06-16 15:26:39,923 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:39,923 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:39,941 - INFO - [DEBUG] Features: [0.47760215 0.57697869 0.84861888 0.49881022 1.97615002 0.70558627
+ 2.42000003 0.0129955 ]... sum=11.92
+2025-06-16 15:26:40,062 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:40,063 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:40,081 - INFO - [DEBUG] Features: [0.46646884 0.58092691 0.85092856 0.49811953 1.967725   0.70456545
+ 2.34000003 0.01510539]... sum=11.85
+2025-06-16 15:26:40,082 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:40,082 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:40,250 - INFO - ✅ Modèle chargé: hand_position_model_model.keras
+2025-06-16 15:26:40,251 - INFO - ✅ Données chargées: 200 échantillons
+2025-06-16 15:26:40,251 - INFO - 📂 Modèle IA chargé
+2025-06-16 15:26:40,251 - INFO - 📂 Modèle IA chargé
+2025-06-16 15:26:40,261 - INFO - [DEBUG] Features: [0.45982327 0.58539932 0.85489408 0.50105424 1.96057999 0.70122749
+ 2.34000008 0.01929791]... sum=11.86
+2025-06-16 15:26:40,501 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.138
+2025-06-16 15:26:40,502 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:40,516 - INFO - [DEBUG] Features: [0.45225366 0.59699015 0.85516613 0.49546516 1.97080997 0.70705348
+ 2.31000001 0.01631174]... sum=11.85
+2025-06-16 15:26:40,591 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:40,592 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:40,613 - INFO - [DEBUG] Features: [0.44635848 0.60175444 0.8580824  0.47829382 1.98689995 0.72291866
+ 2.42       0.0128457 ]... sum=11.96
+2025-06-16 15:26:40,613 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:40,613 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:40,626 - INFO - [DEBUG] Features: [0.44392956 0.60899187 0.8647978  0.4759249  2.02530997 0.73137308
+ 2.45999999 0.00790148]... sum=12.07
+2025-06-16 15:26:40,628 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:40,628 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:40,640 - INFO - [DEBUG] Features: [0.45289355 0.61403645 0.86419442 0.44053622 2.06149998 0.76850201
+ 2.60000002 0.00351837]... sum=12.22
+2025-06-16 15:26:40,640 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:40,640 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:40,653 - INFO - [DEBUG] Features: [0.46943433 0.60279427 0.86510172 0.45544778 2.11518998 0.76516232
+ 2.45999999 0.49182709]... sum=12.65
+2025-06-16 15:26:40,653 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:40,654 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:40,667 - INFO - [DEBUG] Features: [0.49133312 0.59066233 0.85791071 0.45757963 2.16922503 0.77248362
+ 2.43000004 0.78577856]... sum=12.96
+2025-06-16 15:26:40,667 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:40,667 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:40,678 - INFO - [DEBUG] Features: [0.52263966 0.57090057 0.85253125 0.48220976 2.24061506 0.76416302
+ 2.38000007 0.97889546]... sum=13.22
+2025-06-16 15:26:40,678 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:40,679 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:40,689 - INFO - [DEBUG] Features: [0.55323922 0.55758447 0.8399918  0.48434302 2.30496504 0.7733277
+ 2.4000001  0.98182308]... sum=13.29
+2025-06-16 15:26:40,689 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:40,689 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:40,704 - INFO - [DEBUG] Features: [0.58274115 0.53984981 0.82967339 0.48806617 2.37214496 0.7815017
+ 2.35000002 0.99035329]... sum=13.34
+2025-06-16 15:26:40,705 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:40,705 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:40,719 - INFO - [DEBUG] Features: [0.6202706  0.52364451 0.81625651 0.4771883  2.44232001 0.80211319
+ 2.37000005 0.99218252]... sum=13.46
+2025-06-16 15:26:40,812 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:40,813 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:40,828 - INFO - [DEBUG] Features: [0.65962481 0.51291908 0.80663353 0.46780309 2.507195   0.82086294
+ 2.38000007 0.50138338]... sum=13.05
+2025-06-16 15:26:40,828 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:40,829 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:40,842 - INFO - [DEBUG] Features: [0.69614424 0.50530286 0.79632865 0.45851897 2.54898498 0.83587126
+ 2.35000002 0.2008361 ]... sum=12.76
+2025-06-16 15:26:40,842 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:40,843 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:40,857 - INFO - [DEBUG] Features: [0.73086662 0.49739099 0.78813565 0.44110023 2.58182499 0.85807025
+ 2.52000003 0.03224663]... sum=12.84
+2025-06-16 15:26:40,858 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:40,858 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:40,872 - INFO - [DEBUG] Features: [0.75191471 0.49538327 0.78250864 0.43852462 2.59325497 0.86222415
+ 2.41999998 0.03392924]... sum=12.78
+2025-06-16 15:26:40,872 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:40,873 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:40,895 - INFO - [DEBUG] Features: [0.77294713 0.48967728 0.77689407 0.42581629 2.56000001 0.86926852
+ 2.23       0.04026177]... sum=12.57
+2025-06-16 15:26:40,895 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:40,895 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:40,911 - INFO - [DEBUG] Features: [0.78727894 0.48539249 0.77038691 0.42217147 2.49432497 0.86164426
+ 2.05999999 0.03752334]... sum=12.30
+2025-06-16 15:26:40,911 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:40,911 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:40,926 - INFO - [DEBUG] Features: [0.79164546 0.48450785 0.7676697  0.42061433 2.41670496 0.84969968
+ 2.10000002 0.03375565]... sum=12.23
+2025-06-16 15:26:41,046 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:41,047 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,066 - INFO - [DEBUG] Features: [0.78505035 0.48944999 0.76886677 0.43422872 2.32179997 0.82007399
+ 2.06000001 0.04711877]... sum=12.07
+2025-06-16 15:26:41,066 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:41,067 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,081 - INFO - [DEBUG] Features: [0.76978347 0.49459697 0.76869793 0.44142144 2.22478499 0.79595023
+ 2.33999996 0.05118226]... sum=12.21
+2025-06-16 15:26:41,081 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:41,082 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,096 - INFO - [DEBUG] Features: [0.74639835 0.50420045 0.77693965 0.44949294 2.12459998 0.7706348
+ 2.53       0.04647354]... sum=12.24
+2025-06-16 15:26:41,096 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:41,096 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,111 - INFO - [DEBUG] Features: [0.72845797 0.50976447 0.78146626 0.448048   2.021735   0.75287327
+ 2.53000004 0.03981327]... sum=12.11
+2025-06-16 15:26:41,112 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:41,112 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,125 - INFO - [DEBUG] Features: [0.71408263 0.51434905 0.78536676 0.45553646 1.91871498 0.72750859
+ 2.21000003 0.0411326 ]... sum=11.64
+2025-06-16 15:26:41,125 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.139
+2025-06-16 15:26:41,125 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,139 - INFO - [DEBUG] Features: [0.7009328  0.52217779 0.78501304 0.44306647 1.82861001 0.72017895
+ 2.19999999 0.06476996]... sum=11.49
+2025-06-16 15:26:41,213 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:41,215 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,233 - INFO - [DEBUG] Features: [0.69907335 0.5240844  0.78685623 0.45517352 1.74152    0.69371621
+ 2.06999998 0.0710416 ]... sum=11.26
+2025-06-16 15:26:41,235 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:41,235 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,252 - INFO - [DEBUG] Features: [0.69370028 0.52550797 0.79576706 0.46270736 1.657775   0.67140423
+ 2.26000004 0.08200289]... sum=11.35
+2025-06-16 15:26:41,253 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:41,253 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,269 - INFO - [DEBUG] Features: [0.68879319 0.52535697 0.80352752 0.47885163 1.570965   0.64212484
+ 2.22000005 0.0907255 ]... sum=11.23
+2025-06-16 15:26:41,269 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:41,271 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,284 - INFO - [DEBUG] Features: [0.67218121 0.52865413 0.80935004 0.48292301 1.48685002 0.62194078
+ 2.18999999 0.08994836]... sum=11.08
+2025-06-16 15:26:41,284 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:41,284 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,299 - INFO - [DEBUG] Features: [0.65734245 0.52894766 0.81133319 0.48121534 1.40016003 0.60446038
+ 2.17       0.09143405]... sum=10.93
+2025-06-16 15:26:41,299 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:41,300 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,313 - INFO - [DEBUG] Features: [0.6349009  0.53077281 0.8176925  0.47784093 1.30649004 0.58588046
+ 2.02999998 0.08552366]... sum=10.63
+2025-06-16 15:26:41,315 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:41,315 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,331 - INFO - [DEBUG] Features: [0.60913078 0.53326405 0.8221927  0.47581536 1.22079505 0.56759344
+ 2.05999995 0.08467063]... sum=10.50
+2025-06-16 15:26:41,331 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:41,332 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,334 - INFO - 🤖 Mode reconnaissance activé
+2025-06-16 15:26:41,336 - INFO - 🤖 Mode reconnaissance IA activé
+2025-06-16 15:26:41,347 - INFO - [DEBUG] Features: [0.58750788 0.53868417 0.82793758 0.47703461 1.14778501 0.54974838
+ 2.10999999 0.07498631]... sum=10.43
+2025-06-16 15:26:41,417 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.135
+2025-06-16 15:26:41,418 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,427 - INFO - [DEBUG] Features: [0.57265745 0.54795244 0.83155541 0.4776994  1.09503498 0.536643
+ 1.97999997 0.07114303]... sum=10.19
+2025-06-16 15:26:41,428 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.135
+2025-06-16 15:26:41,428 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,442 - INFO - [DEBUG] Features: [0.57292036 0.5458424  0.84048361 0.48275364 1.056505   0.52442047
+ 1.92999998 0.07310521]... sum=10.10
+2025-06-16 15:26:41,442 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.135
+2025-06-16 15:26:41,442 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,456 - INFO - [DEBUG] Features: [0.5750093  0.54480029 0.84332238 0.48378355 1.03082001 0.51745062
+ 1.97999994 0.08358522]... sum=10.13
+2025-06-16 15:26:41,456 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.135
+2025-06-16 15:26:41,458 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,468 - INFO - [DEBUG] Features: [0.59208873 0.53329641 0.84128965 0.48902936 1.01576999 0.51091093
+ 2.00999997 0.09926909]... sum=10.15
+2025-06-16 15:26:41,468 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.135
+2025-06-16 15:26:41,470 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,472 - INFO - 📊 FPS: 27.4 | Mode: recognition (Entraînée) | Détections: 0.0% | Échantillons: 200
+2025-06-16 15:26:41,483 - INFO - [DEBUG] Features: [0.61575984 0.52422192 0.84088567 0.4903788  1.01489997 0.50998545
+ 1.91999996 0.11322448]... sum=10.07
+2025-06-16 15:26:41,484 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.135
+2025-06-16 15:26:41,484 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,500 - INFO - [DEBUG] Features: [0.62940024 0.521627   0.84101869 0.49478255 1.0156     0.50788251
+ 2.04000001 0.12372091]... sum=10.23
+2025-06-16 15:26:41,500 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.135
+2025-06-16 15:26:41,500 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,511 - INFO - [DEBUG] Features: [0.65281855 0.51327776 0.83841788 0.49674207 1.01627001 0.50704818
+ 2.06999996 0.13087934]... sum=10.29
+2025-06-16 15:26:41,511 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.135
+2025-06-16 15:26:41,511 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,527 - INFO - [DEBUG] Features: [0.66905367 0.50376915 0.82961186 0.49144021 1.01278999 0.50892513
+ 1.86999999 0.14449669]... sum=10.11
+2025-06-16 15:26:41,527 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.135
+2025-06-16 15:26:41,527 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,539 - INFO - [DEBUG] Features: [0.67780878 0.49600876 0.8281983  0.49111674 1.01195997 0.50887071
+ 1.7        0.15235803]... sum=9.94
+2025-06-16 15:26:41,539 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.135
+2025-06-16 15:26:41,539 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,561 - INFO - [DEBUG] Features: [0.68579468 0.49133911 0.82645616 0.47366123 1.00608498 0.51682878
+ 1.65000004 0.16091889]... sum=9.86
+2025-06-16 15:26:41,670 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.134
+2025-06-16 15:26:41,671 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,689 - INFO - [DEBUG] Features: [0.68621358 0.48915545 0.8227609  0.46705356 0.99763998 0.51820452
+ 1.58000002 0.15715713]... sum=9.76
+2025-06-16 15:26:41,689 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.134
+2025-06-16 15:26:41,690 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,704 - INFO - [DEBUG] Features: [0.68629132 0.48899248 0.81897371 0.45881824 0.98706499 0.51994349
+ 1.59000002 0.15130558]... sum=9.74
+2025-06-16 15:26:41,705 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.134
+2025-06-16 15:26:41,705 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,719 - INFO - [DEBUG] Features: [0.67005867 0.48534774 0.8198671  0.47674619 0.96973498 0.50589254
+ 1.58000002 0.14136293]... sum=9.69
+2025-06-16 15:26:41,719 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.134
+2025-06-16 15:26:41,720 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,734 - INFO - [DEBUG] Features: [0.66970335 0.49216233 0.82269176 0.47690947 0.956655   0.50222979
+ 1.55000001 0.13742846]... sum=9.66
+2025-06-16 15:26:41,734 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.134
+2025-06-16 15:26:41,736 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,748 - INFO - [DEBUG] Features: [0.66918384 0.50027415 0.82581131 0.49107877 0.94093001 0.4907972
+ 1.62000003 0.13549201]... sum=9.71
+2025-06-16 15:26:41,748 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.134
+2025-06-16 15:26:41,748 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,758 - INFO - [DEBUG] Features: [0.67265152 0.49425302 0.82337342 0.48625384 0.92809001 0.48980797
+ 1.61000003 0.13408789]... sum=9.68
+2025-06-16 15:26:41,758 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.134
+2025-06-16 15:26:41,759 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,774 - INFO - [DEBUG] Features: [0.67066852 0.49291163 0.82364278 0.48534067 0.91521001 0.48680798
+ 1.82000002 0.13358995]... sum=9.85
+2025-06-16 15:26:41,876 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.132
+2025-06-16 15:26:41,876 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,888 - INFO - [DEBUG] Features: [0.67658964 0.48854407 0.81896029 0.48324264 0.90417499 0.48489498
+ 1.86999999 0.1388098 ]... sum=9.87
+2025-06-16 15:26:41,890 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.132
+2025-06-16 15:26:41,890 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,916 - INFO - [DEBUG] Features: [0.68429201 0.48975859 0.81869409 0.49016616 0.89467498 0.47896949
+ 1.77       0.14908409]... sum=9.75
+2025-06-16 15:26:41,917 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.132
+2025-06-16 15:26:41,917 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,930 - INFO - [DEBUG] Features: [0.69460253 0.48141444 0.81763665 0.4932937  0.892625   0.47687244
+ 1.80999999 0.14750053]... sum=9.81
+2025-06-16 15:26:41,930 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.132
+2025-06-16 15:26:41,930 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,947 - INFO - [DEBUG] Features: [0.72676247 0.47170726 0.80773843 0.48296896 0.89421    0.48248494
+ 1.64       0.15750687]... sum=9.66
+2025-06-16 15:26:41,947 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.132
+2025-06-16 15:26:41,947 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,963 - INFO - [DEBUG] Features: [0.7546189  0.46359959 0.80132219 0.48292209 0.90382501 0.48501459
+ 1.47999997 0.16772575]... sum=9.54
+2025-06-16 15:26:41,964 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.132
+2025-06-16 15:26:41,964 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:41,977 - INFO - [DEBUG] Features: [0.79776273 0.45527225 0.792629   0.47783186 0.91162002 0.48965306
+ 1.54000001 0.18050875]... sum=9.65
+2025-06-16 15:26:42,052 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:42,052 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,069 - INFO - [DEBUG] Features: [0.84496608 0.45374807 0.79264353 0.47728063 0.93298001 0.49563296
+ 1.66999998 0.20546792]... sum=9.88
+2025-06-16 15:26:42,070 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:42,070 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,088 - INFO - [DEBUG] Features: [0.90387349 0.4577594  0.80691426 0.4838048  0.96218    0.4998697
+ 1.77999997 0.23411276]... sum=10.16
+2025-06-16 15:26:42,088 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:42,089 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,103 - INFO - [DEBUG] Features: [1.02312338 0.47035308 0.83659995 0.48030351 0.98678499 0.50813661
+ 1.59999996 0.27870606]... sum=10.21
+2025-06-16 15:26:42,103 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:42,103 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,120 - INFO - [DEBUG] Features: [1.13883332 0.50169557 0.85764979 0.45675822 1.00393999 0.52625448
+ 1.82999994 0.30842902]... sum=10.65
+2025-06-16 15:26:42,120 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:42,121 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,139 - INFO - [DEBUG] Features: [1.31905187 0.55144774 0.8652281  0.43864183 1.00654501 0.53733906
+ 1.80999994 0.34131259]... sum=10.86
+2025-06-16 15:26:42,140 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:42,140 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,158 - INFO - [DEBUG] Features: [1.50233972 0.60512257 0.86344144 0.42141192 1.01114999 0.54919419
+ 2.00999992 0.37743668]... sum=11.30
+2025-06-16 15:26:42,160 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.133
+2025-06-16 15:26:42,160 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,180 - INFO - [DEBUG] Features: [1.72677972 0.66388192 0.86735693 0.43761614 1.02020003 0.54158686
+ 1.88999994 0.43881299]... sum=11.50
+2025-06-16 15:26:42,268 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.132
+2025-06-16 15:26:42,268 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,285 - INFO - [DEBUG] Features: [1.73631728 0.6650456  0.87212322 0.45075062 1.03730499 0.53805134
+ 1.80999999 0.51205857]... sum=11.53
+2025-06-16 15:26:42,285 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.132
+2025-06-16 15:26:42,286 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,300 - INFO - [DEBUG] Features: [1.54630919 0.60487657 0.86956934 0.43885638 1.0527     0.54956088
+ 1.72000003 0.5939694 ]... sum=11.31
+2025-06-16 15:26:42,300 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.132
+2025-06-16 15:26:42,300 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,311 - INFO - [DEBUG] Features: [1.28791227 0.54073687 0.85499642 0.39979256 1.08509002 0.5863481
+ 1.65000004 0.67080747]... sum=11.05
+2025-06-16 15:26:42,317 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.132
+2025-06-16 15:26:42,318 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,330 - INFO - [DEBUG] Features: [1.06111934 0.47963926 0.8099772  0.33355624 1.11483502 0.65514882
+ 1.46999999 0.74383043]... sum=10.67
+2025-06-16 15:26:42,330 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.132
+2025-06-16 15:26:42,332 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,342 - INFO - [DEBUG] Features: [0.93179295 0.46738096 0.77440264 0.30153644 1.14875002 0.69460983
+ 1.35999997 0.79853948]... sum=10.50
+2025-06-16 15:26:42,343 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.132
+2025-06-16 15:26:42,343 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,354 - INFO - [DEBUG] Features: [0.88206083 0.47599618 0.75759169 0.33052279 1.1234     0.65868292
+ 1.25       0.84085102]... sum=10.33
+2025-06-16 15:26:42,355 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.132
+2025-06-16 15:26:42,355 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,369 - INFO - [DEBUG] Features: [0.88151405 0.4867966  0.75562262 0.3667972  1.04691999 0.60273591
+ 1.12       0.8618052 ]... sum=10.14
+2025-06-16 15:26:42,369 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.132
+2025-06-16 15:26:42,370 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,382 - INFO - [DEBUG] Features: [0.89946253 0.49282482 0.76699424 0.40321906 0.94568498 0.54333619
+ 0.99       0.87919246]... sum=9.89
+2025-06-16 15:26:42,453 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.138
+2025-06-16 15:26:42,453 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,466 - INFO - [DEBUG] Features: [0.91247821 0.48108683 0.7646925  0.41167169 0.86131    0.51270705
+ 0.71999999 0.87747775]... sum=9.48
+2025-06-16 15:26:42,466 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.138
+2025-06-16 15:26:42,467 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,479 - INFO - [DEBUG] Features: [0.95064623 0.49257721 0.77965012 0.43297351 0.80643    0.48408795
+ 0.77999998 0.8701647 ]... sum=9.49
+2025-06-16 15:26:42,480 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.138
+2025-06-16 15:26:42,480 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,492 - INFO - [DEBUG] Features: [0.95533209 0.50170459 0.78271523 0.44249786 0.78256    0.47166542
+ 0.67       0.86608177]... sum=9.35
+2025-06-16 15:26:42,492 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.138
+2025-06-16 15:26:42,492 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,518 - INFO - [DEBUG] Features: [0.94622397 0.52098021 0.79517359 0.44788231 0.76741001 0.464011
+ 0.96000003 0.87613721]... sum=9.61
+2025-06-16 15:26:42,518 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.138
+2025-06-16 15:26:42,519 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,530 - INFO - [DEBUG] Features: [0.92434717 0.52524998 0.7941592  0.44631156 0.75129    0.45989974
+ 0.88000003 0.88636365]... sum=9.49
+2025-06-16 15:26:42,531 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.138
+2025-06-16 15:26:42,531 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,543 - INFO - [DEBUG] Features: [0.92553765 0.53084016 0.79557434 0.44519459 0.73121001 0.45427719
+ 0.93       0.89268256]... sum=9.51
+2025-06-16 15:26:42,543 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.138
+2025-06-16 15:26:42,543 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,566 - INFO - [DEBUG] Features: [0.936396   0.53767642 0.79874152 0.46022296 0.71012501 0.44056764
+ 0.83       0.89899643]... sum=9.39
+2025-06-16 15:26:42,566 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.138
+2025-06-16 15:26:42,566 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,580 - INFO - [DEBUG] Features: [0.95360557 0.54109139 0.79617808 0.46393066 0.69172001 0.43294926
+ 0.86999999 0.90144045]... sum=9.41
+2025-06-16 15:26:42,580 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.138
+2025-06-16 15:26:42,581 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,596 - INFO - [DEBUG] Features: [0.96158501 0.53931956 0.79642678 0.46844868 0.67870501 0.4266848
+ 0.87999998 0.90809923]... sum=9.41
+2025-06-16 15:26:42,671 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.138
+2025-06-16 15:26:42,671 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,686 - INFO - [DEBUG] Features: [0.9649123  0.53377593 0.79367312 0.46314613 0.66935499 0.42616175
+ 0.94999999 0.90452969]... sum=9.47
+2025-06-16 15:26:42,687 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.138
+2025-06-16 15:26:42,687 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,702 - INFO - [DEBUG] Features: [0.96906328 0.53594837 0.79673305 0.46158577 0.66311501 0.42488724
+ 0.88       0.89669877]... sum=9.39
+2025-06-16 15:26:42,702 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.138
+2025-06-16 15:26:42,703 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,717 - INFO - [DEBUG] Features: [0.97155387 0.53713475 0.79780708 0.46251057 0.65925    0.42322866
+ 0.94       0.88634493]... sum=9.44
+2025-06-16 15:26:42,718 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.138
+2025-06-16 15:26:42,718 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,734 - INFO - [DEBUG] Features: [0.97751623 0.54487718 0.8037137  0.46768247 0.65615501 0.41990735
+ 0.86000001 0.88002558]... sum=9.36
+2025-06-16 15:26:42,734 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.138
+2025-06-16 15:26:42,734 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,751 - INFO - [DEBUG] Features: [0.98009741 0.54633648 0.80839309 0.47804874 0.65258    0.41424044
+ 0.79       0.87059638]... sum=9.30
+2025-06-16 15:26:42,751 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.138
+2025-06-16 15:26:42,752 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,782 - INFO - [DEBUG] Features: [0.9818182  0.54686448 0.81080229 0.48147059 0.64967499 0.41180196
+ 0.71999999 0.86693928]... sum=9.25
+2025-06-16 15:26:42,783 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.138
+2025-06-16 15:26:42,783 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,815 - INFO - [DEBUG] Features: [0.9909091  0.55422285 0.81262316 0.48997423 0.64629499 0.40715933
+ 0.79999998 0.86407427]... sum=9.34
+2025-06-16 15:26:42,911 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:42,911 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,929 - INFO - [DEBUG] Features: [0.99636364 0.55807865 0.81477104 0.49065944 0.64364498 0.40602796
+ 0.90999999 0.86124204]... sum=9.44
+2025-06-16 15:26:42,929 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:42,929 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,946 - INFO - [DEBUG] Features: [1.00471699 0.55955471 0.81506901 0.48884802 0.63765    0.40486644
+ 0.88       0.85399384]... sum=9.39
+2025-06-16 15:26:42,947 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:42,947 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,960 - INFO - [DEBUG] Features: [1.01725327 0.56231162 0.81700041 0.4916647  0.63291999 0.4022179
+ 0.79       0.8449366 ]... sum=9.30
+2025-06-16 15:26:42,960 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:42,960 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,973 - INFO - [DEBUG] Features: [1.02496371 0.56459619 0.81951247 0.49485212 0.63067001 0.40020958
+ 0.71999999 0.8443404 ]... sum=9.25
+2025-06-16 15:26:42,974 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:42,974 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:42,988 - INFO - [DEBUG] Features: [1.02884614 0.56593727 0.82165934 0.49904741 0.62977501 0.39822552
+ 0.75       0.84278238]... sum=9.29
+2025-06-16 15:26:42,988 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:42,988 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:43,015 - INFO - [DEBUG] Features: [1.02884614 0.56634614 0.82085122 0.50114911 0.63023    0.39753263
+ 0.78000001 0.84942618]... sum=9.32
+2025-06-16 15:26:43,015 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:43,017 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:43,058 - INFO - [DEBUG] Features: [1.02884614 0.56662024 0.81962071 0.50205558 0.63053498 0.39726816
+ 0.75       0.85149649]... sum=9.29
+2025-06-16 15:26:43,152 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:43,152 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:43,171 - INFO - [DEBUG] Features: [1.02884614 0.56982837 0.82414549 0.50118735 0.63410497 0.39873678
+ 0.81999999 0.84938937]... sum=9.38
+2025-06-16 15:26:43,172 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:43,172 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:43,188 - INFO - [DEBUG] Features: [1.02884614 0.57145039 0.82807114 0.50028414 0.63591    0.39966399
+ 0.90999999 0.8457578 ]... sum=9.48
+2025-06-16 15:26:43,190 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:43,190 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:43,207 - INFO - [DEBUG] Features: [1.02403843 0.5747257  0.82745519 0.49859683 0.63655502 0.40054268
+ 0.82999999 0.85167639]... sum=9.39
+2025-06-16 15:26:43,207 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:43,207 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:43,224 - INFO - [DEBUG] Features: [1.02115381 0.57557995 0.82620323 0.49749793 0.63571001 0.40071841
+ 0.81       0.85352288]... sum=9.36
+2025-06-16 15:26:43,224 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:43,225 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:43,237 - INFO - [DEBUG] Features: [1.01923072 0.57665547 0.8268725  0.49939742 0.63570499 0.3999569
+ 0.78000001 0.86402907]... sum=9.33
+2025-06-16 15:26:43,237 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:43,239 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:43,254 - INFO - [DEBUG] Features: [1.01923072 0.577295   0.83045719 0.50594125 0.63640999 0.39760126
+ 0.80000001 0.8640083 ]... sum=9.36
+2025-06-16 15:26:43,255 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:43,255 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:43,292 - INFO - [DEBUG] Features: [1.00961536 0.57207396 0.82946187 0.50619281 0.63666    0.39756694
+ 0.90000001 0.86680958]... sum=9.45
+2025-06-16 15:26:43,393 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:43,394 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:43,413 - INFO - [DEBUG] Features: [1.00384614 0.5688597  0.82854047 0.5059335  0.63672001 0.39768409
+ 0.96       0.86618917]... sum=9.50
+2025-06-16 15:26:43,414 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:43,414 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:43,429 - INFO - [DEBUG] Features: [1.         0.56732821 0.82780305 0.50401348 0.63745001 0.398664
+ 1.         0.86537293]... sum=9.54
+2025-06-16 15:26:43,429 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:43,430 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:43,444 - INFO - [DEBUG] Features: [1.         0.56671412 0.82824687 0.50432097 0.63676001 0.39832674
+ 1.         0.86360343]... sum=9.54
+2025-06-16 15:26:43,445 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:43,445 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:43,460 - INFO - [DEBUG] Features: [1.         0.56815593 0.8286826  0.50207759 0.63838002 0.39972673
+ 1.         0.86574026]... sum=9.56
+2025-06-16 15:26:43,460 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:43,462 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:43,474 - INFO - [DEBUG] Features: [1.         0.56966448 0.82706911 0.50233851 0.64007501 0.400151
+ 1.         0.86861331]... sum=9.57
+2025-06-16 15:26:43,474 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:43,474 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:43,484 - INFO - [DEBUG] Features: [0.99074075 0.56914557 0.82795041 0.49221462 0.64551002 0.40602379
+ 0.94999999 0.8665111 ]... sum=9.51
+2025-06-16 15:26:43,484 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:43,485 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:43,523 - INFO - [DEBUG] Features: [0.97626262 0.56484563 0.82431253 0.4743056  0.650155   0.41527648
+ 0.87       0.8757899 ]... sum=9.41
+2025-06-16 15:26:43,634 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:43,635 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:43,654 - INFO - [DEBUG] Features: [0.9496729  0.56787789 0.83232712 0.46417364 0.659395   0.42257942
+ 0.86999999 0.87884971]... sum=9.40
+2025-06-16 15:26:43,655 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:43,655 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:43,670 - INFO - [DEBUG] Features: [0.92388489 0.56572585 0.83982298 0.47930208 0.67408999 0.42056348
+ 0.93       0.88326529]... sum=9.50
+2025-06-16 15:26:43,670 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:43,671 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:43,685 - INFO - [DEBUG] Features: [0.90641853 0.56517603 0.84076481 0.48729098 0.69153    0.42235759
+ 0.88       0.89599187]... sum=9.48
+2025-06-16 15:26:43,686 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:43,686 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:43,699 - INFO - [DEBUG] Features: [0.90052599 0.5582459  0.83659326 0.48433241 0.70705498 0.4284044
+ 0.88999999 0.90100232]... sum=9.51
+2025-06-16 15:26:43,699 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:43,700 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:43,714 - INFO - [DEBUG] Features: [0.90048068 0.54941421 0.82870041 0.47239036 0.71940999 0.43756247
+ 0.98000001 0.90090315]... sum=9.61
+2025-06-16 15:26:43,715 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:43,715 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:43,733 - INFO - [DEBUG] Features: [0.90540982 0.54791066 0.8273984  0.47808419 0.73355999 0.43914827
+ 1.01       0.88662087]... sum=9.68
+2025-06-16 15:26:43,805 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:43,805 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:43,821 - INFO - [DEBUG] Features: [0.90489157 0.54475798 0.82641007 0.47609065 0.74578499 0.44371222
+ 0.92000001 0.88280057]... sum=9.61
+2025-06-16 15:26:43,821 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:43,823 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:43,843 - INFO - [DEBUG] Features: [0.89737939 0.54351223 0.82830634 0.47548303 0.75708999 0.4473507
+ 0.88999999 0.88777484]... sum=9.61
+2025-06-16 15:26:43,844 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:43,845 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:43,862 - INFO - [DEBUG] Features: [0.89175627 0.54697638 0.82767097 0.46988674 0.76946    0.45363354
+ 0.77999999 0.88757406]... sum=9.52
+2025-06-16 15:26:43,863 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:43,863 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:43,875 - INFO - [DEBUG] Features: [0.8968254  0.54632819 0.82963839 0.46779582 0.77784501 0.45711466
+ 0.83999998 0.87897905]... sum=9.58
+2025-06-16 15:26:43,876 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:43,877 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:43,891 - INFO - [DEBUG] Features: [0.90233135 0.54069376 0.82379392 0.46849401 0.78678501 0.45938573
+ 0.96       0.86992483]... sum=9.73
+2025-06-16 15:26:43,892 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:43,892 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:43,922 - INFO - [DEBUG] Features: [0.91376488 0.53105402 0.81640078 0.46754702 0.78994001 0.46077568
+ 0.95999999 0.86666577]... sum=9.73
+2025-06-16 15:26:43,923 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:43,923 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:43,950 - INFO - [DEBUG] Features: [0.9265625  0.52774303 0.81632519 0.45870927 0.80112501 0.46856564
+ 0.83999999 0.86712053]... sum=9.62
+2025-06-16 15:26:44,044 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:44,045 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,071 - INFO - [DEBUG] Features: [0.90408654 0.53594522 0.82883015 0.46527303 0.805795   0.46660583
+ 0.88999999 0.87696931]... sum=9.67
+2025-06-16 15:26:44,072 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:44,072 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,086 - INFO - [DEBUG] Features: [0.8851923  0.54385701 0.84009475 0.46984076 0.808125   0.4649975
+ 0.84       0.88023065]... sum=9.62
+2025-06-16 15:26:44,088 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:44,088 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,097 - INFO - [DEBUG] Features: [0.85600118 0.54953278 0.85063106 0.48164241 0.80096501 0.4571833
+ 0.88999999 0.88890634]... sum=9.65
+2025-06-16 15:26:44,099 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:44,099 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,109 - INFO - [DEBUG] Features: [0.83344687 0.56173851 0.85590367 0.4954396  0.79449002 0.44904187
+ 1.03000002 0.89478021]... sum=9.80
+2025-06-16 15:26:44,110 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:44,110 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,120 - INFO - [DEBUG] Features: [0.81785735 0.56308456 0.85882255 0.5088071  0.79254002 0.44250461
+ 0.99       0.90098099]... sum=9.77
+2025-06-16 15:26:44,121 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:44,121 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,157 - INFO - [DEBUG] Features: [0.8077739  0.5666808  0.85857484 0.51727067 0.792695   0.43884604
+ 0.91000001 0.90111964]... sum=9.68
+2025-06-16 15:26:44,262 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:44,262 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,264 - INFO - 📊 FPS: 32.2 | Mode: recognition (Entraînée) | Détections: 0.0% | Échantillons: 200
+2025-06-16 15:26:44,271 - INFO - [DEBUG] Features: [0.80454546 0.56714317 0.85746076 0.52127869 0.79502999 0.43778746
+ 0.86999999 0.90063962]... sum=9.64
+2025-06-16 15:26:44,272 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:44,272 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,284 - INFO - [DEBUG] Features: [0.7933062  0.56723654 0.85875772 0.51481364 0.795885   0.44079751
+ 0.77999999 0.90014448]... sum=9.52
+2025-06-16 15:26:44,285 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:44,285 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,295 - INFO - [DEBUG] Features: [0.78171011 0.56283298 0.85950134 0.51645576 0.79687999 0.44035903
+ 0.94       0.90438014]... sum=9.69
+2025-06-16 15:26:44,295 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:44,297 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,310 - INFO - [DEBUG] Features: [0.77803997 0.56280175 0.86050269 0.5045775  0.80514001 0.44788451
+ 1.07000003 0.9061307 ]... sum=9.82
+2025-06-16 15:26:44,310 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:44,311 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,321 - INFO - [DEBUG] Features: [0.77229328 0.56007593 0.85973879 0.50173736 0.81180499 0.45097741
+ 1.13000003 0.90723678]... sum=9.90
+2025-06-16 15:26:44,321 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:44,322 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,355 - INFO - [DEBUG] Features: [0.76488856 0.55743956 0.85856512 0.49436285 0.81890499 0.45625436
+ 1.12000003 0.90627192]... sum=9.90
+2025-06-16 15:26:44,356 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:44,356 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,387 - INFO - [DEBUG] Features: [0.75933746 0.55408844 0.85573223 0.49609468 0.81989999 0.45573304
+ 1.10000002 0.90896845]... sum=9.88
+2025-06-16 15:26:44,477 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:44,478 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,496 - INFO - [DEBUG] Features: [0.75714284 0.55123652 0.85717791 0.49813154 0.81803499 0.45428624
+ 0.95000002 0.9079372 ]... sum=9.72
+2025-06-16 15:26:44,496 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:44,498 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,512 - INFO - [DEBUG] Features: [0.76625258 0.55127177 0.85940697 0.50816159 0.816045   0.44927203
+ 0.96000001 0.90534885]... sum=9.75
+2025-06-16 15:26:44,513 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:44,513 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,525 - INFO - [DEBUG] Features: [0.77171842 0.54815922 0.85720742 0.50840601 0.810225   0.44752645
+ 0.96       0.9039695 ]... sum=9.73
+2025-06-16 15:26:44,527 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:44,527 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,539 - INFO - [DEBUG] Features: [0.7789855  0.54385152 0.85202782 0.50289692 0.80677501 0.44903183
+ 1.         0.90349623]... sum=9.76
+2025-06-16 15:26:44,540 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:44,540 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,553 - INFO - [DEBUG] Features: [0.78323741 0.54508433 0.85316544 0.50883985 0.80124    0.44490218
+ 0.94999999 0.90187492]... sum=9.70
+2025-06-16 15:26:44,553 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:44,555 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,583 - INFO - [DEBUG] Features: [0.79328643 0.54083235 0.84850407 0.50294641 0.79811999 0.44662177
+ 1.07000002 0.89586391]... sum=9.81
+2025-06-16 15:26:44,585 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.137
+2025-06-16 15:26:44,585 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,610 - INFO - [DEBUG] Features: [0.7985294  0.54098911 0.85052889 0.50345837 0.79897999 0.44660756
+ 0.99       0.89416721]... sum=9.74
+2025-06-16 15:26:44,707 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:44,707 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,719 - INFO - [DEBUG] Features: [0.80147058 0.54012076 0.85070309 0.49970084 0.800675   0.44872299
+ 0.95999999 0.89372455]... sum=9.71
+2025-06-16 15:26:44,719 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:44,719 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,731 - INFO - [DEBUG] Features: [0.7977941  0.54197422 0.8516133  0.50787102 0.79972999 0.44487619
+ 0.89999998 0.89582149]... sum=9.64
+2025-06-16 15:26:44,731 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:44,732 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,743 - INFO - [DEBUG] Features: [0.79558822 0.54139303 0.84970114 0.50829466 0.79667    0.44381933
+ 0.79999998 0.89381208]... sum=9.53
+2025-06-16 15:26:44,744 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:44,744 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,758 - INFO - [DEBUG] Features: [0.79198635 0.53565007 0.84999548 0.50760021 0.79613999 0.44396491
+ 0.83999998 0.89616298]... sum=9.56
+2025-06-16 15:26:44,758 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:44,759 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,782 - INFO - [DEBUG] Features: [0.79070758 0.53300879 0.85325919 0.50551382 0.79792498 0.44536908
+ 0.90999999 0.89756587]... sum=9.63
+2025-06-16 15:26:44,782 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:44,783 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,820 - INFO - [DEBUG] Features: [0.79710144 0.52882484 0.85337681 0.50386322 0.80272498 0.44743771
+ 0.98       0.89419299]... sum=9.72
+2025-06-16 15:26:44,920 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:44,920 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,930 - INFO - [DEBUG] Features: [0.80144926 0.52819972 0.85399963 0.50138719 0.80616    0.44950462
+ 1.10000002 0.89223176]... sum=9.84
+2025-06-16 15:26:44,931 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:44,931 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,943 - INFO - [DEBUG] Features: [0.79503104 0.52871537 0.8562497  0.49931961 0.81206    0.45207619
+ 1.11000003 0.88964375]... sum=9.86
+2025-06-16 15:26:44,943 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:44,944 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,959 - INFO - [DEBUG] Features: [0.78944098 0.52777622 0.85880869 0.49118262 0.81191    0.45579578
+ 1.07000002 0.89102632]... sum=9.80
+2025-06-16 15:26:44,960 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:44,960 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,974 - INFO - [DEBUG] Features: [0.78928572 0.52964946 0.86326578 0.49669336 0.81938    0.45533893
+ 1.02       0.89242234]... sum=9.77
+2025-06-16 15:26:44,975 - INFO - [DEBUG] Prédiction brute: class=None, confiance=0.136
+2025-06-16 15:26:44,975 - INFO - [DEBUG] Aucun résultat IA ou modèle non entraîné
+2025-06-16 15:26:44,979 - INFO - 🛑 Arrêt demandé
+2025-06-16 15:26:44,980 - INFO - 🧹 Nettoyage...
+2025-06-16 15:26:44,980 - INFO - ================================================================================
+2025-06-16 15:26:44,980 - INFO - 📊 STATS FINALES:
+2025-06-16 15:26:44,980 - INFO -   ⏱️ Durée: 18.6s
+2025-06-16 15:26:44,981 - INFO -   🎞️ Frames: 384
+2025-06-16 15:26:44,981 - INFO -   🎯 Détections gant: 384
+2025-06-16 15:26:44,981 - INFO -   🤖 Frames IA: 384
+2025-06-16 15:26:44,981 - INFO -   🎭 Détections position: 0
+2025-06-16 15:26:44,981 - INFO -   📈 Taux reconnaissance: 0.0%
+2025-06-16 15:26:44,982 - INFO -   📚 Échantillons: 200
+2025-06-16 15:26:44,982 - INFO -   📸 Screenshots: 0
+2025-06-16 15:26:44,982 - INFO - ================================================================================
+2025-06-16 15:26:44,983 - INFO - ✅ Pipeline fermé
+2025-06-16 15:26:45,030 - INFO - ✅ Interface fermée
+2025-06-16 15:26:45,533 - INFO - ✅ Drone déconnecté
+2025-06-16 15:26:45,534 - INFO - 🎉 Session IA terminée!
