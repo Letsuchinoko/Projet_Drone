@@ -340,26 +340,44 @@ class HandPositionRecognizer:
             return False
     
     def train_model(self, validation_split=0.2, epochs=25):
-        """Entraînement du modèle - VERSION CORRIGÉE"""
+        """Entraînement du modèle - VERSION CORRIGÉE avec debug"""
         if not self.tf_available:
             self.logging.error("❌ TensorFlow requis pour l'entraînement")
             return False
-            
+
         try:
             if len(self.training_data) < 10:
                 self.logging.warning("⚠️ Pas assez de données (min 10)")
                 return False
-            
+
+            # === DEBUG: premier vecteur de features
+            self.logging.info(
+                f"[DEBUG TRAIN] First train features: {self.training_data[0][:8]}... sum={np.sum(self.training_data[0]):.2f}, min={np.min(self.training_data[0]):.2f}, max={np.max(self.training_data[0]):.2f}"
+            )
+
+            X = np.array(self.training_data, dtype=np.float32)
+            y = np.array(self.training_labels, dtype=np.int32)
+
+            # === DEBUG: labels et shape
+            self.logging.info(
+                f"[DEBUG TRAIN] Labels (premiers): {self.training_labels[:10]}"
+            )
+            unique, counts = np.unique(self.training_labels, return_counts=True)
+            self.logging.info(
+                f"[DEBUG TRAIN] Distribution des labels: {dict(zip(unique, counts))}"
+            )
+            self.logging.info(
+                f"[DEBUG TRAIN] X shape: {X.shape}, y shape: {y.shape}"
+            )
+            if X.shape[1] != self.feature_size:
+                self.logging.warning(
+                    f"[DEBUG TRAIN] Dimension inattendue: features={X.shape[1]}, attendu={self.feature_size}"
+                )
+
             if self.model is None:
                 if not self.create_model():
                     return False
-            
-            X = np.array(self.training_data, dtype=np.float32)
-            y = np.array(self.training_labels, dtype=np.int32)
-            
-            unique, counts = np.unique(y, return_counts=True)
-            self.logging.info(f"📊 Distribution: {dict(zip(unique, counts))}")
-            
+
             callbacks = [
                 keras.callbacks.EarlyStopping(
                     monitor='val_loss',
@@ -373,10 +391,9 @@ class HandPositionRecognizer:
                     min_lr=1e-6
                 )
             ]
-            
+
             self.logging.info(f"🚀 Entraînement: {len(X)} échantillons, {epochs} époques")
-            self.logging.info(f"[DEBUG] Premier échantillon train: {self.training_data[0][:8]}... sum={np.sum(self.training_data[0]):.2f}")
-            
+
             history = self.model.fit(
                 X, y,
                 validation_split=validation_split,
@@ -385,21 +402,21 @@ class HandPositionRecognizer:
                 callbacks=callbacks,
                 verbose=0  # Supprime les logs TensorFlow
             )
-            
+
             final_accuracy = history.history['accuracy'][-1]
             val_accuracy = history.history.get('val_accuracy', [0])[-1]
-            
+
             self.logging.info(f"✅ Entraînement terminé:")
             self.logging.info(f"   Précision: {final_accuracy:.4f}")
             self.logging.info(f"   Validation: {val_accuracy:.4f}")
-            
+
             self.is_trained = True
             return True
-            
+
         except Exception as e:
             self.logging.error(f"❌ Erreur entraînement: {e}")
             return False
-    
+
     def predict_position(self, features, use_stabilization=True):
         """Prédiction optimisée - VERSION CORRIGÉE"""
         if not self.tf_available or self.model is None or not self.is_trained:
