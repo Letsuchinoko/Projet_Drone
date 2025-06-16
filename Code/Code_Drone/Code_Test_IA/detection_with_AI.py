@@ -753,31 +753,37 @@ class OptimizedBicolorGloveDetectorWithAI:
         """Analyse IA de la position de la main"""
         try:
             if not self.ai_enabled or not self.feature_extractor or not self.position_recognizer:
+                self.logging.info("[DEBUG] IA non activée ou modules manquants")
                 return None, 0.0
-            
+
             bounding_rect = cv2.boundingRect(contour)
-            
+
             # Mode entraînement
             if self.ai_mode == "training":
                 return self._handle_training_mode(frame, contour, bounding_rect)
-            
+
             # Mode reconnaissance
             elif self.ai_mode == "recognition" and self.position_recognizer.is_trained:
                 features = self.feature_extractor.extract_complete_features(
                     frame, contour, bounding_rect
                 )
-                
+                self.logging.info(f"[DEBUG] Features: {features[:8]}... sum={np.sum(features):.2f}")
+
                 predicted_class, confidence = self.position_recognizer.predict_position(features)
-                
+                self.logging.info(f"[DEBUG] Prédiction brute: class={predicted_class}, confiance={confidence:.3f}")
+
                 if predicted_class is not None:
                     position_name = HAND_POSITIONS[predicted_class].name
+                    self.logging.info(f"[DEBUG] Position IA: {position_name}, confiance: {confidence:.3f}")
                     return position_name, confidence
-            
+
+            self.logging.info("[DEBUG] Aucun résultat IA ou modèle non entraîné")
             return None, 0.0
-            
+
         except Exception as e:
             self.logging.debug(f"Erreur analyse IA: {e}")
             return None, 0.0
+
     
     def _handle_training_mode(self, frame, contour, bounding_rect):
         """Gestion du mode entraînement"""
