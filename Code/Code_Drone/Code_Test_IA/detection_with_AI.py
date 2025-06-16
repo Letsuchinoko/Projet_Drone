@@ -340,43 +340,31 @@ class HandPositionRecognizer:
             return False
     
     def train_model(self, validation_split=0.2, epochs=25):
-        """Entraînement du modèle - VERSION CORRIGÉE avec debug"""
+        """Entraînement du modèle - VERSION DEBUGGÉE"""
         if not self.tf_available:
             self.logging.error("❌ TensorFlow requis pour l'entraînement")
             return False
-
+            
         try:
             if len(self.training_data) < 10:
                 self.logging.warning("⚠️ Pas assez de données (min 10)")
                 return False
-
-            # === DEBUG: premier vecteur de features
-            self.logging.info(
-                f"[DEBUG TRAIN] First train features: {self.training_data[0][:8]}... sum={np.sum(self.training_data[0]):.2f}, min={np.min(self.training_data[0]):.2f}, max={np.max(self.training_data[0]):.2f}"
-            )
-
-            X = np.array(self.training_data, dtype=np.float32)
-            y = np.array(self.training_labels, dtype=np.int32)
-
-            # === DEBUG: labels et shape
-            self.logging.info(
-                f"[DEBUG TRAIN] Labels (premiers): {self.training_labels[:10]}"
-            )
-            unique, counts = np.unique(self.training_labels, return_counts=True)
-            self.logging.info(
-                f"[DEBUG TRAIN] Distribution des labels: {dict(zip(unique, counts))}"
-            )
-            self.logging.info(
-                f"[DEBUG TRAIN] X shape: {X.shape}, y shape: {y.shape}"
-            )
-            if X.shape[1] != self.feature_size:
-                self.logging.warning(
-                    f"[DEBUG TRAIN] Dimension inattendue: features={X.shape[1]}, attendu={self.feature_size}"
-                )
-
+            
             if self.model is None:
                 if not self.create_model():
                     return False
+            
+            X = np.array(self.training_data, dtype=np.float32)
+            y = np.array(self.training_labels, dtype=np.int32)
+            
+            # === DEBUG: Inspecte le dataset
+            self.logging.info(
+                f"[DEBUG TRAIN] First train features: {X[0][:8]}... sum={np.sum(X[0]):.2f}, min={np.min(X[0]):.2f}, max={np.max(X[0]):.2f}"
+            )
+            self.logging.info(f"[DEBUG TRAIN] Labels (premiers): {y[:10]}")
+            unique, counts = np.unique(y, return_counts=True)
+            self.logging.info(f"[DEBUG TRAIN] Distribution des labels: {dict(zip(unique, counts))}")
+            self.logging.info(f"[DEBUG TRAIN] X shape: {X.shape}, y shape: {y.shape}")
 
             callbacks = [
                 keras.callbacks.EarlyStopping(
@@ -391,9 +379,9 @@ class HandPositionRecognizer:
                     min_lr=1e-6
                 )
             ]
-
+            
             self.logging.info(f"🚀 Entraînement: {len(X)} échantillons, {epochs} époques")
-
+            
             history = self.model.fit(
                 X, y,
                 validation_split=validation_split,
@@ -402,17 +390,27 @@ class HandPositionRecognizer:
                 callbacks=callbacks,
                 verbose=0  # Supprime les logs TensorFlow
             )
-
+            
             final_accuracy = history.history['accuracy'][-1]
             val_accuracy = history.history.get('val_accuracy', [0])[-1]
-
+            
             self.logging.info(f"✅ Entraînement terminé:")
             self.logging.info(f"   Précision: {final_accuracy:.4f}")
             self.logging.info(f"   Validation: {val_accuracy:.4f}")
+            
+            # === DEBUG: Score sur le jeu d'entraînement complet
+            train_preds = self.model.predict(X, verbose=0)
+            train_acc = np.mean(np.argmax(train_preds, axis=1) == y)
+            self.logging.info(f"[DEBUG TRAIN] Accuracy (train set): {train_acc:.4f}")
+            self.logging.info(f"[DEBUG TRAIN] Sample preds (train set): {np.argmax(train_preds[:10], axis=1)} vs {y[:10]}")
+            
+            # DEBUG: Test prédiction brute sur le 1er échantillon
+            test_pred = self.model.predict(X[0].reshape(1, -1), verbose=0)[0]
+            self.logging.info(f"[DEBUG TRAIN] Pred 1st sample: class={np.argmax(test_pred)}, raw={test_pred}")
 
             self.is_trained = True
             return True
-
+            
         except Exception as e:
             self.logging.error(f"❌ Erreur entraînement: {e}")
             return False
@@ -425,6 +423,8 @@ class HandPositionRecognizer:
         try:
             if len(features) != self.feature_size:
                 return None, 0.0
+            
+            self.logging.info(f"[DEBUG PREDICT] Features min={features.min():.2f} max={features.max():.2f} sum={features.sum():.2f} | shape={features.shape}")
             
             # Limitation fréquence
             current_time = time.time()
