@@ -76,14 +76,14 @@ class HandPosition:
     confidence_threshold: float = 0.7
 
 HAND_POSITIONS = {
-    0: HandPosition("poing", "Poing fermé - ARRÊT D'URGENCE", 0.9),
-    1: HandPosition("paume", "Paume ouverte - AVANCER", 0.7),
-    2: HandPosition("index", "Index pointé - DIRECTION", 0.75),
-    3: HandPosition("victoire", "Signe V - MONTÉE", 0.7),
-    4: HandPosition("ok", "Signe OK - VALIDATION/HOVER", 0.8),
-    5: HandPosition("pouce", "Pouce levé - MONTÉE DOUCE", 0.75),
-    6: HandPosition("stop", "Main STOP - ARRÊT", 0.85),
-    7: HandPosition("salut", "Salut - ROTATION", 0.6)
+    0: HandPosition("poing", "Poing fermé - ARRÊT D'URGENCE", 0.5),
+    1: HandPosition("paume", "Paume ouverte - AVANCER", 0.5),
+    2: HandPosition("index", "Index pointé - DIRECTION", 0.5),
+    3: HandPosition("victoire", "Signe V - MONTÉE", 0.5),
+    4: HandPosition("ok", "Signe OK - VALIDATION/HOVER", 0.5),
+    5: HandPosition("pouce", "Pouce levé - MONTÉE DOUCE", 0.5),
+    6: HandPosition("stop", "Main STOP - ARRÊT", 0.5),
+    7: HandPosition("salut", "Salut - ROTATION", 0.5)
 }
 
 # === EXTRACTEUR DE CARACTÉRISTIQUES ===
