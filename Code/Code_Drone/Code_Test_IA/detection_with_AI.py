@@ -375,6 +375,7 @@ class HandPositionRecognizer:
             ]
             
             self.logging.info(f"🚀 Entraînement: {len(X)} échantillons, {epochs} époques")
+            self.logging.info(f"[DEBUG] Premier échantillon train: {self.training_data[0][:8]}... sum={np.sum(self.training_data[0]):.2f}")
             
             history = self.model.fit(
                 X, y,
