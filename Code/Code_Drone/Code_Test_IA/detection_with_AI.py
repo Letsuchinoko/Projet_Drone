@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+BEBOP 2 - DÉTECTION GANT AVEC IA DE RECONNAISSANCE DE POSITION
+Version finale corrigée - Thread-safe
+"""
+
 import cv2
 import numpy as np
 import time
@@ -464,84 +471,84 @@ class HandPositionRecognizer:
         
         return f"Confiance: {confidence_rate:.1f}% | Moy: {avg_confidence:.2f}"
     
-    def save_model(self, filepath):
-        """Sauvegarde - VERSION CORRIGÉE"""
+    def save_model(self, filepath="hand_position_model"):
         if not self.tf_available or self.model is None:
             return False
-            
         try:
-            import shutil
-            
-            # Sauvegarde modèle TensorFlow
-            model_dir = f"{filepath}_model"
-            
-            if os.path.exists(model_dir):
-                shutil.rmtree(model_dir)
-            
-            self.model.save(model_dir, save_format='tf')
-            self.logging.info(f"✅ Modèle TF sauvegardé: {model_dir}")
-            
-            # Sauvegarde données
+            # --- Correction sauvegarde avec extension .keras ---
+            model_file = f"{filepath}_model.keras"
+            self.model.save(model_file)
+            self.logging.info(f"✅ Modèle sauvegardé dans {model_file}")
+
+            # Sauvegarde des données
             data_path = f"{filepath}_data.pkl"
             with open(data_path, 'wb') as f:
+                import pickle
                 pickle.dump({
                     'training_data': self.training_data,
                     'training_labels': self.training_labels,
                     'feature_size': self.feature_size,
                     'num_classes': self.num_classes,
                     'is_trained': self.is_trained,
-                    'total_predictions': self.total_predictions,
-                    'confident_predictions': self.confident_predictions
+                    'total_predictions': getattr(self, 'total_predictions', 0),
+                    'confident_predictions': getattr(self, 'confident_predictions', 0)
                 }, f)
-            
             self.logging.info(f"✅ Données sauvegardées: {data_path}")
             return True
-            
         except Exception as e:
             self.logging.error(f"❌ Erreur sauvegarde: {e}")
             return False
-    
-    def load_model(self, filepath):
-        """Chargement - VERSION CORRIGÉE"""
+
+    def load_model(self, filepath="hand_position_model"):
+        """Chargement du modèle - VERSION CORRIGÉE"""
         if not self.tf_available:
             return False
-            
         try:
-            # Chargement modèle
-            model_dir = f"{filepath}_model"
-            if os.path.exists(model_dir):
-                self.model = keras.models.load_model(model_dir)
-                self.logging.info(f"✅ Modèle chargé: {model_dir}")
+            # --- Correction chargement .keras d'abord ---
+            model_file = f"{filepath}_model.keras"
+            if os.path.exists(model_file):
+                self.model = keras.models.load_model(model_file)
+                self.logging.info(f"✅ Modèle chargé: {model_file}")
             else:
-                self.logging.warning(f"⚠️ Modèle non trouvé: {model_dir}")
-                return False
-            
+                # Tentative ancien format .h5
+                old_model_path = f"{filepath}_model.h5"
+                if os.path.exists(old_model_path):
+                    self.model = keras.models.load_model(old_model_path)
+                    self.logging.info(f"✅ Ancien modèle chargé: {old_model_path}")
+                else:
+                    self.logging.warning(f"⚠️ Aucun modèle trouvé: {model_file} ou {old_model_path}")
+                    return False
+
             # Chargement données
             data_path = f"{filepath}_data.pkl"
             if os.path.exists(data_path):
                 with open(data_path, 'rb') as f:
+                    import pickle
                     data = pickle.load(f)
-                
                 self.training_data = data.get('training_data', [])
                 self.training_labels = data.get('training_labels', [])
+                self.feature_size = data.get('feature_size', 64)
+                self.num_classes = data.get('num_classes', len(HAND_POSITIONS))
                 self.is_trained = data.get('is_trained', False)
                 self.total_predictions = data.get('total_predictions', 0)
                 self.confident_predictions = data.get('confident_predictions', 0)
-                
                 self.logging.info(f"✅ Données chargées: {len(self.training_data)} échantillons")
-            
             return True
-            
         except Exception as e:
             self.logging.error(f"❌ Erreur chargement: {e}")
             return False
 
-# === DÉTECTEUR PRINCIPAL CORRIGÉ ===
+# === DÉTECTEUR PRINCIPAL AVEC IA ===
 class OptimizedBicolorGloveDetectorWithAI:
-    """Détecteur avec IA - VERSION FINALE CORRIGÉE"""
+    """Détecteur de gant avec IA de reconnaissance de position"""
     
-    def __init__(self):
-        # Paramètres détection originaux
+    def __init__(self, feature_size=64, num_classes=len(HAND_POSITIONS)):
+
+        self.last_prediction_time = 0
+        self.last_prediction_result = (None, 0.0)
+        self.prediction_interval = 0.3  # Prédiction toutes les 300ms seulement
+
+        # === PARAMÈTRES DÉTECTION ORIGINAUX ===
         self.detection_history = deque(maxlen=15)
         self.stable_detections = deque(maxlen=5)
         self.confidence_threshold = 3
@@ -550,32 +557,51 @@ class OptimizedBicolorGloveDetectorWithAI:
         self.max_area = 120000
         self.min_contour_points = 8
         
+        self.color_balance_history = deque(maxlen=20)
+        self.red_orange_ratio_history = deque(maxlen=10)
+        
         self.kernel_small = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
         self.kernel_medium = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+        self.kernel_large = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
+        
+        self.zoom_factor = 1.0
+        self.target_zoom = 1.0
+        self.zoom_smooth_factor = 0.12
+        self.zoom_min = 1.0
+        self.zoom_max = 4.5
+        
+        self.area_reference = 2800
+        self.area_history = deque(maxlen=15)
+        self.quality_scores = deque(maxlen=10)
+        
+        self.search_zone = None
+        self.zone_tracking = deque(maxlen=5)
         
         self.frame_count = 0
         self.detection_count = 0
+        self.quality_count = 0
+        self.zoom_adjustments = 0
         self.fps_start_time = time.time()
         self.current_fps = 0
         
-        # Composants IA
+        self.brightness_history = deque(maxlen=10)
+        self.auto_exposure_factor = 1.0
+        
+        # === COMPOSANTS IA ===
         self.ai_enabled = TF_AVAILABLE
         self.feature_extractor = AdvancedHandFeatureExtractor()
         self.position_recognizer = HandPositionRecognizer()
-        
-        # Protection thread d'entraînement
-        self._training_in_progress = False
-        
-        # État IA
-        self.ai_mode = "detection"
-        self.training_class = 0
-        self.training_countdown = 0
-        self.training_samples_per_class = 25
         
         # Données détection pour IA
         self.last_detected_contour = None
         self.last_detected_area = 0
         self.last_bounding_rect = None
+        
+        # État IA
+        self.ai_mode = "detection"  # "detection", "training", "recognition"
+        self.training_class = 0
+        self.training_countdown = 0
+        self.training_samples_per_class = 25
         
         # Position actuelle
         self.current_position = None
@@ -592,14 +618,16 @@ class OptimizedBicolorGloveDetectorWithAI:
         
         self.logging = logging.getLogger(__name__)
         
+        # Initialisation IA
         if self.ai_enabled:
             self._initialize_ai()
         else:
             self.logging.warning("⚠️ IA désactivée - TensorFlow requis")
     
     def _initialize_ai(self):
-        """Initialisation IA"""
+        """Initialisation des composants IA"""
         try:
+            # Tentative chargement modèle existant
             model_path = "hand_position_model"
             if os.path.exists(f"{model_path}_model"):
                 if self.position_recognizer.load_model(model_path):
@@ -615,7 +643,7 @@ class OptimizedBicolorGloveDetectorWithAI:
             self.ai_enabled = False
     
     def detect_glove_optimized(self, frame):
-        """Détection de gant optimisée"""
+        """Détection de gant optimisée (version simplifiée de votre code original)"""
         if frame is None:
             return frame, False
             
@@ -623,7 +651,7 @@ class OptimizedBicolorGloveDetectorWithAI:
         self.frame_count += 1
         
         try:
-            # Détection couleur simplifiée
+            # === DÉTECTION COULEUR SIMPLIFIÉE ===
             hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
             
             # Masques rouge et orange
@@ -639,13 +667,14 @@ class OptimizedBicolorGloveDetectorWithAI:
             orange_upper = np.array([18, 255, 255])
             mask_orange = cv2.inRange(hsv, orange_lower, orange_upper)
             
+            # Combinaison
             mask_combined = cv2.bitwise_or(mask_red1, cv2.bitwise_or(mask_red2, mask_orange))
             
             # Morphologie
             mask_combined = cv2.morphologyEx(mask_combined, cv2.MORPH_CLOSE, self.kernel_medium)
             mask_combined = cv2.morphologyEx(mask_combined, cv2.MORPH_OPEN, self.kernel_small)
             
-            # Contours
+            # Recherche contours
             contours, _ = cv2.findContours(mask_combined, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             
             best_contour = None
@@ -658,10 +687,11 @@ class OptimizedBicolorGloveDetectorWithAI:
                     if area > best_area:
                         best_contour = contour
                         best_area = area
-                        quality_score = min(area / 2800, 1.0)
+                        quality_score = min(area / self.area_reference, 1.0)
             
             detected = best_contour is not None
             
+            # Sauvegarde pour IA
             if detected:
                 self.last_detected_contour = best_contour.copy()
                 self.last_detected_area = best_area
@@ -674,29 +704,43 @@ class OptimizedBicolorGloveDetectorWithAI:
             return original_frame, False
     
     def _finalize_detection(self, frame, detected, contour, area, quality_score):
-        """Finalisation avec IA"""
+        """Finalisation avec intégration IA"""
         try:
+            # Mise à jour historique
             self.detection_history.append(detected)
             if detected:
                 self.detection_count += 1
             
-            # Analyse IA
+            # === ANALYSE IA ===
             if detected and contour is not None and self.ai_enabled:
                 position, confidence = self._analyze_hand_position_ai(frame, contour)
-                
-                if position:
+
+                # --- Correction: n'afficher que les vraies positions en mode reconnaissance ---
+                if (
+                    self.ai_mode == "recognition"
+                    and position
+                    and position != "training_complete"
+                    and position in [p.name for p in HAND_POSITIONS.values()]
+                ):
                     self.current_position = position
                     self.current_position_confidence = confidence
                     self.ai_position_detections += 1
-                    
+
+                    # Commandes drone si activées
                     if self.drone_commands_enabled:
                         self._execute_drone_command(position, confidence)
-                
+                else:
+                    self.current_position = None
+                    self.current_position_confidence = 0.0
+
+                # Visualisation IA
                 frame = self._draw_ai_overlay(frame, contour, position, confidence)
-            
+
+            # Visualisation détection
             if detected and contour is not None:
                 self._draw_detection_overlay(frame, contour, area, quality_score)
             
+            # Interface complète
             result_frame = self._create_complete_overlay(frame, detected, area, quality_score)
             
             return result_frame, detected
@@ -706,7 +750,7 @@ class OptimizedBicolorGloveDetectorWithAI:
             return frame, False
     
     def _analyze_hand_position_ai(self, frame, contour):
-        """Analyse IA de la position"""
+        """Analyse IA de la position de la main"""
         try:
             if not self.ai_enabled or not self.feature_extractor or not self.position_recognizer:
                 return None, 0.0
@@ -739,15 +783,18 @@ class OptimizedBicolorGloveDetectorWithAI:
         """Gestion du mode entraînement"""
         try:
             if self.training_class >= len(HAND_POSITIONS):
+                # Fin d'entraînement
                 self._start_model_training()
                 return "training_complete", 1.0
             
             position = HAND_POSITIONS[self.training_class]
             
+            # Compte à rebours pour capture
             if self.training_countdown > 0:
                 self.training_countdown -= 1
                 return f"training_{position.name}", self.training_countdown / 60.0
             
+            # Capture d'échantillon
             features = self.feature_extractor.extract_complete_features(
                 frame, contour, bounding_rect
             )
@@ -759,12 +806,12 @@ class OptimizedBicolorGloveDetectorWithAI:
                 
                 if samples_count >= self.training_samples_per_class:
                     self.training_class += 1
-                    self.training_countdown = 60
+                    self.training_countdown = 60  # 2 secondes de pause
                     if self.training_class < len(HAND_POSITIONS):
                         next_position = HAND_POSITIONS[self.training_class]
                         self.logging.info(f"📝 Position suivante: {next_position.name}")
                 else:
-                    self.training_countdown = 30
+                    self.training_countdown = 30  # 1 seconde entre captures
                 
                 return f"captured_{position.name}", 1.0
             
@@ -775,104 +822,92 @@ class OptimizedBicolorGloveDetectorWithAI:
             return None, 0.0
     
     def _start_model_training(self):
-        """Démarrage entraînement - VERSION CORRIGÉE THREAD-SAFE"""
-        
-        # Protection contre multiple threads
+        # === PROTECTION CONTRE MULTIPLE THREADS ===
         if hasattr(self, '_training_in_progress') and self._training_in_progress:
             self.logging.warning("⚠️ Entraînement déjà en cours - ignoré")
             return
-        
+
         self._training_in_progress = True
         self.logging.info("🚀 Démarrage entraînement du modèle IA...")
-        
+
         def train():
             try:
                 if not hasattr(self, '_training_in_progress') or not self._training_in_progress:
                     return
-                    
                 success = self.position_recognizer.train_model(epochs=25)
-                
                 if success:
                     try:
                         model_path = "hand_position_model"
-                        os.makedirs(model_path, exist_ok=True)
-                        
-                        # Sauvegarde TensorFlow moderne
-                        self.position_recognizer.model.save(model_path, save_format='tf')
-                        
-                        # Sauvegarde données
-                        data_path = f"{model_path}_data.pkl"
-                        with open(data_path, 'wb') as f:
-                            pickle.dump({
-                                'training_data': self.position_recognizer.training_data,
-                                'training_labels': self.position_recognizer.training_labels,
-                                'feature_size': self.position_recognizer.feature_size,
-                                'num_classes': self.position_recognizer.num_classes,
-                                'is_trained': True
-                            }, f)
-                        
+                        # --- Correction sauvegarde .keras ---
+                        self.position_recognizer.save_model(model_path)
                         self.logging.info("💾 Modèle sauvegardé avec succès")
-                        
                     except Exception as save_error:
                         self.logging.error(f"❌ Erreur sauvegarde: {save_error}")
-                    
                     self.ai_mode = "recognition"
                     self.logging.info("✅ Modèle entraîné et sauvegardé!")
-                    
                 else:
                     self.logging.error("❌ Échec entraînement")
                     self.ai_mode = "detection"
-                    
             except Exception as e:
                 self.logging.error(f"❌ Erreur thread entraînement: {e}")
                 self.ai_mode = "detection"
-                
             finally:
                 self._training_in_progress = False
-        
+
         training_thread = threading.Thread(target=train, daemon=True, name="ModelTraining")
         training_thread.start()
     
     def _execute_drone_command(self, position, confidence):
-        """Exécution commandes drone"""
+        """Exécution des commandes drone basées sur la position"""
         try:
             current_time = time.time()
             if current_time - self.last_command_time < self.command_cooldown:
                 return False
             
-            if confidence < 0.65:
+            if confidence < 0.65:  # Seuil de sécurité global
                 return False
+            
+            # NOTE: Remplacez 'bebop' par votre instance de drone
+            # Exemple d'implémentation - adaptez selon votre code
             
             if position == "poing" and confidence > 0.9:
                 self.logging.warning("🚨 ARRÊT D'URGENCE - Poing détecté")
+                # bebop.emergency()
                 self.logging.info(">>> COMMANDE: EMERGENCY() <<<")
                 
             elif position == "stop" and confidence > 0.85:
                 self.logging.info("🛑 STOP - Maintien position")
+                # bebop.hover()
                 self.logging.info(">>> COMMANDE: HOVER() <<<")
                 
             elif position == "victoire" and confidence > 0.7:
                 self.logging.info("⬆️ MONTÉE - Signe V")
+                # bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=25, duration=0.8)
                 self.logging.info(">>> COMMANDE: MONTÉE +25 (0.8s) <<<")
                 
             elif position == "pouce" and confidence > 0.75:
                 self.logging.info("👍 MONTÉE DOUCE - Pouce levé")
+                # bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=15, duration=0.5)
                 self.logging.info(">>> COMMANDE: MONTÉE +15 (0.5s) <<<")
                 
             elif position == "paume" and confidence > 0.7:
                 self.logging.info("➡️ AVANCER - Paume ouverte")
+                # bebop.fly_direct(roll=0, pitch=20, yaw=0, vertical_movement=0, duration=0.6)
                 self.logging.info(">>> COMMANDE: AVANCER pitch+20 (0.6s) <<<")
                 
             elif position == "index" and confidence > 0.75:
                 self.logging.info("🎯 AVANCER PRÉCIS - Index pointé")
+                # bebop.fly_direct(roll=0, pitch=15, yaw=0, vertical_movement=0, duration=0.4)
                 self.logging.info(">>> COMMANDE: AVANCER pitch+15 (0.4s) <<<")
                 
             elif position == "salut" and confidence > 0.6:
                 self.logging.info("↺ ROTATION GAUCHE - Salut")
+                # bebop.fly_direct(roll=0, pitch=0, yaw=-30, vertical_movement=0, duration=0.6)
                 self.logging.info(">>> COMMANDE: ROTATION yaw-30 (0.6s) <<<")
                 
             elif position == "ok" and confidence > 0.8:
                 self.logging.info("✅ HOVER - Signe OK")
+                # bebop.hover()
                 self.logging.info(">>> COMMANDE: HOVER() <<<")
                 
             else:
@@ -887,39 +922,50 @@ class OptimizedBicolorGloveDetectorWithAI:
             return False
     
     def _draw_ai_overlay(self, frame, contour, position, confidence):
-        """Visualisation IA"""
+        """Visualisation overlay IA"""
         try:
-            if position and confidence > 0:
+            if (
+                position
+                and confidence > 0
+                and position != "training_complete"
+                and position in [p.name for p in HAND_POSITIONS.values()]
+            ):
+                # Couleur selon confiance
                 if confidence > 0.8:
-                    color = (0, 255, 0)
+                    color = (0, 255, 0)      # Vert
                 elif confidence > 0.6:
-                    color = (0, 255, 255)
+                    color = (0, 255, 255)    # Jaune
                 else:
-                    color = (0, 150, 255)
-                
+                    color = (0, 150, 255)    # Orange
+
+                # Position sur la main
                 M = cv2.moments(contour)
                 if M["m00"] != 0:
                     cx = int(M["m10"] / M["m00"])
                     cy = int(M["m01"] / M["m00"])
-                    
+
+                    # Cercle de confiance
                     radius = int(15 + confidence * 25)
                     cv2.circle(frame, (cx, cy), radius, color, 3)
-                    
+
+                    # Nom de la position
                     cv2.putText(frame, position.upper(), (cx - 30, cy - 40),
-                               cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2)
-                    
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2)
+
+                    # Confiance
                     cv2.putText(frame, f"{confidence:.2f}", (cx - 15, cy + 50),
-                               cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
-            
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
             return frame
-            
+
         except Exception as e:
             self.logging.debug(f"Erreur overlay IA: {e}")
             return frame
+
     
     def _draw_detection_overlay(self, frame, contour, area, quality_score):
-        """Visualisation détection de base"""
+        """Visualisation de la détection de base"""
         try:
+            # Couleur selon qualité
             if quality_score > 0.7:
                 color = (0, 255, 0)
             elif quality_score > 0.5:
@@ -927,11 +973,14 @@ class OptimizedBicolorGloveDetectorWithAI:
             else:
                 color = (0, 150, 255)
             
+            # Contour
             cv2.drawContours(frame, [contour], -1, color, 2)
             
+            # Rectangle englobant
             x, y, w, h = cv2.boundingRect(contour)
             cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
             
+            # Informations
             cv2.putText(frame, f"Q:{quality_score:.2f} A:{int(area)}", 
                        (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1)
             
@@ -943,7 +992,7 @@ class OptimizedBicolorGloveDetectorWithAI:
         try:
             h, w = frame.shape[:2]
             
-            # Status principal
+            # === STATUS PRINCIPAL ===
             if detected:
                 if self.current_position:
                     status = f"🤖 GANT + {self.current_position.upper()} ({self.current_position_confidence:.2f})"
@@ -957,7 +1006,7 @@ class OptimizedBicolorGloveDetectorWithAI:
             
             cv2.putText(frame, status, (10, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.7, status_color, 2)
             
-            # Mode IA
+            # === MODE IA ===
             if self.ai_enabled:
                 ai_status = f"IA: Mode {self.ai_mode}"
                 if self.ai_mode == "training" and self.training_class < len(HAND_POSITIONS):
@@ -974,7 +1023,7 @@ class OptimizedBicolorGloveDetectorWithAI:
             else:
                 cv2.putText(frame, "IA: TensorFlow requis", (10, 65), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (100, 100, 100), 2)
             
-            # Commandes drone
+            # === COMMANDES DRONE ===
             if self.drone_commands_enabled:
                 drone_status = "🚁 COMMANDES ACTIVES"
                 drone_color = (0, 255, 0)
@@ -984,18 +1033,18 @@ class OptimizedBicolorGloveDetectorWithAI:
             
             cv2.putText(frame, drone_status, (10, 95), cv2.FONT_HERSHEY_SIMPLEX, 0.5, drone_color, 1)
             
-            # Statistiques IA
+            # === STATISTIQUES ===
             if self.ai_enabled and self.ai_frame_count > 0:
                 detection_rate = (self.ai_position_detections / max(self.ai_frame_count, 1)) * 100
                 ai_stats = f"IA: {detection_rate:.1f}% positions détectées"
                 cv2.putText(frame, ai_stats, (10, h - 60), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (200, 255, 200), 1)
             
-            # Positions disponibles
+            # === POSITIONS DISPONIBLES ===
             if self.ai_mode == "recognition":
                 positions_text = "Positions: poing(URGENCE), paume(AVANCER), victoire(MONTÉE), ok(HOVER)"
                 cv2.putText(frame, positions_text, (10, h - 40), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
             
-            # Historique
+            # === HISTORIQUE ===
             history = "".join(["●" if x else "○" for x in list(self.detection_history)[-15:]])
             cv2.putText(frame, f"Historique: {history}", (10, h - 20), 
                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
@@ -1006,7 +1055,7 @@ class OptimizedBicolorGloveDetectorWithAI:
             self.logging.debug(f"Erreur interface: {e}")
             return frame
     
-    # Méthodes de contrôle IA
+    # === MÉTHODES DE CONTRÔLE IA ===
     def start_ai_training(self):
         """Démarrage entraînement IA"""
         if not self.ai_enabled:
@@ -1017,6 +1066,7 @@ class OptimizedBicolorGloveDetectorWithAI:
         self.training_class = 0
         self.training_countdown = 60
         
+        # Reset données
         self.position_recognizer.training_data = []
         self.position_recognizer.training_labels = []
         
@@ -1052,7 +1102,7 @@ class OptimizedBicolorGloveDetectorWithAI:
         return self.drone_commands_enabled
     
     def save_ai_model(self):
-        """Sauvegarde modèle IA"""
+        """Sauvegarde du modèle IA"""
         if self.ai_enabled and self.position_recognizer and self.position_recognizer.is_trained:
             success = self.position_recognizer.save_model("hand_position_model")
             if success:
@@ -1061,7 +1111,7 @@ class OptimizedBicolorGloveDetectorWithAI:
         return False
     
     def load_ai_model(self):
-        """Chargement modèle IA"""
+        """Chargement du modèle IA"""
         if self.ai_enabled and self.position_recognizer:
             success = self.position_recognizer.load_model("hand_position_model")
             if success:
@@ -1071,7 +1121,7 @@ class OptimizedBicolorGloveDetectorWithAI:
         return False
     
     def get_ai_stats(self):
-        """Statistiques IA"""
+        """Statistiques IA complètes"""
         if not self.ai_enabled:
             return "IA désactivée (TensorFlow requis)"
         
@@ -1129,7 +1179,7 @@ def simple_drone_control(bebop):
 
 # === FONCTION PRINCIPALE ===
 def main_with_ai():
-    """Fonction principale avec IA corrigée"""
+    """Fonction principale avec IA intégrée"""
     
     logger.info("=== BEBOP 2 AVEC IA DE RECONNAISSANCE DE POSITION ===")
     logger.info("🤖 Système de reconnaissance de gestes pour drone")
@@ -1144,7 +1194,7 @@ def main_with_ai():
     start_time = time.time()
     
     try:
-        # Connexion drone
+        # === CONNEXION DRONE ===
         logger.info("📡 Connexion au drone...")
         bebop = Bebop()
         if not bebop.connect(10):
@@ -1153,16 +1203,16 @@ def main_with_ai():
 
         logger.info("✅ Drone connecté!")
         
-        # Flux vidéo
+        # === FLUX VIDÉO ===
         logger.info("📹 Démarrage flux vidéo...")
         bebop.start_video_stream()
         time.sleep(2)
         
-        # Contrôle drone
+        # === CONTRÔLE DRONE ===
         ctrl_thread = threading.Thread(target=simple_drone_control, args=(bebop,), daemon=True)
         ctrl_thread.start()
         
-        # Pipeline FFmpeg
+        # === PIPELINE FFMPEG ===
         sdp_path = os.path.join(os.path.dirname(pyparrot.__file__), "utils", "bebop.sdp")
         if not os.path.exists(sdp_path):
             logger.error(f"❌ SDP introuvable: {sdp_path}")
@@ -1190,10 +1240,10 @@ def main_with_ai():
             logger.error("❌ FFmpeg non trouvé!")
             return False
 
-        # Détecteur avec IA
+        # === DÉTECTEUR AVEC IA ===
         detector = OptimizedBicolorGloveDetectorWithAI()
         
-        # Interface
+        # === INTERFACE ===
         window_name = "Bebop 2 - IA Reconnaissance Position"
         cv2.namedWindow(window_name, cv2.WINDOW_AUTOSIZE)
         
@@ -1216,9 +1266,10 @@ def main_with_ai():
         
         logger.info("🎬 Démarrage détection avec IA...")
         
-        # Boucle principale
+        # === BOUCLE PRINCIPALE ===
         while True:
             try:
+                # Lecture frame
                 raw_frame = pipe.stdout.read(WIDTH * HEIGHT * 3)
                 
                 if len(raw_frame) != WIDTH * HEIGHT * 3:
@@ -1227,11 +1278,14 @@ def main_with_ai():
                 
                 frame = np.frombuffer(raw_frame, np.uint8).reshape((HEIGHT, WIDTH, 3))
                 
+                # Détection avec IA
                 processed_frame, detected = detector.detect_glove_optimized(frame)
                 
+                # Mise à jour compteurs
                 if detected:
                     detector.ai_frame_count += 1
                 
+                # Affichage
                 cv2.imshow(window_name, processed_frame)
                 
                 # Logs périodiques
@@ -1248,7 +1302,7 @@ def main_with_ai():
                     
                     last_fps_log = current_time
                 
-                # Gestion touches
+                # === GESTION TOUCHES ===
                 key = cv2.waitKey(1) & 0xFF
                 
                 if key == ord('q') or key == 27:
@@ -1266,7 +1320,7 @@ def main_with_ai():
                     detector = OptimizedBicolorGloveDetectorWithAI()
                     logger.info("🔄 Détecteur reset")
                 
-                # Commandes IA
+                # Commandes IA (seulement si TensorFlow disponible)
                 elif TF_AVAILABLE:
                     if key == ord('i'):
                         logger.info(f"📊 {detector.get_ai_stats()}")
@@ -1303,6 +1357,15 @@ def main_with_ai():
                             logger.info("🚁 Commandes drone ACTIVÉES")
                         else:
                             logger.info("🚁 Commandes drone désactivées")
+                
+                # Debug
+                elif key == ord('d'):
+                    logger.info("🔍 DEBUG DÉTAILLÉ:")
+                    logger.info(f"   Détecteur IA: {detector.ai_enabled}")
+                    logger.info(f"   Mode: {detector.ai_mode}")
+                    logger.info(f"   Frames IA: {detector.ai_frame_count}")
+                    logger.info(f"   Position actuelle: {detector.current_position}")
+                    logger.info(f"   Commandes drone: {detector.drone_commands_enabled}")
 
             except KeyboardInterrupt:
                 logger.info("⌨️ Interruption clavier")
@@ -1318,7 +1381,7 @@ def main_with_ai():
         return False
         
     finally:
-        # Nettoyage
+        # === NETTOYAGE ===
         logger.info("🧹 Nettoyage...")
         
         if detector:
@@ -1343,6 +1406,7 @@ def main_with_ai():
             logger.info(f"  📸 Screenshots: {screenshot_count}")
             logger.info("=" * 80)
         
+        # Nettoyage ressources
         if pipe:
             try:
                 pipe.terminate()
@@ -1397,7 +1461,7 @@ if __name__ == "__main__":
 
 # === GUIDE D'UTILISATION ===
 """
-🎮 GUIDE D'UTILISATION COMPLET:
+🎮 GUIDE D'UTILISATION RAPIDE:
 
 1. INSTALLATION:
    pip install tensorflow opencv-python numpy pyparrot
@@ -1413,14 +1477,7 @@ if __name__ == "__main__":
    - Pressez 'c' pour activer les commandes drone
    - Effectuez vos gestes devant la caméra
 
-4. COMMANDES CLAVIER:
-   q = Quitter                    s = Screenshot
-   r = Reset détecteur           i = Info IA
-   t = Entraînement IA           n = Reconnaissance IA
-   m = Sauvegarder modèle        l = Charger modèle
-   c = Activer commandes drone
-
-5. GESTES ET COMMANDES DRONE:
+4. COMMANDES PRINCIPALES:
    ✊ Poing fermé     → ARRÊT D'URGENCE
    ✋ Paume ouverte   → AVANCER
    ✌️ Victoire (V)    → MONTÉE
@@ -1430,51 +1487,34 @@ if __name__ == "__main__":
    🛑 STOP           → ARRÊT
    👋 Salut          → ROTATION
 
-6. SÉCURITÉS:
+5. SÉCURITÉS:
    - Seuils de confiance adaptatifs (60-90%)
    - Cooldown de 2 secondes entre commandes
    - Validation sur plusieurs frames
-   - Mode d'urgence prioritaire (poing)
+   - Mode d'urgence prioritaire
 
-7. FICHIERS GÉNÉRÉS:
+6. FICHIERS GÉNÉRÉS:
    - hand_position_model_model/ (modèle TensorFlow)
    - hand_position_model_data.pkl (données d'entraînement)
    - bebop_ai_detection.log (logs détaillés)
    - ai_capture_*.png (screenshots)
 
-8. CONSEILS ENTRAÎNEMENT:
-   - Variez les angles et distances
-   - Maintenez les positions stables
-   - Entraînez avec différents éclairages
-   - 25 échantillons par position recommandés
+CONSEILS:
+- Entraînez avec des variations d'éclairage et d'angles
+- Maintenez les positions stables pendant la capture
+- Vérifiez les logs pour les performances
+- Sauvegardez régulièrement le modèle ('m')
 
-9. OPTIMISATIONS INTÉGRÉES:
-   - Thread-safe pour éviter les crashes
-   - Prédictions limitées à 5 FPS pour fluidité
-   - Sauvegarde automatique du modèle
-   - Stabilisation temporelle des prédictions
-   - Protection contre les commandes multiples
+DÉPANNAGE:
+- Si TensorFlow manque: pip install tensorflow
+- Si détection faible: ré-entraînez avec plus d'échantillons
+- Si commandes erratiques: augmentez les seuils de confiance
+- Si performances lentes: réduisez la résolution vidéo
 
-10. DÉPANNAGE:
-    - Si TensorFlow manque: pip install tensorflow
-    - Si détection faible: ré-entraînez le modèle
-    - Si freeze: les corrections sont intégrées
-    - Si commandes erratiques: vérifiez les seuils
-
-ARCHITECTURE TECHNIQUE:
+ARCHITECTURE:
 - Détection couleur rouge/orange optimisée
 - Extraction de 64 caractéristiques (géométrie + vision)
 - Réseau de neurones dense avec régularisation
-- Stabilisation temporelle sur 3 frames
-- Interface temps réel avec feedback visuel
-- Système de commandes drone sécurisé
-
-VERSION: Finale corrigée - Thread-safe
-AUTEUR: Assistant IA avec corrections utilisateur
-DATE: 2025-06-16
-"""#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-BEBOP 2 - DÉTECTION GANT AVEC IA DE RECONNAISSANCE DE POSITION
-Version finale corrigée - Thread-safe
+- Stabilisation temporelle des prédictions
+- Interface en temps réel avec feedback visuel
 """
