@@ -21,6 +21,8 @@ from typing import List, Tuple, Optional, Dict
 import pickle
 import json
 
+import matplotlib.pyplot as plt
+
 # Import TensorFlow avec gestion sécurisée
 TF_AVAILABLE = False
 tf = None
@@ -73,18 +75,24 @@ class HandPosition:
     """Classe pour définir une position de main"""
     name: str
     description: str
-    confidence_threshold: float = 0.7
+    confidence_threshold: float = 0.10
 
 HAND_POSITIONS = {
-    0: HandPosition("poing", "Poing fermé - ARRÊT D'URGENCE", 0.9),
-    1: HandPosition("paume", "Paume ouverte - AVANCER", 0.7),
-    2: HandPosition("index", "Index pointé - DIRECTION", 0.75),
-    3: HandPosition("victoire", "Signe V - MONTÉE", 0.7),
-    4: HandPosition("ok", "Signe OK - VALIDATION/HOVER", 0.8),
-    5: HandPosition("pouce", "Pouce levé - MONTÉE DOUCE", 0.75),
-    6: HandPosition("stop", "Main STOP - ARRÊT", 0.85),
-    7: HandPosition("salut", "Salut - ROTATION", 0.6)
+    0: HandPosition("poing", "Poing fermé - ARRÊT D'URGENCE", 0.10),
+    1: HandPosition("paume", "Paume ouverte - AVANCER", 0.10),
+    2: HandPosition("index", "Index pointé - DIRECTION", 0.10),
+    3: HandPosition("victoire", "Signe V - MONTÉE", 0.10),
+    4: HandPosition("ok", "Signe OK - VALIDATION/HOVER", 0.10),
+    5: HandPosition("pouce", "Pouce levé - MONTÉE DOUCE", 0.10),
+    6: HandPosition("stop", "Main STOP - ARRÊT", 0.10),
+    7: HandPosition("salut", "Salut - ROTATION", 0.10)
 }
+
+DISTANCE_LABELS = [
+    "PROCHE de la caméra",
+    "À MI-DISTANCE",
+    "ÉLOIGNÉ du drone"
+]
 
 # === EXTRACTEUR DE CARACTÉRISTIQUES ===
 class AdvancedHandFeatureExtractor:
@@ -249,11 +257,11 @@ class AdvancedHandFeatureExtractor:
             self.logging.debug(f"Erreur extraction complète: {e}")
             return np.zeros(self.feature_size, dtype=np.float32)
 
-# === MODÈLE TENSORFLOW CORRIGÉ ===
 class HandPositionRecognizer:
-    """Modèle de reconnaissance de position - VERSION CORRIGÉE"""
+    """Modèle de reconnaissance de position - VERSION COURBES & FEEDBACK"""
     
-    def __init__(self, feature_size=64, num_classes=len(HAND_POSITIONS)):
+    def __init__(self, feature_size=64, num_classes=8):
+        from collections import deque
         self.feature_size = feature_size
         self.num_classes = num_classes
         self.model = None
@@ -261,190 +269,200 @@ class HandPositionRecognizer:
         self.training_data = []
         self.training_labels = []
         self.logging = logging.getLogger(__name__)
-        
-        # Historique prédictions
+
         self.prediction_history = deque(maxlen=7)
         self.confidence_history = deque(maxlen=5)
-        
-        # Variables pour optimisation prédictions
         self.last_prediction_time = 0
         self.last_prediction_result = (None, 0.0)
-        self.prediction_interval = 0.2  # 5 FPS max
-        
-        # Métriques
+        self.prediction_interval = 0.2
+
         self.total_predictions = 0
         self.confident_predictions = 0
-        
-        self.tf_available = TF_AVAILABLE
-        if not self.tf_available:
-            self.logging.warning("⚠️ TensorFlow non disponible - IA désactivée")
-    
+
+        try:
+            import tensorflow as tf
+            self.tf_available = True
+            self.keras = tf.keras
+            self.layers = tf.keras.layers
+        except ImportError:
+            self.tf_available = False
+            self.keras = None
+            self.layers = None
+            self.logging.warning("TensorFlow non disponible.")
+
     def create_model(self):
-        """Création du modèle"""
         if not self.tf_available:
             return False
-            
         try:
-            model = keras.Sequential([
-                layers.Dense(128, activation='relu', input_shape=(self.feature_size,)),
-                layers.BatchNormalization(),
-                layers.Dropout(0.3),
-                
-                layers.Dense(96, activation='relu'),
-                layers.BatchNormalization(),
-                layers.Dropout(0.4),
-                
-                layers.Dense(64, activation='relu'),
-                layers.BatchNormalization(),
-                layers.Dropout(0.3),
-                
-                layers.Dense(32, activation='relu'),
-                layers.Dropout(0.2),
-                
-                layers.Dense(self.num_classes, activation='softmax')
+            model = self.keras.Sequential([
+                self.layers.Dense(128, activation='relu', input_shape=(self.feature_size,)),
+                self.layers.BatchNormalization(),
+                self.layers.Dropout(0.3),
+                self.layers.Dense(96, activation='relu'),
+                self.layers.BatchNormalization(),
+                self.layers.Dropout(0.4),
+                self.layers.Dense(64, activation='relu'),
+                self.layers.BatchNormalization(),
+                self.layers.Dropout(0.3),
+                self.layers.Dense(32, activation='relu'),
+                self.layers.Dropout(0.2),
+                self.layers.Dense(self.num_classes, activation='softmax')
             ])
-            
             model.compile(
-                optimizer=keras.optimizers.Adam(learning_rate=0.001),
+                optimizer=self.keras.optimizers.Adam(learning_rate=0.001),
                 loss='sparse_categorical_crossentropy',
                 metrics=['accuracy']
             )
-            
             self.model = model
             self.logging.info(f"✅ Modèle créé: {model.count_params()} paramètres")
             return True
-            
         except Exception as e:
             self.logging.error(f"❌ Erreur création modèle: {e}")
             return False
-    
+
     def add_training_sample(self, features, position_class):
-        """Ajout échantillon d'entraînement"""
         if not self.tf_available:
             return False
-            
         try:
             if len(features) != self.feature_size:
                 self.logging.warning(f"Taille features incorrecte: {len(features)} vs {self.feature_size}")
                 return False
-            
             self.training_data.append(features.copy())
             self.training_labels.append(position_class)
-            
-            position_name = HAND_POSITIONS[position_class].name
-            self.logging.info(f"📊 Échantillon ajouté: {position_name} - Total: {len(self.training_data)}")
+            self.logging.info(f"📊 Échantillon ajouté: {position_class} - Total: {len(self.training_data)}")
             return True
-            
         except Exception as e:
             self.logging.error(f"❌ Erreur ajout échantillon: {e}")
             return False
-    
-    def train_model(self, validation_split=0.2, epochs=25):
-        """Entraînement du modèle - VERSION CORRIGÉE"""
+
+    def train_model(self, validation_split=0.2, epochs=25, plot_curves=True, save_fig=True):
         if not self.tf_available:
             self.logging.error("❌ TensorFlow requis pour l'entraînement")
             return False
-            
         try:
             if len(self.training_data) < 10:
                 self.logging.warning("⚠️ Pas assez de données (min 10)")
                 return False
-            
             if self.model is None:
                 if not self.create_model():
                     return False
-            
             X = np.array(self.training_data, dtype=np.float32)
             y = np.array(self.training_labels, dtype=np.int32)
-            
+            self.logging.info(
+                f"[DEBUG TRAIN] First train features: {X[0][:8]}... sum={np.sum(X[0]):.2f}, min={np.min(X[0]):.2f}, max={np.max(X[0]):.2f}"
+            )
+            self.logging.info(f"[DEBUG TRAIN] Labels (premiers): {y[:10]}")
             unique, counts = np.unique(y, return_counts=True)
-            self.logging.info(f"📊 Distribution: {dict(zip(unique, counts))}")
-            
+            self.logging.info(f"[DEBUG TRAIN] Distribution des labels: {dict(zip(unique, counts))}")
+            self.logging.info(f"[DEBUG TRAIN] X shape: {X.shape}, y shape: {y.shape}")
+
+            # Split manuel pour afficher le contenu
+            from sklearn.model_selection import train_test_split
+            X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=validation_split, stratify=y, random_state=42)
+            self.logging.info(f"Train y distrib: {dict(zip(*np.unique(y_train, return_counts=True)))}")
+            self.logging.info(f"Val y distrib: {dict(zip(*np.unique(y_val, return_counts=True)))}")
+            self.logging.info(f"Shapes - X_train: {X_train.shape}, y_train: {y_train.shape}, X_val: {X_val.shape}, y_val: {y_val.shape}")
+
             callbacks = [
-                keras.callbacks.EarlyStopping(
-                    monitor='val_loss',
-                    patience=10,
-                    restore_best_weights=True
+                self.keras.callbacks.EarlyStopping(
+                    monitor='val_loss', patience=10, restore_best_weights=True
                 ),
-                keras.callbacks.ReduceLROnPlateau(
-                    monitor='val_loss',
-                    factor=0.7,
-                    patience=5,
-                    min_lr=1e-6
+                self.keras.callbacks.ReduceLROnPlateau(
+                    monitor='val_loss', factor=0.7, patience=5, min_lr=1e-6
                 )
             ]
-            
             self.logging.info(f"🚀 Entraînement: {len(X)} échantillons, {epochs} époques")
-            
+
             history = self.model.fit(
-                X, y,
-                validation_split=validation_split,
+                X_train, y_train,
+                validation_data=(X_val, y_val),
                 epochs=epochs,
-                batch_size=min(16, len(X) // 4),  # Batch size réduit
+                batch_size=min(16, len(X) // 4),
                 callbacks=callbacks,
-                verbose=0  # Supprime les logs TensorFlow
+                verbose=0,
+                shuffle=True
             )
-            
             final_accuracy = history.history['accuracy'][-1]
             val_accuracy = history.history.get('val_accuracy', [0])[-1]
-            
             self.logging.info(f"✅ Entraînement terminé:")
             self.logging.info(f"   Précision: {final_accuracy:.4f}")
             self.logging.info(f"   Validation: {val_accuracy:.4f}")
-            
+
+            # Courbes d’apprentissage (inchangé)
+            if plot_curves:
+                try:
+                    plt.figure(figsize=(10, 4))
+                    plt.subplot(1, 2, 1)
+                    plt.plot(history.history['accuracy'], label='Train Acc')
+                    if 'val_accuracy' in history.history:
+                        plt.plot(history.history['val_accuracy'], label='Val Acc')
+                    plt.title('Accuracy')
+                    plt.legend()
+                    plt.subplot(1, 2, 2)
+                    plt.plot(history.history['loss'], label='Train Loss')
+                    if 'val_loss' in history.history:
+                        plt.plot(history.history['val_loss'], label='Val Loss')
+                    plt.title('Loss')
+                    plt.legend()
+                    plt.tight_layout()
+                    if save_fig:
+                        stamp = time.strftime("%Y%m%d_%H%M%S")
+                        figname = f"training_curves_{stamp}.png"
+                        plt.savefig(figname)
+                        self.logging.info(f"📈 Courbes sauvegardées : {figname}")
+                    plt.show()
+                except Exception as e:
+                    self.logging.warning(f"Erreur affichage/sauvegarde courbes : {e}")
+
+            # Score sur train
+            train_preds = self.model.predict(X, verbose=0)
+            train_acc = np.mean(np.argmax(train_preds, axis=1) == y)
+            self.logging.info(f"[DEBUG TRAIN] Accuracy (train set): {train_acc:.4f}")
+            self.logging.info(f"[DEBUG TRAIN] Sample preds (train set): {np.argmax(train_preds[:10], axis=1)} vs {y[:10]}")
+            test_pred = self.model.predict(X[0].reshape(1, -1), verbose=0)[0]
+            self.logging.info(f"[DEBUG TRAIN] Pred 1st sample: class={np.argmax(test_pred)}, raw={test_pred}")
+
             self.is_trained = True
             return True
-            
         except Exception as e:
             self.logging.error(f"❌ Erreur entraînement: {e}")
             return False
-    
+
+
     def predict_position(self, features, use_stabilization=True):
-        """Prédiction optimisée - VERSION CORRIGÉE"""
         if not self.tf_available or self.model is None or not self.is_trained:
             return None, 0.0
-            
         try:
             if len(features) != self.feature_size:
                 return None, 0.0
-            
-            # Limitation fréquence
             current_time = time.time()
             if current_time - self.last_prediction_time < self.prediction_interval:
                 return self.last_prediction_result
-            
-            # Prédiction
             features_batch = features.reshape(1, -1)
             prediction = self.model.predict(features_batch, verbose=0, batch_size=1)[0]
-            
             predicted_class = np.argmax(prediction)
             confidence = prediction[predicted_class]
-            
             self.last_prediction_time = current_time
             self.total_predictions += 1
-            
-            # Stabilisation
             if use_stabilization:
                 self.prediction_history.append((predicted_class, confidence))
                 self.confidence_history.append(confidence)
-                
                 if len(self.prediction_history) >= 3:
+                    from collections import Counter
                     recent_classes = [p[0] for p in list(self.prediction_history)[-3:]]
                     recent_confidences = [p[1] for p in list(self.prediction_history)[-3:]]
-                    
-                    from collections import Counter
                     class_counts = Counter(recent_classes)
                     most_common_class, count = class_counts.most_common(1)[0]
-                    
                     if count >= 2:
-                        class_confidences = [conf for cls, conf in zip(recent_classes, recent_confidences) 
-                                           if cls == most_common_class]
+                        class_confidences = [conf for cls, conf in zip(recent_classes, recent_confidences)
+                                             if cls == most_common_class]
                         avg_confidence = np.mean(class_confidences)
-                        
                         predicted_class = most_common_class
                         confidence = avg_confidence
-            
-            # Validation seuil
+            # Validation seuil (adapte à ton HAND_POSITIONS)
+            from collections import namedtuple
+            HandPosition = namedtuple("HandPosition", ["confidence_threshold"])
+            HAND_POSITIONS = {i: HandPosition(0.5) for i in range(self.num_classes)}  # Rends global sinon
             if predicted_class in HAND_POSITIONS:
                 threshold = HAND_POSITIONS[predicted_class].confidence_threshold
                 if confidence >= threshold:
@@ -452,35 +470,27 @@ class HandPositionRecognizer:
                     result = (predicted_class, confidence)
                     self.last_prediction_result = result
                     return result
-            
             result = (None, confidence)
             self.last_prediction_result = result
             return result
-            
         except Exception as e:
             self.logging.debug(f"Erreur prédiction: {e}")
             return None, 0.0
-    
+
     def get_prediction_stats(self):
-        """Statistiques des prédictions"""
         if self.total_predictions == 0:
             return "Aucune prédiction"
-        
         confidence_rate = (self.confident_predictions / self.total_predictions) * 100
         avg_confidence = np.mean(self.confidence_history) if self.confidence_history else 0
-        
         return f"Confiance: {confidence_rate:.1f}% | Moy: {avg_confidence:.2f}"
-    
+
     def save_model(self, filepath="hand_position_model"):
         if not self.tf_available or self.model is None:
             return False
         try:
-            # --- Correction sauvegarde avec extension .keras ---
             model_file = f"{filepath}_model.keras"
             self.model.save(model_file)
             self.logging.info(f"✅ Modèle sauvegardé dans {model_file}")
-
-            # Sauvegarde des données
             data_path = f"{filepath}_data.pkl"
             with open(data_path, 'wb') as f:
                 import pickle
@@ -500,26 +510,21 @@ class HandPositionRecognizer:
             return False
 
     def load_model(self, filepath="hand_position_model"):
-        """Chargement du modèle - VERSION CORRIGÉE"""
         if not self.tf_available:
             return False
         try:
-            # --- Correction chargement .keras d'abord ---
             model_file = f"{filepath}_model.keras"
             if os.path.exists(model_file):
-                self.model = keras.models.load_model(model_file)
+                self.model = self.keras.models.load_model(model_file)
                 self.logging.info(f"✅ Modèle chargé: {model_file}")
             else:
-                # Tentative ancien format .h5
                 old_model_path = f"{filepath}_model.h5"
                 if os.path.exists(old_model_path):
-                    self.model = keras.models.load_model(old_model_path)
+                    self.model = self.keras.models.load_model(old_model_path)
                     self.logging.info(f"✅ Ancien modèle chargé: {old_model_path}")
                 else:
                     self.logging.warning(f"⚠️ Aucun modèle trouvé: {model_file} ou {old_model_path}")
                     return False
-
-            # Chargement données
             data_path = f"{filepath}_data.pkl"
             if os.path.exists(data_path):
                 with open(data_path, 'rb') as f:
@@ -528,7 +533,7 @@ class HandPositionRecognizer:
                 self.training_data = data.get('training_data', [])
                 self.training_labels = data.get('training_labels', [])
                 self.feature_size = data.get('feature_size', 64)
-                self.num_classes = data.get('num_classes', len(HAND_POSITIONS))
+                self.num_classes = data.get('num_classes', 8)
                 self.is_trained = data.get('is_trained', False)
                 self.total_predictions = data.get('total_predictions', 0)
                 self.confident_predictions = data.get('confident_predictions', 0)
@@ -537,6 +542,7 @@ class HandPositionRecognizer:
         except Exception as e:
             self.logging.error(f"❌ Erreur chargement: {e}")
             return False
+
 
 # === DÉTECTEUR PRINCIPAL AVEC IA ===
 class OptimizedBicolorGloveDetectorWithAI:
@@ -714,19 +720,28 @@ class OptimizedBicolorGloveDetectorWithAI:
             # === ANALYSE IA ===
             if detected and contour is not None and self.ai_enabled:
                 position, confidence = self._analyze_hand_position_ai(frame, contour)
-                
-                if position:
+
+                # --- Correction: n'afficher que les vraies positions en mode reconnaissance ---
+                if (
+                    self.ai_mode == "recognition"
+                    and position
+                    and position != "training_complete"
+                    and position in [p.name for p in HAND_POSITIONS.values()]
+                ):
                     self.current_position = position
                     self.current_position_confidence = confidence
                     self.ai_position_detections += 1
-                    
+
                     # Commandes drone si activées
                     if self.drone_commands_enabled:
                         self._execute_drone_command(position, confidence)
-                
+                else:
+                    self.current_position = None
+                    self.current_position_confidence = 0.0
+
                 # Visualisation IA
                 frame = self._draw_ai_overlay(frame, contour, position, confidence)
-            
+
             # Visualisation détection
             if detected and contour is not None:
                 self._draw_detection_overlay(frame, contour, area, quality_score)
@@ -744,31 +759,37 @@ class OptimizedBicolorGloveDetectorWithAI:
         """Analyse IA de la position de la main"""
         try:
             if not self.ai_enabled or not self.feature_extractor or not self.position_recognizer:
+                self.logging.info("[DEBUG] IA non activée ou modules manquants")
                 return None, 0.0
-            
+
             bounding_rect = cv2.boundingRect(contour)
-            
+
             # Mode entraînement
             if self.ai_mode == "training":
                 return self._handle_training_mode(frame, contour, bounding_rect)
-            
+
             # Mode reconnaissance
             elif self.ai_mode == "recognition" and self.position_recognizer.is_trained:
                 features = self.feature_extractor.extract_complete_features(
                     frame, contour, bounding_rect
                 )
-                
+                self.logging.info(f"[DEBUG] Features: {features[:8]}... sum={np.sum(features):.2f}")
+
                 predicted_class, confidence = self.position_recognizer.predict_position(features)
-                
+                self.logging.info(f"[DEBUG] Prédiction brute: class={predicted_class}, confiance={confidence:.3f}")
+
                 if predicted_class is not None:
                     position_name = HAND_POSITIONS[predicted_class].name
+                    self.logging.info(f"[DEBUG] Position IA: {position_name}, confiance: {confidence:.3f}")
                     return position_name, confidence
-            
+
+            self.logging.info("[DEBUG] Aucun résultat IA ou modèle non entraîné")
             return None, 0.0
-            
+
         except Exception as e:
             self.logging.debug(f"Erreur analyse IA: {e}")
             return None, 0.0
+
     
     def _handle_training_mode(self, frame, contour, bounding_rect):
         """Gestion du mode entraînement"""
@@ -776,41 +797,56 @@ class OptimizedBicolorGloveDetectorWithAI:
             if self.training_class >= len(HAND_POSITIONS):
                 # Fin d'entraînement
                 self._start_model_training()
+                self.current_training_distance_msg = ""
                 return "training_complete", 1.0
-            
+
             position = HAND_POSITIONS[self.training_class]
-            
+
+            # --- Mesure la distance main/caméra (ici : utilise la surface du contour) ---
+            area = cv2.contourArea(contour)
+            if area > 10000:
+                distance_msg = "Reculez un peu"
+            elif area < 2500:
+                distance_msg = "Avancez la main"
+            else:
+                distance_msg = "Distance OK"
+            # Stocke le message pour affichage dans l’overlay
+            self.current_training_distance_msg = distance_msg
+
             # Compte à rebours pour capture
             if self.training_countdown > 0:
                 self.training_countdown -= 1
                 return f"training_{position.name}", self.training_countdown / 60.0
-            
+
             # Capture d'échantillon
             features = self.feature_extractor.extract_complete_features(
                 frame, contour, bounding_rect
             )
-            
+
             success = self.position_recognizer.add_training_sample(features, self.training_class)
             if success:
-                samples_count = len([l for l in self.position_recognizer.training_labels 
-                                   if l == self.training_class])
-                
+                samples_count = len([l for l in self.position_recognizer.training_labels
+                                    if l == self.training_class])
+
                 if samples_count >= self.training_samples_per_class:
                     self.training_class += 1
                     self.training_countdown = 60  # 2 secondes de pause
                     if self.training_class < len(HAND_POSITIONS):
                         next_position = HAND_POSITIONS[self.training_class]
                         self.logging.info(f"📝 Position suivante: {next_position.name}")
+                        self.current_training_distance_msg = ""  # Efface le message
                 else:
                     self.training_countdown = 30  # 1 seconde entre captures
-                
+
                 return f"captured_{position.name}", 1.0
-            
+
             return f"training_{position.name}", 0.0
-            
+
         except Exception as e:
             self.logging.error(f"Erreur mode entraînement: {e}")
+            self.current_training_distance_msg = ""
             return None, 0.0
+
     
     def _start_model_training(self):
         # === PROTECTION CONTRE MULTIPLE THREADS ===
@@ -915,7 +951,12 @@ class OptimizedBicolorGloveDetectorWithAI:
     def _draw_ai_overlay(self, frame, contour, position, confidence):
         """Visualisation overlay IA"""
         try:
-            if position and confidence > 0:
+            if (
+                position
+                and confidence > 0
+                and position != "training_complete"
+                and position in [p.name for p in HAND_POSITIONS.values()]
+            ):
                 # Couleur selon confiance
                 if confidence > 0.8:
                     color = (0, 255, 0)      # Vert
@@ -923,30 +964,30 @@ class OptimizedBicolorGloveDetectorWithAI:
                     color = (0, 255, 255)    # Jaune
                 else:
                     color = (0, 150, 255)    # Orange
-                
+
                 # Position sur la main
                 M = cv2.moments(contour)
                 if M["m00"] != 0:
                     cx = int(M["m10"] / M["m00"])
                     cy = int(M["m01"] / M["m00"])
-                    
+
                     # Cercle de confiance
                     radius = int(15 + confidence * 25)
                     cv2.circle(frame, (cx, cy), radius, color, 3)
-                    
+
                     # Nom de la position
                     cv2.putText(frame, position.upper(), (cx - 30, cy - 40),
-                               cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2)
-                    
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2)
+
                     # Confiance
                     cv2.putText(frame, f"{confidence:.2f}", (cx - 15, cy + 50),
-                               cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
-            
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
             return frame
-            
+
         except Exception as e:
             self.logging.debug(f"Erreur overlay IA: {e}")
             return frame
+
     
     def _draw_detection_overlay(self, frame, contour, area, quality_score):
         """Visualisation de la détection de base"""
@@ -977,7 +1018,7 @@ class OptimizedBicolorGloveDetectorWithAI:
         """Interface utilisateur complète"""
         try:
             h, w = frame.shape[:2]
-            
+
             # === STATUS PRINCIPAL ===
             if detected:
                 if self.current_position:
@@ -989,26 +1030,26 @@ class OptimizedBicolorGloveDetectorWithAI:
             else:
                 status = f"🔍 RECHERCHE GANT"
                 status_color = (100, 100, 255)
-            
+
             cv2.putText(frame, status, (10, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.7, status_color, 2)
-            
+
             # === MODE IA ===
             if self.ai_enabled:
                 ai_status = f"IA: Mode {self.ai_mode}"
                 if self.ai_mode == "training" and self.training_class < len(HAND_POSITIONS):
                     position = HAND_POSITIONS[self.training_class]
-                    samples = len([l for l in self.position_recognizer.training_labels 
-                                  if l == self.training_class])
+                    samples = len([l for l in self.position_recognizer.training_labels
+                                if l == self.training_class])
                     ai_status += f" | {position.name} ({samples}/{self.training_samples_per_class})"
                     if self.training_countdown > 0:
                         ai_status += f" | Capture dans {self.training_countdown//30 + 1}s"
                 elif self.position_recognizer.is_trained:
                     ai_status += " (Entraînée)"
-                
+
                 cv2.putText(frame, ai_status, (10, 65), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 200, 100), 2)
             else:
                 cv2.putText(frame, "IA: TensorFlow requis", (10, 65), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (100, 100, 100), 2)
-            
+
             # === COMMANDES DRONE ===
             if self.drone_commands_enabled:
                 drone_status = "🚁 COMMANDES ACTIVES"
@@ -1016,30 +1057,37 @@ class OptimizedBicolorGloveDetectorWithAI:
             else:
                 drone_status = "🚁 Commandes désactivées"
                 drone_color = (100, 100, 100)
-            
+
             cv2.putText(frame, drone_status, (10, 95), cv2.FONT_HERSHEY_SIMPLEX, 0.5, drone_color, 1)
-            
+
+            # === AFFICHAGE DU MESSAGE DE DISTANCE EN TRAINING ===
+            if self.ai_mode == "training" and hasattr(self, 'current_training_distance_msg'):
+                msg = self.current_training_distance_msg
+                if msg:
+                    cv2.putText(frame, f"Distance : {msg}", (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 180, 255), 2)
+
             # === STATISTIQUES ===
             if self.ai_enabled and self.ai_frame_count > 0:
                 detection_rate = (self.ai_position_detections / max(self.ai_frame_count, 1)) * 100
                 ai_stats = f"IA: {detection_rate:.1f}% positions détectées"
                 cv2.putText(frame, ai_stats, (10, h - 60), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (200, 255, 200), 1)
-            
+
             # === POSITIONS DISPONIBLES ===
             if self.ai_mode == "recognition":
                 positions_text = "Positions: poing(URGENCE), paume(AVANCER), victoire(MONTÉE), ok(HOVER)"
                 cv2.putText(frame, positions_text, (10, h - 40), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
-            
+
             # === HISTORIQUE ===
             history = "".join(["●" if x else "○" for x in list(self.detection_history)[-15:]])
-            cv2.putText(frame, f"Historique: {history}", (10, h - 20), 
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
-            
+            cv2.putText(frame, f"Historique: {history}", (10, h - 20),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
+
             return frame
-            
+
         except Exception as e:
             self.logging.debug(f"Erreur interface: {e}")
             return frame
+
     
     # === MÉTHODES DE CONTRÔLE IA ===
     def start_ai_training(self):
