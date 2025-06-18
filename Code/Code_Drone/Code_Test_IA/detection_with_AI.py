@@ -335,7 +335,7 @@ class HandPositionRecognizer:
             self.logging.error(f"❌ Erreur ajout échantillon: {e}")
             return False
 
-    def train_model(self, validation_split=0.2, epochs=25, plot_curves=True, save_fig=True):
+    def train_model(self, validation_split=0.2, epochs=25, plot_curves=True, save_fig=True, show_confusion=True):
         if not self.tf_available:
             self.logging.error("❌ TensorFlow requis pour l'entraînement")
             return False
@@ -356,9 +356,13 @@ class HandPositionRecognizer:
             self.logging.info(f"[DEBUG TRAIN] Distribution des labels: {dict(zip(unique, counts))}")
             self.logging.info(f"[DEBUG TRAIN] X shape: {X.shape}, y shape: {y.shape}")
 
-            # Split manuel pour afficher le contenu
-            from sklearn.model_selection import train_test_split
-            X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=validation_split, stratify=y, random_state=42)
+            # Split train/validation manuellement pour garder l'équilibre par classe
+            from sklearn.model_selection import StratifiedShuffleSplit
+            sss = StratifiedShuffleSplit(n_splits=1, test_size=validation_split, random_state=42)
+            for train_idx, val_idx in sss.split(X, y):
+                X_train, X_val = X[train_idx], X[val_idx]
+                y_train, y_val = y[train_idx], y[val_idx]
+
             self.logging.info(f"Train y distrib: {dict(zip(*np.unique(y_train, return_counts=True)))}")
             self.logging.info(f"Val y distrib: {dict(zip(*np.unique(y_val, return_counts=True)))}")
             self.logging.info(f"Shapes - X_train: {X_train.shape}, y_train: {y_train.shape}, X_val: {X_val.shape}, y_val: {y_val.shape}")
@@ -372,15 +376,13 @@ class HandPositionRecognizer:
                 )
             ]
             self.logging.info(f"🚀 Entraînement: {len(X)} échantillons, {epochs} époques")
-
             history = self.model.fit(
                 X_train, y_train,
                 validation_data=(X_val, y_val),
                 epochs=epochs,
                 batch_size=min(16, len(X) // 4),
                 callbacks=callbacks,
-                verbose=0,
-                shuffle=True
+                verbose=0
             )
             final_accuracy = history.history['accuracy'][-1]
             val_accuracy = history.history.get('val_accuracy', [0])[-1]
@@ -388,7 +390,7 @@ class HandPositionRecognizer:
             self.logging.info(f"   Précision: {final_accuracy:.4f}")
             self.logging.info(f"   Validation: {val_accuracy:.4f}")
 
-            # Courbes d’apprentissage (inchangé)
+            # Courbes d’apprentissage
             if plot_curves:
                 try:
                     plt.figure(figsize=(10, 4))
@@ -414,11 +416,43 @@ class HandPositionRecognizer:
                 except Exception as e:
                     self.logging.warning(f"Erreur affichage/sauvegarde courbes : {e}")
 
-            # Score sur train
-            train_preds = self.model.predict(X, verbose=0)
-            train_acc = np.mean(np.argmax(train_preds, axis=1) == y)
-            self.logging.info(f"[DEBUG TRAIN] Accuracy (train set): {train_acc:.4f}")
-            self.logging.info(f"[DEBUG TRAIN] Sample preds (train set): {np.argmax(train_preds[:10], axis=1)} vs {y[:10]}")
+            # ---- MATRICE DE CONFUSION & stats détaillées par classe ----
+            from sklearn.metrics import confusion_matrix, classification_report
+            import seaborn as sns
+            class_names = [HAND_POSITIONS[i].name for i in range(self.num_classes)]
+
+            # Train
+            train_preds = np.argmax(self.model.predict(X_train, verbose=0), axis=1)
+            cm = confusion_matrix(y_train, train_preds)
+            plt.figure(figsize=(8, 7))
+            sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=class_names, yticklabels=class_names)
+            plt.xlabel('Prédit')
+            plt.ylabel('Vrai')
+            plt.title("Matrice de confusion (train)")
+            plt.tight_layout()
+            plt.show()
+            rep = classification_report(y_train, train_preds, target_names=class_names, digits=3)
+            self.logging.info("\n" + rep)
+
+            # Validation
+            if len(X_val) > 0:
+                val_preds = np.argmax(self.model.predict(X_val, verbose=0), axis=1)
+                cm_val = confusion_matrix(y_val, val_preds)
+                plt.figure(figsize=(8, 7))
+                sns.heatmap(cm_val, annot=True, fmt="d", cmap="Oranges", xticklabels=class_names, yticklabels=class_names)
+                plt.xlabel('Prédit')
+                plt.ylabel('Vrai')
+                plt.title("Matrice de confusion (validation)")
+                plt.tight_layout()
+                plt.show()
+                rep_val = classification_report(y_val, val_preds, target_names=class_names, digits=3)
+                self.logging.info("\n" + rep_val)
+
+            # Score sur tout le train (pour logs)
+            train_preds_full = np.argmax(self.model.predict(X, verbose=0), axis=1)
+            train_acc_full = np.mean(train_preds_full == y)
+            self.logging.info(f"[DEBUG TRAIN] Accuracy (full train set): {train_acc_full:.4f}")
+            self.logging.info(f"[DEBUG TRAIN] Sample preds (train set): {train_preds_full[:10]} vs {y[:10]}")
             test_pred = self.model.predict(X[0].reshape(1, -1), verbose=0)[0]
             self.logging.info(f"[DEBUG TRAIN] Pred 1st sample: class={np.argmax(test_pred)}, raw={test_pred}")
 
@@ -427,7 +461,6 @@ class HandPositionRecognizer:
         except Exception as e:
             self.logging.error(f"❌ Erreur entraînement: {e}")
             return False
-
 
     def predict_position(self, features, use_stabilization=True):
         if not self.tf_available or self.model is None or not self.is_trained:
@@ -607,7 +640,7 @@ class OptimizedBicolorGloveDetectorWithAI:
         self.ai_mode = "detection"  # "detection", "training", "recognition"
         self.training_class = 0
         self.training_countdown = 0
-        self.training_samples_per_class = 25
+        self.training_samples_per_class = 50
         
         # Position actuelle
         self.current_position = None
@@ -1082,12 +1115,20 @@ class OptimizedBicolorGloveDetectorWithAI:
             cv2.putText(frame, f"Historique: {history}", (10, h - 20),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
 
+            # === ÉCHANTILLONS PAR CLASSE EN TRAINING ===
+            if self.ai_mode == "training" and hasattr(self, 'position_recognizer'):
+                ylabels = self.position_recognizer.training_labels
+                txt = "Échantillons : "
+                for i, pos in HAND_POSITIONS.items():
+                    n = len([y for y in ylabels if y == i])
+                    txt += f"{pos.name}({n}) "
+                cv2.putText(frame, txt, (10, h - 80), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (200, 200, 255), 1)
+
             return frame
 
         except Exception as e:
             self.logging.debug(f"Erreur interface: {e}")
             return frame
-
     
     # === MÉTHODES DE CONTRÔLE IA ===
     def start_ai_training(self):
