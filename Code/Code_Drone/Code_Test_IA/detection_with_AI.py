@@ -356,6 +356,13 @@ class HandPositionRecognizer:
             self.logging.info(f"[DEBUG TRAIN] Distribution des labels: {dict(zip(unique, counts))}")
             self.logging.info(f"[DEBUG TRAIN] X shape: {X.shape}, y shape: {y.shape}")
 
+            # Split manuel pour afficher le contenu
+            from sklearn.model_selection import train_test_split
+            X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=validation_split, stratify=y, random_state=42)
+            self.logging.info(f"Train y distrib: {dict(zip(*np.unique(y_train, return_counts=True)))}")
+            self.logging.info(f"Val y distrib: {dict(zip(*np.unique(y_val, return_counts=True)))}")
+            self.logging.info(f"Shapes - X_train: {X_train.shape}, y_train: {y_train.shape}, X_val: {X_val.shape}, y_val: {y_val.shape}")
+
             callbacks = [
                 self.keras.callbacks.EarlyStopping(
                     monitor='val_loss', patience=10, restore_best_weights=True
@@ -365,13 +372,15 @@ class HandPositionRecognizer:
                 )
             ]
             self.logging.info(f"🚀 Entraînement: {len(X)} échantillons, {epochs} époques")
+
             history = self.model.fit(
-                X, y,
-                validation_split=validation_split,
+                X_train, y_train,
+                validation_data=(X_val, y_val),
                 epochs=epochs,
                 batch_size=min(16, len(X) // 4),
                 callbacks=callbacks,
-                verbose=0
+                verbose=0,
+                shuffle=True
             )
             final_accuracy = history.history['accuracy'][-1]
             val_accuracy = history.history.get('val_accuracy', [0])[-1]
@@ -379,7 +388,7 @@ class HandPositionRecognizer:
             self.logging.info(f"   Précision: {final_accuracy:.4f}")
             self.logging.info(f"   Validation: {val_accuracy:.4f}")
 
-            # Courbes d’apprentissage
+            # Courbes d’apprentissage (inchangé)
             if plot_curves:
                 try:
                     plt.figure(figsize=(10, 4))
@@ -418,6 +427,7 @@ class HandPositionRecognizer:
         except Exception as e:
             self.logging.error(f"❌ Erreur entraînement: {e}")
             return False
+
 
     def predict_position(self, features, use_stabilization=True):
         if not self.tf_available or self.model is None or not self.is_trained:
