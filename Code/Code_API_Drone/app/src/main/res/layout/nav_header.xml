@@ -2,22 +2,16 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="#2196F3"
     android:orientation="vertical"
-    android:padding="8dp">
+    android:padding="16dp">
 
     <TextView
-        android:id="@+id/textViewDeviceName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="Application Drone"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
         android:textStyle="bold"
-        android:textSize="16sp"
-        android:text="Device Name" />
-
-    <TextView
-        android:id="@+id/textViewDeviceAddress"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:text="Device Address" />
-
+        android:gravity="center"/>
 </LinearLayout> 

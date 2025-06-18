@@ -1,116 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragment1">
+    android:orientation="vertical"
+    android:padding="16dp">
 
     <ImageView
-        android:id="@+id/imageViewDrone"
+        android:id="@+id/monImage"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:layout_marginTop="16dp"
-        android:src="@drawable/parrot_bebop_2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:contentDescription="Image du drone"
+        android:src="@drawable/drone"
+        android:scaleType="fitCenter"
+        android:layout_marginBottom="16dp"/>
 
     <TextView
-        android:id="@+id/textViewBluetoothStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Bluetooth activé et permissions OK"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/imageViewDrone" />
-
-    <Button
-        android:id="@+id/buttonPermissionsBT"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="32dp"
-        android:text="Permissions BT"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textViewBluetoothStatus" />
-
-    <Button
-        android:id="@+id/buttonActiverBT"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="32dp"
-        android:text="Activer BT"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/buttonPermissionsBT" />
-
-    <Button
-        android:id="@+id/buttonRechercherAppareils"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="32dp"
-        android:text="Rechercher des appareils"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/buttonActiverBT" />
-
-    <TextView
-        android:id="@+id/textViewAppareilsTrouves"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="16dp"
-        android:text="Appareils trouvés :"
-        android:textSize="16sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/buttonRechercherAppareils" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewDevices"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@id/linearLayoutNavigation"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textViewAppareilsTrouves" />
-
-    <LinearLayout
-        android:id="@+id/linearLayoutNavigation"
+        android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="2"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        android:layout_marginBottom="16dp"
+        android:textSize="16sp"
+        android:gravity="center"/>
 
-        <Button
-            android:id="@+id/button_back"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Arrière" />
+    <Button
+        android:id="@+id/btnPermissionsBT"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Permissions BT"
+        android:layout_marginBottom="8dp"/>
 
-        <Button
-            android:id="@+id/button_next"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Suivante" />
+    <Button
+        android:id="@+id/btnActiverBT"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Activer BT"
+        android:enabled="false"
+        android:layout_marginBottom="16dp"/>
 
-    </LinearLayout>
+    <ListView
+        android:id="@+id/listView1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginBottom="8dp"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout> 
+    <Button
+        android:id="@+id/btnAppareilsAssocies"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Recherche des appareils"
+        android:layout_marginBottom="8dp"/>
+
+    <Button
+        android:id="@+id/btnEffacerListe"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Effacer la liste"
+        android:layout_marginBottom="8dp"/>
+
+</LinearLayout> 
