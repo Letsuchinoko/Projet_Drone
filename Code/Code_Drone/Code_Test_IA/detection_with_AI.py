@@ -249,256 +249,213 @@ class AdvancedHandFeatureExtractor:
             self.logging.debug(f"Erreur extraction complète: {e}")
             return np.zeros(self.feature_size, dtype=np.float32)
 
-# === MODÈLE TENSORFLOW CORRIGÉ ===
-class HandPositionRecognizer:
-    """Modèle de reconnaissance de position - VERSION CORRIGÉE"""
-    
-    def __init__(self, feature_size=64, num_classes=len(HAND_POSITIONS)):
-        self.feature_size = feature_size
-        self.num_classes = num_classes
-        self.model = None
-        self.is_trained = False
-        self.training_data = []
-        self.training_labels = []
-        self.logging = logging.getLogger(__name__)
+    class HandPositionRecognizer:
+        """Modèle de reconnaissance de position - VERSION CORRIGÉE AVEC DEBUG SPLIT/PROBA"""
         
-        # Historique prédictions
-        self.prediction_history = deque(maxlen=7)
-        self.confidence_history = deque(maxlen=5)
-        
-        # Variables pour optimisation prédictions
-        self.last_prediction_time = 0
-        self.last_prediction_result = (None, 0.0)
-        self.prediction_interval = 0.2  # 5 FPS max
-        
-        # Métriques
-        self.total_predictions = 0
-        self.confident_predictions = 0
-        
-        self.tf_available = TF_AVAILABLE
-        if not self.tf_available:
-            self.logging.warning("⚠️ TensorFlow non disponible - IA désactivée")
-    
-    def create_model(self):
-        """Création du modèle"""
-        if not self.tf_available:
-            return False
-            
-        try:
-            model = keras.Sequential([
-                layers.Dense(128, activation='relu', input_shape=(self.feature_size,)),
-                layers.BatchNormalization(),
-                layers.Dropout(0.3),
-                
-                layers.Dense(96, activation='relu'),
-                layers.BatchNormalization(),
-                layers.Dropout(0.4),
-                
-                layers.Dense(64, activation='relu'),
-                layers.BatchNormalization(),
-                layers.Dropout(0.3),
-                
-                layers.Dense(32, activation='relu'),
-                layers.Dropout(0.2),
-                
-                layers.Dense(self.num_classes, activation='softmax')
-            ])
-            
-            model.compile(
-                optimizer=keras.optimizers.Adam(learning_rate=0.001),
-                loss='sparse_categorical_crossentropy',
-                metrics=['accuracy']
-            )
-            
-            self.model = model
-            self.logging.info(f"✅ Modèle créé: {model.count_params()} paramètres")
-            return True
-            
-        except Exception as e:
-            self.logging.error(f"❌ Erreur création modèle: {e}")
-            return False
-    
-    def add_training_sample(self, features, position_class):
-        """Ajout échantillon d'entraînement"""
-        if not self.tf_available:
-            return False
-            
-        try:
-            if len(features) != self.feature_size:
-                self.logging.warning(f"Taille features incorrecte: {len(features)} vs {self.feature_size}")
-                return False
-            
-            self.training_data.append(features.copy())
-            self.training_labels.append(position_class)
-            
-            position_name = HAND_POSITIONS[position_class].name
-            self.logging.info(f"📊 Échantillon ajouté: {position_name} - Total: {len(self.training_data)}")
-            return True
-            
-        except Exception as e:
-            self.logging.error(f"❌ Erreur ajout échantillon: {e}")
-            return False
-    
-    def train_model(self, validation_split=0.2, epochs=25):
-        """Entraînement du modèle - VERSION DEBUGGÉE"""
-        if not self.tf_available:
-            self.logging.error("❌ TensorFlow requis pour l'entraînement")
-            return False
-            
-        try:
-            if len(self.training_data) < 10:
-                self.logging.warning("⚠️ Pas assez de données (min 10)")
-                return False
-            
-            if self.model is None:
-                if not self.create_model():
-                    return False
-            
-            X = np.array(self.training_data, dtype=np.float32)
-            y = np.array(self.training_labels, dtype=np.int32)
-            
-            # === DEBUG: Inspecte le dataset
-            self.logging.info(
-                f"[DEBUG TRAIN] First train features: {X[0][:8]}... sum={np.sum(X[0]):.2f}, min={np.min(X[0]):.2f}, max={np.max(X[0]):.2f}"
-            )
-            self.logging.info(f"[DEBUG TRAIN] Labels (premiers): {y[:10]}")
-            unique, counts = np.unique(y, return_counts=True)
-            self.logging.info(f"[DEBUG TRAIN] Distribution des labels: {dict(zip(unique, counts))}")
-            self.logging.info(f"[DEBUG TRAIN] X shape: {X.shape}, y shape: {y.shape}")
+        def __init__(self, feature_size=64, num_classes=len(HAND_POSITIONS)):
+            self.feature_size = feature_size
+            self.num_classes = num_classes
+            self.model = None
+            self.is_trained = False
+            self.training_data = []
+            self.training_labels = []
+            self.logging = logging.getLogger(__name__)
+            self.prediction_history = deque(maxlen=7)
+            self.confidence_history = deque(maxlen=5)
+            self.last_prediction_time = 0
+            self.last_prediction_result = (None, 0.0)
+            self.prediction_interval = 0.2  # 5 FPS max
+            self.total_predictions = 0
+            self.confident_predictions = 0
+            self.tf_available = TF_AVAILABLE
+            if not self.tf_available:
+                self.logging.warning("⚠️ TensorFlow non disponible - IA désactivée")
 
-            callbacks = [
-                keras.callbacks.EarlyStopping(
-                    monitor='val_loss',
-                    patience=10,
-                    restore_best_weights=True
-                ),
-                keras.callbacks.ReduceLROnPlateau(
-                    monitor='val_loss',
-                    factor=0.7,
-                    patience=5,
-                    min_lr=1e-6
+        def create_model(self):
+            if not self.tf_available:
+                return False
+            try:
+                model = keras.Sequential([
+                    layers.Dense(128, activation='relu', input_shape=(self.feature_size,)),
+                    layers.BatchNormalization(),
+                    layers.Dropout(0.3),
+                    layers.Dense(96, activation='relu'),
+                    layers.BatchNormalization(),
+                    layers.Dropout(0.4),
+                    layers.Dense(64, activation='relu'),
+                    layers.BatchNormalization(),
+                    layers.Dropout(0.3),
+                    layers.Dense(32, activation='relu'),
+                    layers.Dropout(0.2),
+                    layers.Dense(self.num_classes, activation='softmax')
+                ])
+                model.compile(
+                    optimizer=keras.optimizers.Adam(learning_rate=0.001),
+                    loss='sparse_categorical_crossentropy',
+                    metrics=['accuracy']
                 )
-            ]
-            
-            self.logging.info(f"🚀 Entraînement: {len(X)} échantillons, {epochs} époques")
-            
-            history = self.model.fit(
-                X, y,
-                validation_split=validation_split,
-                epochs=epochs,
-                batch_size=min(16, len(X) // 4),  # Batch size réduit
-                callbacks=callbacks,
-                verbose=0  # Supprime les logs TensorFlow
-            )
-            
-            final_accuracy = history.history['accuracy'][-1]
-            val_accuracy = history.history.get('val_accuracy', [0])[-1]
-            
-            self.logging.info(f"✅ Entraînement terminé:")
-            self.logging.info(f"   Précision: {final_accuracy:.4f}")
-            self.logging.info(f"   Validation: {val_accuracy:.4f}")
-            
-            # === DEBUG: Score sur le jeu d'entraînement complet
-            train_preds = self.model.predict(X, verbose=0)
-            train_acc = np.mean(np.argmax(train_preds, axis=1) == y)
-            self.logging.info(f"[DEBUG TRAIN] Accuracy (train set): {train_acc:.4f}")
-            self.logging.info(f"[DEBUG TRAIN] Sample preds (train set): {np.argmax(train_preds[:10], axis=1)} vs {y[:10]}")
-            
-            # DEBUG: Test prédiction brute sur le 1er échantillon
-            test_pred = self.model.predict(X[0].reshape(1, -1), verbose=0)[0]
-            self.logging.info(f"[DEBUG TRAIN] Pred 1st sample: class={np.argmax(test_pred)}, raw={test_pred}")
+                self.model = model
+                self.logging.info(f"✅ Modèle créé: {model.count_params()} paramètres")
+                return True
+            except Exception as e:
+                self.logging.error(f"❌ Erreur création modèle: {e}")
+                return False
 
-            self.is_trained = True
-            return True
-            
-        except Exception as e:
-            self.logging.error(f"❌ Erreur entraînement: {e}")
-            return False
+        def add_training_sample(self, features, position_class):
+            if not self.tf_available:
+                return False
+            try:
+                if len(features) != self.feature_size:
+                    self.logging.warning(f"Taille features incorrecte: {len(features)} vs {self.feature_size}")
+                    return False
+                self.training_data.append(features.copy())
+                self.training_labels.append(position_class)
+                position_name = HAND_POSITIONS[position_class].name
+                self.logging.info(f"📊 Échantillon ajouté: {position_name} - Total: {len(self.training_data)}")
+                return True
+            except Exception as e:
+                self.logging.error(f"❌ Erreur ajout échantillon: {e}")
+                return False
 
-    def predict_position(self, features, use_stabilization=True):
-        """Prédiction optimisée - VERSION CORRIGÉE"""
-        if not self.tf_available or self.model is None or not self.is_trained:
-            return None, 0.0
-            
-        try:
-            if len(features) != self.feature_size:
+        def train_model(self, validation_split=0.2, epochs=25):
+            if not self.tf_available:
+                self.logging.error("❌ TensorFlow requis pour l'entraînement")
+                return False
+            try:
+                if len(self.training_data) < 10:
+                    self.logging.warning("⚠️ Pas assez de données (min 10)")
+                    return False
+                if self.model is None:
+                    if not self.create_model():
+                        return False
+                X = np.array(self.training_data, dtype=np.float32)
+                y = np.array(self.training_labels, dtype=np.int32)
+
+                # === DEBUG: Inspecte le dataset
+                self.logging.info(
+                    f"[DEBUG TRAIN] First train features: {X[0][:8]}... sum={np.sum(X[0]):.2f}, min={np.min(X[0]):.2f}, max={np.max(X[0]):.2f}"
+                )
+                self.logging.info(f"[DEBUG TRAIN] Labels (premiers): {y[:10]}")
+                unique, counts = np.unique(y, return_counts=True)
+                self.logging.info(f"[DEBUG TRAIN] Distribution des labels: {dict(zip(unique, counts))}")
+                self.logging.info(f"[DEBUG TRAIN] X shape: {X.shape}, y shape: {y.shape}")
+
+                # ==== AJOUT DEBUG SPLIT ====
+                from sklearn.model_selection import train_test_split
+                X_train, X_val, y_train, y_val = train_test_split(
+                    X, y, test_size=validation_split, stratify=y, random_state=42
+                )
+                self.logging.info(
+                    f"[DEBUG TRAIN] Split: X_train={X_train.shape}, X_val={X_val.shape}, y_train={y_train.shape}, y_val={y_val.shape}"
+                )
+                self.logging.info(f"[DEBUG TRAIN] y_val distribution: {np.bincount(y_val)}")
+
+                callbacks = [
+                    keras.callbacks.EarlyStopping(
+                        monitor='val_loss',
+                        patience=10,
+                        restore_best_weights=True
+                    ),
+                    keras.callbacks.ReduceLROnPlateau(
+                        monitor='val_loss',
+                        factor=0.7,
+                        patience=5,
+                        min_lr=1e-6
+                    )
+                ]
+                self.logging.info(f"🚀 Entraînement: {len(X)} échantillons, {epochs} époques")
+                history = self.model.fit(
+                    X_train, y_train,
+                    validation_data=(X_val, y_val),
+                    epochs=epochs,
+                    batch_size=min(16, len(X) // 4),
+                    callbacks=callbacks,
+                    verbose=0
+                )
+                final_accuracy = history.history['accuracy'][-1]
+                val_accuracy = history.history.get('val_accuracy', [0])[-1]
+                self.logging.info(f"✅ Entraînement terminé:")
+                self.logging.info(f"   Précision: {final_accuracy:.4f}")
+                self.logging.info(f"   Validation: {val_accuracy:.4f}")
+
+                # === DEBUG: Score sur le jeu d'entraînement complet
+                train_preds = self.model.predict(X, verbose=0)
+                train_acc = np.mean(np.argmax(train_preds, axis=1) == y)
+                self.logging.info(f"[DEBUG TRAIN] Accuracy (train set): {train_acc:.4f}")
+                self.logging.info(f"[DEBUG TRAIN] Sample preds (train set): {np.argmax(train_preds[:10], axis=1)} vs {y[:10]}")
+                # DEBUG: Test prédiction brute sur le 1er échantillon
+                test_pred = self.model.predict(X[0].reshape(1, -1), verbose=0)[0]
+                self.logging.info(f"[DEBUG TRAIN] Pred 1st sample: class={np.argmax(test_pred)}, raw={test_pred}")
+                self.is_trained = True
+                return True
+            except Exception as e:
+                self.logging.error(f"❌ Erreur entraînement: {e}")
+                return False
+
+        def predict_position(self, features, use_stabilization=True):
+            if not self.tf_available or self.model is None or not self.is_trained:
                 return None, 0.0
-            
-            self.logging.info(f"[DEBUG PREDICT] Features min={features.min():.2f} max={features.max():.2f} sum={features.sum():.2f} | shape={features.shape}")
-            
-            # Limitation fréquence
-            current_time = time.time()
-            if current_time - self.last_prediction_time < self.prediction_interval:
-                return self.last_prediction_result
-            
-            # Prédiction
-            features_batch = features.reshape(1, -1)
-            prediction = self.model.predict(features_batch, verbose=0, batch_size=1)[0]
-            
-            predicted_class = np.argmax(prediction)
-            confidence = prediction[predicted_class]
-            
-            self.last_prediction_time = current_time
-            self.total_predictions += 1
-            
-            # Stabilisation
-            if use_stabilization:
-                self.prediction_history.append((predicted_class, confidence))
-                self.confidence_history.append(confidence)
-                
-                if len(self.prediction_history) >= 3:
-                    recent_classes = [p[0] for p in list(self.prediction_history)[-3:]]
-                    recent_confidences = [p[1] for p in list(self.prediction_history)[-3:]]
-                    
-                    from collections import Counter
-                    class_counts = Counter(recent_classes)
-                    most_common_class, count = class_counts.most_common(1)[0]
-                    
-                    if count >= 2:
-                        class_confidences = [conf for cls, conf in zip(recent_classes, recent_confidences) 
-                                           if cls == most_common_class]
-                        avg_confidence = np.mean(class_confidences)
-                        
-                        predicted_class = most_common_class
-                        confidence = avg_confidence
-            
-            # Validation seuil
-            if predicted_class in HAND_POSITIONS:
-                threshold = HAND_POSITIONS[predicted_class].confidence_threshold
-                if confidence >= threshold:
-                    self.confident_predictions += 1
-                    result = (predicted_class, confidence)
-                    self.last_prediction_result = result
-                    return result
-            
-            result = (None, confidence)
-            self.last_prediction_result = result
-            return result
-            
-        except Exception as e:
-            self.logging.debug(f"Erreur prédiction: {e}")
-            return None, 0.0
-    
+            try:
+                if len(features) != self.feature_size:
+                    return None, 0.0
+                self.logging.info(f"[DEBUG PREDICT] Features min={features.min():.2f} max={features.max():.2f} sum={features.sum():.2f} | shape={features.shape}")
+
+                current_time = time.time()
+                if current_time - self.last_prediction_time < self.prediction_interval:
+                    return self.last_prediction_result
+                features_batch = features.reshape(1, -1)
+                probs = self.model.predict(features_batch, verbose=0, batch_size=1)[0]
+                pred_class = np.argmax(probs)
+                conf = probs[pred_class]
+                # ==== AJOUT DEBUG PROBAS ====
+                self.logging.info(f"[DEBUG] Probas: {probs}, sum={probs.sum()}")
+
+                self.last_prediction_time = current_time
+                self.total_predictions += 1
+                # Stabilisation
+                if use_stabilization:
+                    self.prediction_history.append((pred_class, conf))
+                    self.confidence_history.append(conf)
+                    if len(self.prediction_history) >= 3:
+                        recent_classes = [p[0] for p in list(self.prediction_history)[-3:]]
+                        recent_confidences = [p[1] for p in list(self.prediction_history)[-3:]]
+                        from collections import Counter
+                        class_counts = Counter(recent_classes)
+                        most_common_class, count = class_counts.most_common(1)[0]
+                        if count >= 2:
+                            class_confidences = [conf for cls, conf in zip(recent_classes, recent_confidences)
+                                                if cls == most_common_class]
+                            avg_confidence = np.mean(class_confidences)
+                            pred_class = most_common_class
+                            conf = avg_confidence
+                if pred_class in HAND_POSITIONS:
+                    threshold = HAND_POSITIONS[pred_class].confidence_threshold
+                    if conf >= threshold:
+                        self.confident_predictions += 1
+                        result = (pred_class, conf)
+                        self.last_prediction_result = result
+                        return result
+                result = (None, conf)
+                self.last_prediction_result = result
+                return result
+            except Exception as e:
+                self.logging.debug(f"Erreur prédiction: {e}")
+                return None, 0.0
+
     def get_prediction_stats(self):
-        """Statistiques des prédictions"""
         if self.total_predictions == 0:
             return "Aucune prédiction"
-        
         confidence_rate = (self.confident_predictions / self.total_predictions) * 100
         avg_confidence = np.mean(self.confidence_history) if self.confidence_history else 0
-        
         return f"Confiance: {confidence_rate:.1f}% | Moy: {avg_confidence:.2f}"
-    
+
     def save_model(self, filepath="hand_position_model"):
         if not self.tf_available or self.model is None:
             return False
         try:
-            # --- Correction sauvegarde avec extension .keras ---
             model_file = f"{filepath}_model.keras"
             self.model.save(model_file)
             self.logging.info(f"✅ Modèle sauvegardé dans {model_file}")
-
-            # Sauvegarde des données
             data_path = f"{filepath}_data.pkl"
             with open(data_path, 'wb') as f:
                 import pickle
@@ -518,17 +475,14 @@ class HandPositionRecognizer:
             return False
 
     def load_model(self, filepath="hand_position_model"):
-        """Chargement du modèle - VERSION CORRIGÉE"""
         if not self.tf_available:
             return False
         try:
-            # --- Correction chargement .keras d'abord ---
             model_file = f"{filepath}_model.keras"
             if os.path.exists(model_file):
                 self.model = keras.models.load_model(model_file)
                 self.logging.info(f"✅ Modèle chargé: {model_file}")
             else:
-                # Tentative ancien format .h5
                 old_model_path = f"{filepath}_model.h5"
                 if os.path.exists(old_model_path):
                     self.model = keras.models.load_model(old_model_path)
@@ -536,8 +490,6 @@ class HandPositionRecognizer:
                 else:
                     self.logging.warning(f"⚠️ Aucun modèle trouvé: {model_file} ou {old_model_path}")
                     return False
-
-            # Chargement données
             data_path = f"{filepath}_data.pkl"
             if os.path.exists(data_path):
                 with open(data_path, 'rb') as f:
@@ -551,10 +503,17 @@ class HandPositionRecognizer:
                 self.total_predictions = data.get('total_predictions', 0)
                 self.confident_predictions = data.get('confident_predictions', 0)
                 self.logging.info(f"✅ Données chargées: {len(self.training_data)} échantillons")
+            # ==== TEST DU MODÈLE CHARGÉ SUR UN SAMPLE ====
+            if self.training_data:
+                X = np.array(self.training_data, dtype=np.float32)
+                test_pred = self.model.predict(X[0].reshape(1, -1), verbose=0)[0]
+                self.logging.info(f"[DEBUG LOAD] Pred sur train[0]: {test_pred}")
             return True
         except Exception as e:
             self.logging.error(f"❌ Erreur chargement: {e}")
             return False
+
+
 
 # === DÉTECTEUR PRINCIPAL AVEC IA ===
 class OptimizedBicolorGloveDetectorWithAI:
