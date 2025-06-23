@@ -928,6 +928,8 @@ class OptimizedBicolorGloveDetectorWithAI:
             threshold = thresholds.get(position, 0.85)
             if confidence < threshold:
                 return False
+            
+            self.logging.info(f"[DEBUG] bebop = {bebop}, sensors = {getattr(bebop, 'sensors', None)}")
 
             # Accès au drone
             bebop = getattr(self, "bebop", None)
@@ -937,6 +939,7 @@ class OptimizedBicolorGloveDetectorWithAI:
 
             # Statut drone
             flying_state = getattr(bebop.sensors, "flying_state", "unknown")
+            self.logging.info(f"[DEBUG] bebop = {bebop}, sensors = {getattr(bebop, 'sensors', None)}")
             # flying_state est normalement "landed" ou "hovering" ou "flying"...
 
             # ——— Commandes sécurisées ———
@@ -1426,6 +1429,7 @@ def main_with_ai():
                 
                 elif key == ord('r'):
                     detector = OptimizedBicolorGloveDetectorWithAI()
+                    detector.bebop = bebop  # ← AJOUTE BIEN cette ligne ICI aussi !
                     logger.info("🔄 Détecteur reset")
                 
                 # Commandes IA (seulement si TensorFlow disponible)
@@ -1459,6 +1463,7 @@ def main_with_ai():
                             logger.warning("⚠️ Aucun modèle à charger")
                     
                     elif key == ord('c'):
+                        logger.info("[DEBUG] Touche 'c' pressée, toggle_drone_commands va être appelé")
                         status = detector.toggle_drone_commands()
                         if status:
                             logger.warning("⚠️ ATTENTION: Gestes contrôlent le drone!")
