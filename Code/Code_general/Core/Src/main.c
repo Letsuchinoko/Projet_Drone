@@ -116,91 +116,78 @@ int main(void)
   MX_USART2_UART_Init();
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
-  sprintf(msgtest,"TEST MODULE BLUETOOTH DRONE\r\n");
-  HAL_UART_Transmit(&huart2, (uint8_t*)msgtest, strlen(msgtest), HAL_MAX_DELAY);
+
   //uint32_t last_test_transmit_time = HAL_GetTick(); // For test transmission
 
   while (1)
   {
+      // Sound Sensor reading (periodic)
+      HAL_ADC_Start(&hadc1);
+      if (HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK) {
+          adc_value = HAL_ADC_GetValue(&hadc1);
+          voltage = (adc_value / 4095.0f) * 3.3f;
+          db = 20.0f * log10f(voltage / 0.01f);
+      }
 
-  // Sound Sensor reading (periodic)
+      // GPS Data Handling
+      if (HAL_UART_Receive(&huart1, &c, 1, 10) == HAL_OK) {
+          // Store character if buffer has space
+          if (gps_rx_index < GPS_BUFFER_SIZE - 1) {
+              gps_rx_buffer[gps_rx_index++] = c;
+          }
 
-        // Lecture audio
-        HAL_ADC_Start(&hadc1);
-        if (HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK) {
-            adc_value = HAL_ADC_GetValue(&hadc1);
-            voltage = (adc_value / 4095.0f) * 3.3f;
-            db = 20.0f * log10f(voltage / 0.01f);
-            sprintf(msg, "Son: %.1f dB\r\n", db);
-        }
+          // Process when line ends or buffer full
+          if (c == '\n' || gps_rx_index >= GPS_BUFFER_SIZE - 1) {
+              gps_rx_buffer[gps_rx_index] = '\0'; // Null-terminate
 
-        // Nouvelle gestion GPS robuste
-        if (HAL_UART_Receive(&huart1, &c, 1, 10) == HAL_OK) {
-            // Accumule les caractères jusqu'à la fin de ligne ou buffer plein
-            if (gps_rx_index < GPS_BUFFER_SIZE - 1) {
-                gps_rx_buffer[gps_rx_index++] = c;
-            }
-            // Si fin de ligne ou buffer plein, traite la phrase
-            if (c == '\n' || gps_rx_index >= GPS_BUFFER_SIZE - 1) {
-                gps_rx_buffer[gps_rx_index] = '\0'; // Fin de chaîne
+              // Check if it's a GGA sentence
+              if (strstr((char*)gps_rx_buffer, "$GPGGA") ||
+                  strstr((char*)gps_rx_buffer, "$GNGGA")) {
 
-                // Debug : Affiche la phrase GPS reçue sur Bluetooth
-                HAL_UART_Transmit(&huart2, (uint8_t*)"GPS: ", 5, HAL_MAX_DELAY);
-                HAL_UART_Transmit(&huart2, gps_rx_buffer, strlen((char*)gps_rx_buffer), HAL_MAX_DELAY);
+                  // Initialize variables
+                  char latitude[12] = "";
+                  char longitude[12] = "";
+                  char altitude[10] = "";
+                  char lat_dir = 'N';
+                  char lon_dir = 'E';
 
-                // Vérifie si c'est une trame GGA
-                if (strstr((char*)gps_rx_buffer, "$GPGGA") == (char*)gps_rx_buffer ||
-                    strstr((char*)gps_rx_buffer, "$GNGGA") == (char*)gps_rx_buffer) {
+                  // Parse GGA sentence
+                  char *token = strtok((char*)gps_rx_buffer, ",");
+                  int field = 0;
 
-                    // Parsing de la trame GGA
-                    char *token;
-                    int field = 0;
-                    latitude[0] = longitude[0] = altitude[0] = '\0';
-                    lat_dir = lon_dir = ' ';
+                  while (token != NULL) {
+                      field++;
+                      switch (field) {
+                          case 3: // Latitude (DDMM.MMMM)
+                              strncpy(latitude, token, sizeof(latitude)-1);
+                              break;
+                          case 4: // N/S
+                              lat_dir = token[0];
+                              break;
+                          case 5: // Longitude (DDDMM.MMMM)
+                              strncpy(longitude, token, sizeof(longitude)-1);
+                              break;
+                          case 6: // E/W
+                              lon_dir = token[0];
+                              break;
+                          case 9: // Altitude (meters)
+                              strncpy(altitude, token, sizeof(altitude)-1);
+                              break;
+                      }
+                      token = strtok(NULL, ",");
+                  }
 
-                    // Copie pour strtok
-                    strncpy(temp_buffer, (char*)gps_rx_buffer, GPS_BUFFER_SIZE-1);
-                    temp_buffer[GPS_BUFFER_SIZE-1] = '\0';
+                  // Format and send combined message
+                  snprintf(combined_buffer, COMBINED_BUFFER_SIZE,
+                      "Lat:%s %c Lon:%s %c Alt:%sm | Son:%.1f dB\r\n",
+                      latitude, lat_dir, longitude, lon_dir, altitude, db);
 
-                    token = strtok(temp_buffer, ",");
-                    while (token != NULL && field < 15) {
-                        field++;
-                        switch (field) {
-                            case 3: // Latitude
-                                strncpy(latitude, token, sizeof(latitude)-1);
-                                latitude[sizeof(latitude)-1] = '\0';
-                                break;
-                            case 4: // N/S
-                                lat_dir = token[0];
-                                break;
-                            case 5: // Longitude
-                                strncpy(longitude, token, sizeof(longitude)-1);
-                                longitude[sizeof(longitude)-1] = '\0';
-                                break;
-                            case 6: // E/W
-                                lon_dir = token[0];
-                                break;
-                            case 10: // Altitude
-                                strncpy(altitude, token, sizeof(altitude)-1);
-                                altitude[sizeof(altitude)-1] = '\0';
-                                break;
-                        }
-                        token = strtok(NULL, ",");
-                    }
-
-                    // Formate et envoie le message combiné
-                    snprintf(combined_buffer, COMBINED_BUFFER_SIZE,
-                        "Lat:%s %c Lon:%s %c Alt:%s - %s",
-                        latitude, lat_dir, longitude, lon_dir, altitude, msg);
-                    HAL_UART_Transmit(&huart2, (uint8_t*)combined_buffer, strlen(combined_buffer), HAL_MAX_DELAY);
-                } else {
-                    // Pas une trame GGA, info debug
-                    HAL_UART_Transmit(&huart2, (uint8_t*)"Not GGA\r\n", 9, HAL_MAX_DELAY);
-                }
-                gps_rx_index = 0; // Réinitialise pour la prochaine phrase
-            }
-        }
-
+                  HAL_UART_Transmit(&huart2, (uint8_t*)combined_buffer,
+                      strlen(combined_buffer), HAL_MAX_DELAY);
+              }
+              gps_rx_index = 0; // Reset buffer
+          }
+      }
   }
   /* USER CODE END 2 */
 
@@ -377,7 +364,7 @@ static void MX_USART2_UART_Init(void)
 
   /* USER CODE END USART2_Init 1 */
   huart2.Instance = USART2;
-  huart2.Init.BaudRate = 9600;
+  huart2.Init.BaudRate = 115200;
   huart2.Init.WordLength = UART_WORDLENGTH_8B;
   huart2.Init.StopBits = UART_STOPBITS_1;
   huart2.Init.Parity = UART_PARITY_NONE;
