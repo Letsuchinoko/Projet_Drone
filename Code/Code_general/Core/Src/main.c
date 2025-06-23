@@ -138,46 +138,47 @@ int main(void)
 
           // Process when line ends or buffer full
           if (c == '\n' || gps_rx_index >= GPS_BUFFER_SIZE - 1) {
-              gps_rx_buffer[gps_rx_index] = '\0'; // Null-terminate
+              gps_rx_buffer[gps_rx_index] = '\0'; // Fin de chaîne
 
-              // Check if it's a GGA sentence
+              // Vérifier si c'est une phrase GGA
               if (strstr((char*)gps_rx_buffer, "$GPGGA") ||
                   strstr((char*)gps_rx_buffer, "$GNGGA")) {
 
-                  // Initialize variables
-                  char latitude[12] = "";
-                  char longitude[12] = "";
-                  char altitude[10] = "";
-                  char lat_dir = 'N';
-                  char lon_dir = 'E';
+                  // Effacer les valeurs précédentes
+                  latitude[0] = '\0';
+                  longitude[0] = '\0';
+                  altitude[0] = '\0';
+                  lat_dir = ' ';
+                  lon_dir = ' ';
 
-                  // Parse GGA sentence
                   char *token = strtok((char*)gps_rx_buffer, ",");
                   int field = 0;
 
                   while (token != NULL) {
-                      field++;
                       switch (field) {
-                          case 3: // Latitude (DDMM.MMMM)
+                          case 2: // Latitude
                               strncpy(latitude, token, sizeof(latitude)-1);
+                              latitude[sizeof(latitude)-1] = '\0';
                               break;
-                          case 4: // N/S
+                          case 3: // N/S
                               lat_dir = token[0];
                               break;
-                          case 5: // Longitude (DDDMM.MMMM)
+                          case 4: // Longitude
                               strncpy(longitude, token, sizeof(longitude)-1);
+                              longitude[sizeof(longitude)-1] = '\0';
                               break;
-                          case 6: // E/W
+                          case 5: // E/W
                               lon_dir = token[0];
                               break;
-                          case 9: // Altitude (meters)
+                          case 9: // Altitude
                               strncpy(altitude, token, sizeof(altitude)-1);
+                              altitude[sizeof(altitude)-1] = '\0';
                               break;
                       }
                       token = strtok(NULL, ",");
+                      field++;
                   }
 
-                  // Format and send combined message
                   snprintf(combined_buffer, COMBINED_BUFFER_SIZE,
                       "Lat:%s %c Lon:%s %c Alt:%sm | Son:%.1f dB\r\n",
                       latitude, lat_dir, longitude, lon_dir, altitude, db);
@@ -185,7 +186,7 @@ int main(void)
                   HAL_UART_Transmit(&huart2, (uint8_t*)combined_buffer,
                       strlen(combined_buffer), HAL_MAX_DELAY);
               }
-              gps_rx_index = 0; // Reset buffer
+              gps_rx_index = 0; // Réinitialiser le buffer
           }
       }
   }
