@@ -910,68 +910,109 @@ class OptimizedBicolorGloveDetectorWithAI:
             self._training_in_progress = False
     
     def _execute_drone_command(self, position, confidence):
-        """Exécution des commandes drone basées sur la position"""
         try:
             current_time = time.time()
             if current_time - self.last_command_time < self.command_cooldown:
                 return False
-            
-            if confidence < 0.65:  # Seuil de sécurité global
+
+            # Seuils (à adapter si besoin)
+            thresholds = {
+                "poing": 0.92,
+                "stop": 0.85,
+                "victoire": 0.80,
+                "paume": 0.80,
+                "ok": 0.85,
+                "index": 0.85,
+                "pouce": 0.85,
+                "salut": 0.80,
+            }
+            threshold = thresholds.get(position, 0.85)
+            if confidence < threshold:
                 return False
-            
-            # NOTE: Remplacez 'bebop' par votre instance de drone
-            # Exemple d'implémentation - adaptez selon votre code
-            
-            if position == "poing" and confidence > 0.9:
+
+            # Accès au drone
+            bebop = getattr(self, "bebop", None)
+            if bebop is None:
+                self.logging.warning("Aucune instance drone !")
+                return False
+
+            # Statut drone
+            flying_state = getattr(bebop.sensors, "flying_state", "unknown")
+            # flying_state est normalement "landed" ou "hovering" ou "flying"...
+
+            # ——— Commandes sécurisées ———
+            # 1. ARRÊT D’URGENCE/RETURN HOME
+            if position == "poing":
                 self.logging.warning("🚨 ARRÊT D'URGENCE - Poing détecté")
-                # bebop.emergency()
-                self.logging.info(">>> COMMANDE: EMERGENCY() <<<")
-                
-            elif position == "stop" and confidence > 0.85:
-                self.logging.info("🛑 STOP - Maintien position")
-                # bebop.hover()
-                self.logging.info(">>> COMMANDE: HOVER() <<<")
-                
-            elif position == "victoire" and confidence > 0.7:
-                self.logging.info("⬆️ MONTÉE - Signe V")
-                # bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=25, duration=0.8)
-                self.logging.info(">>> COMMANDE: MONTÉE +25 (0.8s) <<<")
-                
-            elif position == "pouce" and confidence > 0.75:
-                self.logging.info("👍 MONTÉE DOUCE - Pouce levé")
-                # bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=15, duration=0.5)
-                self.logging.info(">>> COMMANDE: MONTÉE +15 (0.5s) <<<")
-                
-            elif position == "paume" and confidence > 0.7:
-                self.logging.info("➡️ AVANCER - Paume ouverte")
-                # bebop.fly_direct(roll=0, pitch=20, yaw=0, vertical_movement=0, duration=0.6)
-                self.logging.info(">>> COMMANDE: AVANCER pitch+20 (0.6s) <<<")
-                
-            elif position == "index" and confidence > 0.75:
-                self.logging.info("🎯 AVANCER PRÉCIS - Index pointé")
-                # bebop.fly_direct(roll=0, pitch=15, yaw=0, vertical_movement=0, duration=0.4)
-                self.logging.info(">>> COMMANDE: AVANCER pitch+15 (0.4s) <<<")
-                
-            elif position == "salut" and confidence > 0.6:
-                self.logging.info("↺ ROTATION GAUCHE - Salut")
-                # bebop.fly_direct(roll=0, pitch=0, yaw=-30, vertical_movement=0, duration=0.6)
-                self.logging.info(">>> COMMANDE: ROTATION yaw-30 (0.6s) <<<")
-                
-            elif position == "ok" and confidence > 0.8:
-                self.logging.info("✅ HOVER - Signe OK")
-                # bebop.hover()
-                self.logging.info(">>> COMMANDE: HOVER() <<<")
-                
+                if flying_state == "landed":
+                    self.logging.info("Déjà posé. Aucun mouvement.")
+                else:
+                    bebop.safe_land(10)
+                    # Optionnel : bebop.return_home()
+                self.last_command_time = current_time
+                return True
+
+            # 2. MONTÉE/décollage (victoire)
+            elif position == "victoire":
+                if flying_state == "landed":
+                    self.logging.info("🛫 Décollage (victoire)")
+                    bebop.safe_takeoff(10)
+                else:
+                    self.logging.info("⬆️ Monter (victoire, en vol)")
+                    bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=10, duration=0.25)
+                self.last_command_time = current_time
+                return True
+
+            # 3. AVANCER (paume)
+            elif position == "paume" and flying_state != "landed":
+                self.logging.info("➡️ Avancer (paume)")
+                bebop.fly_direct(roll=0, pitch=12, yaw=0, vertical_movement=0, duration=0.18)
+                self.last_command_time = current_time
+                return True
+
+            # 4. AVANCER PRÉCIS (index)
+            elif position == "index" and flying_state != "landed":
+                self.logging.info("➡️ Avancer précis (index)")
+                bebop.fly_direct(roll=0, pitch=7, yaw=0, vertical_movement=0, duration=0.13)
+                self.last_command_time = current_time
+                return True
+
+            # 5. HOVER (ok)
+            elif position == "ok" and flying_state != "landed":
+                self.logging.info("✅ Hover (ok)")
+                bebop.hover()
+                self.last_command_time = current_time
+                return True
+
+            # 6. MONTÉE DOUCE (pouce)
+            elif position == "pouce" and flying_state != "landed":
+                self.logging.info("⬆️ Monter doux (pouce)")
+                bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=7, duration=0.13)
+                self.last_command_time = current_time
+                return True
+
+            # 7. STOP
+            elif position == "stop" and flying_state != "landed":
+                self.logging.info("🛑 STOP")
+                bebop.hover()
+                self.last_command_time = current_time
+                return True
+
+            # 8. ROTATION GAUCHE (salut)
+            elif position == "salut" and flying_state != "landed":
+                self.logging.info("↺ Rotation gauche (salut)")
+                bebop.fly_direct(roll=0, pitch=0, yaw=-18, vertical_movement=0, duration=0.15)
+                self.last_command_time = current_time
+                return True
+
             else:
                 self.logging.debug(f"Position {position} non exécutée (confiance: {confidence:.2f})")
                 return False
-            
-            self.last_command_time = current_time
-            return True
-            
+
         except Exception as e:
             self.logging.error(f"❌ Erreur commande drone: {e}")
             return False
+
     
     def _draw_ai_overlay(self, frame, contour, position, confidence):
         """Visualisation overlay IA"""
@@ -1309,6 +1350,7 @@ def main_with_ai():
 
         # === DÉTECTEUR AVEC IA ===
         detector = OptimizedBicolorGloveDetectorWithAI()
+        detector.bebop = bebop  # Ajoute cette ligne juste après la création du detector
         
         # === INTERFACE ===
         window_name = "Bebop 2 - IA Reconnaissance Position"
