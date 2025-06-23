@@ -495,7 +495,7 @@ class HandPositionRecognizer:
                         confidence = avg_confidence
             # ---- UTILISER LE DICT GLOBAL ----
             if predicted_class in HAND_POSITIONS:
-                threshold = 0.2
+                threshold = 0.3
                 if confidence >= threshold:
                     self.confident_predictions += 1
                     result = (predicted_class, confidence)
@@ -969,43 +969,43 @@ class OptimizedBicolorGloveDetectorWithAI:
                     bebop.safe_takeoff(10)
                 else:
                     self.logging.info("[DRONE CMD] En vol, fly_direct vertical (monter)")
-                    bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=10, duration=0.25)
+                    bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=25, duration=0.4)
                 self.last_command_time = current_time
                 return True
 
             elif position == "paume" and flying_state != "landed":
                 self.logging.info("[DRONE CMD] ➡️ Avancer (paume)")
-                bebop.fly_direct(roll=0, pitch=12, yaw=0, vertical_movement=0, duration=0.18)
+                bebop.fly_direct(roll=0, pitch=25, yaw=0, vertical_movement=0, duration=0.3)
                 self.last_command_time = current_time
                 return True
 
             elif position == "index" and flying_state != "landed":
                 self.logging.info("[DRONE CMD] ➡️ Avancer précis (index)")
-                bebop.fly_direct(roll=0, pitch=7, yaw=0, vertical_movement=0, duration=0.13)
+                bebop.fly_direct(roll=0, pitch=16, yaw=0, vertical_movement=0, duration=0.18)
                 self.last_command_time = current_time
                 return True
 
             elif position == "ok" and flying_state != "landed":
                 self.logging.info("[DRONE CMD] ✅ Hover (ok)")
-                bebop.hover()
+                bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=0, duration=0.5)
                 self.last_command_time = current_time
                 return True
 
             elif position == "pouce" and flying_state != "landed":
                 self.logging.info("[DRONE CMD] ⬆️ Monter doux (pouce)")
-                bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=7, duration=0.13)
+                bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=16, duration=0.22)
                 self.last_command_time = current_time
                 return True
 
             elif position == "stop" and flying_state != "landed":
                 self.logging.info("[DRONE CMD] 🛑 STOP")
-                bebop.hover()
+                bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=0, duration=0.5)
                 self.last_command_time = current_time
                 return True
 
             elif position == "salut" and flying_state != "landed":
                 self.logging.info("[DRONE CMD] ↺ Rotation gauche (salut)")
-                bebop.fly_direct(roll=0, pitch=0, yaw=-18, vertical_movement=0, duration=0.15)
+                bebop.fly_direct(roll=0, pitch=0, yaw=-30, vertical_movement=0, duration=0.25)
                 self.last_command_time = current_time
                 return True
 
