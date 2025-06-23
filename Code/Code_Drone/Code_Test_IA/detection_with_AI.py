@@ -975,13 +975,13 @@ class OptimizedBicolorGloveDetectorWithAI:
 
             elif position == "paume" and flying_state != "landed":
                 self.logging.info("[DRONE CMD] ➡️ Avancer (paume)")
-                bebop.fly_direct(roll=0, pitch=25, yaw=0, vertical_movement=0, duration=0.3)
+                bebop.fly_direct(roll=0, pitch=70, yaw=0, vertical_movement=0, duration=0.3)
                 self.last_command_time = current_time
                 return True
 
             elif position == "index" and flying_state != "landed":
                 self.logging.info("[DRONE CMD] ➡️ Avancer précis (index)")
-                bebop.fly_direct(roll=0, pitch=16, yaw=0, vertical_movement=0, duration=0.18)
+                bebop.fly_direct(roll=0, pitch=30, yaw=0, vertical_movement=0, duration=0.18)
                 self.last_command_time = current_time
                 return True
 
