@@ -412,9 +412,10 @@ class HandPositionRecognizer:
                         figname = f"training_curves_{stamp}.png"
                         plt.savefig(figname)
                         self.logging.info(f"📈 Courbes sauvegardées : {figname}")
-                    plt.show()
+                    plt.close()  # <-- FERMETURE explicite, pas de plt.show()
                 except Exception as e:
                     self.logging.warning(f"Erreur affichage/sauvegarde courbes : {e}")
+
 
             # ---- MATRICE DE CONFUSION & stats détaillées par classe ----
             from sklearn.metrics import confusion_matrix, classification_report
@@ -882,7 +883,7 @@ class OptimizedBicolorGloveDetectorWithAI:
 
     
     def _start_model_training(self):
-        # === PROTECTION CONTRE MULTIPLE THREADS ===
+        # On NE fait plus de thread : tout dans le thread principal pour éviter les bugs et que matplotlib/keras fonctionne bien.
         if hasattr(self, '_training_in_progress') and self._training_in_progress:
             self.logging.warning("⚠️ Entraînement déjà en cours - ignoré")
             return
@@ -890,32 +891,23 @@ class OptimizedBicolorGloveDetectorWithAI:
         self._training_in_progress = True
         self.logging.info("🚀 Démarrage entraînement du modèle IA...")
 
-        def train():
-            try:
-                if not hasattr(self, '_training_in_progress') or not self._training_in_progress:
-                    return
-                success = self.position_recognizer.train_model(epochs=25)
-                if success:
-                    try:
-                        model_path = "hand_position_model"
-                        # --- Correction sauvegarde .keras ---
-                        self.position_recognizer.save_model(model_path)
-                        self.logging.info("💾 Modèle sauvegardé avec succès")
-                    except Exception as save_error:
-                        self.logging.error(f"❌ Erreur sauvegarde: {save_error}")
-                    self.ai_mode = "recognition"
-                    self.logging.info("✅ Modèle entraîné et sauvegardé!")
-                else:
-                    self.logging.error("❌ Échec entraînement")
-                    self.ai_mode = "detection"
-            except Exception as e:
-                self.logging.error(f"❌ Erreur thread entraînement: {e}")
+        try:
+            success = self.position_recognizer.train_model(epochs=25)
+            if success:
+                model_path = "hand_position_model"
+                self.position_recognizer.save_model(model_path)
+                n_samples = len(self.position_recognizer.training_data)
+                self.logging.info(f"💾 Modèle sauvegardé avec succès ({n_samples} échantillons)")
+                self.ai_mode = "recognition"
+                self.logging.info("✅ Modèle entraîné et sauvegardé!")
+            else:
+                self.logging.error("❌ Échec entraînement")
                 self.ai_mode = "detection"
-            finally:
-                self._training_in_progress = False
-
-        training_thread = threading.Thread(target=train, daemon=True, name="ModelTraining")
-        training_thread.start()
+        except Exception as e:
+            self.logging.error(f"❌ Erreur entraînement: {e}")
+            self.ai_mode = "detection"
+        finally:
+            self._training_in_progress = False
     
     def _execute_drone_command(self, position, confidence):
         """Exécution des commandes drone basées sur la position"""
