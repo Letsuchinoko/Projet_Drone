@@ -116,8 +116,8 @@ int main(void)
   MX_USART2_UART_Init();
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
-  //sprintf(msgtest,"TEST MODULE BLUETOOTH DRONE\r\n");
-  //HAL_UART_Transmit(&huart2, (uint8_t*)msgtest, strlen(msgtest), HAL_MAX_DELAY);
+  sprintf(msgtest,"TEST MODULE BLUETOOTH DRONE\r\n");
+  HAL_UART_Transmit(&huart2, (uint8_t*)msgtest, strlen(msgtest), HAL_MAX_DELAY);
   //uint32_t last_test_transmit_time = HAL_GetTick(); // For test transmission
 
   while (1)
