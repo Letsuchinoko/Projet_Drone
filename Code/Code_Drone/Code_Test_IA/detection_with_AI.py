@@ -908,6 +908,7 @@ class OptimizedBicolorGloveDetectorWithAI:
             self._training_in_progress = False
     
     def _execute_drone_command(self, position, confidence):
+        self.logging.info(f"[DEBUG] flying_state = {flying_state}")
         try:
             current_time = time.time()
             if current_time - self.last_command_time < self.command_cooldown:
