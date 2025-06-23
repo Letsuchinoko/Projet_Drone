@@ -917,14 +917,14 @@ class OptimizedBicolorGloveDetectorWithAI:
 
             # Seuils (à adapter si besoin)
             thresholds = {
-                "poing": 0.92,
-                "stop": 0.85,
-                "victoire": 0.80,
-                "paume": 0.80,
-                "ok": 0.85,
-                "index": 0.85,
-                "pouce": 0.85,
-                "salut": 0.80,
+                "poing": 0.6,
+                "stop": 0.6,
+                "victoire": 0.6,
+                "paume": 0.6,
+                "ok": 0.6,
+                "index": 0.6,
+                "pouce": 0.6,
+                "salut": 0.6,
             }
             threshold = thresholds.get(position, 0.85)
             if confidence < threshold:
