@@ -472,7 +472,7 @@ class HandPositionRecognizer:
             current_time = time.time()
             if current_time - self.last_prediction_time < self.prediction_interval:
                 return self.last_prediction_result
-            features_batch = features.reshape(1, -1)
+            features_batch = features.reshape(1, -1)    
             prediction = self.model.predict(features_batch, verbose=0, batch_size=1)[0]
             predicted_class = np.argmax(prediction)
             confidence = prediction[predicted_class]
@@ -489,16 +489,13 @@ class HandPositionRecognizer:
                     most_common_class, count = class_counts.most_common(1)[0]
                     if count >= 2:
                         class_confidences = [conf for cls, conf in zip(recent_classes, recent_confidences)
-                                             if cls == most_common_class]
+                                            if cls == most_common_class]
                         avg_confidence = np.mean(class_confidences)
                         predicted_class = most_common_class
                         confidence = avg_confidence
-            # Validation seuil (adapte à ton HAND_POSITIONS)
-            from collections import namedtuple
-            HandPosition = namedtuple("HandPosition", ["confidence_threshold"])
-            HAND_POSITIONS = {i: HandPosition(0.5) for i in range(self.num_classes)}  # Rends global sinon
+            # ---- UTILISER LE DICT GLOBAL ----
             if predicted_class in HAND_POSITIONS:
-                threshold = HAND_POSITIONS[predicted_class].confidence_threshold
+                threshold = 0.2
                 if confidence >= threshold:
                     self.confident_predictions += 1
                     result = (predicted_class, confidence)
@@ -510,6 +507,7 @@ class HandPositionRecognizer:
         except Exception as e:
             self.logging.debug(f"Erreur prédiction: {e}")
             return None, 0.0
+
 
     def get_prediction_stats(self):
         if self.total_predictions == 0:
