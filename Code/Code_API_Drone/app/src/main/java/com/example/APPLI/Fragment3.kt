@@ -17,7 +17,7 @@ private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
- * Use the [Fragment3.newInstance] factory method to
+ * Use the [Fragment3.newInstance] factory method to a
  * create an instance of this fragment.
  */
 class Fragment3 : Fragment() {
@@ -43,19 +43,19 @@ class Fragment3 : Fragment() {
     ): View? {
         Log.d(TAG, "Fragment3 onCreateView appelé")
         val view = inflater.inflate(R.layout.fragment_3, container, false)
-        
+
         // Initialiser la vue
         soundTextView = view.findViewById(R.id.soundLevelTextView)
         soundTextView.text = "Niveau sonore\n\nEn attente de données..."
         Log.d(TAG, "TextView sonore initialisé")
-        
+
         // Observer les changements de données sonores
         sharedDataManager.soundData.observe(viewLifecycleOwner) { soundData ->
             Log.d(TAG, "Données sonores reçues dans Fragment3: '$soundData'")
             soundTextView.text = "Niveau sonore\n\nDonnées reçues:\n$soundData"
             Log.d(TAG, "TextView sonore mis à jour")
         }
-        
+
         Log.d(TAG, "Fragment3 onCreateView terminé")
         return view
     }

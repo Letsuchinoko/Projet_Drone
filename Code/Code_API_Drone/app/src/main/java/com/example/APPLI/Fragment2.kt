@@ -9,6 +9,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.MapView
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -21,13 +30,15 @@ private const val ARG_PARAM2 = "param2"
  * Use the [Fragment2.newInstance] factory method to
  * create an instance of this fragment.
  */
-class Fragment2 : Fragment() {
+class Fragment2 : Fragment(), OnMapReadyCallback {
     private val TAG = "Fragment2"
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
 
     private lateinit var gpsTextView: TextView
+    private lateinit var mapView: MapView
+    private var googleMap: GoogleMap? = null
     private val sharedDataManager: SharedDataManager by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,9 +68,38 @@ class Fragment2 : Fragment() {
             Log.d(TAG, "TextView GPS mis à jour")
         }
         
+        mapView = view.findViewById(R.id.mapView)
+        mapView.onCreate(savedInstanceState)
+        mapView.getMapAsync(this)
+        
         Log.d(TAG, "Fragment2 onCreateView terminé")
         return view
     }
+
+    override fun onMapReady(map: GoogleMap) {
+        googleMap = map
+        // Observer les données GPS partagées
+        sharedDataManager.gpsData.observe(viewLifecycleOwner) { gpsString ->
+            // gpsString format: "lat,lon"
+            val parts = gpsString.split(",")
+            if (parts.size == 2) {
+                val lat = parts[0].toDoubleOrNull()
+                val lon = parts[1].toDoubleOrNull()
+                if (lat != null && lon != null) {
+                    val position = LatLng(lat, lon)
+                    googleMap?.clear()
+                    googleMap?.addMarker(MarkerOptions().position(position).title("Position reçue"))
+                    googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 15f))
+                }
+            }
+        }
+    }
+
+    // N'oublie pas de forwarder le cycle de vie à la MapView
+    override fun onResume() { super.onResume(); mapView.onResume() }
+    override fun onPause() { super.onPause(); mapView.onPause() }
+    override fun onDestroy() { super.onDestroy(); mapView.onDestroy() }
+    override fun onLowMemory() { super.onLowMemory(); mapView.onLowMemory() }
 
     companion object {
         /**
