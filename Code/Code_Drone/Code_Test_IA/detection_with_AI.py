@@ -909,13 +909,16 @@ class OptimizedBicolorGloveDetectorWithAI:
     
     def _execute_drone_command(self, position, confidence):
         try:
+            import time
             current_time = time.time()
             self.logging.info(f"[DRONE CMD] DEMANDE: position={position}, confidence={confidence:.3f}, t={current_time:.3f}")
+
+            # Vérifie le cooldown
             if current_time - self.last_command_time < self.command_cooldown:
-                self.logging.info(f"[DRONE CMD] Ignorée: cooldown actif ({current_time - self.last_command_time:.2f}s)")
+                self.logging.info("[DRONE CMD] Cooldown actif, commande ignorée.")
                 return False
 
-            # Seuils de confiance
+            # Seuils de confiance (modifiable)
             thresholds = {
                 "poing": 0.6,
                 "stop": 0.6,
@@ -928,34 +931,41 @@ class OptimizedBicolorGloveDetectorWithAI:
             }
             threshold = thresholds.get(position, 0.85)
             self.logging.info(f"[DRONE CMD] Seuil pour {position}: {threshold}")
+
             if confidence < threshold:
-                self.logging.info(f"[DRONE CMD] Commande refusée: confiance insuffisante ({confidence:.3f})")
+                self.logging.info(f"[DRONE CMD] Confiance trop basse ({confidence:.3f} < {threshold}), commande ignorée.")
                 return False
 
+            # Accès au drone
             bebop = getattr(self, "bebop", None)
             if bebop is None:
-                self.logging.error("[DRONE CMD] ERREUR: bebop n'est pas attaché à l'objet!")
+                self.logging.warning("[DRONE CMD] Aucune instance drone !")
                 return False
-            self.logging.info(f"[DRONE CMD] bebop OK: {bebop}")
 
+            # Sensors complet pour debug
+            sensors_dict = vars(bebop.sensors) if hasattr(bebop, 'sensors') else {}
+            self.logging.info(f"[DRONE CMD] bebop OK: {bebop}")
+            self.logging.info(f"[DRONE CMD] sensors: {sensors_dict}")
+
+            # Statut drone
             flying_state = getattr(bebop.sensors, "flying_state", "unknown")
             self.logging.info(f"[DRONE CMD] flying_state = '{flying_state}'")
 
-            # 1. Poing = arrêt d'urgence
+            # ========== Commandes ==========
             if position == "poing":
-                self.logging.warning("🚨 [DRONE CMD] ARRÊT D'URGENCE - Poing détecté")
+                self.logging.warning("[DRONE CMD] 🚨 ARRÊT D'URGENCE - Poing détecté")
                 if flying_state == "landed":
-                    self.logging.info("[DRONE CMD] Déjà posé, pas d'action.")
+                    self.logging.info("[DRONE CMD] Déjà posé. Aucun mouvement.")
                 else:
-                    self.logging.info("[DRONE CMD] safe_land() appelé")
+                    self.logging.info("[DRONE CMD] safe_land appelé !")
                     bebop.safe_land(10)
+                    # Optionnel : bebop.return_home()
                 self.last_command_time = current_time
                 return True
 
-            # 2. Victoire = décollage / montée
             elif position == "victoire":
                 if flying_state == "landed":
-                    self.logging.info("[DRONE CMD] Décollage demandé (safe_takeoff)")
+                    self.logging.info("[DRONE CMD] 🛫 Décollage (victoire)")
                     bebop.safe_takeoff(10)
                 else:
                     self.logging.info("[DRONE CMD] En vol, fly_direct vertical (monter)")
@@ -963,57 +973,52 @@ class OptimizedBicolorGloveDetectorWithAI:
                 self.last_command_time = current_time
                 return True
 
-            # 3. Paume = avancer
             elif position == "paume" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] Avancer (paume) - fly_direct")
+                self.logging.info("[DRONE CMD] ➡️ Avancer (paume)")
                 bebop.fly_direct(roll=0, pitch=12, yaw=0, vertical_movement=0, duration=0.18)
                 self.last_command_time = current_time
                 return True
 
-            # 4. Index = avancer précis
             elif position == "index" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] Avancer précis (index) - fly_direct")
+                self.logging.info("[DRONE CMD] ➡️ Avancer précis (index)")
                 bebop.fly_direct(roll=0, pitch=7, yaw=0, vertical_movement=0, duration=0.13)
                 self.last_command_time = current_time
                 return True
 
-            # 5. OK = hover
             elif position == "ok" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] Hover (ok)")
+                self.logging.info("[DRONE CMD] ✅ Hover (ok)")
                 bebop.hover()
                 self.last_command_time = current_time
                 return True
 
-            # 6. Pouce = montée douce
             elif position == "pouce" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] Monter doux (pouce) - fly_direct")
+                self.logging.info("[DRONE CMD] ⬆️ Monter doux (pouce)")
                 bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=7, duration=0.13)
                 self.last_command_time = current_time
                 return True
 
-            # 7. Stop = hover
             elif position == "stop" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] STOP (hover)")
+                self.logging.info("[DRONE CMD] 🛑 STOP")
                 bebop.hover()
                 self.last_command_time = current_time
                 return True
 
-            # 8. Salut = rotation gauche
             elif position == "salut" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] Rotation gauche (salut) - fly_direct")
+                self.logging.info("[DRONE CMD] ↺ Rotation gauche (salut)")
                 bebop.fly_direct(roll=0, pitch=0, yaw=-18, vertical_movement=0, duration=0.15)
                 self.last_command_time = current_time
                 return True
 
             else:
-                self.logging.info(f"[DRONE CMD] Position {position} non exécutée (confiance: {confidence:.2f}, flying_state: {flying_state})")
+                self.logging.info(f"[DRONE CMD] Position {position} non exécutée ou condition non remplie (flying_state={flying_state}, confiance={confidence:.2f})")
                 return False
 
         except Exception as e:
-            self.logging.error(f"[DRONE CMD] ❌ Exception: {e}")
+            self.logging.error(f"[DRONE CMD] ❌ Erreur commande drone: {e}")
             import traceback
-            self.logging.error(traceback.format_exc())
+            self.logging.error(f"[DRONE CMD] Traceback: {traceback.format_exc()}")
             return False
+
     
     def _draw_ai_overlay(self, frame, contour, position, confidence):
         """Visualisation overlay IA"""
