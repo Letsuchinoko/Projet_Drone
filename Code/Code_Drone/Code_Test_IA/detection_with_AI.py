@@ -705,62 +705,77 @@ class OptimizedBicolorGloveDetectorWithAI:
             self.ai_enabled = False
     
     def detect_glove_optimized(self, frame):
-        """Détection de gant optimisée (version simplifiée de votre code original)"""
+        """Détection de gant améliorée avec nettoyage du masque"""
         if frame is None:
             return frame, False
-            
+
         original_frame = frame.copy()
         self.frame_count += 1
-        
         try:
-            # === DÉTECTION COULEUR SIMPLIFIÉE ===
             hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-            
-            # Masques rouge et orange
-            red_lower1 = np.array([0, 140, 120])
-            red_upper1 = np.array([8, 255, 255])
+
+            # Masques couleur - élargir un peu les bornes si besoin
+            red_lower1 = np.array([0, 120, 90])
+            red_upper1 = np.array([10, 255, 255])
             mask_red1 = cv2.inRange(hsv, red_lower1, red_upper1)
-            
-            red_lower2 = np.array([172, 140, 120])
+
+            red_lower2 = np.array([170, 120, 90])
             red_upper2 = np.array([180, 255, 255])
             mask_red2 = cv2.inRange(hsv, red_lower2, red_upper2)
-            
-            orange_lower = np.array([8, 160, 140])
-            orange_upper = np.array([18, 255, 255])
+
+            orange_lower = np.array([10, 120, 120])
+            orange_upper = np.array([22, 255, 255])
             mask_orange = cv2.inRange(hsv, orange_lower, orange_upper)
-            
-            # Combinaison
-            mask_combined = cv2.bitwise_or(mask_red1, cv2.bitwise_or(mask_red2, mask_orange))
-            
-            # Morphologie
-            mask_combined = cv2.morphologyEx(mask_combined, cv2.MORPH_CLOSE, self.kernel_medium)
-            mask_combined = cv2.morphologyEx(mask_combined, cv2.MORPH_OPEN, self.kernel_small)
-            
-            # Recherche contours
+
+            # Fusion masques
+            mask_combined = cv2.bitwise_or(mask_red1, mask_red2)
+            mask_combined = cv2.bitwise_or(mask_combined, mask_orange)
+
+            # --- FILTRAGE AVANCÉ ---
+            mask_combined = cv2.medianBlur(mask_combined, 5)
+            mask_combined = cv2.morphologyEx(mask_combined, cv2.MORPH_OPEN, self.kernel_small, iterations=2)
+            mask_combined = cv2.dilate(mask_combined, self.kernel_medium, iterations=2)
+            mask_combined = cv2.morphologyEx(mask_combined, cv2.MORPH_CLOSE, self.kernel_large, iterations=2)
+
+            # Recherche de contours
             contours, _ = cv2.findContours(mask_combined, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            
-            best_contour = None
-            best_area = 0
-            quality_score = 0
-            
+            best_contour, best_area, best_quality = None, 0, 0
+
             for contour in contours:
                 area = cv2.contourArea(contour)
-                if self.min_area < area < self.max_area and len(contour) >= self.min_contour_points:
-                    if area > best_area:
-                        best_contour = contour
-                        best_area = area
-                        quality_score = min(area / self.area_reference, 1.0)
-            
+                perimeter = cv2.arcLength(contour, True)
+                if perimeter == 0:
+                    continue
+                compactness = (4 * np.pi * area) / (perimeter ** 2)
+                if (self.min_area < area < self.max_area) and (len(contour) > self.min_contour_points):
+                    # **Prioriser les contours compacts et larges**
+                    if compactness > 0.25 and area > best_area:
+                        best_contour, best_area, best_quality = contour, area, min(area / self.area_reference, 1.0)
+
             detected = best_contour is not None
+
+            # Vérifie la "fermeture" du contour (si besoin, ajouter un check sur cv2.isContourConvex)
+            if detected and not cv2.isContourConvex(best_contour):
+                # Tu peux logguer ici si tu veux
+                self.logging.info("Contour détecté mais pas convexe (main trop ouverte ou contour brisé)")
             
-            # Sauvegarde pour IA
+            # Tu peux ici refuser le contour s'il est trop allongé (erreur classique)
+            if detected and best_contour is not None:
+                x, y, w, h = cv2.boundingRect(best_contour)
+                aspect_ratio = w / float(h) if h > 0 else 0
+                if aspect_ratio < 0.35 or aspect_ratio > 3.0:
+                    # Probablement du bruit ou une main mal détectée
+                    self.logging.info("Contour refusé car aspect ratio douteux.")
+                    detected = False
+
+            # Sauvegarde et return classique
             if detected:
                 self.last_detected_contour = best_contour.copy()
                 self.last_detected_area = best_area
                 self.last_bounding_rect = cv2.boundingRect(best_contour)
             
-            return self._finalize_detection(original_frame, detected, best_contour, best_area, quality_score)
-            
+            return self._finalize_detection(original_frame, detected, best_contour, best_area, best_quality)
+
         except Exception as e:
             self.logging.debug(f"Erreur détection: {e}")
             return original_frame, False
