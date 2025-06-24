@@ -78,14 +78,13 @@ class HandPosition:
     confidence_threshold: float = 0.10
 
 HAND_POSITIONS = {
-    0: HandPosition("poing", "Poing fermé - ARRÊT D'URGENCE", 0.10),
-    1: HandPosition("paume", "Paume ouverte - AVANCER", 0.10),
-    2: HandPosition("index", "Index pointé - DIRECTION", 0.10),
-    3: HandPosition("victoire", "Signe V - MONTÉE", 0.10),
-    4: HandPosition("ok", "Signe OK - VALIDATION/HOVER", 0.10),
-    5: HandPosition("pouce", "Pouce levé - MONTÉE DOUCE", 0.10),
-    6: HandPosition("stop", "Main STOP - ARRÊT", 0.10),
-    7: HandPosition("salut", "Salut - ROTATION", 0.10)
+    0: HandPosition("poing", "Poing fermé - ARRÊT D'URGENCE"),
+    1: HandPosition("paume_avant", "Paume ouverte vers la caméra - AVANCER"),
+    2: HandPosition("dos_main", "Dos de la main vers la caméra (ongles visibles) - RECULER"),
+    3: HandPosition("index_droite", "Index tendu à droite (autres doigts repliés) - DROITE"),
+    4: HandPosition("index_gauche", "Index tendu à gauche (autres doigts repliés) - GAUCHE"),
+    5: HandPosition("doigts_haut", "Main ouverte, doigts pointés vers le haut - HAUT"),
+    6: HandPosition("doigts_bas", "Main ouverte, doigts pointés vers le bas - BAS"),
 }
 
 DISTANCE_LABELS = [
@@ -391,9 +390,10 @@ class HandPositionRecognizer:
             self.logging.info(f"   Précision: {final_accuracy:.4f}")
             self.logging.info(f"   Validation: {val_accuracy:.4f}")
 
-            # Courbes d’apprentissage
+            # === Courbes d’apprentissage (toujours en sauvegarde PNG, jamais de plt.show()) ===
             if plot_curves:
                 try:
+                    import time
                     plt.figure(figsize=(10, 4))
                     plt.subplot(1, 2, 1)
                     plt.plot(history.history['accuracy'], label='Train Acc')
@@ -417,11 +417,12 @@ class HandPositionRecognizer:
                 except Exception as e:
                     self.logging.warning(f"Erreur affichage/sauvegarde courbes : {e}")
 
-
-            # ---- MATRICE DE CONFUSION & stats détaillées par classe ----
+            # === MATRICE DE CONFUSION (train/val) —> uniquement en sauvegarde ===
             from sklearn.metrics import confusion_matrix, classification_report
             import seaborn as sns
+            import time
             class_names = [HAND_POSITIONS[i].name for i in range(self.num_classes)]
+            stamp = time.strftime("%Y%m%d_%H%M%S")
 
             # Train
             train_preds = np.argmax(self.model.predict(X_train, verbose=0), axis=1)
@@ -432,7 +433,10 @@ class HandPositionRecognizer:
             plt.ylabel('Vrai')
             plt.title("Matrice de confusion (train)")
             plt.tight_layout()
-            plt.show()
+            figname_cm = f"confusion_matrix_train_{stamp}.png"
+            plt.savefig(figname_cm)
+            self.logging.info(f"🟦 Matrice de confusion (train) sauvegardée : {figname_cm}")
+            plt.close()
             rep = classification_report(y_train, train_preds, target_names=class_names, digits=3)
             self.logging.info("\n" + rep)
 
@@ -446,12 +450,28 @@ class HandPositionRecognizer:
                 plt.ylabel('Vrai')
                 plt.title("Matrice de confusion (validation)")
                 plt.tight_layout()
-                plt.show()
+                figname_cmval = f"confusion_matrix_val_{stamp}.png"
+                plt.savefig(figname_cmval)
+                self.logging.info(f"🟧 Matrice de confusion (val) sauvegardée : {figname_cmval}")
+                plt.close()
                 rep_val = classification_report(y_val, val_preds, target_names=class_names, digits=3)
                 self.logging.info("\n" + rep_val)
 
-            # Score sur tout le train (pour logs)
+            # === ACCURACY PAR ÉCHANTILLON —> nouveau graphique ===
             train_preds_full = np.argmax(self.model.predict(X, verbose=0), axis=1)
+            accuracies = (train_preds_full == y).astype(int)
+            plt.figure(figsize=(8,4))
+            plt.plot(accuracies, label="Correct/Incorrect (1/0)")
+            plt.title("Performance sur tous les échantillons d'entraînement")
+            plt.xlabel("Échantillon")
+            plt.ylabel("Réussite")
+            plt.legend()
+            figname_full = f"full_sample_accuracy_{stamp}.png"
+            plt.savefig(figname_full)
+            self.logging.info(f"📉 Courbe échantillon par échantillon sauvegardée: {figname_full}")
+            plt.close()
+
+            # Score sur tout le train (pour logs)
             train_acc_full = np.mean(train_preds_full == y)
             self.logging.info(f"[DEBUG TRAIN] Accuracy (full train set): {train_acc_full:.4f}")
             self.logging.info(f"[DEBUG TRAIN] Sample preds (train set): {train_preds_full[:10]} vs {y[:10]}")
@@ -496,7 +516,7 @@ class HandPositionRecognizer:
                         confidence = avg_confidence
             # ---- UTILISER LE DICT GLOBAL ----
             if predicted_class in HAND_POSITIONS:
-                threshold = 0.4
+                threshold = 0.3
                 if confidence >= threshold:
                     self.confident_predictions += 1
                     result = (predicted_class, confidence)
@@ -864,13 +884,14 @@ class OptimizedBicolorGloveDetectorWithAI:
                 samples_count = len([l for l in self.position_recognizer.training_labels
                                     if l == self.training_class])
 
-                if samples_count >= self.training_samples_per_class:
-                    self.training_class += 1
-                    self.training_countdown = 60  # 2 secondes de pause
-                    if self.training_class < len(HAND_POSITIONS):
-                        next_position = HAND_POSITIONS[self.training_class]
-                        self.logging.info(f"📝 Position suivante: {next_position.name}")
-                        self.current_training_distance_msg = ""  # Efface le message
+            if samples_count >= self.training_samples_per_class:
+                self.training_class += 1
+                self.training_countdown = 60  # 2 secondes de pause
+                if self.training_class < len(HAND_POSITIONS):
+                    next_position = HAND_POSITIONS[self.training_class]
+                    # ==> ICI ta ligne log
+                    self.logging.info(f"📝 Prochain geste attendu : {next_position.description}")
+                    self.current_training_distance_msg = ""  # Efface le message
                 else:
                     self.training_countdown = 30  # 1 seconde entre captures
 
@@ -929,14 +950,13 @@ class OptimizedBicolorGloveDetectorWithAI:
 
             # Seuils de confiance (modifiable)
             thresholds = {
-                "poing": 0.75,
-                "stop": 0.75,
-                "victoire": 0.75,
-                "paume": 0.75,
-                "ok": 0.75,
-                "index": 0.75,
-                "pouce": 0.75,
-                "salut": 0.75,
+                "paume_avant": 0.75,      # Avancer
+                "dos_main": 0.75,         # Reculer
+                "index_droite": 0.75,     # Droite
+                "index_gauche": 0.75,     # Gauche
+                "doigts_haut": 0.75,      # Haut
+                "doigts_bas": 0.75,       # Bas
+                "poing": 0.75,            # Arrêt d'urgence
             }
             threshold = thresholds.get(position, 0.85)
             self.logging.info(f"[DRONE CMD] Seuil pour {position}: {threshold}")
@@ -970,61 +990,49 @@ class OptimizedBicolorGloveDetectorWithAI:
 
             # ========== Commandes ==========
             if position == "poing":
+                # Arrêt d'urgence : Atterrir tout de suite
                 self.logging.warning("[DRONE CMD] 🚨 ARRÊT D'URGENCE - Poing détecté")
                 if flying_state == "landed":
                     self.logging.info("[DRONE CMD] Déjà posé. Aucun mouvement.")
                 else:
                     self.logging.info("[DRONE CMD] safe_land appelé !")
                     bebop.safe_land(10)
-                    # Optionnel : bebop.return_home()
                 self.last_command_time = current_time
                 return True
 
-            elif position == "victoire":
-                if flying_state == "landed":
-                    self.logging.info("[DRONE CMD] 🛫 Décollage (victoire)")
-                    bebop.safe_takeoff(10)
-                else:
-                    self.logging.info("[DRONE CMD] En vol, fly_direct vertical (monter)")
-                    bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=25, duration=0.4)
-                self.last_command_time = current_time
-                return True
-
-            elif position == "paume" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] ➡️ Avancer (paume)")
+            elif position == "paume_avant" and flying_state != "landed":
+                self.logging.info("[DRONE CMD] ➡️ Avancer (paume avant)")
                 bebop.fly_direct(roll=0, pitch=70, yaw=0, vertical_movement=0, duration=0.3)
                 self.last_command_time = current_time
                 return True
 
-            # 4. INDEX = GAUCHE (latéral)
-            elif position == "index" and flying_state != "landed":
-                self.logging.info("⬅️ Mouvement gauche (index)")
-                bebop.fly_direct(roll=-18, pitch=0, yaw=0, vertical_movement=0, duration=0.20)
+            elif position == "dos_main" and flying_state != "landed":
+                self.logging.info("[DRONE CMD] ⬅️ Reculer (dos de la main)")
+                bebop.fly_direct(roll=0, pitch=-70, yaw=0, vertical_movement=0, duration=0.3)
                 self.last_command_time = current_time
                 return True
 
-            # 5. OK = DROITE (latéral)
-            elif position == "ok" and flying_state != "landed":
-                self.logging.info("➡️ Mouvement droite (ok)")
-                bebop.fly_direct(roll=18, pitch=0, yaw=0, vertical_movement=0, duration=0.20)
+            elif position == "index_droite" and flying_state != "landed":
+                self.logging.info("[DRONE CMD] ➡️ Droite (index droit)")
+                bebop.fly_direct(roll=30, pitch=0, yaw=0, vertical_movement=0, duration=0.3)
                 self.last_command_time = current_time
                 return True
 
-            elif position == "pouce" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] ⬆️ Monter doux (pouce)")
-                bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=16, duration=0.22)
+            elif position == "index_gauche" and flying_state != "landed":
+                self.logging.info("[DRONE CMD] ⬅️ Gauche (index gauche)")
+                bebop.fly_direct(roll=-30, pitch=0, yaw=0, vertical_movement=0, duration=0.3)
                 self.last_command_time = current_time
                 return True
 
-            elif position == "stop" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] 🛑 STOP")
-                bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=0, duration=0.5)
+            elif position == "doigts_haut" and flying_state != "landed":
+                self.logging.info("[DRONE CMD] ⬆️ Monter (doigts haut)")
+                bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=25, duration=0.3)
                 self.last_command_time = current_time
                 return True
 
-            elif position == "salut" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] ↺ Rotation gauche (salut)")
-                bebop.fly_direct(roll=0, pitch=0, yaw=-30, vertical_movement=0, duration=0.25)
+            elif position == "doigts_bas" and flying_state != "landed":
+                self.logging.info("[DRONE CMD] ⬇️ Descendre (doigts bas)")
+                bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=-25, duration=0.3)
                 self.last_command_time = current_time
                 return True
 
@@ -1129,11 +1137,13 @@ class OptimizedBicolorGloveDetectorWithAI:
                 ai_status = f"IA: Mode {self.ai_mode}"
                 if self.ai_mode == "training" and self.training_class < len(HAND_POSITIONS):
                     position = HAND_POSITIONS[self.training_class]
-                    samples = len([l for l in self.position_recognizer.training_labels
-                                if l == self.training_class])
+                    samples = len([l for l in self.position_recognizer.training_labels if l == self.training_class])
                     ai_status += f" | {position.name} ({samples}/{self.training_samples_per_class})"
                     if self.training_countdown > 0:
                         ai_status += f" | Capture dans {self.training_countdown//30 + 1}s"
+                    # Affichage de la description du geste attendu
+                    instruction = position.description
+                    cv2.putText(frame, f"Geste attendu : {instruction}", (10, 95), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 180, 255), 2)
                 elif self.position_recognizer.is_trained:
                     ai_status += " (Entraînée)"
 
@@ -1165,7 +1175,9 @@ class OptimizedBicolorGloveDetectorWithAI:
 
             # === POSITIONS DISPONIBLES ===
             if self.ai_mode == "recognition":
-                positions_text = "Positions: poing(URGENCE), paume(AVANCER), victoire(MONTÉE), ok(HOVER)"
+                positions_text = ("Positions : "
+                    "avancer(paume), reculer(dos main), droite(index droit), "
+                    "gauche(index gauche), haut(doigts haut), bas(doigts bas), urgence(poing)")
                 cv2.putText(frame, positions_text, (10, h - 40), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
 
             # === HISTORIQUE ===
@@ -1579,10 +1591,12 @@ if __name__ == "__main__":
             print("⚠️  TensorFlow manquant - Mode détection simple")
             print("   Installation: pip install tensorflow")
         
-        print("\n🎯 GESTES RECONNUS:")
+        logger.info("=" * 80)
+        logger.info("🎯 GESTES RECONNUS :")
         for pos_id, position in HAND_POSITIONS.items():
-            print(f"  {pos_id}: {position.name} - {position.description}")
-        
+            logger.info(f"  {pos_id}: {position.name} - {position.description}")
+        logger.info("=" * 80)
+
         print("\n🚀 Démarrage...")
         success = main_with_ai()
         exit_code = 0 if success else 1
