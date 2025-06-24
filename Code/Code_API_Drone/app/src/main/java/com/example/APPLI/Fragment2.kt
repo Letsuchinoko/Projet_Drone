@@ -38,17 +38,26 @@ class Fragment2 : Fragment() {
         gpsTextView.text = "Localisation GPS\n\nEn attente de données..."
         
         sharedDataManager.gpsData.observe(viewLifecycleOwner) { gpsData ->
-            Log.d(TAG, "Données GPS reçues dans Fragment2: '$gpsData'")
-            val parts = gpsData.split(",")
-            if (parts.size >= 3) {
-                val lat = parts[0]
-                val lon = parts[1]
-                val alt = parts[2]
+            Log.d(TAG, "Données GPS reçues pour traitement dans Fragment2: '$gpsData'")
+
+            // Regex pour trouver tous les nombres (entiers ou décimaux, y compris négatifs)
+            val numberPattern = Regex("-?\\d+\\.?\\d*")
+            val numbers = numberPattern.findAll(gpsData).map { it.value }.toList()
+
+            if (numbers.size >= 3) {
+                // Assez de nombres pour lat, lon, et alt
+                val lat = numbers[0]
+                val lon = numbers[1]
+                val alt = numbers[2]
                 gpsTextView.text = "Localisation GPS\n\nLatitude: $lat\nLongitude: $lon\nAltitude: $alt"
-            } else {
-                gpsTextView.text = "Localisation GPS\n\nDonnées reçues:\n$gpsData"
+            } else if (numbers.size == 2) {
+                // Assez pour lat et lon
+                val lat = numbers[0]
+                val lon = numbers[1]
+                gpsTextView.text = "Localisation GPS\n\nLatitude: $lat\nLongitude: $lon"
             }
-            Log.d(TAG, "TextView GPS mis à jour")
+            // Si moins de 2 nombres sont trouvés, on ne met pas à jour l'affichage
+            // pour éviter d'afficher des données incomplètes.
         }
         
         Log.d(TAG, "Fragment2 onCreateView terminé")

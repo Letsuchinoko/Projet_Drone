@@ -49,11 +49,20 @@ class Fragment3 : Fragment() {
         soundTextView.text = "Niveau sonore\n\nEn attente de données..."
         Log.d(TAG, "TextView sonore initialisé")
 
-        // Observer les changements de données sonores
-        sharedDataManager.soundData.observe(viewLifecycleOwner) { soundData ->
-            Log.d(TAG, "Données sonores reçues dans Fragment3: '$soundData'")
-            soundTextView.text = "Niveau sonore\n\nDonnées reçues:\n$soundData"
-            Log.d(TAG, "TextView sonore mis à jour")
+        // Observer les données sonores et extraire la valeur numérique
+        sharedDataManager.soundData.observe(viewLifecycleOwner) { data ->
+            Log.d(TAG, "Données sonores reçues dans Fragment3: '$data'")
+
+            // Regex pour trouver un nombre (peut être précédé de "SOUND:")
+            val soundPattern = Regex("-?\\d+\\.?\\d*")
+            val matchResult = soundPattern.find(data)
+
+            if (matchResult != null) {
+                val soundLevel = matchResult.value
+                soundTextView.text = "Niveau sonore\n\n$soundLevel dB"
+                Log.d(TAG, "Niveau sonore trouvé et affiché: $soundLevel")
+            }
+            // Si aucun nombre n'est trouvé, on ne met pas à jour l'affichage
         }
 
         Log.d(TAG, "Fragment3 onCreateView terminé")

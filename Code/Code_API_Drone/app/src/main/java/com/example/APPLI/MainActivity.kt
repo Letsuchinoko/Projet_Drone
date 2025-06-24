@@ -19,11 +19,37 @@ class MainActivity : AppCompatActivity() {
 
     private fun remplaceFragment(fragment: Fragment) {
         Log.d("MainActivity", "Remplacement du fragment: ${fragment.javaClass.simpleName}")
-        currentFragment = fragment
         val fragMan: FragmentManager = supportFragmentManager
         val fragTran = fragMan.beginTransaction()
-        fragTran.replace(R.id.fragmentContainerView, fragment)
+        if (currentFragment != null) {
+            fragTran.hide(currentFragment!!)
+        }
+        if (!fragment.isAdded) {
+            fragTran.add(R.id.fragmentContainerView, fragment)
+        } else {
+            fragTran.show(fragment)
+        }
+        fragTran.addToBackStack(null)
         fragTran.commit()
+        currentFragment = fragment
+    }
+
+    override fun onBackPressed() {
+        val fragMan = supportFragmentManager
+        if (fragMan.backStackEntryCount > 1) {
+            fragMan.popBackStack()
+            // Met à jour le currentFragment avec le fragment précédent
+            val fragments = fragMan.fragments
+            for (i in fragments.size - 1 downTo 0) {
+                val frag = fragments[i]
+                if (frag.isVisible) {
+                    currentFragment = frag
+                    break
+                }
+            }
+        } else {
+            finish()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
