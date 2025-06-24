@@ -869,7 +869,7 @@ class OptimizedBicolorGloveDetectorWithAI:
             # Stocke le message pour affichage dans l’overlay
             self.current_training_distance_msg = distance_msg
 
-            # Compte à rebours pour capture
+            # Compte à rebours pour capture (attente entre échantillons ou entre positions)
             if self.training_countdown > 0:
                 self.training_countdown -= 1
                 return f"training_{position.name}", self.training_countdown / 60.0
@@ -881,20 +881,22 @@ class OptimizedBicolorGloveDetectorWithAI:
 
             success = self.position_recognizer.add_training_sample(features, self.training_class)
             if success:
-                samples_count = len([l for l in self.position_recognizer.training_labels
-                                    if l == self.training_class])
+                samples_count = len([l for l in self.position_recognizer.training_labels if l == self.training_class])
 
-            if samples_count >= self.training_samples_per_class:
-                self.training_class += 1
-                self.training_countdown = 60  # 2 secondes de pause
-                if self.training_class < len(HAND_POSITIONS):
-                    next_position = HAND_POSITIONS[self.training_class]
-                    # ==> ICI ta ligne log
-                    self.logging.info(f"📝 Prochain geste attendu : {next_position.description}")
-                    self.current_training_distance_msg = ""  # Efface le message
-                else:
-                    self.training_countdown = 30  # 1 seconde entre captures
+                if samples_count >= self.training_samples_per_class:
+                    self.training_class += 1
+                    self.training_countdown = 60  # 2 secondes de pause entre positions
+                    if self.training_class < len(HAND_POSITIONS):
+                        next_position = HAND_POSITIONS[self.training_class]
+                        # ==> Ligne log ici
+                        self.logging.info(f"📝 Prochain geste attendu : {next_position.description}")
+                        self.current_training_distance_msg = ""
+                    else:
+                        self.training_countdown = 30  # 1 seconde entre captures (fin)
+                    return f"captured_{position.name}", 1.0
 
+                # === NOUVEAU : délai entre CHAQUE échantillon ===
+                self.training_countdown = 20   # 20 frames ≈ 0.7s (à ajuster selon FPS)
                 return f"captured_{position.name}", 1.0
 
             return f"training_{position.name}", 0.0
@@ -903,6 +905,7 @@ class OptimizedBicolorGloveDetectorWithAI:
             self.logging.error(f"Erreur mode entraînement: {e}")
             self.current_training_distance_msg = ""
             return None, 0.0
+
 
     
     def _start_model_training(self):
