@@ -14,14 +14,6 @@
         android:scaleType="fitCenter"
         android:layout_marginBottom="16dp"/>
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:textSize="16sp"
-        android:gravity="center"/>
-
     <Button
         android:id="@+id/btnPermissionsBT"
         android:layout_width="match_parent"
@@ -36,6 +28,14 @@
         android:text="Activer BT"
         android:enabled="false"
         android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:textSize="16sp"
+        android:gravity="center"/>
 
     <ListView
         android:id="@+id/listView1"

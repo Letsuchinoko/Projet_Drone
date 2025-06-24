@@ -21,7 +21,6 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ListView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -32,10 +31,10 @@ import java.io.InputStream
 import java.util.UUID
 import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
+import android.widget.TextView
 
 class Fragment1 : Fragment() {
     private val TAG = "Fragment1"
-    private lateinit var textView: TextView
     private lateinit var btnPermissionsBT: Button
     private lateinit var btnActiverBT: Button
     private lateinit var btnRechercheAppareils: Button
@@ -49,6 +48,7 @@ class Fragment1 : Fragment() {
     private var connectThread: ConnectThread? = null
     private var connectedThread: ConnectedThread? = null
     private var bluetoothSocket: BluetoothSocket? = null
+    private lateinit var textView: TextView
     
     // ViewModel partagé pour communiquer avec les autres fragments
     private val sharedDataManager: SharedDataManager by activityViewModels()
@@ -149,12 +149,12 @@ class Fragment1 : Fragment() {
         val view = inflater.inflate(R.layout.fragment_1, container, false)
 
         // Initialisation des vues
-        textView = view.findViewById(R.id.textView)
         btnPermissionsBT = view.findViewById(R.id.btnPermissionsBT)
         btnActiverBT = view.findViewById(R.id.btnActiverBT)
         btnRechercheAppareils = view.findViewById(R.id.btnAppareilsAssocies)
         btnEffacerListe = view.findViewById(R.id.btnEffacerListe)
         listView = view.findViewById(R.id.listView1)
+        textView = view.findViewById(R.id.textView)
         Log.d(TAG, "Views initialized")
 
         // Initialisation de la liste d'appareils
@@ -208,7 +208,6 @@ class Fragment1 : Fragment() {
         Log.d(TAG, "Device list and adapter initialized")
 
         // Configuration initiale
-        textView.text = "En attente des permissions Bluetooth..."
         btnActiverBT.isEnabled = false
         Log.d(TAG, "Initial configuration set")
 
@@ -272,8 +271,6 @@ class Fragment1 : Fragment() {
             Toast.makeText(activity, "Liste effacée", Toast.LENGTH_SHORT).show()
         }
 
-
-
         // Tester si l'appareil ciblé autorise l'interface BT
         Log.d(TAG, "Initializing Bluetooth manager and adapter")
         bluetoothManager = requireContext().getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
@@ -287,6 +284,8 @@ class Fragment1 : Fragment() {
             btnPermissionsBT.isEnabled = true
             Toast.makeText(activity, "Interface BT existe", Toast.LENGTH_SHORT).show()
         }
+
+        textView.text = "En attente des permissions Bluetooth..."
 
         return view
     }
@@ -361,10 +360,8 @@ class Fragment1 : Fragment() {
                 
                 // Mettre à jour l'interface utilisateur sur le thread principal
                 requireActivity().runOnUiThread {
-                    Toast.makeText(activity, "Connexion établie avec ${device.name}", Toast.LENGTH_LONG).show()
-                    textView.text = "Connecté à: ${device.name}\n${device.address}\n\nEn attente de données..."
-                    
-                    // Ajouter un bouton de déconnexion ou modifier l'interface
+                    Toast.makeText(activity, "Connexion établie avec "+device.name, Toast.LENGTH_LONG).show()
+                    textView.text = "Connecté à: ${device.name}\n${device.address}"
                     btnRechercheAppareils.text = "Déconnecter"
                     btnRechercheAppareils.setOnClickListener {
                         disconnect()
@@ -416,27 +413,6 @@ class Fragment1 : Fragment() {
         textView.text = "Déconnecté"
         btnRechercheAppareils.text = "Recherche des appareils"
         
-        // Restaurer le gestionnaire de clic original
-        btnRechercheAppareils.setOnClickListener {
-            Log.d(TAG, "Search devices button clicked")
-            if (!bluetoothAdapter.isEnabled) {
-                Toast.makeText(activity, "Veuillez d'abord activer le Bluetooth", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            
-            if (isDiscovering) {
-                // Arrêter la recherche
-                bluetoothAdapter.cancelDiscovery()
-                Log.d(TAG, "Discovery cancelled")
-            } else {
-                // Démarrer la recherche
-                deviceList.clear()
-                deviceAdapter.notifyDataSetChanged()
-                bluetoothAdapter.startDiscovery()
-                Log.d(TAG, "Discovery started")
-            }
-        }
-        
         Toast.makeText(activity, "Déconnecté", Toast.LENGTH_SHORT).show()
     }
 
@@ -471,14 +447,7 @@ class Fragment1 : Fragment() {
                     // Parser les données et les envoyer aux autres fragments
                     parseAndDistributeData(receivedData)
                     
-                    // Mettre à jour l'interface utilisateur sur le thread principal
-                    requireActivity().runOnUiThread {
-                        // Afficher les données reçues dans le TextView
-                        val currentText = textView.text.toString()
-                        val connectionInfo = currentText.split("\n\n")[0] // Garder les infos de connexion
-                        textView.text = "$connectionInfo\n\nDonnées reçues:\n$receivedData"
-                        Log.d(TAG, "Interface utilisateur mise à jour avec les données reçues")
-                    }
+                    // La mise à jour du TextView avec les données reçues est supprimée.
                 } else {
                     Log.d(TAG, "Aucun byte lu (numBytes = $numBytes)")
                 }
@@ -498,70 +467,23 @@ class Fragment1 : Fragment() {
 
     // Méthode pour parser et distribuer les données aux fragments
     private fun parseAndDistributeData(data: String) {
-        Log.d(TAG, "=== DÉBUT PARSING DES DONNÉES ===")
-        Log.d(TAG, "Données reçues pour parsing: '$data'")
-        Log.d(TAG, "Longueur des données: ${data.length}")
+        Log.d(TAG, "Parsing des données: '$data'")
         
-        try {
-            // Exemple de format de données attendu: "GPS:lat,lon|SOUND:level"
-            // Vous pouvez adapter ce format selon vos besoins
-            
-            if (data.contains("GPS:")) {
-                Log.d(TAG, "Format GPS détecté")
-                val gpsMatch = Regex("GPS:([^|]+)").find(data)
-                gpsMatch?.let { match ->
-                    val gpsData = match.groupValues[1]
-                    Log.i(TAG, "Données GPS trouvées: $gpsData")
-                    sharedDataManager.updateGpsData(gpsData)
-                    Log.d(TAG, "Données GPS envoyées au SharedDataManager")
-                }
-            }
-            
-            if (data.contains("SOUND:")) {
-                Log.d(TAG, "Format SOUND détecté")
-                val soundMatch = Regex("SOUND:([^|]+)").find(data)
-                soundMatch?.let { match ->
-                    val soundData = match.groupValues[1]
-                    Log.i(TAG, "Données sonores trouvées: $soundData")
-                    sharedDataManager.updateSoundData(soundData)
-                    Log.d(TAG, "Données sonores envoyées au SharedDataManager")
-                }
-            }
-            
-            // Si les données ne contiennent pas de format spécifique, on peut les traiter différemment
-            // Par exemple, si c'est juste des coordonnées GPS
-            if (!data.contains("GPS:") && !data.contains("SOUND:")) {
-                Log.d(TAG, "Aucun format spécifique détecté, tentative de détection automatique")
-                
-                // Essayer de détecter si c'est des coordonnées GPS (format: lat,lon)
-                val gpsPattern = Regex("^(-?\\d+\\.\\d+),(-?\\d+\\.\\d+)$")
-                val gpsMatch = gpsPattern.find(data)
-                if (gpsMatch != null) {
-                    Log.i(TAG, "Coordonnées GPS détectées automatiquement: $data")
-                    sharedDataManager.updateGpsData(data)
-                    Log.d(TAG, "Coordonnées GPS envoyées au SharedDataManager")
-                } else {
-                    // Essayer de détecter si c'est un niveau sonore (nombre)
-                    val soundPattern = Regex("^(\\d+(\\.\\d+)?)$")
-                    val soundMatch = soundPattern.find(data)
-                    if (soundMatch != null) {
-                        Log.i(TAG, "Niveau sonore détecté automatiquement: $data")
-                        sharedDataManager.updateSoundData(data)
-                        Log.d(TAG, "Niveau sonore envoyé au SharedDataManager")
-                    } else {
-                        Log.w(TAG, "Aucun format reconnu pour les données: '$data'")
-                        // Envoyer quand même les données brutes pour debug
-                        sharedDataManager.updateGpsData("Données brutes: $data")
-                    }
-                }
-            }
-            
-        } catch (e: Exception) {
-            Log.e(TAG, "Erreur lors du parsing des données: ${e.message}")
-            e.printStackTrace()
+        val parts = data.split('|')
+        
+        // La première partie est pour le GPS
+        if (parts.isNotEmpty()) {
+            val gpsData = parts[0]
+            sharedDataManager.updateGpsData(gpsData)
+            Log.d(TAG, "Données GPS envoyées: $gpsData")
         }
-        
-        Log.d(TAG, "=== FIN PARSING DES DONNÉES ===")
+
+        // La deuxième partie (si elle existe) est pour le son
+        if (parts.size > 1) {
+            val soundData = parts[1]
+            sharedDataManager.updateSoundData(soundData)
+            Log.d(TAG, "Données sonores envoyées: $soundData")
+        }
     }
 
     private fun checkConnection() {
