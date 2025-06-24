@@ -129,6 +129,8 @@ int main(void)
           db = 20.0f * log10f(voltage / 0.01f);
       }
 
+      // In your UART receive callback or main loop:
+
       // GPS Data Handling
       if (HAL_UART_Receive(&huart1, &c, 1, 10) == HAL_OK) {
           // Store character if buffer has space
@@ -141,8 +143,9 @@ int main(void)
               gps_rx_buffer[gps_rx_index] = '\0'; // Fin de chaîne
 
               // Vérifier si c'est une phrase GGA
-              if (strstr((char*)gps_rx_buffer, "$GPGGA") ||
-                  strstr((char*)gps_rx_buffer, "$GNGGA")) {
+              if (strstr((char*)gps_rx_buffer, "$GPGGA") != NULL) {
+            	  if (strstr((char*)gps_rx_buffer, ",M,M,") == NULL &&
+            	              strstr((char*)gps_rx_buffer, ",V,") == NULL) {
 
                   // Effacer les valeurs précédentes
                   latitude[0] = '\0';
@@ -179,12 +182,22 @@ int main(void)
                       field++;
                   }
 
-                  snprintf(combined_buffer, COMBINED_BUFFER_SIZE,
-                      "Lat:%s %c Lon:%s %c Alt:%sm | Son:%.1f dB\r\n",
-                      latitude, lat_dir, longitude, lon_dir, altitude, db);
+                  float lat_degrees = floor(atof(latitude) / 100.0f);
+                                 float lat_minutes = atof(latitude) - (lat_degrees * 100.0f);
+                                 float lat_decimal = lat_degrees + (lat_minutes / 60.0f);
+                                 if (lat_dir == 'S') lat_decimal *= -1.0f;
 
-                  HAL_UART_Transmit(&huart2, (uint8_t*)combined_buffer,
-                      strlen(combined_buffer), HAL_MAX_DELAY);
+                                 float lon_degrees = floor(atof(longitude) / 100.0f);
+                                 float lon_minutes = atof(longitude) - (lon_degrees * 100.0f);
+                                 float lon_decimal = lon_degrees + (lon_minutes / 60.0f);
+                                 if (lon_dir == 'W') lon_decimal *= -1.0f;
+
+                                 snprintf(combined_buffer, COMBINED_BUFFER_SIZE,
+                                                     "Lat:%.6f, Lon:%.6f , Alt:%sm | Son:%.1f dB\r\n",
+                                                     lat_decimal, lon_decimal, altitude, db);
+
+                                 HAL_UART_Transmit(&huart2, (uint8_t*)combined_buffer, strlen(combined_buffer), HAL_MAX_DELAY);
+              }
               }
               gps_rx_index = 0; // Réinitialiser le buffer
           }
