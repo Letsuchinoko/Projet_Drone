@@ -845,68 +845,86 @@ class OptimizedBicolorGloveDetectorWithAI:
         except Exception as e:
             self.logging.debug(f"Erreur analyse IA: {e}")
             return None, 0.0
-
     
     def _handle_training_mode(self, frame, contour, bounding_rect):
-        """Gestion du mode entraînement"""
         try:
             if self.training_class >= len(HAND_POSITIONS):
-                # Fin d'entraînement
+                # Fin d'entraînement, on lance le training du modèle
                 self._start_model_training()
                 self.current_training_distance_msg = ""
                 return "training_complete", 1.0
 
             position = HAND_POSITIONS[self.training_class]
 
-            # --- Mesure la distance main/caméra (ici : utilise la surface du contour) ---
+            # --- QUALITÉ DU CONTOUR ---
+            min_area = 3500        # Aire minimale pour être sûr que le gant est bien détecté
+            min_extent = 0.25      # Proportion du contour par rapport au bounding rect
+            min_solidity = 0.85    # Evite les contours “troués”
+            min_ratio = 0.3        # Ratio largeur/hauteur raisonnable (évite les barres fines)
+
+            x, y, w, h = bounding_rect
             area = cv2.contourArea(contour)
-            if area > 10000:
-                distance_msg = "Reculez un peu"
+            extent = area / (w * h) if w * h > 0 else 0
+            hull = cv2.convexHull(contour)
+            hull_area = cv2.contourArea(hull)
+            solidity = area / hull_area if hull_area > 0 else 0
+            aspect_ratio = w / float(h) if h > 0 else 0
+
+            # Critère "aspect ratio" dans les deux sens pour accepter mains orientées
+            aspect_ok = min_ratio < aspect_ratio < 1.0/min_ratio
+
+            # Si la main n'est pas bien vue : contour trop petit, pas assez “plein”, etc.
+            if (area < min_area or extent < min_extent or solidity < min_solidity or not aspect_ok):
+                self.current_training_distance_msg = "Gant mal détecté : repositionnez bien la main"
+                self.training_countdown = 15   # Petite pause, le temps de replacer la main
+                return f"training_{position.name}", 0.0
+
+            # --- Vérifie la distance à la caméra pour feedback visuel ---
+            if area > 11000:
+                distance_msg = "Reculez un peu la main"
             elif area < 2500:
                 distance_msg = "Avancez la main"
             else:
                 distance_msg = "Distance OK"
-            # Stocke le message pour affichage dans l’overlay
             self.current_training_distance_msg = distance_msg
 
-            # Compte à rebours pour capture (attente entre échantillons ou entre positions)
+            # Attend le countdown avant de capturer
             if self.training_countdown > 0:
                 self.training_countdown -= 1
                 return f"training_{position.name}", self.training_countdown / 60.0
 
-            # Capture d'échantillon
+            # --- Capture d'échantillon si tout est ok ---
             features = self.feature_extractor.extract_complete_features(
                 frame, contour, bounding_rect
             )
-
             success = self.position_recognizer.add_training_sample(features, self.training_class)
             if success:
                 samples_count = len([l for l in self.position_recognizer.training_labels if l == self.training_class])
+                self.current_training_distance_msg = "✅ Échantillon capturé!"
 
+                # Passe à la position suivante si assez d'échantillons pour cette position
                 if samples_count >= self.training_samples_per_class:
                     self.training_class += 1
-                    self.training_countdown = 60  # 2 secondes de pause entre positions
+                    self.training_countdown = 60  # 2 secondes de pause pour changer de position
                     if self.training_class < len(HAND_POSITIONS):
                         next_position = HAND_POSITIONS[self.training_class]
-                        # ==> Ligne log ici
                         self.logging.info(f"📝 Prochain geste attendu : {next_position.description}")
                         self.current_training_distance_msg = ""
                     else:
-                        self.training_countdown = 30  # 1 seconde entre captures (fin)
+                        self.training_countdown = 30  # petite pause avant la fin
                     return f"captured_{position.name}", 1.0
 
-                # === NOUVEAU : délai entre CHAQUE échantillon ===
-                self.training_countdown = 20   # 20 frames ≈ 0.7s (à ajuster selon FPS)
+                # Sinon continue la capture pour cette même position (petite pause)
+                self.training_countdown = 18   # ~0.6s pour laisser le temps à l'utilisateur de rebouger la main
                 return f"captured_{position.name}", 1.0
 
+            # S'il n'y a pas eu de capture, on continue l'affichage et l'attente
             return f"training_{position.name}", 0.0
 
         except Exception as e:
             self.logging.error(f"Erreur mode entraînement: {e}")
             self.current_training_distance_msg = ""
             return None, 0.0
-
-
     
     def _start_model_training(self):
         # On NE fait plus de thread : tout dans le thread principal pour éviter les bugs et que matplotlib/keras fonctionne bien.
@@ -1092,27 +1110,46 @@ class OptimizedBicolorGloveDetectorWithAI:
 
     
     def _draw_detection_overlay(self, frame, contour, area, quality_score):
-        """Visualisation de la détection de base"""
+        """
+        Visualisation de la détection de base avec retour couleur qualité et affichage des problèmes.
+        """
         try:
-            # Couleur selon qualité
-            if quality_score > 0.7:
-                color = (0, 255, 0)
-            elif quality_score > 0.5:
-                color = (0, 255, 255)
-            else:
-                color = (0, 150, 255)
-            
-            # Contour
-            cv2.drawContours(frame, [contour], -1, color, 2)
-            
+            # Couleur selon la qualité (en général)
+            color = (0, 255, 0)  # Vert = bonne qualité
+
+            # En mode entraînement : si le message de distance signale une mauvaise détection, on force le rouge
+            if hasattr(self, "current_training_distance_msg"):
+                msg = self.current_training_distance_msg.lower()
+                if "mal détecté" in msg or "repositionnez" in msg or "gant" in msg and "mal" in msg:
+                    color = (0, 0, 255)  # Rouge
+
+            # Sinon, code couleur selon score
+            if color == (0, 255, 0):
+                if quality_score > 0.7:
+                    color = (0, 255, 0)    # Vert
+                elif quality_score > 0.5:
+                    color = (0, 255, 255)  # Orange
+                else:
+                    color = (0, 0, 255)    # Rouge
+
+            # Dessin du contour
+            cv2.drawContours(frame, [contour], -1, color, 3)
+
             # Rectangle englobant
             x, y, w, h = cv2.boundingRect(contour)
             cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
-            
-            # Informations
-            cv2.putText(frame, f"Q:{quality_score:.2f} A:{int(area)}", 
-                       (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1)
-            
+
+            # Affichage d'infos techniques
+            cv2.putText(frame, f"Q:{quality_score:.2f} A:{int(area)}", (x, y - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1)
+
+            # Affichage du message problème si mauvais
+            if hasattr(self, "current_training_distance_msg"):
+                msg = self.current_training_distance_msg
+                if "mal détecté" in msg or "repositionnez" in msg:
+                    cv2.putText(frame, msg, (x, y - 30),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+
         except Exception as e:
             self.logging.debug(f"Erreur visualisation détection: {e}")
     
