@@ -102,6 +102,7 @@ class AdvancedHandFeatureExtractor:
         self.feature_size = 64
         self.logging = logging.getLogger(__name__)
         self.feature_history = deque(maxlen=5)
+        self.position_history = deque(maxlen=3)
         
     def extract_geometric_features(self, contour, bounding_rect):
         """Extraction des caractéristiques géométriques"""
@@ -495,7 +496,7 @@ class HandPositionRecognizer:
                         confidence = avg_confidence
             # ---- UTILISER LE DICT GLOBAL ----
             if predicted_class in HAND_POSITIONS:
-                threshold = 0.3
+                threshold = 0.4
                 if confidence >= threshold:
                     self.confident_predictions += 1
                     result = (predicted_class, confidence)
@@ -653,7 +654,10 @@ class OptimizedBicolorGloveDetectorWithAI:
         self.drone_commands_enabled = False
         self.last_command_time = 0
         self.command_cooldown = 2.0
-        
+
+        # === AJOUT ICI (stabilisation commandes drone) ===
+        self.position_history = deque(maxlen=3)   # <---- AJOUT OBLIGATOIRE
+
         self.logging = logging.getLogger(__name__)
         
         # Initialisation IA
@@ -917,20 +921,33 @@ class OptimizedBicolorGloveDetectorWithAI:
             if current_time - self.last_command_time < self.command_cooldown:
                 self.logging.info("[DRONE CMD] Cooldown actif, commande ignorée.")
                 return False
+            
+            self.position_history.append((position, confidence))
+            if list(self.position_history).count((position, confidence)) < 2:  # besoin 2x d'affilée
+                self.logging.info(f"[DRONE CMD] Position '{position}' pas assez stable, commande ignorée.")
+                return False
 
             # Seuils de confiance (modifiable)
             thresholds = {
-                "poing": 0.6,
-                "stop": 0.6,
-                "victoire": 0.6,
-                "paume": 0.6,
-                "ok": 0.6,
-                "index": 0.6,
-                "pouce": 0.6,
-                "salut": 0.6,
+                "poing": 0.75,
+                "stop": 0.75,
+                "victoire": 0.75,
+                "paume": 0.75,
+                "ok": 0.75,
+                "index": 0.75,
+                "pouce": 0.75,
+                "salut": 0.75,
             }
             threshold = thresholds.get(position, 0.85)
             self.logging.info(f"[DRONE CMD] Seuil pour {position}: {threshold}")
+
+            # Limite de distance : évite les commandes si le gant est trop loin
+            MIN_GLOVE_AREA = 3500  # Ajuste si besoin (taille en pixels)
+            if position in ["paume", "index", "ok", "salut"]:
+                area = getattr(self, "last_detected_area", None)
+                if area is not None and area < MIN_GLOVE_AREA:
+                    self.logging.warning(f"[DRONE CMD] Gant trop loin (area={area:.0f}), commande ignorée.")
+                    return False
 
             if confidence < threshold:
                 self.logging.info(f"[DRONE CMD] Confiance trop basse ({confidence:.3f} < {threshold}), commande ignorée.")
@@ -979,15 +996,17 @@ class OptimizedBicolorGloveDetectorWithAI:
                 self.last_command_time = current_time
                 return True
 
+            # 4. INDEX = GAUCHE (latéral)
             elif position == "index" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] ➡️ Avancer précis (index)")
-                bebop.fly_direct(roll=0, pitch=30, yaw=0, vertical_movement=0, duration=0.18)
+                self.logging.info("⬅️ Mouvement gauche (index)")
+                bebop.fly_direct(roll=-18, pitch=0, yaw=0, vertical_movement=0, duration=0.20)
                 self.last_command_time = current_time
                 return True
 
+            # 5. OK = DROITE (latéral)
             elif position == "ok" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] ✅ Hover (ok)")
-                bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=0, duration=0.5)
+                self.logging.info("➡️ Mouvement droite (ok)")
+                bebop.fly_direct(roll=18, pitch=0, yaw=0, vertical_movement=0, duration=0.20)
                 self.last_command_time = current_time
                 return True
 
