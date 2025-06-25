@@ -777,52 +777,76 @@ class OptimizedBicolorGloveDetectorWithAI:
             self.logging.debug(f"Erreur détection: {e}")
             return original_frame, False
 
-    def _finalize_detection(self, frame, detected, contour, area, quality_score):
-        """Finalisation avec intégration IA"""
-        try:
-            # Mise à jour historique
-            self.detection_history.append(detected)
-            if detected:
-                self.detection_count += 1
-            
-            # === ANALYSE IA ===
-            if detected and contour is not None and self.ai_enabled:
-                position, confidence = self._analyze_hand_position_ai(frame, contour)
+    def detect_glove_optimized(self, frame):
+        """Détection de gant optimisée, version adoucie pour éviter les débordements et capturer les doigts."""
 
-                # --- Correction: n'afficher que les vraies positions en mode reconnaissance ---
-                if (
-                    self.ai_mode == "recognition"
-                    and position
-                    and position != "training_complete"
-                    and position in [p.name for p in HAND_POSITIONS.values()]
-                ):
-                    self.current_position = position
-                    self.current_position_confidence = confidence
-                    self.ai_position_detections += 1
-
-                    # Commandes drone si activées
-                    if self.drone_commands_enabled:
-                        self._execute_drone_command(position, confidence)
-                else:
-                    self.current_position = None
-                    self.current_position_confidence = 0.0
-
-                # Visualisation IA
-                frame = self._draw_ai_overlay(frame, contour, position, confidence)
-
-            # Visualisation détection
-            if detected and contour is not None:
-                self._draw_detection_overlay(frame, contour, area, quality_score)
-            
-            # Interface complète
-            result_frame = self._create_complete_overlay(frame, detected, area, quality_score)
-            
-            return result_frame, detected
-            
-        except Exception as e:
-            self.logging.debug(f"Erreur finalisation: {e}")
+        if frame is None:
             return frame, False
-    
+
+        original_frame = frame.copy()
+        self.frame_count += 1
+
+        try:
+            # --- DÉTECTION COULEUR ---
+            hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+            # Plages pour le ROUGE (deux bandes)
+            red_lower1 = np.array([0, 130, 90])
+            red_upper1 = np.array([10, 255, 255])
+            mask_red1 = cv2.inRange(hsv, red_lower1, red_upper1)
+
+            red_lower2 = np.array([170, 130, 90])
+            red_upper2 = np.array([180, 255, 255])
+            mask_red2 = cv2.inRange(hsv, red_lower2, red_upper2)
+
+            # Plage ORANGE
+            orange_lower = np.array([9, 120, 120])
+            orange_upper = np.array([24, 255, 255])
+            mask_orange = cv2.inRange(hsv, orange_lower, orange_upper)
+
+            # Combine
+            mask_combined = cv2.bitwise_or(mask_red1, mask_red2)
+            mask_combined = cv2.bitwise_or(mask_combined, mask_orange)
+
+            # --- MORPHOLOGIE plus “fine” ---
+            mask_combined = cv2.morphologyEx(mask_combined, cv2.MORPH_CLOSE, self.kernel_medium, iterations=1)
+            mask_combined = cv2.morphologyEx(mask_combined, cv2.MORPH_OPEN, self.kernel_small, iterations=1)
+            mask_combined = cv2.GaussianBlur(mask_combined, (3, 3), 0)  # léger lissage
+
+            # --- CONTOURS ---
+            contours, _ = cv2.findContours(mask_combined, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            contours = [c for c in contours if cv2.contourArea(c) > 1200]
+
+            best_contour = None
+            best_area = 0
+            quality_score = 0
+
+            for contour in contours:
+                area = cv2.contourArea(contour)
+                if self.min_area < area < self.max_area and len(contour) >= self.min_contour_points:
+                    if area > best_area:
+                        best_contour = contour
+                        best_area = area
+                        quality_score = min(area / self.area_reference, 1.0)
+
+            # Lissage léger du contour pour enlever les “zig-zags” tout en gardant la forme des doigts
+            if best_contour is not None:
+                epsilon = 0.008 * cv2.arcLength(best_contour, True)
+                best_contour = cv2.approxPolyDP(best_contour, epsilon, True)
+
+            detected = best_contour is not None
+
+            if detected:
+                self.last_detected_contour = best_contour.copy()
+                self.last_detected_area = best_area
+                self.last_bounding_rect = cv2.boundingRect(best_contour)
+
+            return self._finalize_detection(original_frame, detected, best_contour, best_area, quality_score)
+
+        except Exception as e:
+            self.logging.debug(f"Erreur détection: {e}")
+            return original_frame, False
+        
     def _analyze_hand_position_ai(self, frame, contour):
         """Analyse IA de la position de la main"""
         try:
