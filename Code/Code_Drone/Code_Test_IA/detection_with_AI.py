@@ -79,13 +79,16 @@ class HandPosition:
 
 HAND_POSITIONS = {
     0: HandPosition("poing", "Poing fermé - ARRÊT D'URGENCE"),
-    1: HandPosition("paume_avant", "Paume ouverte vers la caméra - AVANCER"),
-    2: HandPosition("dos_main", "Dos de la main vers la caméra (ongles visibles) - RECULER"),
-    3: HandPosition("index_droite", "Index tendu à droite (autres doigts repliés) - DROITE"),
-    4: HandPosition("index_gauche", "Index tendu à gauche (autres doigts repliés) - GAUCHE"),
-    5: HandPosition("doigts_haut", "Main ouverte, doigts pointés vers le haut - HAUT"),
-    6: HandPosition("doigts_bas", "Main ouverte, doigts pointés vers le bas - BAS"),
+    1: HandPosition("avancer", "Main vers l'avant, doigts vers le bas (style karaté vers caméra)"),
+    2: HandPosition("reculer", "Paume vers caméra, doigts écartés (main à plat stop classique)"),
+    3: HandPosition("monter", "Pouce vers le haut (pouce en l'air 👍)"),
+    4: HandPosition("descendre", "Pouce vers le bas (👎)"),
+    5: HandPosition("droite", "Index pointé vers la gauche de l'image (pour faire aller le drone à droite)"),
+    6: HandPosition("gauche", "Index pointé vers la droite de l'image (pour faire aller le drone à gauche)"),
+    7: HandPosition("rotation_gauche", "Paume main penché vers droite visible (rotation à gauche)"),
+    8: HandPosition("rotation_droite", "Dos main penché vers gauche visible (rotation à droite)"),
 }
+
 
 DISTANCE_LABELS = [
     "PROCHE de la caméra",
@@ -260,7 +263,7 @@ class AdvancedHandFeatureExtractor:
 class HandPositionRecognizer:
     """Modèle de reconnaissance de position - VERSION COURBES & FEEDBACK"""
     
-    def __init__(self, feature_size=64, num_classes=8):
+    def __init__(self, feature_size=64, num_classes=9):
         from collections import deque
         self.feature_size = feature_size
         self.num_classes = num_classes
@@ -586,7 +589,7 @@ class HandPositionRecognizer:
                 self.training_data = data.get('training_data', [])
                 self.training_labels = data.get('training_labels', [])
                 self.feature_size = data.get('feature_size', 64)
-                self.num_classes = data.get('num_classes', 8)
+                self.num_classes = data.get('num_classes', 9)
                 self.is_trained = data.get('is_trained', False)
                 self.total_predictions = data.get('total_predictions', 0)
                 self.confident_predictions = data.get('confident_predictions', 0)
@@ -1005,7 +1008,6 @@ class OptimizedBicolorGloveDetectorWithAI:
 
             # ========== Commandes ==========
             if position == "poing":
-                # Arrêt d'urgence : Atterrir tout de suite
                 self.logging.warning("[DRONE CMD] 🚨 ARRÊT D'URGENCE - Poing détecté")
                 if flying_state == "landed":
                     self.logging.info("[DRONE CMD] Déjà posé. Aucun mouvement.")
@@ -1015,45 +1017,58 @@ class OptimizedBicolorGloveDetectorWithAI:
                 self.last_command_time = current_time
                 return True
 
-            elif position == "paume_avant" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] ➡️ Avancer (paume avant)")
+            elif position == "avancer" and flying_state != "landed":
+                self.logging.info("[DRONE CMD] ➡️ Avancer (main vers l'avant, doigts vers le bas)")
                 bebop.fly_direct(roll=0, pitch=70, yaw=0, vertical_movement=0, duration=0.3)
                 self.last_command_time = current_time
                 return True
 
-            elif position == "dos_main" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] ⬅️ Reculer (dos de la main)")
+            elif position == "reculer" and flying_state != "landed":
+                self.logging.info("[DRONE CMD] ⬅️ Reculer (paume, doigts écartés)")
                 bebop.fly_direct(roll=0, pitch=-70, yaw=0, vertical_movement=0, duration=0.3)
                 self.last_command_time = current_time
                 return True
 
-            elif position == "index_droite" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] ➡️ Droite (index droit)")
+            elif position == "monter" and flying_state != "landed":
+                self.logging.info("[DRONE CMD] ⬆️ Monter (pouce vers le haut)")
+                bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=30, duration=0.3)
+                self.last_command_time = current_time
+                return True
+
+            elif position == "descendre" and flying_state != "landed":
+                self.logging.info("[DRONE CMD] ⬇️ Descendre (pouce vers le bas)")
+                bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=-30, duration=0.3)
+                self.last_command_time = current_time
+                return True
+
+            elif position == "droite" and flying_state != "landed":
+                self.logging.info("[DRONE CMD] ➡️ Droite (index vers gauche de l'image)")
                 bebop.fly_direct(roll=30, pitch=0, yaw=0, vertical_movement=0, duration=0.3)
                 self.last_command_time = current_time
                 return True
 
-            elif position == "index_gauche" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] ⬅️ Gauche (index gauche)")
+            elif position == "gauche" and flying_state != "landed":
+                self.logging.info("[DRONE CMD] ⬅️ Gauche (index vers droite de l'image)")
                 bebop.fly_direct(roll=-30, pitch=0, yaw=0, vertical_movement=0, duration=0.3)
                 self.last_command_time = current_time
                 return True
 
-            elif position == "doigts_haut" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] ⬆️ Monter (doigts haut)")
-                bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=25, duration=0.3)
+            elif position == "rotation_gauche" and flying_state != "landed":
+                self.logging.info("[DRONE CMD] 🔄 Rotation GAUCHE (dos main droite)")
+                bebop.fly_direct(roll=0, pitch=0, yaw=-40, vertical_movement=0, duration=0.4)
                 self.last_command_time = current_time
                 return True
 
-            elif position == "doigts_bas" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] ⬇️ Descendre (doigts bas)")
-                bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=-25, duration=0.3)
+            elif position == "rotation_droite" and flying_state != "landed":
+                self.logging.info("[DRONE CMD] 🔄 Rotation DROITE (dos main gauche)")
+                bebop.fly_direct(roll=0, pitch=0, yaw=40, vertical_movement=0, duration=0.4)
                 self.last_command_time = current_time
                 return True
 
             else:
                 self.logging.info(f"[DRONE CMD] Position {position} non exécutée ou condition non remplie (flying_state={flying_state}, confiance={confidence:.2f})")
                 return False
+
 
         except Exception as e:
             self.logging.error(f"[DRONE CMD] ❌ Erreur commande drone: {e}")
@@ -1209,9 +1224,11 @@ class OptimizedBicolorGloveDetectorWithAI:
 
             # === POSITIONS DISPONIBLES ===
             if self.ai_mode == "recognition":
-                positions_text = ("Positions : "
-                    "avancer(paume), reculer(dos main), droite(index droit), "
-                    "gauche(index gauche), haut(doigts haut), bas(doigts bas), urgence(poing)")
+                positions_text = (
+                "Positions : avancer(main doigts bas), reculer(paume doigts écartés), "
+                "monter(pouce haut), descendre(pouce bas), droite(index gauche), "
+                "gauche(index droite), rot.gauche(dos main droite), rot.droite(dos main gauche), urgence(poing)"
+            )
                 cv2.putText(frame, positions_text, (10, h - 40), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
 
             # === HISTORIQUE ===
