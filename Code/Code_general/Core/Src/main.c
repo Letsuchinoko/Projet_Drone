@@ -24,6 +24,7 @@
 #include <math.h>
 #include "stdio.h"
 #include "string.h"
+#include <stdlib.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -48,7 +49,7 @@ UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 #define GPS_BUFFER_SIZE 100
-#define COMBINED_BUFFER_SIZE 128
+#define COMBINED_BUFFER_SIZE 512
 uint8_t gps_rx_buffer[GPS_BUFFER_SIZE]; // Re-enabled for full sentence reception
 uint16_t gps_rx_index = 0; // Re-enabled for full sentence reception
 uint8_t c; // Buffer for single character reception
@@ -66,6 +67,7 @@ char longitude[16] = "";
 char lon_dir = ' ';
 char altitude[16] = "";
 char temp_buffer[GPS_BUFFER_SIZE];
+char altitude_str[16] = "";
 
 /* USER CODE END PV */
 
@@ -140,53 +142,66 @@ int main(void)
           if (c == '\n' || gps_rx_index >= GPS_BUFFER_SIZE - 1) {
               gps_rx_buffer[gps_rx_index] = '\0'; // Null-terminate
 
-              // Debug: Print raw NMEA
+              // Parse and process valid GGA sentences
               if (strstr((char*)gps_rx_buffer, "$GPGGA") != NULL) {
-                  HAL_UART_Transmit(&huart2, (uint8_t*)"RAW: ", 5, HAL_MAX_DELAY);
-                  HAL_UART_Transmit(&huart2, gps_rx_buffer, gps_rx_index, HAL_MAX_DELAY);
-
-                  // Parse and process valid GGA sentences
                   if (strstr((char*)gps_rx_buffer, ",V,") == NULL) {  // Skip invalid data
-                      double lat_raw = 0, lon_raw = 0;
-                      char lat_dir = 'N', lon_dir = 'E';
+                      char local_gps_buffer[GPS_BUFFER_SIZE * 2];
+                      strncpy(local_gps_buffer, (char*)gps_rx_buffer, GPS_BUFFER_SIZE-1);
+                      local_gps_buffer[GPS_BUFFER_SIZE-1] = '\0';
+
+                      char latitude[32] = "";
+                      char longitude[32] = "";
+                      char lat_dir = 'N';
+                      char lon_dir = 'E';
                       char fix_quality = '0';
+                      char altitude_str[32] = "";
                       float altitude = 0.0f;
 
-                      char *token = strtok((char*)gps_rx_buffer, ",");
-                      for (int field = 0; token != NULL; token = strtok(NULL, ","), field++) {
+                      char *token = strtok(local_gps_buffer, ",");
+                      int field = 0;
+                      while (token != NULL) {
                           switch (field) {
-                              case 2: lat_raw = atof(token); break;
-                              case 3: lat_dir = *token; break;
-                              case 4: lon_raw = atof(token); break;
-                              case 5: lon_dir = *token; break;
-                              case 6: fix_quality = *token; break;
-                              case 9: altitude = atof(token); break;
+                              case 2: strncpy(latitude, token, sizeof(latitude)-1); latitude[sizeof(latitude)-1] = '\0'; break;
+                              case 3: lat_dir = token[0]; break;
+                              case 4: strncpy(longitude, token, sizeof(longitude)-1); longitude[sizeof(longitude)-1] = '\0'; break;
+                              case 5: lon_dir = token[0]; break;
+                              case 6: fix_quality = token[0]; break;
+                              case 9:
+                                  strncpy(altitude_str, token, sizeof(altitude_str)-1);
+                                  altitude_str[sizeof(altitude_str)-1] = '\0';
+                                  altitude = atof(altitude_str);
+                                  break;
                           }
+                          token = strtok(NULL, ",");
+                          field++;
                       }
 
-                      if (fix_quality > '0') {
-                          // Convert coordinates
-                          double lat_deg = floor(lat_raw / 100.0);
-                          double lat_min = fmod(lat_raw, 100.0);
-                          double lat_decimal = lat_deg + (lat_min / 60.0);
+                      // Conversion des coordonnées GPS et transmission des données
+                      if (fix_quality > '0' && strlen(latitude) > 0 && strlen(longitude) > 0) {
+                          // Conversion latitude : format NMEA ddmm.mmmm en degrés décimaux
+                          int lat_deg = 0;
+                          float lat_min = 0.0f;
+                          sscanf(latitude, "%2d%f", &lat_deg, &lat_min);
+                          float lat_decimal = lat_deg + (lat_min / 60.0f);
                           if (lat_dir == 'S') lat_decimal = -lat_decimal;
 
-                          double lon_deg = floor(lon_raw / 100.0);
-                          double lon_min = fmod(lon_raw, 100.0);
-                          double lon_decimal = lon_deg + (lon_min / 60.0);
+                          // Conversion longitude : format NMEA dddmm.mmmm en degrés décimaux
+                          int lon_deg = 0;
+                          float lon_min = 0.0f;
+                          sscanf(longitude, "%3d%f", &lon_deg, &lon_min);
+                          float lon_decimal = lon_deg + (lon_min / 60.0f);
                           if (lon_dir == 'W') lon_decimal = -lon_decimal;
 
-                          // Format output
+                          // Transmission de la trame formatée avec les données GPS et sonores
                           snprintf(combined_buffer, COMBINED_BUFFER_SIZE,
-                                 "Lat:%.6f, Lon:%.6f, Alt:%.1fm | Son:%.1f dB\r\n",
+                                 "Lat:%.7f, Lon:%.7f, Alt:%.2fm | Son:%.1f dB\r\n",
                                  lat_decimal, lon_decimal, altitude, db);
+                          HAL_UART_Transmit(&huart2, (uint8_t*)combined_buffer, strlen(combined_buffer), HAL_MAX_DELAY);
                       } else {
                           snprintf(combined_buffer, COMBINED_BUFFER_SIZE,
                                  "GPS INVALID FIX | Son:%.1f dB\r\n", db);
+                          HAL_UART_Transmit(&huart2, (uint8_t*)combined_buffer, strlen(combined_buffer), HAL_MAX_DELAY);
                       }
-
-                      // Transmit processed data
-                      HAL_UART_Transmit(&huart2, (uint8_t*)combined_buffer, strlen(combined_buffer), HAL_MAX_DELAY);
                   }
               }
               gps_rx_index = 0; // Reset buffer
