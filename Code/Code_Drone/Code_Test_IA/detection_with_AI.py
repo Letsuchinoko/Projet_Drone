@@ -854,10 +854,10 @@ class OptimizedBicolorGloveDetectorWithAI:
             position = HAND_POSITIONS[self.training_class]
 
             # --- QUALITÉ DU CONTOUR ---
-            min_area = 3500        # Aire minimale pour être sûr que le gant est bien détecté
-            min_extent = 0.25      # Proportion du contour par rapport au bounding rect
-            min_solidity = 0.85    # Evite les contours “troués”
-            min_ratio = 0.3        # Ratio largeur/hauteur raisonnable (évite les barres fines)
+            min_area = 2000        # Aire minimale pour être sûr que le gant est bien détecté
+            min_extent = 0.18      # Proportion du contour par rapport au bounding rect
+            min_solidity = 0.75    # Evite les contours “troués”
+            min_ratio = 0.1        # Ratio largeur/hauteur raisonnable (évite les barres fines)
 
             x, y, w, h = bounding_rect
             area = cv2.contourArea(contour)
