@@ -8,17 +8,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-class Fragment2 : Fragment() {
+class Fragment2 : Fragment(), OnMapReadyCallback {
     private val TAG = "Fragment2"
     private var param1: String? = null
     private var param2: String? = null
 
     private lateinit var gpsTextView: TextView
     private val sharedDataManager: SharedDataManager by activityViewModels()
+    private var googleMap: GoogleMap? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +43,9 @@ class Fragment2 : Fragment() {
         
         gpsTextView = view.findViewById(R.id.textView2)
         gpsTextView.text = "Localisation GPS\n\nEn attente de données..."
+
+        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as? SupportMapFragment
+        mapFragment?.getMapAsync(this)
         
         sharedDataManager.gpsData.observe(viewLifecycleOwner) { gpsData ->
             Log.d(TAG, "Données GPS reçues pour traitement dans Fragment2: '$gpsData'")
@@ -45,16 +55,16 @@ class Fragment2 : Fragment() {
             val numbers = numberPattern.findAll(gpsData).map { it.value }.toList()
 
             if (numbers.size >= 3) {
-                // Assez de nombres pour lat, lon, et alt
                 val lat = numbers[0]
                 val lon = numbers[1]
                 val alt = numbers[2]
                 gpsTextView.text = "Localisation GPS\n\nLatitude: $lat\nLongitude: $lon\nAltitude: $alt"
+                updateMapLocation(lat.toString(), lon.toString())
             } else if (numbers.size == 2) {
-                // Assez pour lat et lon
                 val lat = numbers[0]
                 val lon = numbers[1]
                 gpsTextView.text = "Localisation GPS\n\nLatitude: $lat\nLongitude: $lon"
+                updateMapLocation(lat.toString(), lon.toString())
             }
             // Si moins de 2 nombres sont trouvés, on ne met pas à jour l'affichage
             // pour éviter d'afficher des données incomplètes.
@@ -62,6 +72,21 @@ class Fragment2 : Fragment() {
         
         Log.d(TAG, "Fragment2 onCreateView terminé")
         return view
+    }
+
+    override fun onMapReady(map: GoogleMap) {
+        googleMap = map
+    }
+
+    private fun updateMapLocation(latStr: String, lonStr: String) {
+        val lat = latStr.toDoubleOrNull()
+        val lon = lonStr.toDoubleOrNull()
+        if (lat != null && lon != null && googleMap != null) {
+            val position = LatLng(lat, lon)
+            googleMap?.clear()
+            googleMap?.addMarker(MarkerOptions().position(position).title("Position actuelle"))
+            googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 15f))
+        }
     }
 
     companion object {
