@@ -79,13 +79,16 @@ class HandPosition:
 
 HAND_POSITIONS = {
     0: HandPosition("poing", "Poing fermé - ARRÊT D'URGENCE"),
-    1: HandPosition("paume_avant", "Paume ouverte vers la caméra - AVANCER"),
-    2: HandPosition("dos_main", "Dos de la main vers la caméra (ongles visibles) - RECULER"),
-    3: HandPosition("index_droite", "Index tendu à droite (autres doigts repliés) - DROITE"),
-    4: HandPosition("index_gauche", "Index tendu à gauche (autres doigts repliés) - GAUCHE"),
-    5: HandPosition("doigts_haut", "Main ouverte, doigts pointés vers le haut - HAUT"),
-    6: HandPosition("doigts_bas", "Main ouverte, doigts pointés vers le bas - BAS"),
+    1: HandPosition("avancer", "Main vers l'avant, doigts vers le bas (style karaté vers caméra)"),
+    2: HandPosition("reculer", "Paume vers caméra, doigts écartés (main à plat stop classique)"),
+    3: HandPosition("monter", "Pouce vers le haut (pouce en l'air 👍)"),
+    4: HandPosition("descendre", "Pouce vers le bas (👎)"),
+    5: HandPosition("droite", "Index pointé vers la gauche de l'image (pour faire aller le drone à droite)"),
+    6: HandPosition("gauche", "Index pointé vers la droite de l'image (pour faire aller le drone à gauche)"),
+    7: HandPosition("rotation_gauche", "Paume main penché vers droite visible (rotation à gauche)"),
+    8: HandPosition("rotation_droite", "Dos main penché vers gauche visible (rotation à droite)"),
 }
+
 
 DISTANCE_LABELS = [
     "PROCHE de la caméra",
@@ -260,7 +263,7 @@ class AdvancedHandFeatureExtractor:
 class HandPositionRecognizer:
     """Modèle de reconnaissance de position - VERSION COURBES & FEEDBACK"""
     
-    def __init__(self, feature_size=64, num_classes=8):
+    def __init__(self, feature_size=64, num_classes=9):
         from collections import deque
         self.feature_size = feature_size
         self.num_classes = num_classes
@@ -586,7 +589,7 @@ class HandPositionRecognizer:
                 self.training_data = data.get('training_data', [])
                 self.training_labels = data.get('training_labels', [])
                 self.feature_size = data.get('feature_size', 64)
-                self.num_classes = data.get('num_classes', 8)
+                self.num_classes = data.get('num_classes', 9)
                 self.is_trained = data.get('is_trained', False)
                 self.total_predictions = data.get('total_predictions', 0)
                 self.confident_predictions = data.get('confident_predictions', 0)
@@ -705,7 +708,7 @@ class OptimizedBicolorGloveDetectorWithAI:
             self.ai_enabled = False
     
     def detect_glove_optimized(self, frame):
-        """Détection de gant optimisée, version améliorée pour lisser le contour et mieux capturer les doigts."""
+        """Détection gant simple (rouge/orange), version basique, pas de lissage, contour brut."""
         if frame is None:
             return frame, False
 
@@ -713,38 +716,26 @@ class OptimizedBicolorGloveDetectorWithAI:
         self.frame_count += 1
 
         try:
-            # --- DÉTECTION COULEUR ---
+            # Conversion HSV
             hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-            # Rouge (2 plages)
-            red_lower1 = np.array([0, 120, 80])    # S & V plus bas qu'avant
-            red_upper1 = np.array([10, 255, 255])
-            mask_red1 = cv2.inRange(hsv, red_lower1, red_upper1)
+            # Masque rouge (2 intervalles)
+            mask_red1 = cv2.inRange(hsv, np.array([0, 140, 120]), np.array([8, 255, 255]))
+            mask_red2 = cv2.inRange(hsv, np.array([172, 140, 120]), np.array([180, 255, 255]))
 
-            red_lower2 = np.array([170, 120, 80])
-            red_upper2 = np.array([180, 255, 255])
-            mask_red2 = cv2.inRange(hsv, red_lower2, red_upper2)
+            # Masque orange
+            mask_orange = cv2.inRange(hsv, np.array([8, 160, 140]), np.array([18, 255, 255]))
 
-            # Orange (plage élargie)
-            orange_lower = np.array([8, 100, 70])
-            orange_upper = np.array([24, 255, 255])
-            mask_orange = cv2.inRange(hsv, orange_lower, orange_upper)
-
-            # Combine (OU logique)
+            # Combine tous les masques
             mask_combined = cv2.bitwise_or(mask_red1, mask_red2)
             mask_combined = cv2.bitwise_or(mask_combined, mask_orange)
 
-            # --- MORPHOLOGIE ---
-            # Fermeture forte puis ouverture légère
-            mask_combined = cv2.morphologyEx(mask_combined, cv2.MORPH_CLOSE, self.kernel_large, iterations=2)
-            mask_combined = cv2.morphologyEx(mask_combined, cv2.MORPH_OPEN, self.kernel_medium, iterations=1)
+            # Petite fermeture pour combler les trous, mais rien d'agressif
+            mask_combined = cv2.morphologyEx(mask_combined, cv2.MORPH_CLOSE, self.kernel_small)
 
-            # Lissage doux
-            mask_combined = cv2.GaussianBlur(mask_combined, (7, 7), 0)
-
-            # --- CONTOURS ---
+            # Recherche des contours
             contours, _ = cv2.findContours(mask_combined, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            contours = [c for c in contours if cv2.contourArea(c) > 900]  # baisse le seuil pour doigts fins
+            contours = [c for c in contours if cv2.contourArea(c) > 500]  # On baisse un peu le seuil
 
             best_contour = None
             best_area = 0
@@ -752,18 +743,11 @@ class OptimizedBicolorGloveDetectorWithAI:
 
             for contour in contours:
                 area = cv2.contourArea(contour)
-                if self.min_area < area < self.max_area and len(contour) >= self.min_contour_points:
-                    if area > best_area:
-                        best_contour = contour
-                        best_area = area
-                        quality_score = min(area / self.area_reference, 1.0)
+                if area > best_area:
+                    best_contour = contour
+                    best_area = area
+                    quality_score = min(area / 2800, 1.0)
 
-            # Lissage du meilleur contour (plus fin)
-            if best_contour is not None:
-                epsilon = 0.005 * cv2.arcLength(best_contour, True)  # plus fin
-                best_contour = cv2.approxPolyDP(best_contour, epsilon, True)
-
-            # Save
             detected = best_contour is not None
 
             if detected:
@@ -771,11 +755,12 @@ class OptimizedBicolorGloveDetectorWithAI:
                 self.last_detected_area = best_area
                 self.last_bounding_rect = cv2.boundingRect(best_contour)
 
+            # PAS DE LISSSAGE DU CONTOUR !
             return self._finalize_detection(original_frame, detected, best_contour, best_area, quality_score)
 
         except Exception as e:
             self.logging.debug(f"Erreur détection: {e}")
-            return original_frame, False
+            return original
 
     def _finalize_detection(self, frame, detected, contour, area, quality_score):
         """Finalisation avec intégration IA"""
@@ -1023,7 +1008,6 @@ class OptimizedBicolorGloveDetectorWithAI:
 
             # ========== Commandes ==========
             if position == "poing":
-                # Arrêt d'urgence : Atterrir tout de suite
                 self.logging.warning("[DRONE CMD] 🚨 ARRÊT D'URGENCE - Poing détecté")
                 if flying_state == "landed":
                     self.logging.info("[DRONE CMD] Déjà posé. Aucun mouvement.")
@@ -1033,45 +1017,58 @@ class OptimizedBicolorGloveDetectorWithAI:
                 self.last_command_time = current_time
                 return True
 
-            elif position == "paume_avant" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] ➡️ Avancer (paume avant)")
+            elif position == "avancer" and flying_state != "landed":
+                self.logging.info("[DRONE CMD] ➡️ Avancer (main vers l'avant, doigts vers le bas)")
                 bebop.fly_direct(roll=0, pitch=70, yaw=0, vertical_movement=0, duration=0.3)
                 self.last_command_time = current_time
                 return True
 
-            elif position == "dos_main" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] ⬅️ Reculer (dos de la main)")
+            elif position == "reculer" and flying_state != "landed":
+                self.logging.info("[DRONE CMD] ⬅️ Reculer (paume, doigts écartés)")
                 bebop.fly_direct(roll=0, pitch=-70, yaw=0, vertical_movement=0, duration=0.3)
                 self.last_command_time = current_time
                 return True
 
-            elif position == "index_droite" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] ➡️ Droite (index droit)")
+            elif position == "monter" and flying_state != "landed":
+                self.logging.info("[DRONE CMD] ⬆️ Monter (pouce vers le haut)")
+                bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=30, duration=0.3)
+                self.last_command_time = current_time
+                return True
+
+            elif position == "descendre" and flying_state != "landed":
+                self.logging.info("[DRONE CMD] ⬇️ Descendre (pouce vers le bas)")
+                bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=-30, duration=0.3)
+                self.last_command_time = current_time
+                return True
+
+            elif position == "droite" and flying_state != "landed":
+                self.logging.info("[DRONE CMD] ➡️ Droite (index vers gauche de l'image)")
                 bebop.fly_direct(roll=30, pitch=0, yaw=0, vertical_movement=0, duration=0.3)
                 self.last_command_time = current_time
                 return True
 
-            elif position == "index_gauche" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] ⬅️ Gauche (index gauche)")
+            elif position == "gauche" and flying_state != "landed":
+                self.logging.info("[DRONE CMD] ⬅️ Gauche (index vers droite de l'image)")
                 bebop.fly_direct(roll=-30, pitch=0, yaw=0, vertical_movement=0, duration=0.3)
                 self.last_command_time = current_time
                 return True
 
-            elif position == "doigts_haut" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] ⬆️ Monter (doigts haut)")
-                bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=25, duration=0.3)
+            elif position == "rotation_gauche" and flying_state != "landed":
+                self.logging.info("[DRONE CMD] 🔄 Rotation GAUCHE (dos main droite)")
+                bebop.fly_direct(roll=0, pitch=0, yaw=-40, vertical_movement=0, duration=0.4)
                 self.last_command_time = current_time
                 return True
 
-            elif position == "doigts_bas" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] ⬇️ Descendre (doigts bas)")
-                bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=-25, duration=0.3)
+            elif position == "rotation_droite" and flying_state != "landed":
+                self.logging.info("[DRONE CMD] 🔄 Rotation DROITE (dos main gauche)")
+                bebop.fly_direct(roll=0, pitch=0, yaw=40, vertical_movement=0, duration=0.4)
                 self.last_command_time = current_time
                 return True
 
             else:
                 self.logging.info(f"[DRONE CMD] Position {position} non exécutée ou condition non remplie (flying_state={flying_state}, confiance={confidence:.2f})")
                 return False
+
 
         except Exception as e:
             self.logging.error(f"[DRONE CMD] ❌ Erreur commande drone: {e}")
@@ -1227,9 +1224,11 @@ class OptimizedBicolorGloveDetectorWithAI:
 
             # === POSITIONS DISPONIBLES ===
             if self.ai_mode == "recognition":
-                positions_text = ("Positions : "
-                    "avancer(paume), reculer(dos main), droite(index droit), "
-                    "gauche(index gauche), haut(doigts haut), bas(doigts bas), urgence(poing)")
+                positions_text = (
+                "Positions : avancer(main doigts bas), reculer(paume doigts écartés), "
+                "monter(pouce haut), descendre(pouce bas), droite(index gauche), "
+                "gauche(index droite), rot.gauche(dos main droite), rot.droite(dos main gauche), urgence(poing)"
+            )
                 cv2.putText(frame, positions_text, (10, h - 40), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
 
             # === HISTORIQUE ===
