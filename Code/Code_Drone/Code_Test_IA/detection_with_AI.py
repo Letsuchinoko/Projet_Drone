@@ -705,7 +705,7 @@ class OptimizedBicolorGloveDetectorWithAI:
             self.ai_enabled = False
     
     def detect_glove_optimized(self, frame):
-        """Détection de gant optimisée, simple et fiable pour bien capturer tout le gant (rouge OU orange)"""
+        """Détection gant simple (rouge/orange), version basique, pas de lissage, contour brut."""
         if frame is None:
             return frame, False
 
@@ -713,34 +713,26 @@ class OptimizedBicolorGloveDetectorWithAI:
         self.frame_count += 1
 
         try:
-            # === DÉTECTION COULEUR ===
+            # Conversion HSV
             hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-            # Masque rouge (deux intervalles)
-            red_lower1 = np.array([0, 140, 120])
-            red_upper1 = np.array([8, 255, 255])
-            mask_red1 = cv2.inRange(hsv, red_lower1, red_upper1)
-
-            red_lower2 = np.array([172, 140, 120])
-            red_upper2 = np.array([180, 255, 255])
-            mask_red2 = cv2.inRange(hsv, red_lower2, red_upper2)
+            # Masque rouge (2 intervalles)
+            mask_red1 = cv2.inRange(hsv, np.array([0, 140, 120]), np.array([8, 255, 255]))
+            mask_red2 = cv2.inRange(hsv, np.array([172, 140, 120]), np.array([180, 255, 255]))
 
             # Masque orange
-            orange_lower = np.array([8, 160, 140])
-            orange_upper = np.array([18, 255, 255])
-            mask_orange = cv2.inRange(hsv, orange_lower, orange_upper)
+            mask_orange = cv2.inRange(hsv, np.array([8, 160, 140]), np.array([18, 255, 255]))
 
-            # Combine rouge et orange
+            # Combine tous les masques
             mask_combined = cv2.bitwise_or(mask_red1, mask_red2)
             mask_combined = cv2.bitwise_or(mask_combined, mask_orange)
 
-            # Morphologie de base
-            mask_combined = cv2.morphologyEx(mask_combined, cv2.MORPH_CLOSE, self.kernel_large)
-            mask_combined = cv2.morphologyEx(mask_combined, cv2.MORPH_OPEN, self.kernel_medium)
+            # Petite fermeture pour combler les trous, mais rien d'agressif
+            mask_combined = cv2.morphologyEx(mask_combined, cv2.MORPH_CLOSE, self.kernel_small)
 
             # Recherche des contours
             contours, _ = cv2.findContours(mask_combined, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            contours = [c for c in contours if cv2.contourArea(c) > 1000]
+            contours = [c for c in contours if cv2.contourArea(c) > 500]  # On baisse un peu le seuil
 
             best_contour = None
             best_area = 0
@@ -748,16 +740,10 @@ class OptimizedBicolorGloveDetectorWithAI:
 
             for contour in contours:
                 area = cv2.contourArea(contour)
-                if self.min_area < area < self.max_area and len(contour) >= self.min_contour_points:
-                    if area > best_area:
-                        best_contour = contour
-                        best_area = area
-                        quality_score = min(area / self.area_reference, 1.0)
-
-            # Lissage du contour (optionnel : epsilon par défaut, garde un contour “anguleux” mais cohérent)
-            if best_contour is not None:
-                epsilon = 0.01 * cv2.arcLength(best_contour, True)
-                best_contour = cv2.approxPolyDP(best_contour, epsilon, True)
+                if area > best_area:
+                    best_contour = contour
+                    best_area = area
+                    quality_score = min(area / 2800, 1.0)
 
             detected = best_contour is not None
 
@@ -766,12 +752,12 @@ class OptimizedBicolorGloveDetectorWithAI:
                 self.last_detected_area = best_area
                 self.last_bounding_rect = cv2.boundingRect(best_contour)
 
-            # Passe à la suite (overlay, IA, etc)
+            # PAS DE LISSSAGE DU CONTOUR !
             return self._finalize_detection(original_frame, detected, best_contour, best_area, quality_score)
 
         except Exception as e:
             self.logging.debug(f"Erreur détection: {e}")
-            return original_frame, False
+            return original
 
     def _finalize_detection(self, frame, detected, contour, area, quality_score):
         """Finalisation avec intégration IA"""
