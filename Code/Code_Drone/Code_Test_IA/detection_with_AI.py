@@ -730,13 +730,17 @@ class OptimizedBicolorGloveDetectorWithAI:
             orange_upper = np.array([18, 255, 255])
             mask_orange = cv2.inRange(hsv, orange_lower, orange_upper)
 
-            # Combine rouge et orange en "OU" (pas "ET") : il suffit d'une couleur
+            # Combine rouge et orange en "OU" (pas "ET")
             mask_combined = cv2.bitwise_or(mask_red1, mask_red2)
             mask_combined = cv2.bitwise_or(mask_combined, mask_orange)
 
-            # Morphologie : renforce la fermeture des petits trous, puis supprime petits parasites
+            # Morphologie pour solidifier le gant
             mask_combined = cv2.morphologyEx(mask_combined, cv2.MORPH_CLOSE, self.kernel_large)
             mask_combined = cv2.morphologyEx(mask_combined, cv2.MORPH_OPEN, self.kernel_medium)
+            mask_combined = cv2.morphologyEx(mask_combined, cv2.MORPH_CLOSE, self.kernel_medium)
+
+            # --- FLU GAUSSIEN pour éviter les angles trop durs
+            mask_combined = cv2.GaussianBlur(mask_combined, (7, 7), 0)
 
             # Recherche des contours
             contours, _ = cv2.findContours(mask_combined, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -750,7 +754,15 @@ class OptimizedBicolorGloveDetectorWithAI:
 
             for contour in contours:
                 area = cv2.contourArea(contour)
-                if self.min_area < area < self.max_area and len(contour) >= self.min_contour_points:
+                hull = cv2.convexHull(contour)
+                hull_area = cv2.contourArea(hull)
+                solidity = area / hull_area if hull_area > 0 else 0
+                x, y, w, h = cv2.boundingRect(contour)
+                aspect_ratio = w / float(h) if h > 0 else 0
+
+                # Critères renforcés pour éviter les contours parasites et trop fins
+                if self.min_area < area < self.max_area and len(contour) >= self.min_contour_points \
+                    and solidity > 0.87 and 0.3 < aspect_ratio < 3.5:
                     if area > best_area:
                         best_contour = contour
                         best_area = area
@@ -758,10 +770,34 @@ class OptimizedBicolorGloveDetectorWithAI:
 
             # Lissage du meilleur contour pour plus de précision (tracé propre)
             if best_contour is not None:
-                epsilon = 0.01 * cv2.arcLength(best_contour, True)
+                # Epsilon réduit pour un contour plus doux
+                epsilon = 0.007 * cv2.arcLength(best_contour, True)
                 best_contour = cv2.approxPolyDP(best_contour, epsilon, True)
 
-            # Sauvegarde le meilleur contour trouvé
+                # ---- STABILISATION TEMPORELLE DU CONTOUR (anti-jitter) ----
+                if hasattr(self, 'last_good_contour') and self.last_good_contour is not None:
+                    prev_cx, prev_cy, prev_area = self.last_good_cx, self.last_good_cy, self.last_good_area
+                    M = cv2.moments(best_contour)
+                    if M['m00'] > 0:
+                        cx = int(M['m10'] / M['m00'])
+                        cy = int(M['m01'] / M['m00'])
+                        area = cv2.contourArea(best_contour)
+                        # Si peu de mouvement : interpolation douce
+                        if abs(cx - prev_cx) < 25 and abs(cy - prev_cy) < 25 and abs(area - prev_area) < 1500:
+                            interp = 0.65
+                            best_contour = np.round(interp * self.last_good_contour + (1-interp) * best_contour).astype(np.int32)
+                        self.last_good_cx = cx
+                        self.last_good_cy = cy
+                        self.last_good_area = area
+                    self.last_good_contour = best_contour
+                else:
+                    M = cv2.moments(best_contour)
+                    if M['m00'] > 0:
+                        self.last_good_cx = int(M['m10'] / M['m00'])
+                        self.last_good_cy = int(M['m01'] / M['m00'])
+                        self.last_good_area = cv2.contourArea(best_contour)
+                    self.last_good_contour = best_contour
+
             detected = best_contour is not None
 
             if detected:
@@ -776,7 +812,6 @@ class OptimizedBicolorGloveDetectorWithAI:
             self.logging.debug(f"Erreur détection: {e}")
             return original_frame, False
 
-    
     def _finalize_detection(self, frame, detected, contour, area, quality_score):
         """Finalisation avec intégration IA"""
         try:
