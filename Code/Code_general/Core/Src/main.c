@@ -156,6 +156,7 @@ int main(void)
 
                   char *token = strtok((char*)gps_rx_buffer, ",");
                   int field = 0;
+                  char fix_quality = '0';
 
                   while (token != NULL) {
                       switch (field) {
@@ -173,6 +174,9 @@ int main(void)
                           case 5: // E/W
                               lon_dir = token[0];
                               break;
+                          case 6: // Fix quality
+                              fix_quality = token[0];
+                              break;
                           case 9: // Altitude
                               strncpy(altitude, token, sizeof(altitude)-1);
                               altitude[sizeof(altitude)-1] = '\0';
@@ -182,21 +186,26 @@ int main(void)
                       field++;
                   }
 
-                  float lat_degrees = floor(atof(latitude) / 100.0f);
-                                 float lat_minutes = atof(latitude) - (lat_degrees * 100.0f);
-                                 float lat_decimal = lat_degrees + (lat_minutes / 60.0f);
-                                 if (lat_dir == 'S') lat_decimal *= -1.0f;
+                  // Only process if fix_quality is not '0' and latitude/longitude are not empty
+                  if (fix_quality != '0' && strlen(latitude) > 0 && strlen(longitude) > 0) {
+                      float lat_degrees = floor(atof(latitude) / 100.0f);
+                      float lat_minutes = atof(latitude) - (lat_degrees * 100.0f);
+                      float lat_decimal = lat_degrees + (lat_minutes / 60.0f);
+                      if (lat_dir == 'S') lat_decimal *= -1.0f;
 
-                                 float lon_degrees = floor(atof(longitude) / 100.0f);
-                                 float lon_minutes = atof(longitude) - (lon_degrees * 100.0f);
-                                 float lon_decimal = lon_degrees + (lon_minutes / 60.0f);
-                                 if (lon_dir == 'W') lon_decimal *= -1.0f;
+                      float lon_degrees = floor(atof(longitude) / 100.0f);
+                      float lon_minutes = atof(longitude) - (lon_degrees * 100.0f);
+                      float lon_decimal = lon_degrees + (lon_minutes / 60.0f);
+                      if (lon_dir == 'W') lon_decimal *= -1.0f;
 
-                                 snprintf(combined_buffer, COMBINED_BUFFER_SIZE,
-                                                     "Lat:%.6f, Lon:%.6f , Alt:%sm | Son:%.1f dB\r\n",
-                                                     lat_decimal, lon_decimal, altitude, db);
-
-                                 HAL_UART_Transmit(&huart2, (uint8_t*)combined_buffer, strlen(combined_buffer), HAL_MAX_DELAY);
+                      snprintf(combined_buffer, COMBINED_BUFFER_SIZE,
+                          "Lat:%.6f, Lon:%.6f , Alt:%sm | Son:%.1f dB\r\n",
+                          lat_decimal, lon_decimal, altitude, db);
+                  } else {
+                      snprintf(combined_buffer, COMBINED_BUFFER_SIZE,
+                          "Lat:0, Lon:0 , Alt:0m | Son:%.1f dB\r\n", db);
+                  }
+                  HAL_UART_Transmit(&huart2, (uint8_t*)combined_buffer, strlen(combined_buffer), HAL_MAX_DELAY);
               }
               }
               gps_rx_index = 0; // Réinitialiser le buffer
