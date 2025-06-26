@@ -272,6 +272,7 @@ class HandPositionRecognizer:
         self.training_data = []
         self.training_labels = []
         self.logging = logging.getLogger(__name__)
+        self.force_stop = False
 
         self.prediction_history = deque(maxlen=7)
         self.confidence_history = deque(maxlen=5)
@@ -951,6 +952,9 @@ class OptimizedBicolorGloveDetectorWithAI:
             self._training_in_progress = False
     
     def _execute_drone_command(self, position, confidence):
+        if getattr(self, "force_stop", False):
+            self.logging.info("[DRONE CMD] Commandes bloquées (arrêt manuel activé)")
+            return False
         try:
             import time
             from math import radians, cos, sin, sqrt, atan2
@@ -1574,6 +1578,23 @@ def main_with_ai():
                         else:
                             logger.warning("⚠️ Aucun modèle à charger")
                     
+                    elif key == ord('a'):
+                        logger.warning("🛑 Touche A détectée : arrêt manuel demandé")
+                        detector.drone_commands_enabled = False
+
+                        if hasattr(detector, "bebop") and detector.bebop is not None:
+                            try:
+                                logger.info("[DRONE CMD] Stabilisation (hover)...")
+                                detector.bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=0, duration=0.5)
+                                time.sleep(0.5)
+                                logger.info("[DRONE CMD] Atterrissage...")
+                                detector.bebop.safe_land(10)
+                                logger.info("[DRONE CMD] ✅ Drone posé manuellement via touche A")
+                            except Exception as e:
+                                logger.error(f"[DRONE CMD] ❌ Erreur arrêt manuel (A): {e}")
+                        else:
+                            logger.warning("[DRONE CMD] Aucun drone actif pour atterrissage manuel.")
+
                     elif key == ord('c'):
                         logger.info("[DEBUG] Touche 'c' pressée, toggle_drone_commands va être appelé")
                         status = detector.toggle_drone_commands()
