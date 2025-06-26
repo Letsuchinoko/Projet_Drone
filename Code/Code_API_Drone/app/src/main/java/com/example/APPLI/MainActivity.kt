@@ -12,11 +12,19 @@ import androidx.fragment.app.FragmentManager
 import com.google.android.material.navigation.NavigationView
 import androidx.appcompat.widget.Toolbar
 
+/**
+ * Activité principale qui gère la navigation entre les fragments
+ * via un menu latéral (Drawer) et des boutons Suivant/Précédent.
+ */
 class MainActivity : AppCompatActivity() {
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
     private var currentFragment: Fragment? = null
 
+    /**
+     * Remplace le fragment actuellement affiché par un nouveau.
+     * Gère le cycle de vie des fragments pour optimiser les performances.
+     */
     private fun remplaceFragment(fragment: Fragment) {
         Log.d("MainActivity", "Remplacement du fragment: ${fragment.javaClass.simpleName}")
         val fragMan: FragmentManager = supportFragmentManager
@@ -34,6 +42,10 @@ class MainActivity : AppCompatActivity() {
         currentFragment = fragment
     }
 
+    /**
+     * Gère le comportement du bouton "Retour".
+     * Permet de revenir au fragment précédent ou de quitter l'application.
+     */
     override fun onBackPressed() {
         val fragMan = supportFragmentManager
         if (fragMan.backStackEntryCount > 1) {
@@ -57,22 +69,22 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
-        // Initialize fragments
+        // --- Initialisation des fragments ---
         val frag1 = Fragment1()
         val frag2 = Fragment2()
         val frag3 = Fragment3()
 
-        // Setup toolbar
+        // --- Configuration de la Toolbar ---
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeAsUpIndicator(android.R.drawable.ic_menu_sort_by_size)
 
-        // Setup navigation drawer
+        // --- Configuration du menu de navigation (Drawer) ---
         drawerLayout = findViewById(R.id.main)
         navigationView = findViewById(R.id.nav_view)
 
-        // Handle navigation item clicks
+        // --- Gestion des clics sur les items du menu ---
         navigationView.setNavigationItemSelectedListener { menuItem ->
             Log.d("MainActivity", "Menu item clicked: ${menuItem.title}")
             when (menuItem.itemId) {
@@ -98,11 +110,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Setup buttons
+        // --- Configuration des boutons de navigation ---
         val bouton1 = findViewById<Button>(R.id.button)
         val bouton2 = findViewById<Button>(R.id.button2)
 
-        // Set initial fragment
+        // --- Affichage du fragment initial ---
         remplaceFragment(frag1)
 
         bouton1.setOnClickListener {
@@ -124,6 +136,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Ouvre le menu de navigation (Drawer) au clic sur l'icône du menu.
+     */
     override fun onSupportNavigateUp(): Boolean {
         Log.d("MainActivity", "Navigation up clicked")
         drawerLayout.openDrawer(GravityCompat.START)

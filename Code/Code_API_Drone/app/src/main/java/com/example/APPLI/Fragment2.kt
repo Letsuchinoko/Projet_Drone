@@ -8,24 +8,26 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
+import org.osmdroid.views.MapView
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.overlay.Marker
+import android.preference.PreferenceManager
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-class Fragment2 : Fragment(), OnMapReadyCallback {
+/**
+ * Fragment qui affiche la position GPS sur une carte OpenStreetMap (osmdroid)
+ * et les coordonnées détaillées dans un TextView.
+ */
+class Fragment2 : Fragment() {
     private val TAG = "Fragment2"
     private var param1: String? = null
     private var param2: String? = null
 
     private lateinit var gpsTextView: TextView
     private val sharedDataManager: SharedDataManager by activityViewModels()
-    private var googleMap: GoogleMap? = null
+    private var mapView: MapView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,56 +42,73 @@ class Fragment2 : Fragment(), OnMapReadyCallback {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_2, container, false)
-        
+
+        // --- Initialisation d'osmdroid ---
+        val context = requireContext().applicationContext
+        org.osmdroid.config.Configuration.getInstance().load(context, PreferenceManager.getDefaultSharedPreferences(context))
+
+        // --- Initialisation des composants graphiques (MapView et TextView) ---
         gpsTextView = view.findViewById(R.id.textView2)
         gpsTextView.text = "Localisation GPS\n\nEn attente de données..."
 
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as? SupportMapFragment
-        mapFragment?.getMapAsync(this)
-        
+        mapView = view.findViewById(R.id.map)
+        mapView?.setMultiTouchControls(true)
+        mapView?.controller?.setZoom(15.0)
+
+        // --- Observation des données GPS partagées ---
         sharedDataManager.gpsData.observe(viewLifecycleOwner) { gpsData ->
             Log.d(TAG, "Données GPS reçues pour traitement dans Fragment2: '$gpsData'")
 
-            // Regex pour trouver tous les nombres (entiers ou décimaux, y compris négatifs)
+            // Regex pour extraire les nombres (latitude, longitude, etc.) des données reçues
             val numberPattern = Regex("-?\\d+\\.?\\d*")
             val numbers = numberPattern.findAll(gpsData).map { it.value }.toList()
 
-            if (numbers.size >= 3) {
-                val lat = numbers[0]
-                val lon = numbers[1]
-                val alt = numbers[2]
-                gpsTextView.text = "Localisation GPS\n\nLatitude: $lat\nLongitude: $lon\nAltitude: $alt"
-                updateMapLocation(lat.toString(), lon.toString())
-            } else if (numbers.size == 2) {
-                val lat = numbers[0]
-                val lon = numbers[1]
-                gpsTextView.text = "Localisation GPS\n\nLatitude: $lat\nLongitude: $lon"
-                updateMapLocation(lat.toString(), lon.toString())
+            // Affichage des coordonnées formatées en colonne
+            val displayBuilder = StringBuilder()
+            if (numbers.isNotEmpty()) {
+                if (numbers.size >= 1) displayBuilder.append("Lat: ${numbers[0]}\n")
+                if (numbers.size >= 2) displayBuilder.append("Lon: ${numbers[1]}\n")
+                if (numbers.size >= 3) displayBuilder.append("Alt: ${numbers[2]}\n")
+                if (numbers.size >= 4) displayBuilder.append("Autre: ${numbers[3]}\n")
+            } else {
+                displayBuilder.append("Aucune donnée GPS valide")
             }
-            // Si moins de 2 nombres sont trouvés, on ne met pas à jour l'affichage
-            // pour éviter d'afficher des données incomplètes.
+            gpsTextView.text = displayBuilder.toString()
+
+            // Mise à jour de la position sur la carte si les données sont valides
+            if (numbers.size >= 2) {
+                val lat = numbers[0].toDoubleOrNull()
+                val lon = numbers[1].toDoubleOrNull()
+                if (lat != null && lon != null) {
+                    updateMapLocation(lat, lon)
+                }
+            }
         }
-        
+
         Log.d(TAG, "Fragment2 onCreateView terminé")
         return view
     }
 
-    override fun onMapReady(map: GoogleMap) {
-        googleMap = map
-    }
-
-    private fun updateMapLocation(latStr: String, lonStr: String) {
-        val lat = latStr.toDoubleOrNull()
-        val lon = lonStr.toDoubleOrNull()
-        if (lat != null && lon != null && googleMap != null) {
-            val position = LatLng(lat, lon)
-            googleMap?.clear()
-            googleMap?.addMarker(MarkerOptions().position(position).title("Position actuelle"))
-            googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 15f))
-        }
+    /**
+     * Met à jour la carte en centrant la vue sur la nouvelle position GPS
+     * et en y plaçant un marqueur.
+     */
+    private fun updateMapLocation(lat: Double, lon: Double) {
+        val geoPoint = GeoPoint(lat, lon)
+        mapView?.controller?.setCenter(geoPoint)
+        mapView?.overlays?.clear()
+        val marker = Marker(mapView)
+        marker.position = geoPoint
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        marker.title = "Position actuelle"
+        mapView?.overlays?.add(marker)
+        mapView?.invalidate()
     }
 
     companion object {
+        /**
+         * Factory method pour créer une nouvelle instance du fragment.
+         */
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             Fragment2().apply {

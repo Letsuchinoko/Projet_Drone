@@ -9,7 +9,7 @@
     <TextView
         android:id="@+id/soundLevelTextView"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:text="Niveau sonore\n\nEn attente de données..."
         android:textSize="18sp"
         android:gravity="center"
@@ -17,9 +17,24 @@
         android:background="#FF9800"
         android:textColor="#FFFFFF"
         android:padding="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/soundLevelProgressBar"
+        />
+
+    <ProgressBar
+        android:id="@+id/soundLevelProgressBar"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:max="120"
+        android:progress="0"
+        android:progressTint="@android:color/holo_orange_dark"
+        app:layout_constraintTop_toBottomOf="@id/soundLevelTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="16dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout> 
