@@ -708,7 +708,7 @@ class OptimizedBicolorGloveDetectorWithAI:
             self.ai_enabled = False
     
     def detect_glove_optimized(self, frame):
-        """Détection gant rouge/orange avec filtre anti-faux positifs (mur, etc.)"""
+        """Détection gant avec filtrage robuste (couleur + forme)"""
         if frame is None:
             return frame, False
 
@@ -716,41 +716,64 @@ class OptimizedBicolorGloveDetectorWithAI:
         self.frame_count += 1
 
         try:
-            # Conversion HSV
             hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-            # ROUGE/ORANGE avec tolérance lumière extérieure (V et S abaissées)
-            mask_red1 = cv2.inRange(hsv, np.array([0, 70, 60]), np.array([10, 255, 255]))
-            mask_red2 = cv2.inRange(hsv, np.array([160, 70, 60]), np.array([180, 255, 255]))
-            mask_orange = cv2.inRange(hsv, np.array([10, 80, 70]), np.array([20, 255, 255]))
+            # Masques rouge/orange (gant)
+            mask_red1 = cv2.inRange(hsv, (0, 140, 120), (8, 255, 255))
+            mask_red2 = cv2.inRange(hsv, (172, 140, 120), (180, 255, 255))
+            mask_orange = cv2.inRange(hsv, (8, 160, 140), (18, 255, 255))
 
-            # Combine les masques
             mask_combined = cv2.bitwise_or(mask_red1, mask_red2)
             mask_combined = cv2.bitwise_or(mask_combined, mask_orange)
 
-            # Morphologie
+            # Élimination bruit (fermeture douce)
             mask_combined = cv2.morphologyEx(mask_combined, cv2.MORPH_CLOSE, self.kernel_small)
 
-            # Contours
+            # → FILTRE PEAU (zones beige/rose claires)
+            skin_mask = cv2.inRange(hsv, (0, 30, 60), (25, 180, 255))
+            mask_combined = cv2.bitwise_and(mask_combined, cv2.bitwise_not(skin_mask))
+
+            # Recherche des contours
             contours, _ = cv2.findContours(mask_combined, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            
-            # Filtrer les contours aberrants
-            filtered_contours = []
-            for c in contours:
-                area = cv2.contourArea(c)
-                if 800 < area < 30000:  # filtre : ni trop petit, ni immense
-                    filtered_contours.append(c)
 
             best_contour = None
+            best_score = 0
             best_area = 0
-            quality_score = 0
 
-            for contour in filtered_contours:
+            for contour in contours:
                 area = cv2.contourArea(contour)
-                if area > best_area:
+                if area < 1500 or area > 15000:
+                    continue  # trop petit ou trop gros
+
+                x, y, w, h = cv2.boundingRect(contour)
+                if w == 0 or h == 0:
+                    continue
+
+                aspect_ratio = w / float(h)
+                if not 0.3 < aspect_ratio < 2.5:
+                    continue  # trop allongé
+
+                hull = cv2.convexHull(contour)
+                hull_area = cv2.contourArea(hull)
+                if hull_area == 0:
+                    continue
+                solidity = area / hull_area
+
+                extent = area / (w * h)
+                perimeter = cv2.arcLength(contour, True)
+                compactness = (4 * np.pi * area) / (perimeter * perimeter) if perimeter > 0 else 0
+
+                score = (
+                    area / 10000.0 +
+                    solidity * 1.2 +
+                    extent * 1.0 +
+                    compactness * 1.5
+                )
+
+                if score > best_score:
+                    best_score = score
                     best_contour = contour
                     best_area = area
-                    quality_score = min(area / 2800, 1.0)
 
             detected = best_contour is not None
 
@@ -759,7 +782,7 @@ class OptimizedBicolorGloveDetectorWithAI:
                 self.last_detected_area = best_area
                 self.last_bounding_rect = cv2.boundingRect(best_contour)
 
-            return self._finalize_detection(original_frame, detected, best_contour, best_area, quality_score)
+            return self._finalize_detection(original_frame, detected, best_contour, best_area, min(best_score, 1.0))
 
         except Exception as e:
             self.logging.debug(f"Erreur détection: {e}")
