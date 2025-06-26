@@ -924,40 +924,12 @@ class OptimizedBicolorGloveDetectorWithAI:
             self.current_training_distance_msg = ""
             return None, 0.0
     
-    def _start_model_training(self):
-        # On NE fait plus de thread : tout dans le thread principal pour éviter les bugs et que matplotlib/keras fonctionne bien.
-        if hasattr(self, '_training_in_progress') and self._training_in_progress:
-            self.logging.warning("⚠️ Entraînement déjà en cours - ignoré")
-            return
-
-        self._training_in_progress = True
-        self.logging.info("🚀 Démarrage entraînement du modèle IA...")
-
-        try:
-            success = self.position_recognizer.train_model(epochs=50)
-            if success:
-                model_path = "hand_position_model"
-                self.position_recognizer.save_model(model_path)
-                n_samples = len(self.position_recognizer.training_data)
-                self.logging.info(f"💾 Modèle sauvegardé avec succès ({n_samples} échantillons)")
-                self.ai_mode = "recognition"
-                self.logging.info("✅ Modèle entraîné et sauvegardé!")
-            else:
-                self.logging.error("❌ Échec entraînement")
-                self.ai_mode = "detection"
-        except Exception as e:
-            self.logging.error(f"❌ Erreur entraînement: {e}")
-            self.ai_mode = "detection"
-        finally:
-            self._training_in_progress = False
-    
     def _execute_drone_command(self, position, confidence):
         if getattr(self, "force_stop", False):
             self.logging.info("[DRONE CMD] Commandes bloquées (arrêt manuel activé)")
             return False
         try:
             import time
-            from math import radians, cos, sin, sqrt, atan2
 
             current_time = time.time()
             self.logging.info(f"[DRONE CMD] DEMANDE: position={position}, confidence={confidence:.3f}, t={current_time:.3f}")
@@ -1007,36 +979,6 @@ class OptimizedBicolorGloveDetectorWithAI:
 
             flying_state = getattr(bebop.sensors, "flying_state", "unknown")
             self.logging.info(f"[DRONE CMD] flying_state = '{flying_state}'")
-
-            # Sécurité - Limites
-            max_altitude = 2.0  # m
-            max_distance = 1.0  # m
-
-            alt = bebop.sensors.sensors_dict.get("AltitudeChanged_altitude", 0)
-            lat0 = bebop.sensors.sensors_dict.get("HomeChanged_latitude", None)
-            lon0 = bebop.sensors.sensors_dict.get("HomeChanged_longitude", None)
-            lat = bebop.sensors.sensors_dict.get("GpsLocationChanged_latitude", lat0)
-            lon = bebop.sensors.sensors_dict.get("GpsLocationChanged_longitude", lon0)
-
-            if alt > max_altitude:
-                self.logging.warning(f"[DRONE CMD] ⚠️ Altitude limite dépassée ({alt:.2f}m > {max_altitude}m), atterrissage.")
-                bebop.safe_land(10)
-                self.last_command_time = current_time
-                return True
-
-            if lat and lon and lat0 and lon0:
-                dlat = radians(lat - lat0)
-                dlon = radians(lon - lon0)
-                a = sin(dlat/2)**2 + cos(radians(lat0)) * cos(radians(lat)) * sin(dlon/2)**2
-                c = 2 * atan2(sqrt(a), sqrt(1-a))
-                distance_m = 6371 * c * 1000  # Terre en km -> m
-
-                self.logging.info(f"[DRONE CMD] Distance au point de départ: {distance_m:.2f}m")
-                if distance_m > max_distance:
-                    self.logging.warning(f"[DRONE CMD] ⚠️ Distance limite dépassée ({distance_m:.2f}m > {max_distance}m), atterrissage.")
-                    bebop.safe_land(10)
-                    self.last_command_time = current_time
-                    return True
 
             # === Commandes ===
             if position == "poing":
