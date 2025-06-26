@@ -708,7 +708,7 @@ class OptimizedBicolorGloveDetectorWithAI:
             self.ai_enabled = False
     
     def detect_glove_optimized(self, frame):
-        """Détection gant simple (rouge/orange), version basique, pas de lissage, contour brut."""
+        """Détection gant couleur (rouge/orange élargi + jaune pâle), version élargie pour extérieur."""
         if frame is None:
             return frame, False
 
@@ -716,26 +716,24 @@ class OptimizedBicolorGloveDetectorWithAI:
         self.frame_count += 1
 
         try:
-            # Conversion HSV
+            # === Conversion HSV ===
             hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-            # Masque rouge (2 intervalles)
-            mask_red1 = cv2.inRange(hsv, np.array([0, 140, 120]), np.array([8, 255, 255]))
-            mask_red2 = cv2.inRange(hsv, np.array([172, 140, 120]), np.array([180, 255, 255]))
-
-            # Masque orange
-            mask_orange = cv2.inRange(hsv, np.array([8, 160, 140]), np.array([18, 255, 255]))
+            # === NOUVELLE PLAGE - ROUGE/ORANGE/JAUNE PALE, saturation basse acceptée ===
+            mask_red1 = cv2.inRange(hsv, np.array([0, 50, 80]), np.array([18, 255, 255]))
+            mask_red2 = cv2.inRange(hsv, np.array([160, 50, 80]), np.array([180, 255, 255]))
+            mask_yellow = cv2.inRange(hsv, np.array([18, 30, 80]), np.array([35, 255, 255]))   # <-- Ajout jaune pâle
 
             # Combine tous les masques
             mask_combined = cv2.bitwise_or(mask_red1, mask_red2)
-            mask_combined = cv2.bitwise_or(mask_combined, mask_orange)
+            mask_combined = cv2.bitwise_or(mask_combined, mask_yellow)
 
-            # Petite fermeture pour combler les trous, mais rien d'agressif
+            # Petite fermeture pour combler les trous
             mask_combined = cv2.morphologyEx(mask_combined, cv2.MORPH_CLOSE, self.kernel_small)
 
             # Recherche des contours
             contours, _ = cv2.findContours(mask_combined, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            contours = [c for c in contours if cv2.contourArea(c) > 500]  # On baisse un peu le seuil
+            contours = [c for c in contours if cv2.contourArea(c) > 500]  # seuil minimum
 
             best_contour = None
             best_area = 0
@@ -760,7 +758,7 @@ class OptimizedBicolorGloveDetectorWithAI:
 
         except Exception as e:
             self.logging.debug(f"Erreur détection: {e}")
-            return original
+            return original_frame, False
 
     def _finalize_detection(self, frame, detected, contour, area, quality_score):
         """Finalisation avec intégration IA"""
