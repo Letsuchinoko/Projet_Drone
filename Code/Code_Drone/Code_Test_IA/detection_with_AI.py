@@ -1381,6 +1381,8 @@ def simple_drone_control(bebop):
             
         if key == 't':
             bebop.safe_takeoff(10)
+            time.sleep(3)
+            bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=0, duration=0.5)
             print("✈️ Décollage")
         elif key == 'l':
             bebop.safe_land(10)
