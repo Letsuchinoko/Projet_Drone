@@ -676,7 +676,7 @@ class OptimizedBicolorGloveDetectorWithAI:
         # Commandes drone
         self.drone_commands_enabled = False
         self.last_command_time = 0
-        self.command_cooldown = 2.0
+        self.command_cooldown = 1.0
 
         # === AJOUT ICI (stabilisation commandes drone) ===
         self.position_history = deque(maxlen=3)   # <---- AJOUT OBLIGATOIRE
@@ -708,7 +708,7 @@ class OptimizedBicolorGloveDetectorWithAI:
             self.ai_enabled = False
     
     def detect_glove_optimized(self, frame):
-        """Détection gant robuste (extérieur, forte lumière, ombre)"""
+        """Détection gant simple (rouge/orange), version basique, pas de lissage, contour brut."""
         if frame is None:
             return frame, False
 
@@ -716,58 +716,37 @@ class OptimizedBicolorGloveDetectorWithAI:
         self.frame_count += 1
 
         try:
-            # Correction gamma douce (contre-lumière)
-            frame_corrected = cv2.convertScaleAbs(frame, alpha=1.1, beta=15)
+            # Conversion HSV
+            hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-            hsv = cv2.cvtColor(frame_corrected, cv2.COLOR_BGR2HSV)
+            # Masque rouge (2 intervalles)
+            mask_red1 = cv2.inRange(hsv, np.array([0, 140, 120]), np.array([8, 255, 255]))
+            mask_red2 = cv2.inRange(hsv, np.array([172, 140, 120]), np.array([180, 255, 255]))
 
-            # Plages étendues rouge/orange
-            mask_red1 = cv2.inRange(hsv, (0, 120, 100), (8, 255, 255))
-            mask_red2 = cv2.inRange(hsv, (170, 120, 100), (180, 255, 255))
-            mask_orange = cv2.inRange(hsv, (8, 100, 120), (22, 255, 255))
+            # Masque orange
+            mask_orange = cv2.inRange(hsv, np.array([8, 160, 140]), np.array([18, 255, 255]))
 
-            mask = cv2.bitwise_or(mask_red1, mask_red2)
-            mask = cv2.bitwise_or(mask, mask_orange)
+            # Combine tous les masques
+            mask_combined = cv2.bitwise_or(mask_red1, mask_red2)
+            mask_combined = cv2.bitwise_or(mask_combined, mask_orange)
 
-            # Filtrage de la peau (zones claires et saturées)
-            mask_skin = cv2.inRange(hsv, (0, 30, 70), (25, 150, 255))
-            mask = cv2.bitwise_and(mask, cv2.bitwise_not(mask_skin))
+            # Petite fermeture pour combler les trous, mais rien d'agressif
+            mask_combined = cv2.morphologyEx(mask_combined, cv2.MORPH_CLOSE, self.kernel_small)
 
-            # Nettoyage
-            mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, self.kernel_small)
-            mask = cv2.dilate(mask, self.kernel_small, iterations=1)
-
-            contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            # Recherche des contours
+            contours, _ = cv2.findContours(mask_combined, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            contours = [c for c in contours if cv2.contourArea(c) > 500]  # On baisse un peu le seuil
 
             best_contour = None
-            best_score = 0
             best_area = 0
+            quality_score = 0
 
             for contour in contours:
                 area = cv2.contourArea(contour)
-                if area < 1200 or area > 16000:
-                    continue
-
-                x, y, w, h = cv2.boundingRect(contour)
-                aspect = w / float(h)
-                if not (0.25 < aspect < 3.5):
-                    continue
-
-                hull = cv2.convexHull(contour)
-                hull_area = cv2.contourArea(hull)
-                if hull_area == 0:
-                    continue
-
-                solidity = area / hull_area
-                perimeter = cv2.arcLength(contour, True)
-                compactness = (4 * np.pi * area) / (perimeter * perimeter) if perimeter > 0 else 0
-
-                score = area / 10000.0 + solidity * 1.3 + compactness * 1.2
-
-                if score > best_score:
-                    best_score = score
+                if area > best_area:
                     best_contour = contour
                     best_area = area
+                    quality_score = min(area / 2800, 1.0)
 
             detected = best_contour is not None
 
@@ -776,11 +755,12 @@ class OptimizedBicolorGloveDetectorWithAI:
                 self.last_detected_area = best_area
                 self.last_bounding_rect = cv2.boundingRect(best_contour)
 
-            return self._finalize_detection(original_frame, detected, best_contour, best_area, min(best_score, 1.0))
+            # PAS DE LISSSAGE DU CONTOUR !
+            return self._finalize_detection(original_frame, detected, best_contour, best_area, quality_score)
 
         except Exception as e:
             self.logging.debug(f"Erreur détection: {e}")
-            return original_frame, False
+            return original
 
     def _finalize_detection(self, frame, detected, contour, area, quality_score):
         """Finalisation avec intégration IA"""
@@ -973,35 +953,36 @@ class OptimizedBicolorGloveDetectorWithAI:
     def _execute_drone_command(self, position, confidence):
         try:
             import time
+            from math import radians, cos, sin, sqrt, atan2
+
             current_time = time.time()
             self.logging.info(f"[DRONE CMD] DEMANDE: position={position}, confidence={confidence:.3f}, t={current_time:.3f}")
 
-            # Vérifie le cooldown
             if current_time - self.last_command_time < self.command_cooldown:
                 self.logging.info("[DRONE CMD] Cooldown actif, commande ignorée.")
                 return False
-            
+
             self.position_history.append((position, confidence))
-            if list(self.position_history).count((position, confidence)) < 2:  # besoin 2x d'affilée
+            if list(self.position_history).count((position, confidence)) < 2:
                 self.logging.info(f"[DRONE CMD] Position '{position}' pas assez stable, commande ignorée.")
                 return False
 
-            # Seuils de confiance (modifiable)
             thresholds = {
-                "paume_avant": 0.75,      # Avancer
-                "dos_main": 0.75,         # Reculer
-                "index_droite": 0.75,     # Droite
-                "index_gauche": 0.75,     # Gauche
-                "doigts_haut": 0.75,      # Haut
-                "doigts_bas": 0.75,       # Bas
-                "poing": 0.75,            # Arrêt d'urgence
+                "avancer": 0.75,
+                "reculer": 0.75,
+                "monter": 0.75,
+                "descendre": 0.75,
+                "droite": 0.75,
+                "gauche": 0.75,
+                "rotation_gauche": 0.75,
+                "rotation_droite": 0.75,
+                "poing": 0.75,
             }
             threshold = thresholds.get(position, 0.85)
             self.logging.info(f"[DRONE CMD] Seuil pour {position}: {threshold}")
 
-            # Limite de distance : évite les commandes si le gant est trop loin
-            MIN_GLOVE_AREA = 3500  # Ajuste si besoin (taille en pixels)
-            if position in ["paume", "index", "ok", "salut"]:
+            MIN_GLOVE_AREA = 3500
+            if position in ["avancer", "reculer", "droite", "gauche"]:
                 area = getattr(self, "last_detected_area", None)
                 if area is not None and area < MIN_GLOVE_AREA:
                     self.logging.warning(f"[DRONE CMD] Gant trop loin (area={area:.0f}), commande ignorée.")
@@ -1011,22 +992,49 @@ class OptimizedBicolorGloveDetectorWithAI:
                 self.logging.info(f"[DRONE CMD] Confiance trop basse ({confidence:.3f} < {threshold}), commande ignorée.")
                 return False
 
-            # Accès au drone
             bebop = getattr(self, "bebop", None)
             if bebop is None:
                 self.logging.warning("[DRONE CMD] Aucune instance drone !")
                 return False
 
-            # Sensors complet pour debug
             sensors_dict = vars(bebop.sensors) if hasattr(bebop, 'sensors') else {}
             self.logging.info(f"[DRONE CMD] bebop OK: {bebop}")
             self.logging.info(f"[DRONE CMD] sensors: {sensors_dict}")
 
-            # Statut drone
             flying_state = getattr(bebop.sensors, "flying_state", "unknown")
             self.logging.info(f"[DRONE CMD] flying_state = '{flying_state}'")
 
-            # ========== Commandes ==========
+            # Sécurité - Limites
+            max_altitude = 2.0  # m
+            max_distance = 1.0  # m
+
+            alt = bebop.sensors.sensors_dict.get("AltitudeChanged_altitude", 0)
+            lat0 = bebop.sensors.sensors_dict.get("HomeChanged_latitude", None)
+            lon0 = bebop.sensors.sensors_dict.get("HomeChanged_longitude", None)
+            lat = bebop.sensors.sensors_dict.get("GpsLocationChanged_latitude", lat0)
+            lon = bebop.sensors.sensors_dict.get("GpsLocationChanged_longitude", lon0)
+
+            if alt > max_altitude:
+                self.logging.warning(f"[DRONE CMD] ⚠️ Altitude limite dépassée ({alt:.2f}m > {max_altitude}m), atterrissage.")
+                bebop.safe_land(10)
+                self.last_command_time = current_time
+                return True
+
+            if lat and lon and lat0 and lon0:
+                dlat = radians(lat - lat0)
+                dlon = radians(lon - lon0)
+                a = sin(dlat/2)**2 + cos(radians(lat0)) * cos(radians(lat)) * sin(dlon/2)**2
+                c = 2 * atan2(sqrt(a), sqrt(1-a))
+                distance_m = 6371 * c * 1000  # Terre en km -> m
+
+                self.logging.info(f"[DRONE CMD] Distance au point de départ: {distance_m:.2f}m")
+                if distance_m > max_distance:
+                    self.logging.warning(f"[DRONE CMD] ⚠️ Distance limite dépassée ({distance_m:.2f}m > {max_distance}m), atterrissage.")
+                    bebop.safe_land(10)
+                    self.last_command_time = current_time
+                    return True
+
+            # === Commandes ===
             if position == "poing":
                 self.logging.warning("[DRONE CMD] 🚨 ARRÊT D'URGENCE - Poing détecté")
                 if flying_state == "landed":
@@ -1038,50 +1046,50 @@ class OptimizedBicolorGloveDetectorWithAI:
                 return True
 
             elif position == "avancer" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] ➡️ Avancer (main vers l'avant, doigts vers le bas)")
-                bebop.fly_direct(roll=0, pitch=70, yaw=0, vertical_movement=0, duration=0.3)
+                self.logging.info("[DRONE CMD] ➡️ Avancer")
+                bebop.fly_direct(roll=0, pitch=30, yaw=0, vertical_movement=0, duration=0.3)
                 self.last_command_time = current_time
                 return True
 
             elif position == "reculer" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] ⬅️ Reculer (paume, doigts écartés)")
-                bebop.fly_direct(roll=0, pitch=-70, yaw=0, vertical_movement=0, duration=0.3)
+                self.logging.info("[DRONE CMD] ⬅️ Reculer")
+                bebop.fly_direct(roll=0, pitch=-30, yaw=0, vertical_movement=0, duration=0.3)
                 self.last_command_time = current_time
                 return True
 
             elif position == "monter" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] ⬆️ Monter (pouce vers le haut)")
-                bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=30, duration=0.3)
+                self.logging.info("[DRONE CMD] ⬆️ Monter")
+                bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=20, duration=0.3)
                 self.last_command_time = current_time
                 return True
 
             elif position == "descendre" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] ⬇️ Descendre (pouce vers le bas)")
-                bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=-30, duration=0.3)
+                self.logging.info("[DRONE CMD] ⬇️ Descendre")
+                bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=-20, duration=0.3)
                 self.last_command_time = current_time
                 return True
 
             elif position == "droite" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] ➡️ Droite (index vers gauche de l'image)")
-                bebop.fly_direct(roll=30, pitch=0, yaw=0, vertical_movement=0, duration=0.3)
+                self.logging.info("[DRONE CMD] ➡️ Droite")
+                bebop.fly_direct(roll=20, pitch=0, yaw=0, vertical_movement=0, duration=0.3)
                 self.last_command_time = current_time
                 return True
 
             elif position == "gauche" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] ⬅️ Gauche (index vers droite de l'image)")
-                bebop.fly_direct(roll=-30, pitch=0, yaw=0, vertical_movement=0, duration=0.3)
+                self.logging.info("[DRONE CMD] ⬅️ Gauche")
+                bebop.fly_direct(roll=-20, pitch=0, yaw=0, vertical_movement=0, duration=0.3)
                 self.last_command_time = current_time
                 return True
 
             elif position == "rotation_gauche" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] 🔄 Rotation GAUCHE (dos main droite)")
-                bebop.fly_direct(roll=0, pitch=0, yaw=-40, vertical_movement=0, duration=0.4)
+                self.logging.info("[DRONE CMD] 🔄 Rotation GAUCHE")
+                bebop.fly_direct(roll=0, pitch=0, yaw=-25, vertical_movement=0, duration=0.4)
                 self.last_command_time = current_time
                 return True
 
             elif position == "rotation_droite" and flying_state != "landed":
-                self.logging.info("[DRONE CMD] 🔄 Rotation DROITE (dos main gauche)")
-                bebop.fly_direct(roll=0, pitch=0, yaw=40, vertical_movement=0, duration=0.4)
+                self.logging.info("[DRONE CMD] 🔄 Rotation DROITE")
+                bebop.fly_direct(roll=0, pitch=0, yaw=25, vertical_movement=0, duration=0.4)
                 self.last_command_time = current_time
                 return True
 
@@ -1089,14 +1097,12 @@ class OptimizedBicolorGloveDetectorWithAI:
                 self.logging.info(f"[DRONE CMD] Position {position} non exécutée ou condition non remplie (flying_state={flying_state}, confiance={confidence:.2f})")
                 return False
 
-
         except Exception as e:
             self.logging.error(f"[DRONE CMD] ❌ Erreur commande drone: {e}")
             import traceback
             self.logging.error(f"[DRONE CMD] Traceback: {traceback.format_exc()}")
             return False
 
-    
     def _draw_ai_overlay(self, frame, contour, position, confidence):
         """Visualisation overlay IA"""
         try:
