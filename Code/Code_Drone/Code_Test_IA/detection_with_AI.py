@@ -677,7 +677,7 @@ class OptimizedBicolorGloveDetectorWithAI:
         # Commandes drone
         self.drone_commands_enabled = False
         self.last_command_time = 0
-        self.command_cooldown = 1.0
+        self.command_cooldown = 5.0
 
         # === AJOUT ICI (stabilisation commandes drone) ===
         self.position_history = deque(maxlen=3)   # <---- AJOUT OBLIGATOIRE
