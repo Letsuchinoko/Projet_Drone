@@ -338,7 +338,7 @@ class HandPositionRecognizer:
             self.logging.error(f"❌ Erreur ajout échantillon: {e}")
             return False
 
-    def train_model(self, validation_split=0.2, epochs=25, plot_curves=True, save_fig=True, show_confusion=True):
+    def train_model(self, validation_split=0.2, epochs=50, plot_curves=True, save_fig=True, show_confusion=True):
         if not self.tf_available:
             self.logging.error("❌ TensorFlow requis pour l'entraînement")
             return False
@@ -663,7 +663,7 @@ class OptimizedBicolorGloveDetectorWithAI:
         self.ai_mode = "detection"  # "detection", "training", "recognition"
         self.training_class = 0
         self.training_countdown = 0
-        self.training_samples_per_class = 50
+        self.training_samples_per_class = 150
         
         # Position actuelle
         self.current_position = None
@@ -933,7 +933,7 @@ class OptimizedBicolorGloveDetectorWithAI:
         self.logging.info("🚀 Démarrage entraînement du modèle IA...")
 
         try:
-            success = self.position_recognizer.train_model(epochs=25)
+            success = self.position_recognizer.train_model(epochs=50)
             if success:
                 model_path = "hand_position_model"
                 self.position_recognizer.save_model(model_path)
