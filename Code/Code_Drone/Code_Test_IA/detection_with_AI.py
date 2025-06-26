@@ -708,7 +708,7 @@ class OptimizedBicolorGloveDetectorWithAI:
             self.ai_enabled = False
     
     def detect_glove_optimized(self, frame):
-        """Détection gant avec filtrage robuste (couleur + forme)"""
+        """Détection gant robuste (extérieur, forte lumière, ombre)"""
         if frame is None:
             return frame, False
 
@@ -716,25 +716,28 @@ class OptimizedBicolorGloveDetectorWithAI:
         self.frame_count += 1
 
         try:
-            hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+            # Correction gamma douce (contre-lumière)
+            frame_corrected = cv2.convertScaleAbs(frame, alpha=1.1, beta=15)
 
-            # Masques rouge/orange (gant)
-            mask_red1 = cv2.inRange(hsv, (0, 140, 120), (8, 255, 255))
-            mask_red2 = cv2.inRange(hsv, (172, 140, 120), (180, 255, 255))
-            mask_orange = cv2.inRange(hsv, (8, 160, 140), (18, 255, 255))
+            hsv = cv2.cvtColor(frame_corrected, cv2.COLOR_BGR2HSV)
 
-            mask_combined = cv2.bitwise_or(mask_red1, mask_red2)
-            mask_combined = cv2.bitwise_or(mask_combined, mask_orange)
+            # Plages étendues rouge/orange
+            mask_red1 = cv2.inRange(hsv, (0, 120, 100), (8, 255, 255))
+            mask_red2 = cv2.inRange(hsv, (170, 120, 100), (180, 255, 255))
+            mask_orange = cv2.inRange(hsv, (8, 100, 120), (22, 255, 255))
 
-            # Élimination bruit (fermeture douce)
-            mask_combined = cv2.morphologyEx(mask_combined, cv2.MORPH_CLOSE, self.kernel_small)
+            mask = cv2.bitwise_or(mask_red1, mask_red2)
+            mask = cv2.bitwise_or(mask, mask_orange)
 
-            # → FILTRE PEAU (zones beige/rose claires)
-            skin_mask = cv2.inRange(hsv, (0, 30, 60), (25, 180, 255))
-            mask_combined = cv2.bitwise_and(mask_combined, cv2.bitwise_not(skin_mask))
+            # Filtrage de la peau (zones claires et saturées)
+            mask_skin = cv2.inRange(hsv, (0, 30, 70), (25, 150, 255))
+            mask = cv2.bitwise_and(mask, cv2.bitwise_not(mask_skin))
 
-            # Recherche des contours
-            contours, _ = cv2.findContours(mask_combined, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            # Nettoyage
+            mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, self.kernel_small)
+            mask = cv2.dilate(mask, self.kernel_small, iterations=1)
+
+            contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
             best_contour = None
             best_score = 0
@@ -742,33 +745,24 @@ class OptimizedBicolorGloveDetectorWithAI:
 
             for contour in contours:
                 area = cv2.contourArea(contour)
-                if area < 1500 or area > 15000:
-                    continue  # trop petit ou trop gros
-
-                x, y, w, h = cv2.boundingRect(contour)
-                if w == 0 or h == 0:
+                if area < 1200 or area > 16000:
                     continue
 
-                aspect_ratio = w / float(h)
-                if not 0.3 < aspect_ratio < 2.5:
-                    continue  # trop allongé
+                x, y, w, h = cv2.boundingRect(contour)
+                aspect = w / float(h)
+                if not (0.25 < aspect < 3.5):
+                    continue
 
                 hull = cv2.convexHull(contour)
                 hull_area = cv2.contourArea(hull)
                 if hull_area == 0:
                     continue
-                solidity = area / hull_area
 
-                extent = area / (w * h)
+                solidity = area / hull_area
                 perimeter = cv2.arcLength(contour, True)
                 compactness = (4 * np.pi * area) / (perimeter * perimeter) if perimeter > 0 else 0
 
-                score = (
-                    area / 10000.0 +
-                    solidity * 1.2 +
-                    extent * 1.0 +
-                    compactness * 1.5
-                )
+                score = area / 10000.0 + solidity * 1.3 + compactness * 1.2
 
                 if score > best_score:
                     best_score = score
