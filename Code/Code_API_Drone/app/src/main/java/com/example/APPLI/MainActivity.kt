@@ -12,19 +12,17 @@ import androidx.fragment.app.FragmentManager
 import com.google.android.material.navigation.NavigationView
 import androidx.appcompat.widget.Toolbar
 
-/**
- * Activité principale qui gère la navigation entre les fragments
- * via un menu latéral (Drawer) et des boutons Suivant/Précédent.
- */
+
+ //Activité principale qui gère la navigation entre les fragments
+ //via un menu latéral (Drawer) et des boutons Suivant/Précédent.
 class MainActivity : AppCompatActivity() {
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
     private var currentFragment: Fragment? = null
 
-    /**
-     * Remplace le fragment actuellement affiché par un nouveau.
-     * Gère le cycle de vie des fragments pour optimiser les performances.
-     */
+
+    //Remplace le fragment actuellement affiché par un nouveau.
+    //Gère le cycle de vie des fragments pour optimiser les performances.
     private fun remplaceFragment(fragment: Fragment) {
         Log.d("MainActivity", "Remplacement du fragment: ${fragment.javaClass.simpleName}")
         val fragMan: FragmentManager = supportFragmentManager

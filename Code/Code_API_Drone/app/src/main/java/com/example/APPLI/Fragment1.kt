@@ -291,11 +291,6 @@ class Fragment1 : Fragment() {
 
         textView.text = "En attente des permissions Bluetooth..."
 
-        // --- Configuration des listeners pour les boutons ---
-        setupListeners()
-
-        // --- Observation des données partagées pour affichage ---
-        observeSharedData()
 
         return view
     }
@@ -542,65 +537,5 @@ class Fragment1 : Fragment() {
         Log.d(TAG, "=== FIN VÉRIFICATION DE LA CONNEXION ===")
     }
 
-    /**
-     * Configure les actions des boutons (Scan, Connexion, Déconnexion, Envoi de données).
-     */
-    private fun setupListeners() {
-        // ... existing code ...
-    }
 
-    /**
-     * Observe les données partagées (GPS, Son) et les affiche dans les TextViews.
-     */
-    private fun observeSharedData() {
-        // ... existing code ...
-    }
-
-    /**
-     * Scanne les appareils BLE à proximité.
-     */
-    private fun scanLeDevice() {
-        // ... existing code ...
-    }
-
-    /**
-     * Se connecte à un appareil BLE sélectionné.
-     */
-    private fun connectToDevice(device: BluetoothDevice) {
-        // ... existing code ...
-    }
-
-    /**
-     * Se déconnecte de l'appareil BLE.
-     */
-    private fun disconnectFromDevice() {
-        // ... existing code ...
-    }
-
-    /**
-     * Envoie des données à l'appareil BLE connecté.
-     */
-    private fun sendData(data: String) {
-        // ... existing code ...
-    }
-
-    /**
-     * Récepteur pour les mises à jour de l'état de la connexion et les données reçues.
-     */
-    private val gattUpdateReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            // ... existing code ...
-        }
-    }
-
-    /**
-     * Gère les demandes de permissions Bluetooth et localisation.
-     */
-    private fun checkAndRequestPermissions() {
-        // ... existing code ...
-    }
-
-    companion object {
-        // ... Constantes et instance du fragment ...
-    }
 } 
