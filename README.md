@@ -43,10 +43,9 @@ Projet_Drone/
 
 ### 1. 🎥 Détection de gestes (Vision embarquée – `Code_Drone/`)
 
-Traitement temps réel du **flux vidéo du drone Parrot Bebop 2**, détection d’un **gant rouge** porté par l’utilisateur, IA (TensorFlow / HuggingFace) pour classification des gestes.
+Traitement temps réel du **flux vidéo du drone Parrot Bebop 2**, détection d’un **gant rouge** porté par l’utilisateur, IA (TensorFlow) pour classification des gestes.
 
 - Détection couleur (HSV)
-- Classification IA via Teachable Machine
 - Contrôle du drone par position de la main
 - Nettoyage automatique du cache image
 
@@ -113,9 +112,9 @@ Utilisation de **TensorFlow**, **HuggingFace** et **Teachable Machine** pour :
 | Module                    | État              |
 |---------------------------|-------------------|
 | Détection gant + flux     | ✅ Fonctionnel    |
-| Carte électronique        | 🛠️ En test        |
-| App mobile Android        | 🔧 En cours       |
-| Contrôle IA du drone      | 🔜 En intégration |
+| Carte électronique        | ✅ Fonctionnel    |
+| App mobile Android        | ✅ Fonctionnel    |
+| Contrôle IA du drone      | ✅ Fonctionnel    |
 
 ---
 
